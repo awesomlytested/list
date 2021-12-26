@@ -1,0 +1,107 @@
+{
+    "repo": "snabbdom/snabbdom",
+    "url": "https://github.com/snabbdom/snabbdom",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "snabbdom",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "attaches click event handler to element",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 45
+            },
+            "line": 10,
+            "code": "  it(\"attaches click event handler to element\", function () {\n    const result = [];\n\n    function clicked(ev) {\n      result.push(ev);\n    }\n\n    const vnode = h(\"div\", {\n      on: {\n        click: clicked\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode0, vnode).elm;\n    elm.click();\n    assert.strictEqual(1, result.length);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not attach new listener",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 34
+            },
+            "line": 26,
+            "code": "  it(\"does not attach new listener\", function () {\n    const result = []; // function clicked(ev) { result.push(ev); }\n\n    const vnode1 = h(\"div\", {\n      on: {\n        click: function () {\n          result.push(1);\n        }\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    const vnode2 = h(\"div\", {\n      on: {\n        click: function () {\n          result.push(2);\n        }\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode0, vnode1).elm;\n    elm.click();\n    elm = patch(vnode1, vnode2).elm;\n    elm.click();\n    assert.deepEqual(result, [1, 2]);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "detach attached click event handler to element",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 49,
+                "column": 52
+            },
+            "line": 49,
+            "code": "  it(\"detach attached click event handler to element\", function () {\n    const result = [];\n\n    function clicked(ev) {\n      result.push(ev);\n    }\n\n    const vnode1 = h(\"div\", {\n      on: {\n        click: clicked\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode0, vnode1).elm;\n    elm.click();\n    assert.strictEqual(1, result.length);\n    const vnode2 = h(\"div\", {\n      on: {}\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode1, vnode2).elm;\n    elm.click();\n    assert.strictEqual(1, result.length);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multiple event handlers for same event on same element",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 60
+            },
+            "line": 71,
+            "code": "  it(\"multiple event handlers for same event on same element\", function () {\n    let called = 0;\n\n    function clicked(ev, vnode) {\n      ++called; // Check that the first argument is an event\n\n      assert.strictEqual(true, \"target\" in ev); // Check that the second argument was a vnode\n\n      assert.strictEqual(vnode.sel, \"div\");\n    }\n\n    const vnode1 = h(\"div\", {\n      on: {\n        click: [clicked, clicked, clicked]\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode0, vnode1).elm;\n    elm.click();\n    assert.strictEqual(3, called);\n    const vnode2 = h(\"div\", {\n      on: {\n        click: [clicked, clicked]\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode1, vnode2).elm;\n    elm.click();\n    assert.strictEqual(5, called);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "access to virtual node in event handler",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 99,
+                "column": 45
+            },
+            "line": 99,
+            "code": "  it(\"access to virtual node in event handler\", function () {\n    const result = [];\n\n    function clicked(ev, vnode) {\n      result.push(this);\n      result.push(vnode);\n    }\n\n    const vnode1 = h(\"div\", {\n      on: {\n        click: clicked\n      }\n    }, [h(\"a\", \"Click my parent\")]);\n    elm = patch(vnode0, vnode1).elm;\n    elm.click();\n    assert.strictEqual(2, result.length);\n    assert.strictEqual(vnode1, result[0]);\n    assert.strictEqual(vnode1, result[1]);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shared handlers in parent and child nodes",
+            "suites": [
+                "event listeners"
+            ],
+            "updatePoint": {
+                "line": 118,
+                "column": 47
+            },
+            "line": 118,
+            "code": "  it(\"shared handlers in parent and child nodes\", function () {\n    const result = [];\n    const sharedHandlers = {\n      click: function (ev) {\n        result.push(ev);\n      }\n    };\n    const vnode1 = h(\"div\", {\n      on: sharedHandlers\n    }, [h(\"a\", {\n      on: sharedHandlers\n    }, \"Click my parent\")]);\n    elm = patch(vnode0, vnode1).elm;\n    elm.click();\n    assert.strictEqual(1, result.length);\n    elm.firstChild.click();\n    assert.strictEqual(3, result.length);\n  });",
+            "file": "unit/eventlisteners.ts",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "snabbdom__snabbdom.svg"
+}

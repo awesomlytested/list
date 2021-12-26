@@ -1,0 +1,209 @@
+{
+    "repo": "jamiebuilds/react-loadable",
+    "url": "https://github.com/jamiebuilds/react-loadable",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "react-loadable",
+            "lang": "js",
+            "dir": "__tests__",
+            "framework": "jest",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "loading success",
+            "suites": [],
+            "updatePoint": {
+                "line": 42,
+                "column": 21
+            },
+            "line": 42,
+            "code": "test('loading success', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, () => MyComponent),\n    loading: MyLoadingComponent\n  });\n  let component1 = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"foo\"\n  }));\n  expect(component1.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(200);\n  expect(component1.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(200);\n  expect(component1.toJSON()).toMatchSnapshot(); // loaded\n\n  let component2 = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"bar\"\n  }));\n  expect(component2.toJSON()).toMatchSnapshot(); // reload\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "delay and timeout",
+            "suites": [],
+            "updatePoint": {
+                "line": 63,
+                "column": 23
+            },
+            "line": 63,
+            "code": "test('delay and timeout', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(300, () => MyComponent),\n    loading: MyLoadingComponent,\n    delay: 100,\n    timeout: 200\n  });\n  let component1 = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"foo\"\n  }));\n  expect(component1.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(100);\n  expect(component1.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(100);\n  expect(component1.toJSON()).toMatchSnapshot(); // timed out\n\n  await waitFor(100);\n  expect(component1.toJSON()).toMatchSnapshot(); // loaded\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "loading error",
+            "suites": [],
+            "updatePoint": {
+                "line": 84,
+                "column": 19
+            },
+            "line": 84,
+            "code": "test('loading error', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, null, new Error('test error')),\n    loading: MyLoadingComponent\n  });\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // errored\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "server side rendering",
+            "suites": [],
+            "updatePoint": {
+                "line": 100,
+                "column": 27
+            },
+            "line": 100,
+            "code": "test('server side rendering', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, () => require('../__fixtures__/component')),\n    loading: MyLoadingComponent\n  });\n  await Loadable.preloadAll();\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // serverside\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "server side rendering es6",
+            "suites": [],
+            "updatePoint": {
+                "line": 111,
+                "column": 31
+            },
+            "line": 111,
+            "code": "test('server side rendering es6', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, () => require('../__fixtures__/component.es6')),\n    loading: MyLoadingComponent\n  });\n  await Loadable.preloadAll();\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // serverside\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "preload",
+            "suites": [],
+            "updatePoint": {
+                "line": 122,
+                "column": 13
+            },
+            "line": 122,
+            "code": "test('preload', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, () => MyComponent),\n    loading: MyLoadingComponent\n  });\n  let promise = LoadableMyComponent.preload();\n  await waitFor(200);\n  let component1 = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component1.toJSON()).toMatchSnapshot(); // still loading...\n\n  await promise;\n  expect(component1.toJSON()).toMatchSnapshot(); // success\n\n  let component2 = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component2.toJSON()).toMatchSnapshot(); // success\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "render",
+            "suites": [],
+            "updatePoint": {
+                "line": 142,
+                "column": 12
+            },
+            "line": 142,
+            "code": "test('render', async () => {\n  let LoadableMyComponent = Loadable({\n    loader: createLoader(400, () => ({\n      MyComponent\n    })),\n    loading: MyLoadingComponent,\n\n    render(loaded, props) {\n      return /*#__PURE__*/React.createElement(loaded.MyComponent, props);\n    }\n\n  });\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // success\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "loadable map success",
+            "suites": [],
+            "updatePoint": {
+                "line": 165,
+                "column": 26
+            },
+            "line": 165,
+            "code": "test('loadable map success', async () => {\n  let LoadableMyComponent = Loadable.Map({\n    loader: {\n      a: createLoader(200, () => ({\n        MyComponent\n      })),\n      b: createLoader(400, () => ({\n        MyComponent\n      }))\n    },\n    loading: MyLoadingComponent,\n\n    render(loaded, props) {\n      return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(loaded.a.MyComponent, props), /*#__PURE__*/React.createElement(loaded.b.MyComponent, props));\n    }\n\n  });\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // success\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "loadable map error",
+            "suites": [],
+            "updatePoint": {
+                "line": 193,
+                "column": 24
+            },
+            "line": 193,
+            "code": "test('loadable map error', async () => {\n  let LoadableMyComponent = Loadable.Map({\n    loader: {\n      a: createLoader(200, () => ({\n        MyComponent\n      })),\n      b: createLoader(400, null, new Error('test error'))\n    },\n    loading: MyLoadingComponent,\n\n    render(loaded, props) {\n      return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(loaded.a.MyComponent, props), /*#__PURE__*/React.createElement(loaded.b.MyComponent, props));\n    }\n\n  });\n  let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n    prop: \"baz\"\n  }));\n  expect(component.toJSON()).toMatchSnapshot(); // initial\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // loading\n\n  await waitFor(200);\n  expect(component.toJSON()).toMatchSnapshot(); // success\n});",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "undefined",
+            "suites": [
+                "preloadReady"
+            ],
+            "updatePoint": {
+                "line": 229,
+                "column": 17
+            },
+            "line": 229,
+            "code": "  test('undefined', async () => {\n    let LoadableMyComponent = Loadable({\n      loader: createLoader(200, () => MyComponent),\n      loading: MyLoadingComponent\n    });\n    await Loadable.preloadReady();\n    let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n      prop: \"baz\"\n    }));\n    expect(component.toJSON()).toMatchSnapshot();\n  });",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "one",
+            "suites": [
+                "preloadReady"
+            ],
+            "updatePoint": {
+                "line": 240,
+                "column": 11
+            },
+            "line": 240,
+            "code": "  test('one', async () => {\n    let LoadableMyComponent = Loadable({\n      loader: createLoader(200, () => MyComponent),\n      loading: MyLoadingComponent,\n      webpack: () => [1]\n    });\n    await Loadable.preloadReady();\n    let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n      prop: \"baz\"\n    }));\n    expect(component.toJSON()).toMatchSnapshot();\n  });",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "many",
+            "suites": [
+                "preloadReady"
+            ],
+            "updatePoint": {
+                "line": 252,
+                "column": 12
+            },
+            "line": 252,
+            "code": "  test('many', async () => {\n    let LoadableMyComponent = Loadable({\n      loader: createLoader(200, () => MyComponent),\n      loading: MyLoadingComponent,\n      webpack: () => [1, 2]\n    });\n    await Loadable.preloadReady();\n    let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n      prop: \"baz\"\n    }));\n    expect(component.toJSON()).toMatchSnapshot();\n  });",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "missing",
+            "suites": [
+                "preloadReady"
+            ],
+            "updatePoint": {
+                "line": 264,
+                "column": 15
+            },
+            "line": 264,
+            "code": "  test('missing', async () => {\n    let LoadableMyComponent = Loadable({\n      loader: createLoader(200, () => MyComponent),\n      loading: MyLoadingComponent,\n      webpack: () => [1, 42]\n    });\n    await Loadable.preloadReady();\n    let component = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n      prop: \"baz\"\n    }));\n    expect(component.toJSON()).toMatchSnapshot();\n  });",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        },
+        {
+            "name": "delay with 0",
+            "suites": [
+                "preloadReady"
+            ],
+            "updatePoint": {
+                "line": 276,
+                "column": 20
+            },
+            "line": 276,
+            "code": "  test('delay with 0', () => {\n    let LoadableMyComponent = Loadable({\n      loader: createLoader(300, () => MyComponent),\n      loading: MyLoadingComponent,\n      delay: 0,\n      timeout: 200\n    });\n    let loadingComponent = renderer.create( /*#__PURE__*/React.createElement(LoadableMyComponent, {\n      prop: \"foo\"\n    }));\n    expect(loadingComponent.toJSON()).toMatchSnapshot(); // loading\n  });",
+            "file": "test.js",
+            "skipped": false,
+            "dir": "__tests__"
+        }
+    ],
+    "badge": "jamiebuilds__react-loadable.svg"
+}

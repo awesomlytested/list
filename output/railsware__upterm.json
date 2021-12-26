@@ -1,0 +1,1040 @@
+{
+    "repo": "railsware/upterm",
+    "url": "https://github.com/railsware/upterm",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "upterm",
+            "lang": "ts",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "prepend",
+            "suites": [
+                "EnvironmentPath",
+                "input method"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 19
+            },
+            "line": 7,
+            "code": "        it(\"prepend\", async() => {\n            const environment = new Environment({});\n\n            environment.path.prepend(\"/usr/bin\");\n            environment.path.prepend(\"/usr/local/bin\");\n\n            expect(environment.toObject()).to.eql({\n                PATH: \"/usr/local/bin:/usr/bin\",\n            });\n        });",
+            "file": "environment_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "preprocesses bash functions",
+            "suites": [
+                "EnvironmentPath",
+                "environment preprocessor"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 39
+            },
+            "line": 20,
+            "code": "        it(\"preprocesses bash functions\", () => {\n            expect(preprocessEnv([\n                \"BASH_FUNC_foo%%=() if 0; then\",\n                \" x\",\n                \" else\",\n                \" y\",\n                \" fi\",\n                \"}\",\n                \"var=val\",\n            ])).to.eql([\n                \"BASH_FUNC_foo%%=() if 0; then\\n x\\n else\\n y\\n fi\\n}\",\n                \"var=val\",\n            ]);\n        });",
+            "file": "environment_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "contains the first row even if there was no input (to show cursor on)",
+            "suites": [
+                "Output"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 77
+            },
+            "line": 38,
+            "code": "    it(\"contains the first row even if there was no input (to show cursor on)\", () => {\n        const terminal = new DummyTerminal({columns: 5, rows: 5});\n\n        expect(terminal.output.toLines()).to.eql([\n            \"     \",\n        ]);\n    });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "wraps long strings",
+            "suites": [
+                "Output"
+            ],
+            "updatePoint": {
+                "line": 46,
+                "column": 26
+            },
+            "line": 46,
+            "code": "    it(\"wraps long strings\", () => {\n        const terminal = new DummyTerminal({columns: 5, rows: 5});\n        terminal.output.write(\"0123456789\");\n\n        expect(terminal.output.toLines()).to.eql([\n            \"01234\",\n            \"56789\",\n        ]);\n    });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can move down",
+            "suites": [
+                "Output",
+                "movements"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 25
+            },
+            "line": 57,
+            "code": "        it(\"can move down\", () => {\n            const terminal = new DummyTerminal({columns: 11, rows: 2});\n            terminal.output.write(`first${csi([1], \"B\")}second`);\n\n            expect(terminal.output.toLines()).to.eql([\n                \"first      \",\n                \"     second\",\n            ]);\n        });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "stays at the same line after writing last column character",
+            "suites": [
+                "Output",
+                "movements"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 70
+            },
+            "line": 67,
+            "code": "        it(\"stays at the same line after writing last column character\", () => {\n            const terminal = new DummyTerminal({columns: 10, rows: 5});\n            terminal.output.write(`${esc}[1;10H*${esc}[5D*`);\n\n            expect(terminal.output.toString()).to.eql(\"    *    *\");\n            expect(terminal.output.toString()).to.eql(\"    *    *\");\n        });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't move outside of the current page",
+            "suites": [
+                "Output",
+                "movements"
+            ],
+            "updatePoint": {
+                "line": 75,
+                "column": 52
+            },
+            "line": 75,
+            "code": "        it(\"doesn't move outside of the current page\", () => {\n            const terminal = new DummyTerminal({columns: 10, rows: 5});\n            terminal.output.write(`1\\r\\n2\\r\\n3\\r\\n4\\r\\n5\\r\\n6\\r\\n7${esc}[1;1H42`);\n\n            expect(terminal.output.toLines()).to.eql([\n                \"1         \",\n                \"2         \",\n                \"42        \",\n                \"4         \",\n                \"5         \",\n                \"6         \",\n                \"7         \",\n            ]);\n        });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "scrolls down when cursor is at the beginning of page",
+            "suites": [
+                "Output",
+                "movements",
+                "Reverse Index"
+            ],
+            "updatePoint": {
+                "line": 91,
+                "column": 68
+            },
+            "line": 91,
+            "code": "            it(\"scrolls down when cursor is at the beginning of page\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                terminal.output.write(`1\\r\\n2\\r\\n3\\r\\n4\\r\\n5\\r\\n6\\r\\n7${cup(1, 1)}${ri}`);\n\n                expect(terminal.output.toLines()).to.eql([\n                    \"1         \",\n                    \"2         \",\n                    \"          \",\n                    \"3         \",\n                    \"4         \",\n                    \"5         \",\n                    \"6         \",\n                ]);\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "scrolls down scrolling region",
+            "suites": [
+                "Output",
+                "movements",
+                "Reverse Index"
+            ],
+            "updatePoint": {
+                "line": 106,
+                "column": 45
+            },
+            "line": 106,
+            "code": "            it(\"scrolls down scrolling region\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                terminal.output.write(`1\\r\\n2\\r\\n3\\r\\n4\\r\\n5\\r\\n6\\r\\n7${decstbm(1, 3)}${cup(1, 1)}${ri}`);\n\n                expect(terminal.output.toLines()).to.eql([\n                    \"1         \",\n                    \"2         \",\n                    \"          \",\n                    \"3         \",\n                    \"4         \",\n                    \"6         \",\n                    \"7         \",\n                ]);\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can parse an ASCII string",
+            "suites": [
+                "Output",
+                "movements",
+                "Reverse Index"
+            ],
+            "updatePoint": {
+                "line": 123,
+                "column": 33
+            },
+            "line": 123,
+            "code": "    it(\"can parse an ASCII string\", () => {\n        const terminal = new DummyTerminal();\n        terminal.output.write(\"something\");\n\n        expect(terminal.output.toString().trim()).to.eql(\"something\");\n    });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ICH",
+            "suites": [
+                "Output",
+                "movements",
+                "Reverse Index"
+            ],
+            "updatePoint": {
+                "line": 130,
+                "column": 11
+            },
+            "line": 130,
+            "code": "    it(\"ICH\", () => {\n        const terminal = new DummyTerminal();\n        terminal.output.write(`123${cup(1, 1)}${ich}0`);\n\n        expect(terminal.output.toString().trim()).to.eql(\"0123\");\n    });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "sets the correct foreground color",
+            "suites": [
+                "Output",
+                "true color"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 45
+            },
+            "line": 138,
+            "code": "        it(\"sets the correct foreground color\", () => {\n            const terminal = new DummyTerminal();\n            terminal.output.write(`${sgr([38, 2, 255, 100, 0])}A${sgr([0])}`);\n\n            const firstChar = terminal.output.activeBuffer.at({rowIndex: 0, columnIndex: 0});\n            expect(firstChar.attributes.color).to.eql([255, 100, 0]);\n        });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "uses default attributes to fill in new lines",
+            "suites": [
+                "Output",
+                "true color"
+            ],
+            "updatePoint": {
+                "line": 147,
+                "column": 52
+            },
+            "line": 147,
+            "code": "    it(\"uses default attributes to fill in new lines\", () => {\n        const terminal = new DummyTerminal();\n        terminal.output.write(`${sgr([46])}${cup(2, 1)}`);\n\n        const firstChar = terminal.output.activeBuffer.at({rowIndex: 1, columnIndex: 0});\n        expect(firstChar.attributes.backgroundColor).to.eql(0);\n    });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "report cursor position",
+            "suites": [
+                "Output",
+                "CSI",
+                "Device Status Report (DSR)",
+                "Report Cursor Position (CPR)"
+            ],
+            "updatePoint": {
+                "line": 158,
+                "column": 42
+            },
+            "line": 158,
+            "code": "                it(\"report cursor position\", () => {\n                    const terminal = new DummyTerminal();\n                    terminal.output.write(`some text${csi([6], \"n\")}`);\n\n                    expect(terminal.written).to.eql(`${csi([1, 10], \"R\")}`);\n                });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't fail",
+            "suites": [
+                "Output",
+                "CSI",
+                "DL"
+            ],
+            "updatePoint": {
+                "line": 169,
+                "column": 28
+            },
+            "line": 169,
+            "code": "            it(\"doesn't fail\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                const input = `1\\r\\n2\\r\\n3${cup(3, 1)}${dl(1)}`;\n                terminal.output.write(input);\n\n                terminal.output.toLines();\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Removes chars from cursor position",
+            "suites": [
+                "Output",
+                "CSI",
+                "DCH"
+            ],
+            "updatePoint": {
+                "line": 179,
+                "column": 50
+            },
+            "line": 179,
+            "code": "            it(\"Removes chars from cursor position\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                const input = `1234567890${cup(1, 2)}${dch(2)}`;\n                terminal.output.write(input);\n\n                expect(terminal.output.toLines()).to.deep.equal([\n                    \"14567890  \",\n                ]);\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Erases line to right",
+            "suites": [
+                "Output",
+                "CSI",
+                "DECSEL"
+            ],
+            "updatePoint": {
+                "line": 191,
+                "column": 36
+            },
+            "line": 191,
+            "code": "            it(\"Erases line to right\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                const input = `1234567890${cup(1, 5)}${decsel(0)}`;\n                terminal.output.write(input);\n\n                expect(terminal.output.toLines()).to.deep.equal([\n                    \"1234      \",\n                ]);\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Correctly erases line to right from beginning",
+            "suites": [
+                "Output",
+                "CSI",
+                "DECSEL"
+            ],
+            "updatePoint": {
+                "line": 201,
+                "column": 61
+            },
+            "line": 201,
+            "code": "            it(\"Correctly erases line to right from beginning\", () => {\n                const terminal = new DummyTerminal({columns: 10, rows: 5});\n                const input = `1234567890${cup(1, 1)}${decsel(0)}`;\n                terminal.output.write(input);\n\n                expect(terminal.output.toLines()).to.deep.equal([\n                    \"          \",\n                ]);\n            });",
+            "file": "output_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't interpolate expressions inside single quotes",
+            "suites": [
+                "PTY"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 60
+            },
+            "line": 8,
+            "code": "    it(\"doesn't interpolate expressions inside single quotes\", (done) => {\n        let output = \"\";\n        const tokens = scan(\"echo '$('\");\n        const env = <ProcessEnv & {PWD: string}>process.env;\n\n        return new PTY(\n            tokens.map(token => token.escapedValue),\n            env,\n            {columns: 80, rows: 30},\n            (data: string) => output += data,\n            (exitCode: number) => {\n                expect(exitCode).to.eq(0);\n                done();\n            },\n        );\n    });",
+            "file": "pty_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns no tokens on empty input",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 40
+            },
+            "line": 8,
+            "code": "    it(\"returns no tokens on empty input\", () => {\n        const tokens = scan(\"\");\n\n        expect(tokens.length).to.eq(0);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns an invalid token on input that consists only of spaces",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 70
+            },
+            "line": 14,
+            "code": "    it(\"returns an invalid token on input that consists only of spaces\", () => {\n        const tokens = scan(\"  \");\n\n        expect(tokens.length).to.eq(1);\n        expect(tokens[0]).to.be.an.instanceof(Invalid);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "splits on a space",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 21,
+                "column": 25
+            },
+            "line": 21,
+            "code": "    it(\"splits on a space\", () => {\n        const tokens = scan(\"some words\");\n\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"some\", \"words\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't split inside double quotes",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 42
+            },
+            "line": 31,
+            "code": "    it(\"doesn't split inside double quotes\", () => {\n        const tokens = scan('prefix \"inside quotes\"');\n\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(DoubleQuotedStringLiteral);\n\n        expect(tokens.map(token => token.value)).to.eql([\"prefix\", \"inside quotes\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't split inside single quotes",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 42
+            },
+            "line": 41,
+            "code": "    it(\"doesn't split inside single quotes\", () => {\n        const tokens = scan(\"prefix 'inside quotes'\");\n\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(SingleQuotedStringLiteral);\n\n        expect(tokens.map(token => token.value)).to.eql([\"prefix\", \"inside quotes\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't split string literals with no spaces between them",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 65
+            },
+            "line": 51,
+            "code": "    it(\"doesn't split string literals with no spaces between them\", () => {\n        const tokens = scan(\"echo a'b'\\\"c\\\" d\");\n\n        expect(tokens.length).to.eq(3);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(CompositeStringLiteral);\n        expect(tokens[2]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"echo\", \"abc\", \"d\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't split on an escaped space",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 62,
+                "column": 41
+            },
+            "line": 62,
+            "code": "    it(\"doesn't split on an escaped space\", () => {\n        const tokens = scan(\"prefix single\\\\ token\");\n\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"prefix\", \"single token\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't split on a colon",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 32
+            },
+            "line": 72,
+            "code": "    it(\"doesn't split on a colon\", () => {\n        const tokens = scan(\"curl http://www.example.com\");\n\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"curl\", \"http://www.example.com\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle special characters",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 82,
+                "column": 37
+            },
+            "line": 82,
+            "code": "    it(\"can handle special characters\", () => {\n        const tokens = scan(\"ls --color=tty -lh\");\n\n        expect(tokens.length).to.eq(3);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n        expect(tokens[2]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"ls\", \"--color=tty\", \"-lh\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recognizes a pipe",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 93,
+                "column": 25
+            },
+            "line": 93,
+            "code": "    it(\"recognizes a pipe\", () => {\n        const tokens = scan(\"cat file | grep word\");\n\n        expect(tokens.length).to.eq(5);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n        expect(tokens[2]).to.be.an.instanceof(Pipe);\n        expect(tokens[3]).to.be.an.instanceof(Word);\n        expect(tokens[4]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"cat\", \"file\", \"|\", \"grep\", \"word\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recognizes a semicolon",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 106,
+                "column": 30
+            },
+            "line": 106,
+            "code": "    it(\"recognizes a semicolon\", () => {\n        const tokens = scan(\"cd directory; rm file\");\n\n        expect(tokens.length).to.eq(5);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n        expect(tokens[2]).to.be.an.instanceof(Semicolon);\n        expect(tokens[3]).to.be.an.instanceof(Word);\n        expect(tokens[4]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"cd\", \"directory\", \";\", \"rm\", \"file\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recognizes input redirection",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 119,
+                "column": 36
+            },
+            "line": 119,
+            "code": "    it(\"recognizes input redirection\", () => {\n        const tokens = scan(\"cat < file\");\n\n        expect(tokens.length).to.eq(3);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(InputRedirectionSymbol);\n        expect(tokens[2]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"cat\", \"<\", \"file\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recognizes output redirection",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 130,
+                "column": 37
+            },
+            "line": 130,
+            "code": "    it(\"recognizes output redirection\", () => {\n        const tokens = scan(\"cat file > another_file\");\n\n        expect(tokens.length).to.eq(4);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n        expect(tokens[2]).to.be.an.instanceof(OutputRedirectionSymbol);\n        expect(tokens[3]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"cat\", \"file\", \">\", \"another_file\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recognizes appending output redirection",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 142,
+                "column": 47
+            },
+            "line": 142,
+            "code": "    it(\"recognizes appending output redirection\", () => {\n        const tokens = scan(\"cat file >> another_file\");\n\n        expect(tokens.length).to.eq(4);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Word);\n        expect(tokens[2]).to.be.an.instanceof(AppendingOutputRedirectionSymbol);\n        expect(tokens[3]).to.be.an.instanceof(Word);\n\n        expect(tokens.map(token => token.value)).to.eql([\"cat\", \"file\", \">>\", \"another_file\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle unicode é",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 154,
+                "column": 29
+            },
+            "line": 154,
+            "code": "    it(\"can handle unicode é\", () => {\n        const tokens = scan(\"cd é/\");\n        expect(tokens.map(token => token.value)).to.eql([\"cd\", \"é/\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle 'x+' (regression test for #753)",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 159,
+                "column": 50
+            },
+            "line": 159,
+            "code": "    it(\"can handle 'x+' (regression test for #753)\", () => {\n        const tokens = scan(\"cd x+\");\n        expect(tokens.map(token => token.value)).to.eql([\"cd\", \"x+\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "includes spaces at end in final token",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 164,
+                "column": 45
+            },
+            "line": 164,
+            "code": "    it(\"includes spaces at end in final token\", () => {\n        const tokens = scan(\"test space \");\n        expect(tokens.map(token => token.value)).to.eql([\"test\", \"space\", \"\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles escaped brackets in words",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 169,
+                "column": 41
+            },
+            "line": 169,
+            "code": "    it(\"handles escaped brackets in words\", () => {\n        const tokens = scan(\"file\\\\ with\\\\ brackets\\\\(\\\\)\");\n        expect(tokens.map(token => token.value)).to.eql([\"file with brackets\\\\(\\\\)\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "adds an invalid token on invalid input",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 174,
+                "column": 46
+            },
+            "line": 174,
+            "code": "    it(\"adds an invalid token on invalid input\", () => {\n        const tokens = scan(\"cd '\");\n        expect(tokens.length).to.eq(2);\n        expect(tokens[0]).to.be.an.instanceof(Word);\n        expect(tokens[1]).to.be.an.instanceof(Invalid);\n        expect(tokens.map(token => token.value)).to.eql([\"cd\", \"'\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles file descriptor redirection",
+            "suites": [
+                "scan"
+            ],
+            "updatePoint": {
+                "line": 182,
+                "column": 43
+            },
+            "line": 182,
+            "code": "    it(\"handles file descriptor redirection\", () => {\n        const tokens = scan(\"find / -name x 2>/dev/null\");\n        expect(tokens.map(token => token.value)).to.eql([\"find\", \"/\", \"-name\", \"x\", \"2>\", \"/dev/null\"]);\n    });",
+            "file": "shell/scanner_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns the whole string for the same strings",
+            "suites": [
+                "common utils",
+                "commonPrefix"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 57
+            },
+            "line": 19,
+            "code": "        it(\"returns the whole string for the same strings\", () => {\n            expect(commonPrefix(\"abc\", \"abc\")).to.eql(\"abc\");\n        });",
+            "file": "utils/common_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "matches beginning of string",
+            "suites": [
+                "common utils",
+                "fuzzyMatch"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 39
+            },
+            "line": 25,
+            "code": "        it(\"matches beginning of string\", () => {\n            expect(fuzzyMatch(\"com\", \"commit\")).to.eql(true);\n        });",
+            "file": "utils/common_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "matches beginning of token",
+            "suites": [
+                "common utils",
+                "fuzzyMatch"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 38
+            },
+            "line": 29,
+            "code": "        it(\"matches beginning of token\", () => {\n            expect(fuzzyMatch(\"nam\", \"file_name\")).to.eql(true);\n        });",
+            "file": "utils/common_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles Ctrl+[",
+            "suites": [
+                "common utils",
+                "normalizeProcessInput"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 26
+            },
+            "line": 35,
+            "code": "        it(\"handles Ctrl+[\", () => {\n            const event = simulateKeyboardEvent({ctrlKey: true, keyCode: 219, key: \"[\"});\n            const escape = String.fromCharCode(27);\n\n            expect(normalizeProcessInput(event, false)).to.eql(escape);\n        });",
+            "file": "utils/common_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles Ctrl+J",
+            "suites": [
+                "common utils",
+                "normalizeProcessInput"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 26
+            },
+            "line": 42,
+            "code": "        it(\"handles Ctrl+J\", () => {\n            const event = simulateKeyboardEvent({ctrlKey: true, keyCode: 219, key: \"[\"});\n            const escape = String.fromCharCode(27);\n\n            expect(normalizeProcessInput(event, false)).to.eql(escape);\n        });",
+            "file": "utils/common_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "finds next common prefixes",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 12,
+                "column": 34
+            },
+            "line": 12,
+            "code": "    it(\"finds next common prefixes\", () => {\n        const history = [\n            \"git commit\",\n            \"git checkout\",\n        ];\n        const input = \"git \";\n        const suggestions = [\n            \"commit\",\n            \"checkout\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "finds first word",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 24
+            },
+            "line": 26,
+            "code": "    it(\"finds first word\", () => {\n        const history = [\n            \"git commit\",\n            \"git checkout\",\n        ];\n        const input = \"gi\";\n        const suggestions = [\n            \"git \",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "finds single continuation",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 33
+            },
+            "line": 39,
+            "code": "    it(\"finds single continuation\", () => {\n        const history = [\n            \"git commit\",\n            \"git checkout\",\n        ];\n        const input = \"git co\";\n        const suggestions = [\n            \"commit\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "finds next word",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 23
+            },
+            "line": 52,
+            "code": "    it(\"finds next word\", () => {\n        const history = [\n            \"git commit\",\n            \"git checkout master\",\n        ];\n        const input = \"git c\";\n        const suggestions = [\n            \"commit\",\n            \"checkout \",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "finds longest prefix",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 28
+            },
+            "line": 66,
+            "code": "    it(\"finds longest prefix\", () => {\n        const history = [\n            \"git commit\",\n            \"git checkout master --option\",\n        ];\n        const input = \"git ch\";\n        const suggestions = [\n            \"checkout \",\n            \"checkout master --option\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is ordered by frequency",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 80,
+                "column": 31
+            },
+            "line": 80,
+            "code": "    it(\"is ordered by frequency\", () => {\n        const history = [\n            \"git status\",\n            \"git pull\",\n            \"git pull\",\n        ];\n        const input = \"git \";\n        const suggestions = [\n            \"pull\",\n            \"status\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is fuzzy matches",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 95,
+                "column": 24
+            },
+            "line": 95,
+            "code": "    it(\"is fuzzy matches\", () => {\n        const history = [\n            \"git cherry-pick\",\n        ];\n        const input = \"git pi\";\n        const suggestions = [\n            \"cherry-pick\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "considers a string literal a single token",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 49
+            },
+            "line": 107,
+            "code": "    it(\"considers a string literal a single token\", () => {\n        const history = [\n            \"git commit -m 'first message'\",\n            \"git commit -m 'second message'\",\n        ];\n        const input = \"git commit -m \";\n        const suggestions = [\n            \"'first message'\",\n            \"'second message'\",\n        ];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "gives no results for empty input",
+            "suites": [
+                "HistoryTrie"
+            ],
+            "updatePoint": {
+                "line": 121,
+                "column": 40
+            },
+            "line": 121,
+            "code": "    it(\"gives no results for empty input\", () => {\n        const history = [\n            \"git log\",\n        ];\n        const input = \"\";\n        const suggestions: string[] = [];\n\n        expect(getSuggestions(history, input)).to.eql(suggestions);\n    });",
+            "file": "utils/history_trie_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "combines lines with correct spacing",
+            "suites": [
+                "man page line combiner"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 41
+            },
+            "line": 13,
+            "code": "  it(\"combines lines with correct spacing\", () => {\n    expect(combineManPageLines([\n      \"   first line     \",\n      \"  second line       \",\n    ])).to.eql(\"first line second line\");\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "correctly handles words split across lines",
+            "suites": [
+                "man page line combiner"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 48
+            },
+            "line": 20,
+            "code": "  it(\"correctly handles words split across lines\", () => {\n    expect(combineManPageLines([\n      \"this is com-\",\n      \"bined\",\n    ])).to.eql(\"this is combined\");\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "strips whitespace and applies backspace literals",
+            "suites": [
+                "man page preprocessor"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 54
+            },
+            "line": 29,
+            "code": "  it(\"strips whitespace and applies backspace literals\", () => {\n    expect(preprocessManPage(\"   ab\\x08   \")).to.eql(\"a\");\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "extracts sections",
+            "suites": [
+                "man page section extractor"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 23
+            },
+            "line": 35,
+            "code": "  it(\"extracts sections\", () => {\n    expect(extractManPageSections(\"DESCRIPTION\\n desc\\n\\nNAME\\n name\")).to.eql({\n      DESCRIPTION: [\" desc\", \"\"],\n      NAME: [\" name\"],\n    });\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "extracts paragraphs",
+            "suites": [
+                "man page paragraph extraction"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 25
+            },
+            "line": 44,
+            "code": "  it(\"extracts paragraphs\", () => {\n    expect(extractManPageSectionParagraphs([\n      \"p1\",\n      \"p1\",\n      \"\",\n      \"p2\",\n      \"p2\",\n    ])).to.eql([\n      [\"p1\", \"p1\"],\n      [\"p2\", \"p2\"],\n    ]);\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't output empty paragraphs",
+            "suites": [
+                "man page paragraph extraction"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 37
+            },
+            "line": 57,
+            "code": "  it(\"doesn't output empty paragraphs\", () => {\n    expect(extractManPageSectionParagraphs([\n      \"p1\",\n      \"p1\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"p2\",\n      \"p2\",\n    ])).to.eql([\n      [\"p1\", \"p1\"],\n      [\"p2\", \"p2\"],\n    ]);\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle flag descriptions that have blank lines in the middle",
+            "suites": [
+                "man page paragraph extraction"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 70
+            },
+            "line": 74,
+            "code": "  it(\"can handle flag descriptions that have blank lines in the middle\", () => {\n    expect(extractManPageSectionParagraphs([\n      \"     -f1   line one\",\n      \"           line two\",\n      \"\",\n      \"           line three\",\n      \"\",\n      \"     -f2   line one\",\n    ])).to.eql([\n      [\n        \"     -f1   line one\",\n        \"           line two\",\n        \"           line three\",\n      ],\n      [\"     -f2   line one\"],\n    ]);\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle flag descriptions that have indentation like df's -T option",
+            "suites": [
+                "man page paragraph extraction"
+            ],
+            "updatePoint": {
+                "line": 92,
+                "column": 76
+            },
+            "line": 92,
+            "code": "  it(\"can handle flag descriptions that have indentation like df's -T option\", () => {\n    expect(extractManPageSectionParagraphs([\n      \"     -f        line one\",\n      \"               line two\",\n      \"\",\n      \"                      indented\",\n      \"\",\n      \"               line three\",\n      \"\",\n      \"     -g        line one\",\n    ])).to.eql([\n      [\n        \"     -f        line one\",\n        \"               line two\",\n        \"                      indented\",\n        \"               line three\",\n      ],\n      [\"     -g        line one\"],\n    ]);\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle short flags without arguments",
+            "suites": [
+                "suggestion parser"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 46
+            },
+            "line": 115,
+            "code": "  it(\"can handle short flags without arguments\", () => {\n    expect(suggestionFromFlagParagraph([\n      \"   -f  flag with\",\n      \"       description\",\n    ])).to.eql({\n      label: \"-f\",\n      detail: \"flag with description\",\n    });\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can handle short flags with arguments",
+            "suites": [
+                "suggestion parser"
+            ],
+            "updatePoint": {
+                "line": 125,
+                "column": 43
+            },
+            "line": 125,
+            "code": "  it(\"can handle short flags with arguments\", () => {\n    expect(suggestionFromFlagParagraph([\n      \"   -f arg\",\n      \"       flag with\",\n      \"       description\",\n    ])).to.eql({\n      label: \"-f\",\n      detail: \"flag with description\",\n    });\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns undefined if attempting to parse paragraph with no flag",
+            "suites": [
+                "suggestion parser"
+            ],
+            "updatePoint": {
+                "line": 137,
+                "column": 69
+            },
+            "line": 137,
+            "code": "  it(\"returns undefined if attempting to parse paragraph with no flag\", () => {\n    expect(suggestionFromFlagParagraph([\n      \"        no flag\",\n    ])).to.eql(undefined);\n  });",
+            "file": "utils/ManPages_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesn't keep two elements with the same values",
+            "suites": [
+                "ordered set",
+                "prepend"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 58
+            },
+            "line": 7,
+            "code": "        it(\"doesn't keep two elements with the same values\", () => {\n            const set = new OrderedSet<string>();\n\n            set.prepend(\"foo\");\n            set.prepend(\"foo\");\n\n            expect(set.size).to.eq(1);\n        });",
+            "file": "utils/ordered_set_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "moves an element to the beginning if it already exists",
+            "suites": [
+                "ordered set",
+                "prepend"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 66
+            },
+            "line": 16,
+            "code": "        it(\"moves an element to the beginning if it already exists\", () => {\n            const set = new OrderedSet<string>();\n\n            set.prepend(\"foo\");\n            set.prepend(\"bar\");\n            set.prepend(\"foo\");\n\n            expect(set.at(0)).to.eq(\"foo\");\n        });",
+            "file": "utils/ordered_set_spec.ts",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "railsware__upterm.svg"
+}

@@ -1,0 +1,702 @@
+{
+    "repo": "senchalabs/connect",
+    "url": "https://github.com/senchalabs/connect",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "connect",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should wrap in an http.Server",
+            "suites": [
+                "app.listen()"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 35
+            },
+            "line": 8,
+            "code": "  it('should wrap in an http.Server', function (done) {\n    var app = connect();\n    app.use(function (req, res) {\n      res.end();\n    });\n    var server = app.listen(0, function () {\n      assert.ok(server);\n      request(server).get('/').expect(200, function (err) {\n        server.close(function () {\n          done(err);\n        });\n      });\n    });\n  });",
+            "file": "app.listen.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not obscure FQDNs",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 30
+            },
+            "line": 10,
+            "code": "  it('should not obscure FQDNs', function (done) {\n    app.use(function (req, res) {\n      res.end(req.url);\n    });\n    rawrequest(app).get('http://example.com/foo').expect(200, 'http://example.com/foo', done);\n  });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should ignore FQDN in search",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 36
+            },
+            "line": 17,
+            "code": "    it('should ignore FQDN in search', function (done) {\n      app.use('/proxy', function (req, res) {\n        res.end(req.url);\n      });\n      rawrequest(app).get('/proxy?url=http://example.com/blog/post/1').expect(200, '/?url=http://example.com/blog/post/1', done);\n    });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should ignore FQDN in path",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 34
+            },
+            "line": 23,
+            "code": "    it('should ignore FQDN in path', function (done) {\n      app.use('/proxy', function (req, res) {\n        res.end(req.url);\n      });\n      rawrequest(app).get('/proxy/http://example.com/blog/post/1').expect(200, '/http://example.com/blog/post/1', done);\n    });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should adjust FQDN req.url",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 34
+            },
+            "line": 29,
+            "code": "    it('should adjust FQDN req.url', function (done) {\n      app.use('/blog', function (req, res) {\n        res.end(req.url);\n      });\n      rawrequest(app).get('http://example.com/blog/post/1').expect(200, 'http://example.com/post/1', done);\n    });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should adjust FQDN req.url with multiple handlers",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 57
+            },
+            "line": 35,
+            "code": "    it('should adjust FQDN req.url with multiple handlers', function (done) {\n      app.use(function (req, res, next) {\n        next();\n      });\n      app.use('/blog', function (req, res) {\n        res.end(req.url);\n      });\n      rawrequest(app).get('http://example.com/blog/post/1').expect(200, 'http://example.com/post/1', done);\n    });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should adjust FQDN req.url with multiple routed handlers",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 64
+            },
+            "line": 44,
+            "code": "    it('should adjust FQDN req.url with multiple routed handlers', function (done) {\n      app.use('/blog', function (req, res, next) {\n        next();\n      });\n      app.use('/blog', function (req, res) {\n        res.end(req.url);\n      });\n      rawrequest(app).get('http://example.com/blog/post/1').expect(200, 'http://example.com/post/1', done);\n    });",
+            "file": "fqdn.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match all paths with \"/\"",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 37
+            },
+            "line": 14,
+            "code": "  it('should match all paths with \"/\"', function (done) {\n    app.use('/', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog').expect(200, '/blog', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match full path",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 28
+            },
+            "line": 20,
+            "code": "  it('should match full path', function (done) {\n    app.use('/blog', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog').expect(200, '/', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match left-side of path",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 36
+            },
+            "line": 26,
+            "code": "  it('should match left-side of path', function (done) {\n    app.use('/blog', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog/article/1').expect(200, '/article/1', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match up to dot",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 28
+            },
+            "line": 32,
+            "code": "  it('should match up to dot', function (done) {\n    app.use('/blog', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog.json').expect(200, done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not match shorter path",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 35
+            },
+            "line": 38,
+            "code": "  it('should not match shorter path', function (done) {\n    app.use('/blog-o-rama', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog').expect(404, done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not end match in middle of component",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 49
+            },
+            "line": 44,
+            "code": "  it('should not end match in middle of component', function (done) {\n    app.use('/blog', function (req, res) {\n      res.end(req.url);\n    });\n    request(app).get('/blog-o-rama/article/1').expect(404, done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be case insensitive (lower-case route, mixed-case request)",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 71
+            },
+            "line": 50,
+            "code": "  it('should be case insensitive (lower-case route, mixed-case request)', function (done) {\n    var blog = http.createServer(function (req, res) {\n      assert.equal(req.url, '/');\n      res.end('blog');\n    });\n    app.use('/blog', blog);\n    request(app).get('/BLog').expect('blog', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be case insensitive (mixed-case route, lower-case request)",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 71
+            },
+            "line": 58,
+            "code": "  it('should be case insensitive (mixed-case route, lower-case request)', function (done) {\n    var blog = http.createServer(function (req, res) {\n      assert.equal(req.url, '/');\n      res.end('blog');\n    });\n    app.use('/BLog', blog);\n    request(app).get('/blog').expect('blog', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be case insensitive (mixed-case route, mixed-case request)",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 71
+            },
+            "line": 66,
+            "code": "  it('should be case insensitive (mixed-case route, mixed-case request)', function (done) {\n    var blog = http.createServer(function (req, res) {\n      assert.equal(req.url, '/');\n      res.end('blog');\n    });\n    app.use('/BLog', blog);\n    request(app).get('/blOG').expect('blog', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should ignore fn.arity > 4",
+            "suites": [
+                "app.use()"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 32
+            },
+            "line": 74,
+            "code": "  it('should ignore fn.arity > 4', function (done) {\n    var invoked = [];\n    app.use(function (req, res, next, _a, _b) {\n      invoked.push(0);\n      next();\n    });\n    app.use(function (req, res, next) {\n      invoked.push(1);\n      next(new Error('err'));\n    });\n    app.use(function (err, req, res, next) {\n      invoked.push(2);\n      res.end(invoked.join(','));\n    });\n    request(app).get('/').expect(200, '1,2', done);\n  });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should mount",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 91,
+                "column": 20
+            },
+            "line": 91,
+            "code": "    it('should mount', function (done) {\n      var blog = connect();\n      blog.use(function (req, res) {\n        assert.equal(req.url, '/');\n        res.end('blog');\n      });\n      app.use('/blog', blog);\n      request(app).get('/blog').expect(200, 'blog', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should retain req.originalUrl",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 100,
+                "column": 37
+            },
+            "line": 100,
+            "code": "    it('should retain req.originalUrl', function (done) {\n      var app = connect();\n      app.use('/blog', function (req, res) {\n        res.end(req.originalUrl);\n      });\n      request(app).get('/blog/post/1').expect(200, '/blog/post/1', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should adjust req.url",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 29
+            },
+            "line": 107,
+            "code": "    it('should adjust req.url', function (done) {\n      app.use('/blog', function (req, res) {\n        res.end(req.url);\n      });\n      request(app).get('/blog/post/1').expect(200, '/post/1', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should strip trailing slash",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 35
+            },
+            "line": 113,
+            "code": "    it('should strip trailing slash', function (done) {\n      var blog = connect();\n      blog.use(function (req, res) {\n        assert.equal(req.url, '/');\n        res.end('blog');\n      });\n      app.use('/blog/', blog);\n      request(app).get('/blog').expect('blog', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set .route",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 25
+            },
+            "line": 122,
+            "code": "    it('should set .route', function () {\n      var blog = connect();\n      var admin = connect();\n      app.use('/blog', blog);\n      blog.use('/admin', admin);\n      assert.equal(app.route, '/');\n      assert.equal(blog.route, '/blog');\n      assert.equal(admin.route, '/admin');\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not add trailing slash to req.url",
+            "suites": [
+                "app.use()",
+                "with a connect app"
+            ],
+            "updatePoint": {
+                "line": 131,
+                "column": 48
+            },
+            "line": 131,
+            "code": "    it('should not add trailing slash to req.url', function (done) {\n      app.use('/admin', function (req, res, next) {\n        next();\n      });\n      app.use(function (req, res, next) {\n        res.end(req.url);\n      });\n      request(app).get('/admin').expect('/admin', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should mount",
+            "suites": [
+                "app.use()",
+                "with a node app"
+            ],
+            "updatePoint": {
+                "line": 142,
+                "column": 20
+            },
+            "line": 142,
+            "code": "    it('should mount', function (done) {\n      var blog = http.createServer(function (req, res) {\n        assert.equal(req.url, '/');\n        res.end('blog');\n      });\n      app.use('/blog', blog);\n      request(app).get('/blog').expect('blog', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should send errors to airty 4 fns",
+            "suites": [
+                "app.use()",
+                "error handling"
+            ],
+            "updatePoint": {
+                "line": 152,
+                "column": 41
+            },
+            "line": 152,
+            "code": "    it('should send errors to airty 4 fns', function (done) {\n      app.use(function (req, res, next) {\n        next(new Error('msg'));\n      });\n      app.use(function (err, req, res, next) {\n        res.end('got error ' + err.message);\n      });\n      request(app).get('/').expect('got error msg', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should skip to non-error middleware",
+            "suites": [
+                "app.use()",
+                "error handling"
+            ],
+            "updatePoint": {
+                "line": 161,
+                "column": 43
+            },
+            "line": 161,
+            "code": "    it('should skip to non-error middleware', function (done) {\n      var invoked = false;\n      app.use(function (req, res, next) {\n        next(new Error('msg'));\n      });\n      app.use(function (req, res, next) {\n        invoked = true;\n        next();\n      });\n      app.use(function (err, req, res, next) {\n        res.end(invoked ? 'invoked' : err.message);\n      });\n      request(app).get('/').expect(200, 'msg', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should start at error middleware declared after error",
+            "suites": [
+                "app.use()",
+                "error handling"
+            ],
+            "updatePoint": {
+                "line": 175,
+                "column": 61
+            },
+            "line": 175,
+            "code": "    it('should start at error middleware declared after error', function (done) {\n      app.use(function (err, req, res, next) {\n        res.end('fail: ' + err.message);\n      });\n      app.use(function (req, res, next) {\n        next(new Error('boom!'));\n      });\n      app.use(function (err, req, res, next) {\n        res.end('pass: ' + err.message);\n      });\n      request(app).get('/').expect(200, 'pass: boom!', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should stack error fns",
+            "suites": [
+                "app.use()",
+                "error handling"
+            ],
+            "updatePoint": {
+                "line": 187,
+                "column": 30
+            },
+            "line": 187,
+            "code": "    it('should stack error fns', function (done) {\n      app.use(function (req, res, next) {\n        next(new Error('msg'));\n      });\n      app.use(function (err, req, res, next) {\n        res.setHeader('X-Error', err.message);\n        next(err);\n      });\n      app.use(function (err, req, res, next) {\n        res.end('got error ' + err.message);\n      });\n      request(app).get('/').expect('X-Error', 'msg').expect(200, 'got error msg', done);\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should invoke error stack even when headers sent",
+            "suites": [
+                "app.use()",
+                "error handling"
+            ],
+            "updatePoint": {
+                "line": 200,
+                "column": 56
+            },
+            "line": 200,
+            "code": "    it('should invoke error stack even when headers sent', function (done) {\n      app.use(function (req, res, next) {\n        res.end('0');\n        next(new Error('msg'));\n      });\n      app.use(function (err, req, res, next) {\n        done();\n      });\n      request(app).get('/').end(function () {});\n    });",
+            "file": "mounting.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should inherit from event emitter",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 39
+            },
+            "line": 16,
+            "code": "  it('should inherit from event emitter', function (done) {\n    app.on('foo', done);\n    app.emit('foo');\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work in http.createServer",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 38
+            },
+            "line": 20,
+            "code": "  it('should work in http.createServer', function (done) {\n    var app = connect();\n    app.use(function (req, res) {\n      res.end('hello, world!');\n    });\n    var server = http.createServer(app);\n    request(server).get('/').expect(200, 'hello, world!', done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be a callable function",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 35
+            },
+            "line": 28,
+            "code": "  it('should be a callable function', function (done) {\n    var app = connect();\n    app.use(function (req, res) {\n      res.end('hello, world!');\n    });\n\n    function handler(req, res) {\n      res.write('oh, ');\n      app(req, res);\n    }\n\n    var server = http.createServer(handler);\n    request(server).get('/').expect(200, 'oh, hello, world!', done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should invoke callback if request not handled",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 51
+            },
+            "line": 42,
+            "code": "  it('should invoke callback if request not handled', function (done) {\n    var app = connect();\n    app.use('/foo', function (req, res) {\n      res.end('hello, world!');\n    });\n\n    function handler(req, res) {\n      res.write('oh, ');\n      app(req, res, function () {\n        res.end('no!');\n      });\n    }\n\n    var server = http.createServer(handler);\n    request(server).get('/').expect(200, 'oh, no!', done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should invoke callback on error",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 37
+            },
+            "line": 58,
+            "code": "  it('should invoke callback on error', function (done) {\n    var app = connect();\n    app.use(function (req, res) {\n      throw new Error('boom!');\n    });\n\n    function handler(req, res) {\n      res.write('oh, ');\n      app(req, res, function (err) {\n        res.end(err.message);\n      });\n    }\n\n    var server = http.createServer(handler);\n    request(server).get('/').expect(200, 'oh, boom!', done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work as middleware",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 31
+            },
+            "line": 74,
+            "code": "  it('should work as middleware', function (done) {\n    // custom server handler array\n    var handlers = [connect(), function (req, res, next) {\n      res.writeHead(200, {\n        'Content-Type': 'text/plain'\n      });\n      res.end('Ok');\n    }]; // execute callbacks in sequence\n\n    var n = 0;\n\n    function run(req, res) {\n      if (handlers[n]) {\n        handlers[n++](req, res, function () {\n          run(req, res);\n        });\n      }\n    } // create a non-connect server\n\n\n    var server = http.createServer(run);\n    request(server).get('/').expect(200, 'Ok', done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should escape the 500 response body",
+            "suites": [
+                "app"
+            ],
+            "updatePoint": {
+                "line": 97,
+                "column": 41
+            },
+            "line": 97,
+            "code": "  it('should escape the 500 response body', function (done) {\n    app.use(function (req, res, next) {\n      next(new Error('error!'));\n    });\n    request(app).get('/').expect(/Error: error!<br>/).expect(/<br> &nbsp; &nbsp;at/).expect(500, done);\n  });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should escape the 404 response body",
+            "suites": [
+                "app",
+                "404 handler"
+            ],
+            "updatePoint": {
+                "line": 104,
+                "column": 43
+            },
+            "line": 104,
+            "code": "    it('should escape the 404 response body', function (done) {\n      rawrequest(app).get('/foo/<script>stuff\\'n</script>').expect(404, />Cannot GET \\/foo\\/%3Cscript%3Estuff&#39;n%3C\\/script%3E</, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shoud not fire after headers sent",
+            "suites": [
+                "app",
+                "404 handler"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 41
+            },
+            "line": 107,
+            "code": "    it('shoud not fire after headers sent', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        res.write('body');\n        res.end();\n        process.nextTick(next);\n      });\n      request(app).get('/').expect(200, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shoud have no body for HEAD",
+            "suites": [
+                "app",
+                "404 handler"
+            ],
+            "updatePoint": {
+                "line": 116,
+                "column": 35
+            },
+            "line": 116,
+            "code": "    it('shoud have no body for HEAD', function (done) {\n      var app = connect();\n      request(app).head('/').expect(404).expect(shouldHaveNoBody()).end(done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should have escaped response body",
+            "suites": [
+                "app",
+                "error handler"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 41
+            },
+            "line": 122,
+            "code": "    it('should have escaped response body', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        throw new Error('<script>alert()</script>');\n      });\n      request(app).get('/').expect(500, /&lt;script&gt;alert\\(\\)&lt;\\/script&gt;/, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use custom error code",
+            "suites": [
+                "app",
+                "error handler"
+            ],
+            "updatePoint": {
+                "line": 129,
+                "column": 36
+            },
+            "line": 129,
+            "code": "    it('should use custom error code', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        var err = new Error('ack!');\n        err.status = 503;\n        throw err;\n      });\n      request(app).get('/').expect(503, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should keep error statusCode",
+            "suites": [
+                "app",
+                "error handler"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 36
+            },
+            "line": 138,
+            "code": "    it('should keep error statusCode', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        res.statusCode = 503;\n        throw new Error('ack!');\n      });\n      request(app).get('/').expect(503, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shoud not fire after headers sent",
+            "suites": [
+                "app",
+                "error handler"
+            ],
+            "updatePoint": {
+                "line": 146,
+                "column": 41
+            },
+            "line": 146,
+            "code": "    it('shoud not fire after headers sent', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        res.write('body');\n        res.end();\n        process.nextTick(function () {\n          next(new Error('ack!'));\n        });\n      });\n      request(app).get('/').expect(200, done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shoud have no body for HEAD",
+            "suites": [
+                "app",
+                "error handler"
+            ],
+            "updatePoint": {
+                "line": 157,
+                "column": 35
+            },
+            "line": 157,
+            "code": "    it('shoud have no body for HEAD', function (done) {\n      var app = connect();\n      app.use(function (req, res, next) {\n        throw new Error('ack!');\n      });\n      request(app).head('/').expect(500).expect(shouldHaveNoBody()).end(done);\n    });",
+            "file": "server.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "senchalabs__connect.svg"
+}

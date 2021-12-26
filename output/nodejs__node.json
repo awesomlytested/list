@@ -1,0 +1,781 @@
+{
+    "repo": "nodejs/node",
+    "url": "https://github.com/nodejs/node",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "npm",
+            "lang": "js",
+            "dir": "deps/npm/test",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        },
+        {
+            "package": "ochang_js_fuzzer",
+            "lang": "js",
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        },
+        {
+            "package": "turbolizer",
+            "lang": "ts",
+            "dir": "deps/v8/tools/turbolizer/test",
+            "framework": "mocha",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "test",
+            "suites": [
+                "Available variables and functions"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 10
+            },
+            "line": 17,
+            "code": "  it('test', () => {\n    const source = helpers.loadTestData('available_variables.js');\n    const result = new Array();\n    babelTraverse(source.ast, {\n      CallExpression(path) {\n        result.push({\n          variables: common.availableVariables(path),\n          functions: common.availableFunctions(path)\n        });\n      }\n\n    });\n    helpers.assertExpectedResult('available_variables_expected.js', JSON.stringify(result, null, 2));\n  });",
+            "file": "test_available_variables.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "keeps all tests with no soft-skipped tests",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 48
+            },
+            "line": 33,
+            "code": "  it('keeps all tests with no soft-skipped tests', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.9);\n    testSoftSkipped(3, [], ['mjsunit_softskipped/permitted.js', 'mjsunit_softskipped/object-literal.js', 'mjsunit_softskipped/regress/binaryen-123.js']);\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "choose one test with no soft-skipped tests",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 48
+            },
+            "line": 37,
+            "code": "  it('choose one test with no soft-skipped tests', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.9);\n    testSoftSkipped(1, [], ['mjsunit_softskipped/permitted.js']);\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "keeps soft-skipped tests",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 30
+            },
+            "line": 41,
+            "code": "  it('keeps soft-skipped tests', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.9);\n    testSoftSkipped(1, [/^binaryen.*\\.js/, 'object-literal.js'], ['mjsunit_softskipped/permitted.js']);\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "keeps no generated soft-skipped tests",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 43
+            },
+            "line": 45,
+            "code": "  it('keeps no generated soft-skipped tests', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.9);\n    const softSkipped = [// Correctly listed full relative path of test case.\n    'mjsunit_softskipped/regress/binaryen-123.js', // Only basename doesn't match.\n    'object-literal.js', // Only pieces of the path don't match.\n    'mjsunit_softskipped'];\n    sandbox.stub(exceptions, 'getGeneratedSoftSkipped').callsFake(() => {\n      return new Set(softSkipped);\n    });\n    testSoftSkipped(2, // None soft-skipped for basenames and regexps.\n    [], // Only binaryen-123.js gets filtered out.\n    ['mjsunit_softskipped/object-literal.js', 'mjsunit_softskipped/permitted.js']);\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "keeps soft-skipped tests by chance",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 40
+            },
+            "line": 58,
+            "code": "  it('keeps soft-skipped tests by chance', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0);\n    testSoftSkipped(3, [/^binaryen.*\\.js/, 'object-literal.js'], ['mjsunit_softskipped/object-literal.js', 'mjsunit_softskipped/regress/binaryen-123.js', 'mjsunit_softskipped/permitted.js']);\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "caches relative paths",
+            "suites": [
+                "Loading corpus"
+            ],
+            "updatePoint": {
+                "line": 62,
+                "column": 27
+            },
+            "line": 62,
+            "code": "  it('caches relative paths', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0);\n    sandbox.stub(exceptions, 'getSoftSkipped').callsFake(() => {\n      return ['object-literal.js'];\n    });\n    const generatedSoftSkipped = ['mjsunit_softskipped/regress/binaryen-123.js'];\n    sandbox.stub(exceptions, 'getGeneratedSoftSkipped').callsFake(() => {\n      return new Set(generatedSoftSkipped);\n    });\n    const mjsunit = new corpus.Corpus('test_data', 'mjsunit_softskipped');\n    assert.deepEqual(['mjsunit_softskipped/object-literal.js', 'mjsunit_softskipped/regress/binaryen-123.js'], mjsunit.softSkippedFiles);\n    assert.deepEqual(['mjsunit_softskipped/permitted.js'], mjsunit.permittedFiles);\n    assert.deepEqual(['mjsunit_softskipped/permitted.js', 'mjsunit_softskipped/object-literal.js', 'mjsunit_softskipped/regress/binaryen-123.js'], Array.from(mjsunit.relFiles()));\n  });",
+            "file": "test_corpus.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "omits erroneous expressions",
+            "suites": [
+                "DB tests"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 33
+            },
+            "line": 30,
+            "code": "  it('omits erroneous expressions', () => {\n    const outPath = tempy.directory();\n    buildDb('test_data/db', 'this', outPath);\n    const indexFile = path.join(outPath, 'index.json');\n    const indexJSON = JSON.parse(fs.readFileSync(indexFile), 'utf-8');\n    assert.deepEqual(indexJSON, {\n      \"statements\": [],\n      \"superStatements\": [],\n      \"all\": []\n    });\n  });",
+            "file": "test_db.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "prints objects",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 20
+            },
+            "line": 32,
+            "code": "  it('prints objects', () => {\n    testLibrary('__prettyPrint([0, 1, 2, 3]); result;', '[0, 1, 2, 3]');\n    testLibrary('__prettyPrint({0: 1, 2: 3}); result;', 'Object{0: 1, 2: 3}');\n    testLibrary('const o = {}; o.k = 42;__prettyPrint(o); result;', 'Object{k: 42}');\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "cuts off deep nesting",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 27
+            },
+            "line": 37,
+            "code": "  it('cuts off deep nesting', () => {\n    // We print only until a nesting depth of 4.\n    testLibrary('__prettyPrint({0: [1, 2, [3, {4: []}]]}); result;', 'Object{0: [1, 2, [3, Object{4: ...}]]}');\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "cuts off long strings",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 27
+            },
+            "line": 41,
+            "code": "  it('cuts off long strings', () => {\n    const long = new Array(66).join('a');\n    const head = new Array(55).join('a');\n    const tail = new Array(10).join('a');\n    testLibrary(`__prettyPrint(\"${long}\"); result;`, `${head}[...]${tail}`); // If the string gets longer, the cut-off version is still the same.\n\n    const veryLong = new Array(100).join('a');\n    testLibrary(`__prettyPrint(\"${veryLong}\"); result;`, `${head}[...]${tail}`);\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "tracks hash difference",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 28
+            },
+            "line": 50,
+            "code": "  it('tracks hash difference', () => {\n    // Test that we track a hash value for each string we print.\n    const long = new Array(66).join('a');\n    testLibrary(`__prettyPrint(\"${long}\"); __hash;`, 2097980794); // Test that the hash value differs, also when the cut-off result doesn't.\n\n    const veryLong = new Array(100).join('a');\n    testLibrary(`__prettyPrint(\"${veryLong}\"); __hash;`, -428472866); // Test that repeated calls update the hash.\n\n    testLibrary(`__prettyPrint(\"${long}\");__prettyPrint(\"${long}\"); __hash;`, -909224493);\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "limits extra printing",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 27
+            },
+            "line": 60,
+            "code": "  it('limits extra printing', () => {\n    // Test that after exceeding the limit for calling extra printing, there\n    // is no new string printed (in the test case no new result added).\n    testLibrary('for (let i = 0; i < 20; i++) __prettyPrintExtra(i); result;', '19');\n    testLibrary('for (let i = 0; i < 101; i++) __prettyPrintExtra(i); result;', '99');\n    testLibrary('for (let i = 0; i < 102; i++) __prettyPrintExtra(i); result;', '99');\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "tracks hash after limit",
+            "suites": [
+                "Differential fuzzing library"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 29
+            },
+            "line": 67,
+            "code": "  it('tracks hash after limit', () => {\n    // Test that after exceeding the limit for calling extra printing, the\n    // hash is still updated.\n    testLibrary('for (let i = 0; i < 20; i++) __prettyPrintExtra(i); __hash;', -945753644);\n    testLibrary('for (let i = 0; i < 101; i++) __prettyPrintExtra(i); __hash;', 1907055979);\n    testLibrary('for (let i = 0; i < 102; i++) __prettyPrintExtra(i); __hash;', -590842070);\n  });",
+            "file": "test_differential_fuzz_library.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "applies suppressions",
+            "suites": [
+                "Differential fuzzing"
+            ],
+            "updatePoint": {
+                "line": 64,
+                "column": 26
+            },
+            "line": 64,
+            "code": "  it('applies suppressions', () => {\n    // This selects the first random variable when replacing .arguments.\n    sandbox.stub(random, 'single').callsFake(a => a[0]);\n    testMutators(this.settings, DifferentialFuzzSuppressions, 'suppressions.js', 'suppressions_expected.js');\n  });",
+            "file": "test_differential_fuzz.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "adds extra printing",
+            "suites": [
+                "Differential fuzzing"
+            ],
+            "updatePoint": {
+                "line": 69,
+                "column": 25
+            },
+            "line": 69,
+            "code": "  it('adds extra printing', () => {\n    testMutators(this.settings, DifferentialFuzzMutator, 'mutations.js', 'mutations_expected.js');\n  });",
+            "file": "test_differential_fuzz.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "does no extra printing",
+            "suites": [
+                "Differential fuzzing"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 28
+            },
+            "line": 72,
+            "code": "  it('does no extra printing', () => {\n    this.settings['DIFF_FUZZ_EXTRA_PRINT'] = 0.0;\n    testMutators(this.settings, DifferentialFuzzMutator, 'exceptions.js', 'exceptions_expected.js');\n  });",
+            "file": "test_differential_fuzz.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "runs end to end",
+            "suites": [
+                "Differential fuzzing"
+            ],
+            "updatePoint": {
+                "line": 76,
+                "column": 21
+            },
+            "line": 76,
+            "code": "  it('runs end to end', () => {\n    // Don't choose any zeroed settings or IGNORE_DEFAULT_PROB in try-catch\n    // mutator. Choose using original flags with >= 2%.\n    const chooseOrigFlagsProb = 0.2;\n    sandbox.stub(random, 'choose').callsFake(p => p >= chooseOrigFlagsProb); // Fake build directory from which two json configurations for flags are\n    // loaded.\n\n    const env = {\n      APP_DIR: 'test_data/differential_fuzz',\n      GENERATE: process.env.GENERATE\n    };\n    sandbox.stub(process, 'env').value(env); // Fake loading resources and instead load one fixed fake file for each.\n\n    sandbox.stub(sourceHelpers, 'loadResource').callsFake(() => {\n      return helpers.loadTestData('differential_fuzz/fake_resource.js');\n    }); // Load input files.\n\n    const files = ['differential_fuzz/input1.js', 'differential_fuzz/input2.js'];\n    const sources = files.map(helpers.loadTestData); // Apply top-level fuzzing, with all probabilistic configs switched off.\n\n    this.settings['DIFF_FUZZ_EXTRA_PRINT'] = 0.0;\n    this.settings['DIFF_FUZZ_TRACK_CAUGHT'] = 0.0;\n    const mutator = new DifferentialScriptMutator(this.settings, helpers.DB_DIR);\n    const mutated = mutator.mutateMultiple(sources);\n    helpers.assertExpectedResult('differential_fuzz/combined_expected.js', mutated.code); // Flags for v8_foozzie.py are calculated from v8_fuzz_experiments.json and\n    // v8_fuzz_flags.json in test_data/differential_fuzz.\n\n    const expectedFlags = ['--first-config=ignition', '--second-config=ignition_turbo', '--second-d8=d8', '--second-config-extra-flags=--foo1', '--second-config-extra-flags=--foo2', '--first-config-extra-flags=--flag1', '--second-config-extra-flags=--flag1', '--first-config-extra-flags=--flag2', '--second-config-extra-flags=--flag2', '--first-config-extra-flags=--flag3', '--second-config-extra-flags=--flag3', '--first-config-extra-flags=--flag4', '--second-config-extra-flags=--flag4'];\n    assert.deepEqual(expectedFlags, mutated.flags);\n  });",
+            "file": "test_differential_fuzz.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "V8 dependencies"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 10
+            },
+            "line": 31,
+            "code": "  it('test', () => {\n    testLoad('mjsunit/test_load.js', 'mjsunit/test_load_expected.js');\n  });",
+            "file": "test_load.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "does not loop indefinitely",
+            "suites": [
+                "V8 dependencies"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 32
+            },
+            "line": 34,
+            "code": "  it('does not loop indefinitely', () => {\n    testLoad('mjsunit/test_load_self.js', 'mjsunit/test_load_self_expected.js');\n  });",
+            "file": "test_load.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "Chakra dependencies"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 10
+            },
+            "line": 39,
+            "code": "  it('test', () => {\n    testLoad('chakra/load.js', 'chakra/load_expected.js');\n  });",
+            "file": "test_load.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "JSTest dependencies"
+            ],
+            "updatePoint": {
+                "line": 47,
+                "column": 10
+            },
+            "line": 47,
+            "code": "  it('test', () => {\n    const fakeStubs = sourceHelpers.loadSource(helpers.BASE_DIR, 'JSTests/fake_stub.js');\n    sandbox.stub(sourceHelpers, 'loadResource').callsFake(() => fakeStubs);\n    testLoad('JSTests/load.js', 'JSTests/load_expected.js');\n  });",
+            "file": "test_load.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "SpiderMonkey dependencies"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 10
+            },
+            "line": 54,
+            "code": "  it('test', () => {\n    testLoad('spidermonkey/test/load.js', 'spidermonkey/test/load_expected.js');\n  });",
+            "file": "test_load.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "performs all mutations",
+            "suites": [
+                "Mutate arrays"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 28
+            },
+            "line": 31,
+            "code": "  it('performs all mutations', () => {\n    // Make random operations deterministic.\n    sandbox.stub(common, 'randomValue').callsFake(() => babylon.parseExpression('\"\"'));\n    helpers.deterministicRandom(sandbox);\n    const source = helpers.loadTestData('mutate_arrays.js');\n    const settings = scriptMutator.defaultSettings();\n    settings['MUTATE_ARRAYS'] = 1.0;\n    const mutator = new ArrayMutator(settings);\n    mutator.mutate(source);\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_arrays_expected.js', mutated);\n  });",
+            "file": "test_mutate_arrays.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "clones previous to current",
+            "suites": [
+                "Mutate expressions"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 32
+            },
+            "line": 50,
+            "code": "  it('clones previous to current', () => {\n    // Keep the order of [previous, current], select previous.\n    sandbox.stub(random, 'shuffle').callsFake(a => a); // Insert after. Keep returning true for the MUTATE_EXPRESSIONS check.\n\n    sandbox.stub(random, 'choose').callsFake(a => a === 1);\n    testCloneSiblings('mutate_expressions_previous_expected.js');\n  });",
+            "file": "test_mutate_expressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "clones current to previous",
+            "suites": [
+                "Mutate expressions"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 32
+            },
+            "line": 57,
+            "code": "  it('clones current to previous', () => {\n    // Switch the order of [previous, current], select current.\n    sandbox.stub(random, 'shuffle').callsFake(a => [a[1], a[0]]); // Insert before.\n\n    sandbox.stub(random, 'choose').callsFake(() => true);\n    testCloneSiblings('mutate_expressions_current_expected.js');\n  });",
+            "file": "test_mutate_expressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "is not copying added state",
+            "suites": [
+                "Cloning"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 32
+            },
+            "line": 67,
+            "code": "  it('is not copying added state', () => {\n    const source = helpers.loadTestData('mutate_expressions.js');\n    common.setSourceLoc(source, 5, 10);\n    const noopNode = source.ast.program.body[0];\n    assert.equal(0.5, common.getSourceLoc(noopNode));\n    const cloned = babelTypes.cloneDeep(noopNode);\n    assert.equal(undefined, common.getSourceLoc(cloned));\n  });",
+            "file": "test_mutate_expressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "is robust without available functions",
+            "suites": [
+                "Mutate functions"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 43
+            },
+            "line": 38,
+            "code": "  it('is robust without available functions', () => {\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.3;\n    }); // We just ensure here that mutating this file doesn't throw.\n\n    loadAndMutate('mutate_function_call.js');\n  });",
+            "file": "test_mutate_function_calls.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "optimizes functions in V8",
+            "suites": [
+                "Mutate functions"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 31
+            },
+            "line": 45,
+            "code": "  it('optimizes functions in V8', () => {\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.5;\n    });\n    const source = loadAndMutate('mutate_function_call.js');\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_function_call_expected.js', mutated);\n  });",
+            "file": "test_mutate_function_calls.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "compiles functions in V8 to baseline",
+            "suites": [
+                "Mutate functions"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 42
+            },
+            "line": 53,
+            "code": "  it('compiles functions in V8 to baseline', () => {\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.7;\n    });\n    const source = loadAndMutate('mutate_function_call.js');\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_function_call_baseline_expected.js', mutated);\n  });",
+            "file": "test_mutate_function_calls.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "deoptimizes functions in V8",
+            "suites": [
+                "Mutate functions"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 33
+            },
+            "line": 61,
+            "code": "  it('deoptimizes functions in V8', () => {\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.8;\n    });\n    const source = loadAndMutate('mutate_function_call.js');\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_function_call_deopt_expected.js', mutated);\n  });",
+            "file": "test_mutate_function_calls.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "Mutate numbers"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 10
+            },
+            "line": 45,
+            "code": "  it('test', () => {\n    const source = helpers.loadTestData('mutate_numbers.js');\n    const settings = scriptMutator.defaultSettings();\n    settings['MUTATE_NUMBERS'] = 1.0;\n    const mutator = new numberMutator.NumberMutator(settings);\n    mutator.mutate(source);\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_numbers_expected.js', mutated);\n  });",
+            "file": "test_mutate_numbers.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "performs all mutations",
+            "suites": [
+                "Mutate objects"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 28
+            },
+            "line": 31,
+            "code": "  it('performs all mutations', () => {\n    // Make random operations deterministic.\n    sandbox.stub(common, 'randomValue').callsFake(() => babylon.parseExpression('\"\"'));\n    helpers.deterministicRandom(sandbox);\n    const source = helpers.loadTestData('mutate_objects.js');\n    const settings = scriptMutator.defaultSettings();\n    settings['MUTATE_OBJECTS'] = 1.0;\n    const mutator = new ObjectMutator(settings);\n    mutator.mutate(source);\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_objects_expected.js', mutated);\n  });",
+            "file": "test_mutate_objects.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "Variable or object mutator"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 10
+            },
+            "line": 55,
+            "code": "  it('test', () => {\n    let index = 0; // Test different cases of _randomVariableOrObjectMutations in\n    // variable_or_object_mutation.js.\n\n    const choices = [0.2, // Trigger recursive case.\n    0.3, // Recursion 1: Delete.\n    0.4, // Recursion 2: Property access.\n    0.5, // Random assignment.\n    // 0.6 case for randomFunction omitted as it has too much randomization.\n    0.7, // Variable assignment.\n    0.8, // Object.defineProperty.\n    0.9, // Object.defineProperty recursive.\n    0.3, // Recursion 1: Delete.\n    0.4 // Recursion 2: Property access.\n    ];\n    sandbox.stub(random, 'random').callsFake(() => {\n      return choices[index++];\n    });\n    testMutations('mutate_var_or_obj.js', 'mutate_var_or_obj_expected.js');\n  });",
+            "file": "test_mutate_variable_or_object.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test",
+            "suites": [
+                "Mutate variables"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 10
+            },
+            "line": 34,
+            "code": "  it('test', () => {\n    const source = helpers.loadTestData('mutate_variables.js');\n    const settings = scriptMutator.defaultSettings();\n    settings['MUTATE_VARIABLES'] = 1.0;\n    const mutator = new variableMutator.VariableMutator(settings);\n    mutator.mutate(source);\n    const mutated = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('mutate_variables_expected.js', mutated);\n  });",
+            "file": "test_mutate_variables.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test basic",
+            "suites": [
+                "Normalize"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 16
+            },
+            "line": 17,
+            "code": "  it('test basic', () => {\n    const source = helpers.loadTestData('normalize.js');\n    const mutator = new normalizer.IdentifierNormalizer();\n    mutator.mutate(source);\n    const normalized_0 = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('normalize_expected_0.js', normalized_0);\n    mutator.mutate(source);\n    const normalized_1 = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('normalize_expected_1.js', normalized_1);\n  });",
+            "file": "test_normalize.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "test simple_test.js",
+            "suites": [
+                "Normalize"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 25
+            },
+            "line": 27,
+            "code": "  it('test simple_test.js', () => {\n    const source = helpers.loadTestData('simple_test.js');\n    const mutator = new normalizer.IdentifierNormalizer();\n    mutator.mutate(source);\n    const normalized = sourceHelpers.generateCode(source);\n    helpers.assertExpectedResult('simple_test_expected.js', normalized);\n  });",
+            "file": "test_normalize.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "with one empty",
+            "suites": [
+                "Two-bucket choosing"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 20
+            },
+            "line": 23,
+            "code": "  it('with one empty', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.5);\n    assert.deepEqual([1, 2], twoBucketSample([0, 1, 2], [], 1, 2));\n    assert.deepEqual([1, 2], twoBucketSample([], [0, 1, 2], 1, 2));\n    assert.deepEqual([0], twoBucketSample([0], [], 1, 1));\n    assert.deepEqual([0], twoBucketSample([], [0], 1, 1));\n  });",
+            "file": "test_random.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "chooses with 0.3",
+            "suites": [
+                "Two-bucket choosing"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 22
+            },
+            "line": 30,
+            "code": "  it('chooses with 0.3', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.3);\n    assert.deepEqual([1, 2], twoBucketSample([0, 1, 2], [3, 4, 5], 1, 2)); // Higher factor.\n\n    assert.deepEqual([3, 5], twoBucketSample([0, 1, 2], [3, 4, 5], 4, 2));\n  });",
+            "file": "test_random.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "chooses with 0.7",
+            "suites": [
+                "Two-bucket choosing"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 22
+            },
+            "line": 36,
+            "code": "  it('chooses with 0.7', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.7);\n    assert.deepEqual([4, 3], twoBucketSample([0, 1, 2], [3, 4, 5], 1, 2));\n  });",
+            "file": "test_random.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "chooses with 0.5",
+            "suites": [
+                "Two-bucket choosing"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 22
+            },
+            "line": 40,
+            "code": "  it('chooses with 0.5', () => {\n    sandbox.stub(Math, 'random').callsFake(() => 0.5);\n    assert.deepEqual([3], twoBucketSample([0, 1], [2, 3, 4, 5], 1, 1));\n    assert.deepEqual([3], twoBucketSample([0, 1, 2, 3], [4, 5], 1, 1)); // Higher factor.\n\n    assert.deepEqual([4], twoBucketSample([0, 1, 2, 3], [4, 5], 2, 1));\n  });",
+            "file": "test_random.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "combine strict and with",
+            "suites": [
+                "Regression tests"
+            ],
+            "updatePoint": {
+                "line": 65,
+                "column": 29
+            },
+            "line": 65,
+            "code": "  it('combine strict and with', () => {\n    // Test that when a file with \"use strict\" is used in the inputs,\n    // the result is only strict if no other file contains anything\n    // prohibited in strict mode (here a with statement).\n    // It is assumed that such input files are marked as sloppy in the\n    // auto generated exceptions.\n    sandbox.stub(exceptions, 'getGeneratedSloppy').callsFake(() => {\n      return new Set(['regress/strict/input_with.js']);\n    });\n    const file = createFuzzTest('test_data/regress/strict/db', this.settings, ['regress/strict/input_strict.js', 'regress/strict/input_with.js']);\n    execFile(file);\n  });",
+            "file": "test_regressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "combine strict and delete",
+            "suites": [
+                "Regression tests"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 31
+            },
+            "line": 77,
+            "code": "  it('combine strict and delete', () => {\n    // As above with unqualified delete.\n    sandbox.stub(exceptions, 'getGeneratedSloppy').callsFake(() => {\n      return new Set(['regress/strict/input_delete.js']);\n    });\n    const file = createFuzzTest('test_data/regress/strict/db', this.settings, ['regress/strict/input_strict.js', 'regress/strict/input_delete.js']);\n    execFile(file);\n  });",
+            "file": "test_regressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "mutates negative value",
+            "suites": [
+                "Regression tests"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 28
+            },
+            "line": 85,
+            "code": "  it('mutates negative value', () => {\n    // This tests that the combination of number, function call and expression\n    // mutator does't produce an update expression.\n    // Previously the 1 in -1 was replaced with another negative number leading\n    // to e.g. -/*comment/*-2. Then cloning the expression removed the\n    // comment and produced --2 in the end.\n    this.settings['MUTATE_NUMBERS'] = 1.0;\n    this.settings['MUTATE_FUNCTION_CALLS'] = 1.0;\n    this.settings['MUTATE_EXPRESSIONS'] = 1.0;\n    const file = createFuzzTest('test_data/regress/numbers/db', this.settings, ['regress/numbers/input_negative.js']);\n    execFile(file);\n  });",
+            "file": "test_regressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "mutates indices",
+            "suites": [
+                "Regression tests"
+            ],
+            "updatePoint": {
+                "line": 97,
+                "column": 21
+            },
+            "line": 97,
+            "code": "  it('mutates indices', () => {\n    // Test that indices are not replaced with a negative number causing a\n    // syntax error (e.g. {-1: \"\"}).\n    this.settings['MUTATE_NUMBERS'] = 1.0;\n    const file = createFuzzTest('test_data/regress/numbers/db', this.settings, ['regress/numbers/input_indices.js']);\n    execFile(file);\n  });",
+            "file": "test_regressions.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "wraps all",
+            "suites": [
+                "Try catch"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 15
+            },
+            "line": 40,
+            "code": "  it('wraps all', () => {\n    sandbox.stub(random, 'choose').callsFake(() => {\n      return false;\n    });\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.7;\n    });\n    testTryCatch(loadSource(), 'try_catch_expected.js');\n  }); // Wrap on enter and skip.",
+            "file": "test_try_catch.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "wraps toplevel",
+            "suites": [
+                "Try catch"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 20
+            },
+            "line": 50,
+            "code": "  it('wraps toplevel', () => {\n    sandbox.stub(random, 'choose').callsFake(() => {\n      return false;\n    });\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.04;\n    });\n    const source = loadSource(); // Fake source fraction 0.1 (i.e. the second of 10 files).\n    // Probability for toplevel try-catch is 0.05.\n\n    common.setSourceLoc(source, 1, 10);\n    testTryCatch(source, 'try_catch_toplevel_expected.js');\n  }); // Choose the rare case of skipping try-catch.",
+            "file": "test_try_catch.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "wraps nothing",
+            "suites": [
+                "Try catch"
+            ],
+            "updatePoint": {
+                "line": 64,
+                "column": 19
+            },
+            "line": 64,
+            "code": "  it('wraps nothing', () => {\n    sandbox.stub(random, 'choose').callsFake(() => {\n      return false;\n    });\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.01;\n    });\n    const source = loadSource(); // Fake source fraction 0.1 (i.e. the second of 10 files).\n    // Probability for skipping is 0.02.\n\n    common.setSourceLoc(source, 1, 10);\n    testTryCatch(source, 'try_catch_nothing_expected.js');\n  }); // Choose to alter the target probability to 0.9 resulting in skipping",
+            "file": "test_try_catch.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "wraps nothing with high target probability",
+            "suites": [
+                "Try catch"
+            ],
+            "updatePoint": {
+                "line": 79,
+                "column": 48
+            },
+            "line": 79,
+            "code": "  it('wraps nothing with high target probability', () => {\n    sandbox.stub(random, 'choose').callsFake(() => {\n      return true;\n    });\n    sandbox.stub(random, 'uniform').callsFake(() => {\n      return 0.9;\n    });\n    sandbox.stub(random, 'random').callsFake(() => {\n      return 0.8;\n    });\n    const source = loadSource(); // Fake source fraction 0.9 (i.e. the last of 10 files).\n    // Probability for skipping is 0.81 (0.9 * 0.9).\n\n    common.setSourceLoc(source, 9, 10);\n    testTryCatch(source, 'try_catch_alternate_expected.js');\n  });",
+            "file": "test_try_catch.js",
+            "skipped": false,
+            "dir": "deps/v8/tools/clusterfuzz/js_fuzzer/test"
+        },
+        {
+            "name": "should be constructible",
+            "suites": [
+                "SourceResolver"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 29
+            },
+            "line": 6,
+            "code": "  it('should be constructible', () => {\n    const a: SourceResolver = new SourceResolver();\n    expect(a.sources.length).to.equal(0);\n  });",
+            "file": "source-resolver-test.ts",
+            "skipped": false,
+            "dir": "deps/v8/tools/turbolizer/test"
+        }
+    ],
+    "badge": "nodejs__node.svg"
+}

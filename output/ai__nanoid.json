@@ -1,0 +1,526 @@
+{
+    "repo": "ai/nanoid",
+    "url": "https://github.com/ai/nanoid",
+    "branch": "main",
+    "configs": [
+        {
+            "package": "nanoid",
+            "lang": "js",
+            "dir": "test",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "generates URL-friendly IDs",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 36
+            },
+            "line": 54,
+            "code": "      it('generates URL-friendly IDs', async () => {\n        await Promise.all(times(100, async () => {\n          let id = await nanoid();\n          expect(id).toHaveLength(21);\n          expect(typeof id).toBe('string');\n\n          for (let char of id) {\n            expect(urlAlphabet).toContain(char);\n          }\n        }));\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "changes ID length",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 65,
+                "column": 27
+            },
+            "line": 65,
+            "code": "      it('changes ID length', async () => {\n        let id = await nanoid(10);\n        expect(id).toHaveLength(10);\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no collisions",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 69,
+                "column": 27
+            },
+            "line": 69,
+            "code": "      it('has no collisions', async () => {\n        let ids = await Promise.all(times(50 * 1000, () => nanoid()));\n        ids.reduce((used, id) => {\n          expect(used[id]).toBeUndefined();\n          used[id] = true;\n          return used;\n        }, []);\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 31
+            },
+            "line": 77,
+            "code": "      it('has flat distribution', async () => {\n        let COUNT = 100 * 1000;\n        let LENGTH = (await nanoid()).length;\n        let chars = {};\n        await Promise.all(times(COUNT, async () => {\n          let id = await nanoid();\n\n          for (let char of id) {\n            if (!chars[char]) chars[char] = 0;\n            chars[char] += 1;\n          }\n        }));\n        expect(Object.keys(chars)).toHaveLength(urlAlphabet.length);\n        let max = 0;\n        let min = Number.MAX_SAFE_INTEGER;\n\n        for (let k in chars) {\n          let distribution = chars[k] * urlAlphabet.length / (COUNT * LENGTH);\n          if (distribution > max) max = distribution;\n          if (distribution < min) min = distribution;\n        }\n\n        expect(max - min).toBeLessThanOrEqual(0.05);\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejects Promise on error",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 103,
+                "column": 36
+            },
+            "line": 103,
+            "code": "        it('rejects Promise on error', async () => {\n          let error = new Error('test');\n          mock((buffer, callback) => {\n            callback(error);\n          });\n          let catched;\n\n          try {\n            await nanoid();\n          } catch (e) {\n            catched = e;\n          }\n\n          expect(catched).toBe(error);\n        });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates small random buffers",
+            "suites": [
+                "",
+                "random"
+            ],
+            "updatePoint": {
+                "line": 121,
+                "column": 40
+            },
+            "line": 121,
+            "code": "      it('generates small random buffers', async () => {\n        expect(await random(10)).toHaveLength(10);\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates random buffers",
+            "suites": [
+                "",
+                "random"
+            ],
+            "updatePoint": {
+                "line": 124,
+                "column": 34
+            },
+            "line": 124,
+            "code": "      it('generates random buffers', async () => {\n        let numbers = {};\n        let bytes = await random(10000);\n        expect(bytes).toHaveLength(10000);\n\n        for (let byte of bytes) {\n          if (!numbers[byte]) numbers[byte] = 0;\n          numbers[byte] += 1;\n          expect(typeof byte).toBe('number');\n          expect(byte).toBeLessThanOrEqual(255);\n          expect(byte).toBeGreaterThanOrEqual(0);\n        }\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has options",
+            "suites": [
+                "",
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 146,
+                "column": 21
+            },
+            "line": 146,
+            "code": "      it('has options', async () => {\n        let nanoidA = customAlphabet('a', 5);\n        let id = await nanoidA();\n        expect(id).toBe('aaaaa');\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "",
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 151,
+                "column": 31
+            },
+            "line": 151,
+            "code": "      it('has flat distribution', async () => {\n        let COUNT = 50 * 1000;\n        let LENGTH = 30;\n        let ALPHABET = 'abcdefghijklmnopqrstuvwxy';\n        let nanoid2 = customAlphabet(ALPHABET, LENGTH);\n        let chars = {};\n        await Promise.all(times(100, async () => {\n          let id = await nanoid2();\n          expect(id).toHaveLength(LENGTH);\n\n          for (let char of id) {\n            if (!chars[char]) chars[char] = 0;\n            chars[char] += 1;\n          }\n        }));\n        expect(Object.keys(chars)).toHaveLength(ALPHABET.length);\n        let max = 0;\n        let min = Number.MAX_SAFE_INTEGER;\n\n        for (let k in chars) {\n          let distribution = chars[k] * ALPHABET.length / (COUNT * LENGTH);\n          if (distribution > max) max = distribution;\n          if (distribution < min) min = distribution;\n        }\n\n        expect(max - min).toBeLessThanOrEqual(0.05);\n      });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call random two times",
+            "suites": [
+                "",
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 40
+            },
+            "line": 180,
+            "code": "        it('should call random two times', async () => {\n          let randomFillMock = jest.fn((buffer, callback) => callback(null, [220, 215, 129, 35, 242, 202, 137, 180]));\n          mock(randomFillMock);\n          let nanoidA = customAlphabet('a', 5);\n          let id = await nanoidA();\n          expect(randomFillMock).toHaveBeenCalledTimes(2);\n          expect(id).toBe('aaaaa');\n        });",
+            "file": "async.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shows error in IE",
+            "suites": [],
+            "updatePoint": {
+                "line": 2,
+                "column": 21
+            },
+            "line": 2,
+            "code": "it('shows error in IE', () => {\n  expect(() => {\n    require('../index.browser');\n  }).toThrow(/IE 11/);\n});",
+            "file": "ie.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates URL-friendly IDs",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 36
+            },
+            "line": 26,
+            "code": "      it('generates URL-friendly IDs', () => {\n        for (let i = 0; i < 100; i++) {\n          let id = nanoid();\n          expect(id).toHaveLength(21);\n          expect(typeof id).toBe('string');\n\n          for (let char of id) {\n            expect(urlAlphabet).toContain(char);\n          }\n        }\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "changes ID length",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 27
+            },
+            "line": 37,
+            "code": "      it('changes ID length', () => {\n        expect(nanoid(10)).toHaveLength(10);\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "accepts string",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 24
+            },
+            "line": 40,
+            "code": "      it('accepts string', () => {\n        expect(nanoid('10')).toHaveLength(10);\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no collisions",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 27
+            },
+            "line": 43,
+            "code": "      it('has no collisions', () => {\n        let used = {};\n\n        for (let i = 0; i < 50 * 1000; i++) {\n          let id = nanoid();\n          expect(used[id]).toBeUndefined();\n          used[id] = true;\n        }\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "",
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 31
+            },
+            "line": 52,
+            "code": "      it('has flat distribution', () => {\n        let COUNT = 100 * 1000;\n        let LENGTH = nanoid().length;\n        let chars = {};\n\n        for (let i = 0; i < COUNT; i++) {\n          let id = nanoid();\n\n          for (let char of id) {\n            if (!chars[char]) chars[char] = 0;\n            chars[char] += 1;\n          }\n        }\n\n        expect(Object.keys(chars)).toHaveLength(urlAlphabet.length);\n        let max = 0;\n        let min = Number.MAX_SAFE_INTEGER;\n\n        for (let k in chars) {\n          let distribution = chars[k] * urlAlphabet.length / (COUNT * LENGTH);\n          if (distribution > max) max = distribution;\n          if (distribution < min) min = distribution;\n        }\n\n        expect(max - min).toBeLessThanOrEqual(0.05);\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has options",
+            "suites": [
+                "",
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 80,
+                "column": 21
+            },
+            "line": 80,
+            "code": "      it('has options', () => {\n        let nanoidA = customAlphabet('a', 5);\n        expect(nanoidA()).toBe('aaaaa');\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "",
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 84,
+                "column": 31
+            },
+            "line": 84,
+            "code": "      it('has flat distribution', () => {\n        let COUNT = 50 * 1000;\n        let LENGTH = 30;\n        let ALPHABET = 'abcdefghijklmnopqrstuvwxyz';\n        let nanoid2 = customAlphabet(ALPHABET, LENGTH);\n        let chars = {};\n\n        for (let i = 0; i < COUNT; i++) {\n          let id = nanoid2();\n\n          for (let char of id) {\n            if (!chars[char]) chars[char] = 0;\n            chars[char] += 1;\n          }\n        }\n\n        expect(Object.keys(chars)).toHaveLength(ALPHABET.length);\n        let max = 0;\n        let min = Number.MAX_SAFE_INTEGER;\n\n        for (let k in chars) {\n          let distribution = chars[k] * ALPHABET.length / (COUNT * LENGTH);\n          if (distribution > max) max = distribution;\n          if (distribution < min) min = distribution;\n        }\n\n        expect(max - min).toBeLessThanOrEqual(0.05);\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "supports generator",
+            "suites": [
+                "",
+                "customRandom"
+            ],
+            "updatePoint": {
+                "line": 114,
+                "column": 28
+            },
+            "line": 114,
+            "code": "      it('supports generator', () => {\n        let sequence = [2, 255, 3, 7, 7, 7, 7, 7, 0, 1];\n\n        function fakeRandom(size) {\n          let bytes = [];\n\n          for (let i = 0; i < size; i += sequence.length) {\n            bytes = bytes.concat(sequence.slice(0, size - i));\n          }\n\n          return bytes;\n        }\n\n        let nanoid4 = customRandom('abcde', 4, fakeRandom);\n        let nanoid18 = customRandom('abcde', 18, fakeRandom);\n        expect(nanoid4()).toBe('adca');\n        expect(nanoid18()).toBe('cbadcbadcbadcbadcc');\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is string",
+            "suites": [
+                "",
+                "urlAlphabet"
+            ],
+            "updatePoint": {
+                "line": 134,
+                "column": 19
+            },
+            "line": 134,
+            "code": "      it('is string', () => {\n        expect(typeof urlAlphabet).toBe('string');\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no duplicates",
+            "suites": [
+                "",
+                "urlAlphabet"
+            ],
+            "updatePoint": {
+                "line": 137,
+                "column": 27
+            },
+            "line": 137,
+            "code": "      it('has no duplicates', () => {\n        for (let i = 0; i < urlAlphabet.length; i++) {\n          expect(urlAlphabet.lastIndexOf(urlAlphabet[i])).toEqual(i);\n        }\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates small random buffers",
+            "suites": [
+                "",
+                "random"
+            ],
+            "updatePoint": {
+                "line": 144,
+                "column": 40
+            },
+            "line": 144,
+            "code": "      it('generates small random buffers', () => {\n        expect(random(10)).toHaveLength(10);\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates random buffers",
+            "suites": [
+                "",
+                "random"
+            ],
+            "updatePoint": {
+                "line": 147,
+                "column": 34
+            },
+            "line": 147,
+            "code": "      it('generates random buffers', () => {\n        let numbers = {};\n        let bytes = random(10000);\n        expect(bytes).toHaveLength(10000);\n\n        for (let byte of bytes) {\n          if (!numbers[byte]) numbers[byte] = 0;\n          numbers[byte] += 1;\n          expect(typeof byte).toBe('number');\n          expect(byte).toBeLessThanOrEqual(255);\n          expect(byte).toBeGreaterThanOrEqual(0);\n        }\n      });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "generates URL-friendly IDs",
+            "suites": [
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 11,
+                "column": 32
+            },
+            "line": 11,
+            "code": "  it('generates URL-friendly IDs', () => {\n    for (let i = 0; i < 10; i++) {\n      let id = nanoid();\n      expect(id).toHaveLength(21);\n\n      for (let char of id) {\n        expect(urlAlphabet).toContain(char);\n      }\n    }\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "changes ID length",
+            "suites": [
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 21,
+                "column": 23
+            },
+            "line": 21,
+            "code": "  it('changes ID length', () => {\n    expect(nanoid(10)).toHaveLength(10);\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "accepts string",
+            "suites": [
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 20
+            },
+            "line": 24,
+            "code": "  it('accepts string', () => {\n    expect(nanoid('10')).toHaveLength(10);\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no collisions",
+            "suites": [
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 23
+            },
+            "line": 27,
+            "code": "  it('has no collisions', () => {\n    let used = {};\n\n    for (let i = 0; i < 100 * 1000; i++) {\n      let id = nanoid();\n      expect(used[id]).toBeUndefined();\n      used[id] = true;\n    }\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "nanoid"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 27
+            },
+            "line": 36,
+            "code": "  it('has flat distribution', () => {\n    let COUNT = 100 * 1000;\n    let LENGTH = nanoid().length;\n    let chars = {};\n\n    for (let i = 0; i < COUNT; i++) {\n      let id = nanoid();\n\n      for (let char of id) {\n        if (!chars[char]) chars[char] = 0;\n        chars[char] += 1;\n      }\n    }\n\n    expect(Object.keys(chars)).toHaveLength(urlAlphabet.length);\n    let max = 0;\n    let min = Number.MAX_SAFE_INTEGER;\n\n    for (let k in chars) {\n      let distribution = chars[k] * urlAlphabet.length / (COUNT * LENGTH);\n      if (distribution > max) max = distribution;\n      if (distribution < min) min = distribution;\n    }\n\n    expect(max - min).toBeLessThanOrEqual(0.05);\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has options",
+            "suites": [
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 64,
+                "column": 17
+            },
+            "line": 64,
+            "code": "  it('has options', () => {\n    let nanoidA = customAlphabet('a', 5);\n    expect(nanoidA()).toBe('aaaaa');\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has flat distribution",
+            "suites": [
+                "customAlphabet"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 27
+            },
+            "line": 68,
+            "code": "  it('has flat distribution', () => {\n    let COUNT = 100 * 1000;\n    let LENGTH = 5;\n    let ALPHABET = 'abcdefghijklmnopqrstuvwxyz';\n    let nanoid2 = customAlphabet(ALPHABET, LENGTH);\n    let chars = {};\n\n    for (let i = 0; i < COUNT; i++) {\n      let id = nanoid2();\n\n      for (let char of id) {\n        if (!chars[char]) chars[char] = 0;\n        chars[char] += 1;\n      }\n    }\n\n    expect(Object.keys(chars)).toHaveLength(ALPHABET.length);\n    let max = 0;\n    let min = Number.MAX_SAFE_INTEGER;\n\n    for (let k in chars) {\n      let distribution = chars[k] * ALPHABET.length / (COUNT * LENGTH);\n      if (distribution > max) max = distribution;\n      if (distribution < min) min = distribution;\n    }\n\n    expect(max - min).toBeLessThanOrEqual(0.05);\n  });",
+            "file": "non-secure.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "warns to use non-secure generator on old browsers",
+            "suites": [],
+            "updatePoint": {
+                "line": 1,
+                "column": 53
+            },
+            "line": 1,
+            "code": "it('warns to use non-secure generator on old browsers', () => {\n  expect(() => {\n    require('../index.browser');\n  }).toThrow(/use nanoid\\/non-secure/);\n});",
+            "file": "old-browser.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works with polyfill",
+            "suites": [],
+            "updatePoint": {
+                "line": 19,
+                "column": 23
+            },
+            "line": 19,
+            "code": "it('works with polyfill', () => {\n  expect(typeof nanoid()).toBe('string');\n});",
+            "file": "react-native-polyfill.test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "tells to use non-secure generator on old browsers",
+            "suites": [],
+            "updatePoint": {
+                "line": 4,
+                "column": 53
+            },
+            "line": 4,
+            "code": "it('tells to use non-secure generator on old browsers', () => {\n  expect(() => {\n    require('../index.browser');\n  }).toThrow(/React Native does not have/);\n});",
+            "file": "react-native.test.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "ai__nanoid.svg"
+}

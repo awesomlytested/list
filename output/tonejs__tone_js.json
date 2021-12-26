@@ -1,0 +1,772 @@
+{
+    "repo": "Tonejs/Tone.js",
+    "url": "https://github.com/Tonejs/Tone.js",
+    "branch": "dev",
+    "configs": [
+        {
+            "package": "tone",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "can be created and disposed",
+            "suites": [
+                "Basic"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 35
+            },
+            "line": 20,
+            "code": "    it(\"can be created and disposed\", () => {\n      const instance = new Constr(...args);\n      instance.dispose(); // check that all of the attributes were disposed\n\n      expect(instance.disposed).to.equal(true); // also check all of it's attributes to see if they also have the right context\n\n      for (const member in instance) {\n        if (instance[member] instanceof Tone && member !== \"context\") {\n          expect(instance[member].disposed, `member ${member}`).to.equal(true);\n        }\n      } // check that all callback functions are assigned to noOp\n\n\n      for (const member in instance) {\n        if (isFunction(instance[member]) && member.startsWith(\"on\")) {\n          expect(instance[member]).to.equal(noOp);\n        }\n      }\n    });",
+            "file": "helper/Basic.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "extends Tone",
+            "suites": [
+                "Basic"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 20
+            },
+            "line": 39,
+            "code": "    it(\"extends Tone\", () => {\n      const instance = new Constr(...args);\n      expect(instance).to.be.an.instanceof(Tone);\n      instance.dispose();\n    });",
+            "file": "helper/Basic.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can specify the AudioContext",
+            "suites": [
+                "Basic"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 36
+            },
+            "line": 44,
+            "code": "    it(\"can specify the AudioContext\", () => {\n      const instance = new Constr(Object.assign({\n        context: testAudioContext\n      }, ...args));\n\n      if (instance instanceof ToneWithContext) {\n        expect(instance.context).to.equal(testAudioContext); // also check all of it's attributes to see if they also have the right context\n\n        for (const member in instance) {\n          if (instance[member] instanceof ToneWithContext) {\n            expect(instance[member].context, `member: ${member}`).to.equal(testAudioContext);\n          }\n        }\n      }\n\n      instance.dispose();\n    });",
+            "file": "helper/Basic.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be serialized to JSON",
+            "suites": [
+                "Basic"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 33
+            },
+            "line": 61,
+            "code": "    it(\"can be serialized to JSON\", () => {\n      const instance = new Constr(...args);\n\n      if (instance instanceof ToneAudioNode) {\n        const json = instance.get(); // this throws an error if the object is recursive\n\n        JSON.stringify(json);\n      }\n    });",
+            "file": "helper/Basic.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exports its class name",
+            "suites": [
+                "Basic"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 28
+            },
+            "line": 72,
+            "code": "  it(\"exports its class name\", () => {\n    // find the constructor\n    for (const className in Classes) {\n      if (Classes[className] === Constr) {\n        const instance = new Constr(...args);\n        expect(instance.toString()).to.equal(className);\n        instance.dispose();\n      }\n    }\n  });",
+            "file": "helper/Basic.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles input and output connections",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 42
+            },
+            "line": 10,
+            "code": "  it(\"handles input and output connections\", () => {\n    const instance = new constr(...args); // test each of the input and outputs and connect\n\n    if (instance.numberOfInputs) {\n      for (let input = 0; input < instance.numberOfInputs; input++) {\n        connectFrom().connect(instance, 0, input);\n      }\n    }\n\n    if (instance.numberOfOutputs) {\n      for (let output = 0; output < instance.numberOfOutputs; output++) {\n        instance.connect(connectTo(), output, 0);\n      }\n    }\n\n    instance.dispose();\n  });",
+            "file": "helper/Connect.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has an input and output",
+            "suites": [
+                "Effect Tests"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 31
+            },
+            "line": 8,
+            "code": "    it(\"has an input and output\", () => {\n      const instance = new Constr(args);\n\n      if (before) {\n        before(instance);\n      }\n\n      instance.connect(connectTo());\n      connectFrom().connect(instance);\n      instance.dispose();\n    });",
+            "file": "helper/EffectTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can set the dry/wet value",
+            "suites": [
+                "Effect Tests"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 33
+            },
+            "line": 19,
+            "code": "    it(\"can set the dry/wet value\", () => {\n      const instance = new Constr(args);\n\n      if (before) {\n        before(instance);\n      }\n\n      instance.wet.value = 0;\n      expect(instance.wet.value).to.equal(0);\n      instance.wet.value = 0.5;\n      expect(instance.wet.value).to.equal(0.5);\n      instance.dispose();\n    });",
+            "file": "helper/EffectTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be constructed with an object",
+            "suites": [
+                "Effect Tests"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 41
+            },
+            "line": 32,
+            "code": "    it(\"can be constructed with an object\", () => {\n      const instance = new Constr({\n        wet: 0.25\n      });\n\n      if (before) {\n        before(instance);\n      }\n\n      expect(instance.wet.value).to.equal(0.25);\n      instance.dispose();\n    });",
+            "file": "helper/EffectTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "passes audio from input to output",
+            "suites": [
+                "Effect Tests"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 41
+            },
+            "line": 44,
+            "code": "    it(\"passes audio from input to output\", () => {\n      return PassAudio(input => {\n        const instance = new Constr(args);\n\n        if (before) {\n          before(instance);\n        }\n\n        input.connect(instance);\n        instance.toDestination();\n      });\n    });",
+            "file": "helper/EffectTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no sound when not connected to any inputs",
+            "suites": [
+                "Effect Tests"
+            ],
+            "updatePoint": {
+                "line": 56,
+                "column": 53
+            },
+            "line": 56,
+            "code": "    it(\"has no sound when not connected to any inputs\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n\n        if (before) {\n          before(instance);\n        }\n      }, 0.5, 1).then(buffer => {\n        expect(buffer.isSilent()).to.be.true;\n      });\n    });",
+            "file": "helper/EffectTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can pass 100% dry signal",
+            "suites": [
+                "Effect Tests"
+            ],
+            "line": 67,
+            "code": "    it.skip(\"can pass 100% dry signal\", () => {",
+            "file": "helper/EffectTests.ts",
+            "skipped": true,
+            "dir": "test"
+        },
+        {
+            "name": "effects the incoming signal",
+            "suites": [
+                "Effect Tests"
+            ],
+            "line": 86,
+            "code": "    it.skip(\"effects the incoming signal\", () => {",
+            "file": "helper/EffectTests.ts",
+            "skipped": true,
+            "dir": "test"
+        },
+        {
+            "name": "extends Tone.Instrument",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 31
+            },
+            "line": 14,
+            "code": "    it(\"extends Tone.Instrument\", () => {\n      const instance = new Constr(constrArg);\n      expect(instance).to.be.an.instanceof(Instrument);\n      instance.dispose();\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can connect the output",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 30
+            },
+            "line": 19,
+            "code": "    it(\"can connect the output\", () => {\n      const instance = new Constr(constrArg);\n      instance.connect(connectTo());\n      instance.dispose();\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can set the volume",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 26
+            },
+            "line": 24,
+            "code": "    it(\"can set the volume\", () => {\n      let instance;\n\n      if (!optionsIndex) {\n        instance = new Constr({\n          volume: -10\n        });\n      } else if (optionsIndex === 1) {\n        instance = new Constr(constrArg, {\n          volume: -10\n        });\n      }\n\n      expect(instance.volume.value).to.be.closeTo(-10, 0.1);\n      instance.dispose();\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "makes a sound",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 21
+            },
+            "line": 40,
+            "code": "    it(\"makes a sound\", () => {\n      return OutputAudio(() => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.triggerAttack(note);\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is silent before being triggered",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 47,
+                "column": 40
+            },
+            "line": 47,
+            "code": "    it(\"is silent before being triggered\", () => {\n      return Offline(() => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n      }).then(buffer => {\n        expect(buffer.isSilent()).to.be.true;\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can trigger release after attack",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 42
+            },
+            "line": 57,
+            "code": "      it(\"can trigger release after attack\", () => {\n        return Offline(() => {\n          const instance = new Constr(constrArg);\n          instance.toDestination();\n\n          if (note) {\n            instance.triggerAttack(note, 0.05);\n          } else {\n            instance.triggerAttack(0.05);\n          }\n\n          instance.triggerRelease(0.1);\n        }, 1).then(buffer => {\n          expect(buffer.getTimeOfFirstSound()).to.be.within(0.05, 0.1);\n        });\n      });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can trigger another attack before the release has ended",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 73,
+                "column": 65
+            },
+            "line": 73,
+            "code": "      it(\"can trigger another attack before the release has ended\", () => {\n        // compute the end time\n        return Offline(() => {\n          const instance = new Constr(constrArg);\n          instance.toDestination();\n\n          if (note) {\n            instance.triggerAttack(note, 0.05);\n          } else {\n            instance.triggerAttack(0.05);\n          }\n\n          instance.triggerRelease(0.1);\n        }, 1).then(buffer => {\n          const bufferDuration = buffer.getTimeOfLastSound();\n          const secondTrigger = 0.15;\n          return Offline(() => {\n            const instance = new Constr(constrArg);\n            instance.toDestination();\n\n            if (note) {\n              instance.triggerAttack(note, 0.05);\n            } else {\n              instance.triggerAttack(0.05);\n            }\n\n            instance.triggerRelease(0.1); // star the note again before the last one has finished\n\n            if (note) {\n              instance.triggerAttack(note, secondTrigger);\n            } else {\n              instance.triggerAttack(secondTrigger);\n            }\n          }, bufferDuration + secondTrigger * 2).then(resultingBuffer => {\n            expect(resultingBuffer.getTimeOfLastSound()).to.be.gt(bufferDuration);\n          });\n        });\n      });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can combine triggerAttack and triggerRelease",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 111,
+                "column": 54
+            },
+            "line": 111,
+            "code": "      it(\"can combine triggerAttack and triggerRelease\", () => {\n        return Offline(() => {\n          const instance = new Constr(constrArg);\n          instance.toDestination();\n\n          if (note) {\n            instance.triggerAttackRelease(note, 0.1, 0.05);\n          } else {\n            instance.triggerAttackRelease(0.1, 0.05);\n          }\n        }, 0.2).then(buffer => {\n          expect(buffer.getTimeOfFirstSound()).to.be.within(0.05, 0.1);\n        });\n      });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "be scheduled to start in the future",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 127,
+                "column": 43
+            },
+            "line": 127,
+            "code": "    it(\"be scheduled to start in the future\", () => {\n      return Offline(() => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n      }, 0.2).then(buffer => {\n        expect(buffer.getTimeOfFirstSound()).to.be.within(0.1, 0.15);\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can sync triggerAttack to the Transport",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 141,
+                "column": 47
+            },
+            "line": 141,
+            "code": "    it(\"can sync triggerAttack to the Transport\", () => {\n      return Offline(({\n        transport\n      }) => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n\n        transport.start(0.1);\n      }, 0.3).then(buffer => {\n        expect(buffer.getTimeOfFirstSound()).to.be.within(0.19, 0.25);\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can unsync triggerAttack to the Transport",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 160,
+                "column": 49
+            },
+            "line": 160,
+            "code": "    it(\"can unsync triggerAttack to the Transport\", () => {\n      return Offline(({\n        transport\n      }) => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n\n        instance.unsync();\n        transport.start(0.1);\n      }, 0.3).then(buffer => {\n        expect(buffer.isSilent()).to.be.true;\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can unsync and re-sync triggerAttack to the Transport",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 61
+            },
+            "line": 180,
+            "code": "    it(\"can unsync and re-sync triggerAttack to the Transport\", () => {\n      return Offline(async ({\n        transport\n      }) => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n\n        transport.start(0.1);\n        await wait(100);\n        instance.unsync();\n        transport.stop();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n\n        transport.start(0.1);\n      }, 1).then(buffer => {\n        expect(buffer.getTimeOfFirstSound()).to.be.within(0.19, 0.25);\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calling sync and unsync multiple times has no effect",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 211,
+                "column": 60
+            },
+            "line": 211,
+            "code": "    it(\"calling sync and unsync multiple times has no effect\", () => {\n      return Offline(({\n        transport\n      }) => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.sync();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttack(note, 0.1);\n        } else {\n          instance.triggerAttack(0.1);\n        }\n\n        instance.unsync();\n        instance.unsync();\n        transport.start(0.1);\n      }, 0.3).then(buffer => {\n        expect(buffer.isSilent()).to.be.true;\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can sync triggerAttackRelease to the Transport",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 233,
+                "column": 54
+            },
+            "line": 233,
+            "code": "    it(\"can sync triggerAttackRelease to the Transport\", () => {\n      return Offline(({\n        transport\n      }) => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.sync();\n\n        if (note) {\n          instance.triggerAttackRelease(note, 0.25, 0.1);\n        } else {\n          instance.triggerAttackRelease(0.25, 0.1);\n        }\n\n        transport.start(0.1);\n      }, 1).then(buffer => {\n        expect(buffer.getTimeOfFirstSound()).to.be.within(0.19, 0.25); // test a sample enough in the future for the decay to die down\n\n        expect(buffer.getRmsAtTime(0.9)).to.be.closeTo(0, 0.1);\n      });\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "invokes onsilence",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 254,
+                "column": 25
+            },
+            "line": 254,
+            "code": "    it(\"invokes onsilence\", done => {\n      Offline(() => {\n        const instance = new Constr(constrArg);\n\n        if (instance instanceof Monophonic) {\n          instance.triggerAttackRelease(note, 0.1, 0);\n\n          instance.onsilence = voice => {\n            expect(voice).to.equal(instance);\n            done();\n          };\n        } else {\n          done();\n        }\n      }, 3);\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can do portamento glide between notes",
+            "suites": [
+                "Instrument Tests"
+            ],
+            "updatePoint": {
+                "line": 270,
+                "column": 45
+            },
+            "line": 270,
+            "code": "    it(\"can do portamento glide between notes\", () => {\n      return Offline(() => {\n        const instance = new Constr(constrArg);\n\n        if (instance instanceof Monophonic) {\n          instance.portamento = 0.5;\n          instance.triggerAttackRelease(\"C4\", 0.2, 0);\n          expect(instance.getLevelAtTime(0.4)).to.be.greaterThan(0);\n          instance.triggerAttackRelease(\"C2\", 0.2, 0.4);\n        }\n      }, 0.5);\n    });",
+            "file": "helper/InstrumentTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has an onsilence callback which is invoked after the release has finished",
+            "suites": [
+                "Monophonic Tests"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 81
+            },
+            "line": 6,
+            "code": "    it(\"has an onsilence callback which is invoked after the release has finished\", () => {\n      let wasInvoked = false;\n      return Offline(() => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n        instance.triggerAttackRelease(note, 0.1, 0);\n\n        instance.onsilence = () => wasInvoked = true;\n      }, 2).then(() => {\n        expect(wasInvoked).to.equal(true);\n      });\n    });",
+            "file": "helper/MonophonicTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "invokes onsilence callback when the sustain is set to 0",
+            "suites": [
+                "Monophonic Tests"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 63
+            },
+            "line": 18,
+            "code": "    it(\"invokes onsilence callback when the sustain is set to 0\", () => {\n      let wasInvoked = false;\n      return Offline(() => {\n        const instance = new Constr(constrArg);\n        instance.toDestination();\n\n        if (instance.envelope) {\n          instance.envelope.sustain = 0;\n        } else if (instance.voice0) {\n          // DuoSynth is a special case\n          instance.voice0.envelope.sustain = 0;\n          instance.voice1.envelope.sustain = 0;\n        }\n\n        instance.triggerAttack(note, 0);\n\n        instance.onsilence = () => wasInvoked = true;\n      }, 2).then(() => {\n        expect(wasInvoked).to.equal(true);\n      });\n    });",
+            "file": "helper/MonophonicTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can pass in the detune into the constructor",
+            "suites": [
+                "Monophonic Tests"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 51
+            },
+            "line": 39,
+            "code": "    it(\"can pass in the detune into the constructor\", () => {\n      const instance = new Constr({\n        detune: -100\n      });\n      expect(instance.detune.value).to.be.closeTo(-100, 0.1);\n      instance.dispose();\n    });",
+            "file": "helper/MonophonicTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be created with an options object",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 45
+            },
+            "line": 6,
+            "code": "    it(\"can be created with an options object\", () => {\n      const instance = new Constr({\n        detune: -20,\n        frequency: 200\n      });\n      expect(instance.frequency.value).to.equal(200);\n      expect(instance.detune.value).to.equal(-20);\n      instance.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can set/set the frequency",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 33
+            },
+            "line": 15,
+            "code": "    it(\"can set/set the frequency\", () => {\n      const instance = new Constr(args);\n      instance.frequency.value = 110;\n      expect(instance.frequency.value).to.equal(110);\n      instance.start();\n      instance.frequency.value = 220;\n      expect(instance.frequency.value).to.equal(220);\n      instance.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can set/set the detune",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 30
+            },
+            "line": 24,
+            "code": "    it(\"can set/set the detune\", () => {\n      const instance = new Constr(args);\n      instance.detune.value = -50;\n      expect(instance.detune.value).to.equal(-50);\n      instance.start();\n      instance.detune.value = 92;\n      expect(instance.detune.value).to.equal(92);\n      instance.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can connect to detune and frequency",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 43
+            },
+            "line": 33,
+            "code": "    it(\"can connect to detune and frequency\", () => {\n      const instance = new Constr(args);\n      connectFrom().connect(instance.frequency);\n      connectFrom().connect(instance.detune);\n      instance.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can get/set the phase",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 29
+            },
+            "line": 39,
+            "code": "    it(\"can get/set the phase\", () => {\n      const osc = new Constr({\n        phase: 180\n      });\n      expect(osc.phase).to.be.closeTo(180, 0.001);\n      osc.phase = 270;\n      expect(osc.phase).to.be.closeTo(270, 0.001);\n      osc.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not clip in volume",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 31
+            },
+            "line": 48,
+            "code": "    it(\"does not clip in volume\", () => {\n      return Offline(() => {\n        new Constr(args).toDestination().start(0);\n      }).then(buffer => {\n        expect(buffer.max()).to.be.at.most(1);\n      });\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can generate a waveform",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 31
+            },
+            "line": 55,
+            "code": "    it(\"can generate a waveform\", async () => {\n      const osc = new Constr();\n      const waveform = await osc.asArray();\n      waveform.forEach(v => expect(v).to.be.within(-1, 1));\n      osc.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can generate a waveform of a specific length",
+            "suites": [
+                "Oscillator Tests"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 52
+            },
+            "line": 61,
+            "code": "    it(\"can generate a waveform of a specific length\", async () => {\n      const osc = new Constr();\n      const waveform = await osc.asArray(256);\n      expect(waveform.length).to.equal(256);\n      osc.dispose();\n    });",
+            "file": "helper/OscillatorTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can connect the output",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 30
+            },
+            "line": 8,
+            "code": "    it(\"can connect the output\", () => {\n      const instance = new Constr(args);\n      instance.connect(connectTo());\n      instance.dispose();\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "has no input",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 20
+            },
+            "line": 13,
+            "code": "    it(\"has no input\", () => {\n      const instance = new Constr(args); // has no input\n\n      expect(instance.numberOfInputs).to.equal(0);\n      instance.dispose();\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "starts and stops",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 24
+            },
+            "line": 19,
+            "code": "    it(\"starts and stops\", () => {\n      return Offline(() => {\n        const instance = new Constr(args);\n        expect(instance.state).to.equal(\"stopped\");\n        instance.start(0).stop(0.2);\n        return time => {\n          if (time >= 0 && time < 0.2) {\n            expect(instance.state).to.equal(\"started\");\n          } else if (time > 0.2) {\n            expect(instance.state).to.equal(\"stopped\");\n          }\n        };\n      }, 0.3);\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "makes a sound",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 21
+            },
+            "line": 33,
+            "code": "    it(\"makes a sound\", () => {\n      return OutputAudio(() => {\n        const instance = new Constr(args);\n        instance.toDestination();\n        instance.start();\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "invokes the onstop method the source is stopped",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 55
+            },
+            "line": 40,
+            "code": "    it(\"invokes the onstop method the source is stopped\", () => {\n      let wasInvoked = false;\n      return Offline(() => {\n        const instance = new Constr(args);\n        instance.toDestination();\n\n        instance.onstop = () => wasInvoked = true;\n\n        instance.start(0).stop(0.1);\n      }, 0.2).then(() => {\n        expect(wasInvoked).to.equal(true);\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "be scheduled to start in the future",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 43
+            },
+            "line": 53,
+            "code": "    it(\"be scheduled to start in the future\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.start(0.1);\n      }, 0.3).then(buffer => {\n        buffer.forEach((sample, time) => {\n          if (sample > 0) {\n            expect(time).to.be.at.least(0.099);\n          }\n        });\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "makes no sound if it is started and then stopped with a time at or before the start time",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 65,
+                "column": 96
+            },
+            "line": 65,
+            "code": "    it(\"makes no sound if it is started and then stopped with a time at or before the start time\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.start(0.1).stop(0.05);\n      }, 0.3).then(buffer => {\n        expect(buffer.isSilent()).to.equal(true);\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be muted",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 73,
+                "column": 20
+            },
+            "line": 73,
+            "code": "    it(\"can be muted\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.start(0);\n        instance.mute = true;\n      }, 0.3).then(buffer => {\n        expect(buffer.isSilent()).to.equal(true);\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "be scheduled to stop in the future",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 82,
+                "column": 42
+            },
+            "line": 82,
+            "code": "    it(\"be scheduled to stop in the future\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.start(0).stop(0.2);\n      }, 0.3).then(buffer => {\n        buffer.forEach((sample, time) => {\n          if (time > 0.2) {\n            expect(sample).to.equal(0);\n          }\n        });\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be restarted",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 94,
+                "column": 24
+            },
+            "line": 94,
+            "code": "    it(\"can be restarted\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.start(0).stop(0.2);\n        instance.restart(0.1);\n        instance.stop(0.25);\n      }, 0.32).then(buffer => {\n        expect(buffer.getRmsAtTime(0)).to.be.gt(0);\n        expect(buffer.getRmsAtTime(0.1)).to.be.gt(0);\n        expect(buffer.getRmsAtTime(0.2)).to.be.gt(0);\n        expect(buffer.getRmsAtTime(0.23)).to.be.gt(0);\n        expect(buffer.getRmsAtTime(0.3)).to.equal(0);\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calling restart before calling start has no effect",
+            "suites": [
+                "Source Tests"
+            ],
+            "updatePoint": {
+                "line": 108,
+                "column": 58
+            },
+            "line": 108,
+            "code": "    it(\"calling restart before calling start has no effect\", () => {\n      return Offline(() => {\n        const instance = new Constr(args).toDestination();\n        instance.restart(0.1);\n      }, 0.2).then(buffer => {\n        expect(buffer.isSilent()).to.be.true;\n      });\n    });",
+            "file": "helper/SourceTests.ts",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "Tonejs__Tone_js.svg"
+}

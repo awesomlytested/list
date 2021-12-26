@@ -1,0 +1,1313 @@
+{
+    "repo": "reduxjs/redux",
+    "url": "https://github.com/reduxjs/redux",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "redux",
+            "lang": "ts",
+            "dir": "test",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "warns when dispatching during middleware setup",
+            "suites": [
+                "applyMiddleware"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 52
+            },
+            "line": 16,
+            "code": "  it('warns when dispatching during middleware setup', () => {\n    function dispatchingMiddleware(store: Store) {\n      store.dispatch(addTodo(\"Don't dispatch in middleware setup\"))\n      return (next: Dispatch) => (action: Action) => next(action)\n    }\n\n    expect(() =>\n      applyMiddleware(dispatchingMiddleware as Middleware)(createStore)(\n        reducers.todos\n      )\n    ).toThrow()\n  })",
+            "file": "applyMiddleware.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "wraps dispatch method with middleware once",
+            "suites": [
+                "applyMiddleware"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 48
+            },
+            "line": 29,
+            "code": "  it('wraps dispatch method with middleware once', () => {\n    function test(spyOnMethods: any) {\n      return (methods: any) => {\n        spyOnMethods(methods)\n        return (next: Dispatch) => (action: Action) => next(action)\n      }\n    }\n\n    const spy = jest.fn()\n    const store = applyMiddleware(test(spy), thunk)(createStore)(reducers.todos)\n\n    store.dispatch(addTodo('Use Redux'))\n    store.dispatch(addTodo('Flux FTW!'))\n\n    expect(spy.mock.calls.length).toEqual(1)\n\n    expect(spy.mock.calls[0][0]).toHaveProperty('getState')\n    expect(spy.mock.calls[0][0]).toHaveProperty('dispatch')\n\n    expect(store.getState()).toEqual([\n      { id: 1, text: 'Use Redux' },\n      { id: 2, text: 'Flux FTW!' }\n    ])\n  })",
+            "file": "applyMiddleware.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "passes recursive dispatches through the middleware chain",
+            "suites": [
+                "applyMiddleware"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 62
+            },
+            "line": 54,
+            "code": "  it('passes recursive dispatches through the middleware chain', () => {\n    function test(spyOnMethods: any) {\n      return () => (next: Dispatch) => (action: Action) => {\n        spyOnMethods(action)\n        return next(action)\n      }\n    }\n\n    const spy = jest.fn()\n    const store = applyMiddleware(test(spy), thunk)(createStore)(reducers.todos)\n\n    // the typing for redux-thunk is super complex, so we will use an as unknown hack\n    const dispatchedValue = store.dispatch(\n      addTodoAsync('Use Redux') as any\n    ) as unknown as Promise<void>\n    return dispatchedValue.then(() => {\n      expect(spy.mock.calls.length).toEqual(2)\n    })\n  })",
+            "file": "applyMiddleware.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works with thunk middleware",
+            "suites": [
+                "applyMiddleware"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 33
+            },
+            "line": 74,
+            "code": "  it('works with thunk middleware', done => {\n    const store = applyMiddleware(thunk)(createStore)(reducers.todos)\n\n    store.dispatch(addTodoIfEmpty('Hello') as any)\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n\n    store.dispatch(addTodoIfEmpty('Hello') as any)\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n\n    store.dispatch(addTodo('World'))\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n\n    // the typing for redux-thunk is super complex, so we will use an \"as unknown\" hack\n    const dispatchedValue = store.dispatch(\n      addTodoAsync('Maybe') as any\n    ) as unknown as Promise<void>\n    dispatchedValue.then(() => {\n      expect(store.getState()).toEqual([\n        {\n          id: 1,\n          text: 'Hello'\n        },\n        {\n          id: 2,\n          text: 'World'\n        },\n        {\n          id: 3,\n          text: 'Maybe'\n        }\n      ])\n      done()\n    })\n  })",
+            "file": "applyMiddleware.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "passes through all arguments of dispatch calls from within middleware",
+            "suites": [
+                "applyMiddleware"
+            ],
+            "updatePoint": {
+                "line": 128,
+                "column": 75
+            },
+            "line": 128,
+            "code": "  it('passes through all arguments of dispatch calls from within middleware', () => {\n    const spy = jest.fn()\n    const testCallArgs = ['test']\n\n    interface MultiDispatch<A extends Action = AnyAction> {\n      <T extends A>(action: T, extraArg?: string[]): T\n    }\n\n    const multiArgMiddleware: Middleware<MultiDispatch, any, MultiDispatch> =\n      _store => {\n        return next => (action: any, callArgs?: any) => {\n          if (Array.isArray(callArgs)) {\n            return action(...callArgs)\n          }\n          return next(action)\n        }\n      }\n\n    function dummyMiddleware({ dispatch }: MiddlewareAPI) {\n      return (_next: Dispatch) => (action: Action) =>\n        dispatch(action, testCallArgs)\n    }\n\n    const store = createStore(\n      reducers.todos,\n      applyMiddleware(multiArgMiddleware, dummyMiddleware)\n    )\n\n    store.dispatch(spy as any)\n    expect(spy.mock.calls[0]).toEqual(testCallArgs)\n  })",
+            "file": "applyMiddleware.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "wraps the action creators with the dispatch function",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 58
+            },
+            "line": 19,
+            "code": "  it('wraps the action creators with the dispatch function', () => {\n    const boundActionCreators = bindActionCreators(\n      actionCreators,\n      store.dispatch\n    )\n    expect(Object.keys(boundActionCreators)).toEqual(\n      Object.keys(actionCreatorFunctions)\n    )\n\n    const action = boundActionCreators.addTodo('Hello')\n    expect(action).toEqual(actionCreators.addTodo('Hello'))\n    expect(store.getState()).toEqual([{ id: 1, text: 'Hello' }])\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "wraps action creators transparently",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 41
+            },
+            "line": 33,
+            "code": "  it('wraps action creators transparently', () => {\n    const uniqueThis = {}\n    const argArray = [1, 2, 3]\n    function actionCreator(this: any) {\n      return { type: 'UNKNOWN_ACTION', this: this, args: [...arguments] }\n    }\n    const boundActionCreator = bindActionCreators(actionCreator, store.dispatch)\n\n    const boundAction = boundActionCreator.apply(uniqueThis, argArray as [])\n    const action = actionCreator.apply(uniqueThis, argArray as [])\n    expect(boundAction).toEqual(action)\n    expect(boundAction.this).toBe(uniqueThis)\n    expect(action.this).toBe(uniqueThis)\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "skips non-function values in the passed object",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 52
+            },
+            "line": 48,
+            "code": "  it('skips non-function values in the passed object', () => {\n    // as this is testing against invalid values, we will cast to unknown and then back to ActionCreator<any>\n    // in a typescript environment this test is unnecessary, but required in javascript\n    const boundActionCreators = bindActionCreators(\n      {\n        ...actionCreators,\n        foo: 42,\n        bar: 'baz',\n        wow: undefined,\n        much: {},\n        test: null\n      } as unknown as ActionCreator<any>,\n      store.dispatch\n    )\n    expect(Object.keys(boundActionCreators)).toEqual(\n      Object.keys(actionCreatorFunctions)\n    )\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "supports wrapping a single function only",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 46
+            },
+            "line": 67,
+            "code": "  it('supports wrapping a single function only', () => {\n    const actionCreator = actionCreators.addTodo\n    const boundActionCreator = bindActionCreators(actionCreator, store.dispatch)\n\n    const action = boundActionCreator('Hello')\n    expect(action).toEqual(actionCreator('Hello'))\n    expect(store.getState()).toEqual([{ id: 1, text: 'Hello' }])\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws for an undefined actionCreator",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 76,
+                "column": 43
+            },
+            "line": 76,
+            "code": "  it('throws for an undefined actionCreator', () => {\n    expect(() => {\n      // @ts-expect-error\n      bindActionCreators(undefined, store.dispatch)\n    }).toThrow(\n      `bindActionCreators expected an object or a function, but instead received: 'undefined'. ` +\n        `Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?`\n    )\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws for a null actionCreator",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 86,
+                "column": 37
+            },
+            "line": 86,
+            "code": "  it('throws for a null actionCreator', () => {\n    expect(() => {\n      // @ts-expect-error\n      bindActionCreators(null, store.dispatch)\n    }).toThrow(\n      `bindActionCreators expected an object or a function, but instead received: 'null'. ` +\n        `Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?`\n    )\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws for a primitive actionCreator",
+            "suites": [
+                "bindActionCreators"
+            ],
+            "updatePoint": {
+                "line": 96,
+                "column": 42
+            },
+            "line": 96,
+            "code": "  it('throws for a primitive actionCreator', () => {\n    expect(() => {\n      bindActionCreators(\n        'string' as unknown as ActionCreator<any>,\n        store.dispatch\n      )\n    }).toThrow(\n      `bindActionCreators expected an object or a function, but instead received: 'string'. ` +\n        `Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?`\n    )\n  })",
+            "file": "bindActionCreators.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns a composite reducer that maps the state keys to given reducers",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 78
+            },
+            "line": 13,
+            "code": "    it('returns a composite reducer that maps the state keys to given reducers', () => {\n      const reducer = combineReducers({\n        counter: (state: number = 0, action) =>\n          action.type === 'increment' ? state + 1 : state,\n        stack: (state: any[] = [], action) =>\n          action.type === 'push' ? [...state, action.value] : state\n      })\n\n      const s1 = reducer(undefined, { type: 'increment' })\n      expect(s1).toEqual({ counter: 1, stack: [] })\n      const s2 = reducer(s1, { type: 'push', value: 'a' })\n      expect(s2).toEqual({ counter: 1, stack: ['a'] })\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignores all props which are not a function",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 50
+            },
+            "line": 27,
+            "code": "    it('ignores all props which are not a function', () => {\n      // we double-cast because these conditions can only happen in a javascript setting\n      const reducer = combineReducers({\n        fake: true as unknown as Reducer,\n        broken: 'string' as unknown as Reducer,\n        another: { nested: 'object' } as unknown as Reducer,\n        stack: (state = []) => state\n      })\n\n      expect(Object.keys(reducer(undefined, { type: 'push' }))).toEqual([\n        'stack'\n      ])\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "warns if a reducer prop is undefined",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 44
+            },
+            "line": 41,
+            "code": "    it('warns if a reducer prop is undefined', () => {\n      const preSpy = console.error\n      const spy = jest.fn()\n      console.error = spy\n\n      let isNotDefined: any\n      combineReducers({ isNotDefined })\n      expect(spy.mock.calls[0][0]).toMatch(\n        /No reducer provided for key \"isNotDefined\"/\n      )\n\n      spy.mockClear()\n      // @ts-expect-error\n      combineReducers({ thing: undefined })\n      expect(spy.mock.calls[0][0]).toMatch(\n        /No reducer provided for key \"thing\"/\n      )\n\n      spy.mockClear()\n      console.error = preSpy\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws an error if a reducer returns undefined handling an action",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 73
+            },
+            "line": 63,
+            "code": "    it('throws an error if a reducer returns undefined handling an action', () => {\n      const reducer = combineReducers({\n        counter(state: number = 0, action) {\n          switch (action && action.type) {\n            case 'increment':\n              return state + 1\n            case 'decrement':\n              return state - 1\n            case 'whatever':\n            case null:\n            case undefined:\n              return undefined\n            default:\n              return state\n          }\n        }\n      })\n\n      expect(() => reducer({ counter: 0 }, { type: 'whatever' })).toThrow(\n        /\"whatever\".*\"counter\"/\n      )\n      // @ts-expect-error\n      expect(() => reducer({ counter: 0 }, null)).toThrow(\n        /\"counter\".*an action/\n      )\n      expect(() => reducer({ counter: 0 }, {} as unknown as AnyAction)).toThrow(\n        /\"counter\".*an action/\n      )\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws an error on first call if a reducer returns undefined initializing",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 93,
+                "column": 81
+            },
+            "line": 93,
+            "code": "    it('throws an error on first call if a reducer returns undefined initializing', () => {\n      const reducer = combineReducers({\n        counter(state: number, action) {\n          switch (action.type) {\n            case 'increment':\n              return state + 1\n            case 'decrement':\n              return state - 1\n            default:\n              return state\n          }\n        }\n      })\n      expect(() => reducer(undefined, { type: '' })).toThrow(\n        /\"counter\".*initialization/\n      )\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "catches error thrown in reducer when initializing and re-throw",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 111,
+                "column": 70
+            },
+            "line": 111,
+            "code": "    it('catches error thrown in reducer when initializing and re-throw', () => {\n      const reducer = combineReducers({\n        throwingReducer() {\n          throw new Error('Error thrown in reducer')\n        }\n      })\n      expect(() =>\n        reducer(undefined, undefined as unknown as AnyAction)\n      ).toThrow(/Error thrown in reducer/)\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "allows a symbol to be used as an action type",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 52
+            },
+            "line": 122,
+            "code": "    it('allows a symbol to be used as an action type', () => {\n      const increment = Symbol('INCREMENT')\n\n      const reducer = combineReducers({\n        counter(state: number = 0, action) {\n          switch (action.type) {\n            case increment:\n              return state + 1\n            default:\n              return state\n          }\n        }\n      })\n\n      expect(reducer({ counter: 0 }, { type: increment }).counter).toEqual(1)\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "maintains referential equality if the reducers it is combining do",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 139,
+                "column": 73
+            },
+            "line": 139,
+            "code": "    it('maintains referential equality if the reducers it is combining do', () => {\n      const reducer = combineReducers({\n        child1(state = {}) {\n          return state\n        },\n        child2(state = {}) {\n          return state\n        },\n        child3(state = {}) {\n          return state\n        }\n      })\n\n      const initialState = reducer(undefined, { type: '@@INIT' })\n      expect(reducer(initialState, { type: 'FOO' })).toBe(initialState)\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not have referential equality if one of the reducers changes something",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 156,
+                "column": 83
+            },
+            "line": 156,
+            "code": "    it('does not have referential equality if one of the reducers changes something', () => {\n      const reducer = combineReducers({\n        child1(state = {}) {\n          return state\n        },\n        child2(state: { count: number } = { count: 0 }, action) {\n          switch (action.type) {\n            case 'increment':\n              return { count: state.count + 1 }\n            default:\n              return state\n          }\n        },\n        child3(state = {}) {\n          return state\n        }\n      })\n\n      const initialState = reducer(undefined, { type: '@@INIT' })\n      expect(reducer(initialState, { type: 'increment' })).not.toBe(\n        initialState\n      )\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws an error on first call if a reducer attempts to handle a private action",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 86
+            },
+            "line": 180,
+            "code": "    it('throws an error on first call if a reducer attempts to handle a private action', () => {\n      const reducer = combineReducers({\n        counter(state: number, action) {\n          switch (action.type) {\n            case 'increment':\n              return state + 1\n            case 'decrement':\n              return state - 1\n            // Never do this in your code:\n            case ActionTypes.INIT:\n              return 0\n            default:\n              return undefined\n          }\n        }\n      })\n      expect(() =>\n        reducer(undefined, undefined as unknown as AnyAction)\n      ).toThrow(/\"counter\".*private/)\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "warns if no reducers are passed to combineReducers",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 201,
+                "column": 58
+            },
+            "line": 201,
+            "code": "    it('warns if no reducers are passed to combineReducers', () => {\n      const preSpy = console.error\n      const spy = jest.fn()\n      console.error = spy\n\n      const reducer = combineReducers({})\n      reducer(undefined, { type: '' })\n      expect(spy.mock.calls[0][0]).toMatch(\n        /Store does not have a valid reducer/\n      )\n\n      spy.mockClear()\n      console.error = preSpy\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "warns if input state does not match reducer shape",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 216,
+                "column": 57
+            },
+            "line": 216,
+            "code": "    it('warns if input state does not match reducer shape', () => {\n      const preSpy = console.error\n      const spy = jest.fn()\n      const nullAction = undefined as unknown as AnyAction\n      console.error = spy\n\n      interface ShapeState {\n        foo: { bar: number }\n        baz: { qux: number }\n      }\n\n      type _ShapeMismatchState = CombinedState<ShapeState>\n\n      const reducer = combineReducers<ShapeState>({\n        foo(state = { bar: 1 }) {\n          return state\n        },\n        baz(state = { qux: 3 }) {\n          return state\n        }\n      })\n\n      reducer(undefined, nullAction)\n      expect(spy.mock.calls.length).toBe(0)\n\n      reducer({ foo: { bar: 2 } } as unknown as ShapeState, nullAction)\n      expect(spy.mock.calls.length).toBe(0)\n\n      reducer(\n        {\n          foo: { bar: 2 },\n          baz: { qux: 4 }\n        },\n        nullAction\n      )\n      expect(spy.mock.calls.length).toBe(0)\n\n      createStore(reducer, { bar: 2 } as unknown as ShapeState)\n      expect(spy.mock.calls[0][0]).toMatch(\n        /Unexpected key \"bar\".*createStore.*instead: \"foo\", \"baz\"/\n      )\n\n      createStore(reducer, {\n        bar: 2,\n        qux: 4,\n        thud: 5\n      } as unknown as ShapeState)\n      expect(spy.mock.calls[1][0]).toMatch(\n        /Unexpected keys \"qux\", \"thud\".*createStore.*instead: \"foo\", \"baz\"/\n      )\n\n      createStore(reducer, 1 as unknown as ShapeState)\n      expect(spy.mock.calls[2][0]).toMatch(\n        /createStore has unexpected type of \"number\".*keys: \"foo\", \"baz\"/\n      )\n\n      reducer({ corge: 2 } as unknown as ShapeState, nullAction)\n      expect(spy.mock.calls[3][0]).toMatch(\n        /Unexpected key \"corge\".*reducer.*instead: \"foo\", \"baz\"/\n      )\n\n      reducer({ fred: 2, grault: 4 } as unknown as ShapeState, nullAction)\n      expect(spy.mock.calls[4][0]).toMatch(\n        /Unexpected keys \"fred\", \"grault\".*reducer.*instead: \"foo\", \"baz\"/\n      )\n\n      reducer(1 as unknown as ShapeState, nullAction)\n      expect(spy.mock.calls[5][0]).toMatch(\n        /reducer has unexpected type of \"number\".*keys: \"foo\", \"baz\"/\n      )\n\n      spy.mockClear()\n      console.error = preSpy\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "only warns for unexpected keys once",
+            "suites": [
+                "Utils",
+                "combineReducers"
+            ],
+            "updatePoint": {
+                "line": 291,
+                "column": 43
+            },
+            "line": 291,
+            "code": "    it('only warns for unexpected keys once', () => {\n      const preSpy = console.error\n      const spy = jest.fn()\n      console.error = spy\n      const nullAction = { type: '' }\n\n      const foo = (state = { foo: 1 }) => state\n      const bar = (state = { bar: 2 }) => state\n\n      expect(spy.mock.calls.length).toBe(0)\n\n      interface WarnState {\n        foo: { foo: number }\n        bar: { bar: number }\n      }\n\n      const reducer = combineReducers({ foo, bar })\n      const state = { foo: 1, bar: 2, qux: 3 } as unknown as WarnState\n      const bazState = { ...state, baz: 5 } as unknown as WarnState\n\n      reducer(state, nullAction)\n      reducer(state, nullAction)\n      reducer(state, nullAction)\n      reducer(state, nullAction)\n      expect(spy.mock.calls.length).toBe(1)\n\n      reducer(bazState, nullAction)\n      reducer({ ...bazState }, nullAction)\n      reducer({ ...bazState }, nullAction)\n      reducer({ ...bazState }, nullAction)\n      expect(spy.mock.calls.length).toBe(2)\n\n      spy.mockClear()\n      console.error = preSpy\n    })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return an updated state when additional reducers are passed to combineReducers",
+            "suites": [
+                "Utils",
+                "combineReducers",
+                "With Replace Reducers"
+            ],
+            "updatePoint": {
+                "line": 332,
+                "column": 95
+            },
+            "line": 332,
+            "code": "      it('should return an updated state when additional reducers are passed to combineReducers', function () {\n        const originalCompositeReducer = combineReducers({ foo })\n        const store = createStore(originalCompositeReducer)\n\n        store.dispatch(ACTION)\n\n        const initialState = store.getState()\n\n        store.replaceReducer(combineReducers({ foo, bar }))\n        store.dispatch(ACTION)\n\n        const nextState = store.getState()\n        expect(nextState).not.toBe(initialState)\n      })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return an updated state when reducers passed to combineReducers are changed",
+            "suites": [
+                "Utils",
+                "combineReducers",
+                "With Replace Reducers"
+            ],
+            "updatePoint": {
+                "line": 347,
+                "column": 92
+            },
+            "line": 347,
+            "code": "      it('should return an updated state when reducers passed to combineReducers are changed', function () {\n        const baz = (state = {}) => state\n\n        const originalCompositeReducer = combineReducers({ foo, bar })\n        const store = createStore(originalCompositeReducer)\n\n        store.dispatch(ACTION)\n\n        const initialState = store.getState()\n\n        store.replaceReducer(combineReducers({ baz, bar }))\n        store.dispatch(ACTION)\n\n        const nextState = store.getState()\n        expect(nextState).not.toBe(initialState)\n      })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the same state when reducers passed to combineReducers not changed",
+            "suites": [
+                "Utils",
+                "combineReducers",
+                "With Replace Reducers"
+            ],
+            "updatePoint": {
+                "line": 364,
+                "column": 90
+            },
+            "line": 364,
+            "code": "      it('should return the same state when reducers passed to combineReducers not changed', function () {\n        const originalCompositeReducer = combineReducers({ foo, bar })\n        const store = createStore(originalCompositeReducer)\n\n        store.dispatch(ACTION)\n\n        const initialState = store.getState()\n\n        store.replaceReducer(combineReducers({ foo, bar }))\n        store.dispatch(ACTION)\n\n        const nextState = store.getState()\n        expect(nextState).toBe(initialState)\n      })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return an updated state when one of more reducers passed to the combineReducers are removed",
+            "suites": [
+                "Utils",
+                "combineReducers",
+                "With Replace Reducers"
+            ],
+            "updatePoint": {
+                "line": 379,
+                "column": 108
+            },
+            "line": 379,
+            "code": "      it('should return an updated state when one of more reducers passed to the combineReducers are removed', function () {\n        const originalCompositeReducer = combineReducers({ foo, bar })\n        const store = createStore(originalCompositeReducer)\n\n        store.dispatch(ACTION)\n\n        const initialState = store.getState()\n\n        store.replaceReducer(combineReducers({ bar }))\n\n        const nextState = store.getState()\n        expect(nextState).not.toBe(initialState)\n      })",
+            "file": "combineReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "composes from right to left",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 5,
+                "column": 35
+            },
+            "line": 5,
+            "code": "    it('composes from right to left', () => {\n      const double = (x: number) => x * 2\n      const square = (x: number) => x * x\n      expect(compose(square)(5)).toBe(25)\n      expect(compose(square, double)(5)).toBe(100)\n      expect(compose(double, square, double)(5)).toBe(200)\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "composes functions from right to left",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 45
+            },
+            "line": 13,
+            "code": "    it('composes functions from right to left', () => {\n      const a = (next: (x: string) => string) => (x: string) => next(x + 'a')\n      const b = (next: (x: string) => string) => (x: string) => next(x + 'b')\n      const c = (next: (x: string) => string) => (x: string) => next(x + 'c')\n      const final = (x: string) => x\n\n      expect(compose(a, b, c)(final)('')).toBe('abc')\n      expect(compose(b, c, a)(final)('')).toBe('bca')\n      expect(compose(c, a, b)(final)('')).toBe('cab')\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws at runtime if argument is not a function",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 55
+            },
+            "line": 24,
+            "code": "    it('throws at runtime if argument is not a function', () => {\n      type sFunc = (x: number, y: number) => number\n      const square = (x: number, _: number) => x * x\n      const add = (x: number, y: number) => x + y\n\n      expect(() =>\n        compose(square, add, false as unknown as sFunc)(1, 2)\n      ).toThrow()\n      // @ts-expect-error\n      expect(() => compose(square, add, undefined)(1, 2)).toThrow()\n      expect(() =>\n        compose(square, add, true as unknown as sFunc)(1, 2)\n      ).toThrow()\n      expect(() =>\n        compose(square, add, NaN as unknown as sFunc)(1, 2)\n      ).toThrow()\n      expect(() =>\n        compose(square, add, '42' as unknown as sFunc)(1, 2)\n      ).toThrow()\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can be seeded with multiple arguments",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 45
+            },
+            "line": 45,
+            "code": "    it('can be seeded with multiple arguments', () => {\n      const square = (x: number, _: number) => x * x\n      const add = (x: number, y: number) => x + y\n      expect(compose(square, add)(1, 2)).toBe(9)\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns the first given argument if given no functions",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 62
+            },
+            "line": 51,
+            "code": "    it('returns the first given argument if given no functions', () => {\n      expect(compose<number>()(1, 2)).toBe(1)\n      expect(compose()(3)).toBe(3)\n      expect(compose()(undefined)).toBe(undefined)\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns the first function if given only one",
+            "suites": [
+                "Utils",
+                "compose"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 52
+            },
+            "line": 57,
+            "code": "    it('returns the first function if given only one', () => {\n      const fn = () => {}\n\n      expect(compose(fn)).toBe(fn)\n    })",
+            "file": "compose.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exposes the public API",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 28
+            },
+            "line": 17,
+            "code": "  it('exposes the public API', () => {\n    const store = createStore(combineReducers(reducers))\n\n    // Since switching to internal Symbol.observable impl, it will show up as a key in node env\n    // So we filter it out\n    const methods = Object.keys(store).filter(key => key !== $$observable)\n\n    expect(methods.length).toBe(4)\n    expect(methods).toContain('subscribe')\n    expect(methods).toContain('dispatch')\n    expect(methods).toContain('getState')\n    expect(methods).toContain('replaceReducer')\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if reducer is not a function",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 41
+            },
+            "line": 31,
+            "code": "  it('throws if reducer is not a function', () => {\n    // @ts-expect-error\n    expect(() => createStore(undefined)).toThrow()\n    // @ts-expect-error\n    expect(() => createStore('test')).toThrow()\n    // @ts-expect-error\n    expect(() => createStore({})).toThrow()\n\n    expect(() => createStore(() => {})).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "passes the initial state",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 30
+            },
+            "line": 42,
+            "code": "  it('passes the initial state', () => {\n    const store = createStore(reducers.todos, [\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "applies the reducer to the previous state",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 47
+            },
+            "line": 57,
+            "code": "  it('applies the reducer to the previous state', () => {\n    const store = createStore(reducers.todos)\n    expect(store.getState()).toEqual([])\n\n    store.dispatch(unknownAction())\n    expect(store.getState()).toEqual([])\n\n    store.dispatch(addTodo('Hello'))\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n\n    store.dispatch(addTodo('World'))\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "applies the reducer to the initial state",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 46
+            },
+            "line": 85,
+            "code": "  it('applies the reducer to the initial state', () => {\n    const store = createStore(reducers.todos, [\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n\n    store.dispatch(unknownAction())\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n\n    store.dispatch(addTodo('World'))\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "preserves the state when replacing a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 50
+            },
+            "line": 120,
+            "code": "  it('preserves the state when replacing a reducer', () => {\n    const store = createStore(reducers.todos)\n    store.dispatch(addTodo('Hello'))\n    store.dispatch(addTodo('World'))\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n\n    store.replaceReducer(reducers.todosReverse)\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n\n    store.dispatch(addTodo('Perhaps'))\n    expect(store.getState()).toEqual([\n      {\n        id: 3,\n        text: 'Perhaps'\n      },\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n\n    store.replaceReducer(reducers.todos)\n    expect(store.getState()).toEqual([\n      {\n        id: 3,\n        text: 'Perhaps'\n      },\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      }\n    ])\n\n    store.dispatch(addTodo('Surely'))\n    expect(store.getState()).toEqual([\n      {\n        id: 3,\n        text: 'Perhaps'\n      },\n      {\n        id: 1,\n        text: 'Hello'\n      },\n      {\n        id: 2,\n        text: 'World'\n      },\n      {\n        id: 4,\n        text: 'Surely'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "supports multiple subscriptions",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 200,
+                "column": 37
+            },
+            "line": 200,
+            "code": "  it('supports multiple subscriptions', () => {\n    const store = createStore(reducers.todos)\n    const listenerA = jest.fn()\n    const listenerB = jest.fn()\n\n    let unsubscribeA = store.subscribe(listenerA)\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(1)\n    expect(listenerB.mock.calls.length).toBe(0)\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(2)\n    expect(listenerB.mock.calls.length).toBe(0)\n\n    const unsubscribeB = store.subscribe(listenerB)\n    expect(listenerA.mock.calls.length).toBe(2)\n    expect(listenerB.mock.calls.length).toBe(0)\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(1)\n\n    unsubscribeA()\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(1)\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(2)\n\n    unsubscribeB()\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(2)\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(2)\n\n    unsubscribeA = store.subscribe(listenerA)\n    expect(listenerA.mock.calls.length).toBe(3)\n    expect(listenerB.mock.calls.length).toBe(2)\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(4)\n    expect(listenerB.mock.calls.length).toBe(2)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "only removes listener once when unsubscribe is called",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 247,
+                "column": 59
+            },
+            "line": 247,
+            "code": "  it('only removes listener once when unsubscribe is called', () => {\n    const store = createStore(reducers.todos)\n    const listenerA = jest.fn()\n    const listenerB = jest.fn()\n\n    const unsubscribeA = store.subscribe(listenerA)\n    store.subscribe(listenerB)\n\n    unsubscribeA()\n    unsubscribeA()\n\n    store.dispatch(unknownAction())\n    expect(listenerA.mock.calls.length).toBe(0)\n    expect(listenerB.mock.calls.length).toBe(1)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "only removes relevant listener when unsubscribe is called",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 263,
+                "column": 63
+            },
+            "line": 263,
+            "code": "  it('only removes relevant listener when unsubscribe is called', () => {\n    const store = createStore(reducers.todos)\n    const listener = jest.fn()\n\n    store.subscribe(listener)\n    const unsubscribeSecond = store.subscribe(listener)\n\n    unsubscribeSecond()\n    unsubscribeSecond()\n\n    store.dispatch(unknownAction())\n    expect(listener.mock.calls.length).toBe(1)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "supports removing a subscription within a subscription",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 277,
+                "column": 60
+            },
+            "line": 277,
+            "code": "  it('supports removing a subscription within a subscription', () => {\n    const store = createStore(reducers.todos)\n    const listenerA = jest.fn()\n    const listenerB = jest.fn()\n    const listenerC = jest.fn()\n\n    store.subscribe(listenerA)\n    const unSubB = store.subscribe(() => {\n      listenerB()\n      unSubB()\n    })\n    store.subscribe(listenerC)\n\n    store.dispatch(unknownAction())\n    store.dispatch(unknownAction())\n\n    expect(listenerA.mock.calls.length).toBe(2)\n    expect(listenerB.mock.calls.length).toBe(1)\n    expect(listenerC.mock.calls.length).toBe(2)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "notifies all subscribers about current dispatch regardless if any of them gets unsubscribed in the process",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 298,
+                "column": 112
+            },
+            "line": 298,
+            "code": "  it('notifies all subscribers about current dispatch regardless if any of them gets unsubscribed in the process', () => {\n    const store = createStore(reducers.todos)\n\n    const unsubscribeHandles: any[] = []\n    const doUnsubscribeAll = () =>\n      unsubscribeHandles.forEach(unsubscribe => unsubscribe())\n\n    const listener1 = jest.fn()\n    const listener2 = jest.fn()\n    const listener3 = jest.fn()\n\n    unsubscribeHandles.push(store.subscribe(() => listener1()))\n    unsubscribeHandles.push(\n      store.subscribe(() => {\n        listener2()\n        doUnsubscribeAll()\n      })\n    )\n    unsubscribeHandles.push(store.subscribe(() => listener3()))\n\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(1)\n    expect(listener2.mock.calls.length).toBe(1)\n    expect(listener3.mock.calls.length).toBe(1)\n\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(1)\n    expect(listener2.mock.calls.length).toBe(1)\n    expect(listener3.mock.calls.length).toBe(1)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "notifies only subscribers active at the moment of current dispatch",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 329,
+                "column": 72
+            },
+            "line": 329,
+            "code": "  it('notifies only subscribers active at the moment of current dispatch', () => {\n    const store = createStore(reducers.todos)\n\n    const listener1 = jest.fn()\n    const listener2 = jest.fn()\n    const listener3 = jest.fn()\n\n    let listener3Added = false\n    const maybeAddThirdListener = () => {\n      if (!listener3Added) {\n        listener3Added = true\n        store.subscribe(() => listener3())\n      }\n    }\n\n    store.subscribe(() => listener1())\n    store.subscribe(() => {\n      listener2()\n      maybeAddThirdListener()\n    })\n\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(1)\n    expect(listener2.mock.calls.length).toBe(1)\n    expect(listener3.mock.calls.length).toBe(0)\n\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(2)\n    expect(listener2.mock.calls.length).toBe(2)\n    expect(listener3.mock.calls.length).toBe(1)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "uses the last snapshot of subscribers during nested dispatch",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 361,
+                "column": 66
+            },
+            "line": 361,
+            "code": "  it('uses the last snapshot of subscribers during nested dispatch', () => {\n    const store = createStore(reducers.todos)\n\n    const listener1 = jest.fn()\n    const listener2 = jest.fn()\n    const listener3 = jest.fn()\n    const listener4 = jest.fn()\n\n    let unsubscribe4: any\n    const unsubscribe1 = store.subscribe(() => {\n      listener1()\n      expect(listener1.mock.calls.length).toBe(1)\n      expect(listener2.mock.calls.length).toBe(0)\n      expect(listener3.mock.calls.length).toBe(0)\n      expect(listener4.mock.calls.length).toBe(0)\n\n      unsubscribe1()\n      unsubscribe4 = store.subscribe(listener4)\n      store.dispatch(unknownAction())\n\n      expect(listener1.mock.calls.length).toBe(1)\n      expect(listener2.mock.calls.length).toBe(1)\n      expect(listener3.mock.calls.length).toBe(1)\n      expect(listener4.mock.calls.length).toBe(1)\n    })\n    store.subscribe(listener2)\n    store.subscribe(listener3)\n\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(1)\n    expect(listener2.mock.calls.length).toBe(2)\n    expect(listener3.mock.calls.length).toBe(2)\n    expect(listener4.mock.calls.length).toBe(1)\n\n    unsubscribe4()\n    store.dispatch(unknownAction())\n    expect(listener1.mock.calls.length).toBe(1)\n    expect(listener2.mock.calls.length).toBe(3)\n    expect(listener3.mock.calls.length).toBe(3)\n    expect(listener4.mock.calls.length).toBe(1)\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "provides an up-to-date state when a subscriber is notified",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 403,
+                "column": 64
+            },
+            "line": 403,
+            "code": "  it('provides an up-to-date state when a subscriber is notified', done => {\n    const store = createStore(reducers.todos)\n    store.subscribe(() => {\n      expect(store.getState()).toEqual([\n        {\n          id: 1,\n          text: 'Hello'\n        }\n      ])\n      done()\n    })\n    store.dispatch(addTodo('Hello'))\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not leak private listeners array",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 417,
+                "column": 43
+            },
+            "line": 417,
+            "code": "  it('does not leak private listeners array', done => {\n    const store = createStore(reducers.todos)\n    store.subscribe(function (this: any) {\n      expect(this).toBe(undefined)\n      done()\n    })\n    store.dispatch(addTodo('Hello'))\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "only accepts plain object actions",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 426,
+                "column": 39
+            },
+            "line": 426,
+            "code": "  it('only accepts plain object actions', () => {\n    const store = createStore(reducers.todos)\n    expect(() => store.dispatch(unknownAction())).not.toThrow()\n\n    function AwesomeMap() {}\n    // @ts-expect-error\n    ;[null, undefined, 42, 'hey', new AwesomeMap()].forEach(nonObject =>\n      expect(() => store.dispatch(nonObject)).toThrow(/plain/)\n    )\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "handles nested dispatches gracefully",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 437,
+                "column": 42
+            },
+            "line": 437,
+            "code": "  it('handles nested dispatches gracefully', () => {\n    function foo(state = 0, action: Action) {\n      return action.type === 'foo' ? 1 : state\n    }\n\n    function bar(state = 0, action: Action) {\n      return action.type === 'bar' ? 2 : state\n    }\n\n    const store = createStore(combineReducers({ foo, bar }))\n\n    store.subscribe(function kindaComponentDidUpdate() {\n      const state = store.getState()\n      if (state.bar === 0) {\n        store.dispatch({ type: 'bar' })\n      }\n    })\n\n    store.dispatch({ type: 'foo' })\n    expect(store.getState()).toEqual({\n      foo: 1,\n      bar: 2\n    })\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not allow dispatch() from within a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 462,
+                "column": 53
+            },
+            "line": 462,
+            "code": "  it('does not allow dispatch() from within a reducer', () => {\n    const store = createStore(reducers.dispatchInTheMiddleOfReducer)\n\n    expect(() =>\n      store.dispatch(\n        dispatchInMiddle(store.dispatch.bind(store, unknownAction()))\n      )\n    ).toThrow(/may not dispatch/)\n\n    expect(() => store.dispatch(dispatchInMiddle(() => {}))).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not allow getState() from within a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 474,
+                "column": 53
+            },
+            "line": 474,
+            "code": "  it('does not allow getState() from within a reducer', () => {\n    const store = createStore(reducers.getStateInTheMiddleOfReducer)\n\n    expect(() =>\n      store.dispatch(getStateInMiddle(store.getState.bind(store)))\n    ).toThrow(/You may not call store.getState()/)\n\n    expect(() => store.dispatch(getStateInMiddle(() => {}))).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not allow subscribe() from within a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 484,
+                "column": 54
+            },
+            "line": 484,
+            "code": "  it('does not allow subscribe() from within a reducer', () => {\n    const store = createStore(reducers.subscribeInTheMiddleOfReducer)\n\n    expect(() =>\n      store.dispatch(subscribeInMiddle(store.subscribe.bind(store, () => {})))\n    ).toThrow(/You may not call store.subscribe()/)\n\n    expect(() => store.dispatch(subscribeInMiddle(() => {}))).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not allow unsubscribe from subscribe() from within a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 494,
+                "column": 71
+            },
+            "line": 494,
+            "code": "  it('does not allow unsubscribe from subscribe() from within a reducer', () => {\n    const store = createStore(reducers.unsubscribeInTheMiddleOfReducer)\n    const unsubscribe = store.subscribe(() => {})\n\n    expect(() =>\n      store.dispatch(unsubscribeInMiddle(unsubscribe.bind(store)))\n    ).toThrow(/You may not unsubscribe from a store/)\n\n    expect(() => store.dispatch(unsubscribeInMiddle(() => {}))).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recovers from an error within a reducer",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 505,
+                "column": 45
+            },
+            "line": 505,
+            "code": "  it('recovers from an error within a reducer', () => {\n    const store = createStore(reducers.errorThrowingReducer)\n    expect(() => store.dispatch(throwError())).toThrow()\n\n    expect(() => store.dispatch(unknownAction())).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if action type is missing",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 512,
+                "column": 38
+            },
+            "line": 512,
+            "code": "  it('throws if action type is missing', () => {\n    const store = createStore(reducers.todos)\n    // @ts-expect-error\n    expect(() => store.dispatch({})).toThrow(\n      /Actions may not have an undefined \"type\" property/\n    )\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws an error that correctly describes the type of item dispatched",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 520,
+                "column": 74
+            },
+            "line": 520,
+            "code": "  it('throws an error that correctly describes the type of item dispatched', () => {\n    const store = createStore(reducers.todos)\n    // @ts-ignore\n    expect(() => store.dispatch(Promise.resolve(42))).toThrow(\n      /the actual type was: 'Promise'/\n    )\n\n    // @ts-ignore\n    expect(() => store.dispatch(() => {})).toThrow(\n      /the actual type was: 'function'/\n    )\n\n    // @ts-ignore\n    expect(() => store.dispatch(new Date())).toThrow(\n      /the actual type was: 'date'/\n    )\n\n    // @ts-ignore\n    expect(() => store.dispatch(null)).toThrow(/the actual type was: 'null'/)\n\n    // @ts-ignore\n    expect(() => store.dispatch(undefined)).toThrow(\n      /the actual type was: 'undefined'/\n    )\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if action type is undefined",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 546,
+                "column": 40
+            },
+            "line": 546,
+            "code": "  it('throws if action type is undefined', () => {\n    const store = createStore(reducers.todos)\n    expect(() => store.dispatch({ type: undefined })).toThrow(\n      /Actions may not have an undefined \"type\" property/\n    )\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not throw if action type is falsy",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 553,
+                "column": 44
+            },
+            "line": 553,
+            "code": "  it('does not throw if action type is falsy', () => {\n    const store = createStore(reducers.todos)\n    expect(() => store.dispatch({ type: false })).not.toThrow()\n    expect(() => store.dispatch({ type: 0 })).not.toThrow()\n    expect(() => store.dispatch({ type: null })).not.toThrow()\n    expect(() => store.dispatch({ type: '' })).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "accepts enhancer as the third argument",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 561,
+                "column": 44
+            },
+            "line": 561,
+            "code": "  it('accepts enhancer as the third argument', () => {\n    const emptyArray: any[] = []\n    const spyEnhancer =\n      (vanillaCreateStore: any) =>\n      (...args: any[]) => {\n        expect(args[0]).toBe(reducers.todos)\n        expect(args[1]).toBe(emptyArray)\n        expect(args.length).toBe(2)\n        const vanillaStore = vanillaCreateStore(...args)\n        return {\n          ...vanillaStore,\n          dispatch: jest.fn(vanillaStore.dispatch)\n        }\n      }\n\n    const store = createStore(reducers.todos, emptyArray, spyEnhancer)\n    const action = addTodo('Hello')\n    store.dispatch(action)\n    expect(store.dispatch).toBeCalledWith(action)\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "accepts enhancer as the second argument if initial state is missing",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 588,
+                "column": 73
+            },
+            "line": 588,
+            "code": "  it('accepts enhancer as the second argument if initial state is missing', () => {\n    const spyEnhancer =\n      (vanillaCreateStore: any) =>\n      (...args: any[]) => {\n        expect(args[0]).toBe(reducers.todos)\n        expect(args[1]).toBe(undefined)\n        expect(args.length).toBe(2)\n        const vanillaStore = vanillaCreateStore(...args)\n        return {\n          ...vanillaStore,\n          dispatch: jest.fn(vanillaStore.dispatch)\n        }\n      }\n\n    const store = createStore(reducers.todos, spyEnhancer)\n    const action = addTodo('Hello')\n    store.dispatch(action)\n    expect(store.dispatch).toBeCalledWith(action)\n    expect(store.getState()).toEqual([\n      {\n        id: 1,\n        text: 'Hello'\n      }\n    ])\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if enhancer is neither undefined nor a function",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 614,
+                "column": 60
+            },
+            "line": 614,
+            "code": "  it('throws if enhancer is neither undefined nor a function', () => {\n    expect(() =>\n      createStore(reducers.todos, undefined, {} as unknown as StoreEnhancer)\n    ).toThrow()\n\n    expect(() =>\n      createStore(reducers.todos, undefined, [] as unknown as StoreEnhancer)\n    ).toThrow()\n\n    // @ts-expect-error\n    expect(() => createStore(reducers.todos, undefined, null)).toThrow()\n\n    expect(() =>\n      createStore(reducers.todos, undefined, false as unknown as StoreEnhancer)\n    ).toThrow()\n\n    expect(() =>\n      createStore(reducers.todos, undefined, undefined)\n    ).not.toThrow()\n\n    expect(() => createStore(reducers.todos, undefined, x => x)).not.toThrow()\n\n    expect(() => createStore(reducers.todos, x => x)).not.toThrow()\n\n    expect(() => createStore(reducers.todos, [])).not.toThrow()\n\n    expect(() =>\n      createStore<any, Action, {}, {}>(reducers.todos, {})\n    ).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if nextReducer is not a function",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 645,
+                "column": 45
+            },
+            "line": 645,
+            "code": "  it('throws if nextReducer is not a function', () => {\n    const store = createStore(reducers.todos)\n\n    // @ts-expect-error\n    expect(() => store.replaceReducer(undefined)).toThrow(\n      'Expected the nextReducer to be a function.'\n    )\n\n    expect(() => store.replaceReducer(() => [])).not.toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if listener is not a function",
+            "suites": [
+                "createStore"
+            ],
+            "updatePoint": {
+                "line": 656,
+                "column": 42
+            },
+            "line": 656,
+            "code": "  it('throws if listener is not a function', () => {\n    const store = createStore(reducers.todos)\n    // @ts-expect-error\n    expect(() => store.subscribe(undefined)).toThrow()\n    // @ts-expect-error\n    expect(() => store.subscribe('')).toThrow()\n    // @ts-expect-error\n    expect(() => store.subscribe(null)).toThrow()\n    // @ts-expect-error\n    expect(() => store.subscribe(undefined)).toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should exist",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point"
+            ],
+            "updatePoint": {
+                "line": 669,
+                "column": 20
+            },
+            "line": 669,
+            "code": "    it('should exist', () => {\n      const store = createStore(() => {})\n      // @ts-expect-error\n      expect(typeof store[$$observable]).toBe('function')\n    })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be subscribable",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 676,
+                "column": 32
+            },
+            "line": 676,
+            "code": "      it('should be subscribable', () => {\n        const store = createStore(() => {})\n        // @ts-expect-error\n        const obs = store[$$observable]()\n        expect(typeof obs.subscribe).toBe('function')\n      })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "may be used to retrieve itself",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 683,
+                "column": 40
+            },
+            "line": 683,
+            "code": "      it('may be used to retrieve itself', () => {\n        const store = createStore(() => {})\n        // @ts-expect-error\n        const obs = store[$$observable]()\n        expect(obs[$$observable]()).toBe(obs)\n      })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw a TypeError if an observer object is not supplied to subscribe",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 690,
+                "column": 85
+            },
+            "line": 690,
+            "code": "      it('should throw a TypeError if an observer object is not supplied to subscribe', () => {\n        const store = createStore(() => {})\n        // @ts-expect-error\n        const obs = store[$$observable]()\n\n        expect(function () {\n          obs.subscribe()\n        }).toThrowError(\n          new TypeError(\n            `Expected the observer to be an object. Instead, received: 'undefined'`\n          )\n        )\n\n        expect(function () {\n          obs.subscribe(null)\n        }).toThrowError(\n          new TypeError(\n            `Expected the observer to be an object. Instead, received: 'null'`\n          )\n        )\n\n        expect(function () {\n          obs.subscribe(() => {})\n        }).toThrowError(\n          new TypeError(\n            `Expected the observer to be an object. Instead, received: 'function'`\n          )\n        )\n\n        expect(function () {\n          obs.subscribe({})\n        }).not.toThrow()\n      })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return a subscription object when subscribed",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 724,
+                "column": 61
+            },
+            "line": 724,
+            "code": "      it('should return a subscription object when subscribed', () => {\n        const store = createStore(() => {})\n        // @ts-expect-error\n        const obs = store[$$observable]()\n        const sub = obs.subscribe({})\n        expect(typeof sub.unsubscribe).toBe('function')\n      })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass an integration test with no unsubscribe",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 733,
+                "column": 59
+            },
+            "line": 733,
+            "code": "    it('should pass an integration test with no unsubscribe', () => {\n      function foo(state = 0, action: Action) {\n        return action.type === 'foo' ? 1 : state\n      }\n\n      function bar(state = 0, action: Action) {\n        return action.type === 'bar' ? 2 : state\n      }\n\n      const store = createStore(combineReducers({ foo, bar }))\n      // @ts-expect-error\n      const observable = store[$$observable]()\n      const results: any[] = []\n\n      observable.subscribe({\n        next(state: any) {\n          results.push(state)\n        }\n      })\n\n      store.dispatch({ type: 'foo' })\n      store.dispatch({ type: 'bar' })\n\n      expect(results).toEqual([\n        { foo: 0, bar: 0 },\n        { foo: 1, bar: 0 },\n        { foo: 1, bar: 2 }\n      ])\n    })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass an integration test with an unsubscribe",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 763,
+                "column": 59
+            },
+            "line": 763,
+            "code": "    it('should pass an integration test with an unsubscribe', () => {\n      function foo(state = 0, action: Action) {\n        return action.type === 'foo' ? 1 : state\n      }\n\n      function bar(state = 0, action: Action) {\n        return action.type === 'bar' ? 2 : state\n      }\n\n      const store = createStore(combineReducers({ foo, bar }))\n      // @ts-expect-error\n      const observable = store[$$observable]()\n      const results: any[] = []\n\n      const sub = observable.subscribe({\n        next(state: any) {\n          results.push(state)\n        }\n      })\n\n      store.dispatch({ type: 'foo' })\n      sub.unsubscribe()\n      store.dispatch({ type: 'bar' })\n\n      expect(results).toEqual([\n        { foo: 0, bar: 0 },\n        { foo: 1, bar: 0 }\n      ])\n    })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass an integration test with a common library (RxJS)",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 793,
+                "column": 68
+            },
+            "line": 793,
+            "code": "    it('should pass an integration test with a common library (RxJS)', () => {\n      function foo(state = 0, action: Action) {\n        return action.type === 'foo' ? 1 : state\n      }\n\n      function bar(state = 0, action: Action) {\n        return action.type === 'bar' ? 2 : state\n      }\n\n      const store: ObservableInput<{ foo: number; bar: number }> = createStore(\n        combineReducers({ foo, bar })\n      )\n      const observable = from(store)\n      const results: any[] = []\n\n      const sub = observable\n        .pipe(map(state => ({ fromRx: true, ...state })))\n        .subscribe(state => results.push(state))\n      ;(store as unknown as Store).dispatch({ type: 'foo' })\n      sub.unsubscribe()\n      ;(store as unknown as Store).dispatch({ type: 'bar' })\n\n      expect(results).toEqual([\n        { foo: 0, bar: 0, fromRx: true },\n        { foo: 1, bar: 0, fromRx: true }\n      ])\n    })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not log an error if parts of the current state will be ignored by a nextReducer using combineReducers",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 822,
+                "column": 112
+            },
+            "line": 822,
+            "code": "  it('does not log an error if parts of the current state will be ignored by a nextReducer using combineReducers', () => {\n    const originalConsoleError = console.error\n    console.error = jest.fn()\n\n    const store = createStore(\n      combineReducers({\n        x: (s = 0, _) => s,\n        y: combineReducers({\n          z: (s = 0, _) => s,\n          w: (s = 0, _) => s\n        })\n      })\n    )\n\n    store.replaceReducer(\n      combineReducers({\n        y: combineReducers({\n          z: (s = 0, _) => s\n        })\n      })\n    )\n\n    expect((console.error as any).mock.calls.length).toBe(0)\n    console.error = originalConsoleError\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if passing several enhancer functions without preloaded state",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 848,
+                "column": 74
+            },
+            "line": 848,
+            "code": "  it('throws if passing several enhancer functions without preloaded state', () => {\n    const rootReducer = combineReducers(reducers)\n    const dummyEnhancer = (f: any) => f\n    expect(() =>\n      // use a fake pre-loaded state to get a valid createStore signature\n      createStore(rootReducer, dummyEnhancer as unknown as {}, dummyEnhancer)\n    ).toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws if passing several enhancer functions with preloaded state",
+            "suites": [
+                "createStore",
+                "Symbol.observable interop point",
+                "returned value"
+            ],
+            "updatePoint": {
+                "line": 857,
+                "column": 71
+            },
+            "line": 857,
+            "code": "  it('throws if passing several enhancer functions with preloaded state', () => {\n    const rootReducer = combineReducers(reducers)\n    const dummyEnhancer = (f: any) => f\n    expect(() =>\n      // work around the type so we can call this poorly\n      (createStore as any)(\n        rootReducer,\n        { todos: [] },\n        dummyEnhancer,\n        dummyEnhancer\n      )\n    ).toThrow()\n  })",
+            "file": "createStore.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns the original store",
+            "suites": [
+                "replaceReducers test"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 32
+            },
+            "line": 4,
+            "code": "  it('returns the original store', () => {\n    const nextReducer = combineReducers({\n      foo: (state = 1, _action) => state,\n      bar: (state = 2, _action) => state\n    })\n    const store = createStore((state, action) => {\n      if (state === undefined) return { type: 5 }\n      return action\n    })\n\n    const nextStore = store.replaceReducer(nextReducer)\n\n    expect(nextStore).toBe(store)\n  })",
+            "file": "replaceReducers.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns message with expected code references",
+            "suites": [
+                "formatProdErrorMessage"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 51
+            },
+            "line": 4,
+            "code": "  it('returns message with expected code references', () => {\n    const code = 16\n\n    const errorMessage = formatProdErrorMessage(code)\n\n    expect(errorMessage).toContain(`#${code}`)\n    expect(errorMessage).toContain(`code=${code}`)\n  })",
+            "file": "utils/formatProdErrorMessage.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns true only if plain object",
+            "suites": [
+                "isPlainObject"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 39
+            },
+            "line": 6,
+            "code": "  it('returns true only if plain object', () => {\n    const sandbox = { fromAnotherRealm: false }\n    vm.runInNewContext('fromAnotherRealm = {}', sandbox)\n\n    expect(isPlainObject(sandbox.fromAnotherRealm)).toBe(true)\n    expect(isPlainObject(new Date())).toBe(false)\n    expect(isPlainObject([1, 2, 3])).toBe(false)\n    expect(isPlainObject(null)).toBe(false)\n    expect(isPlainObject(undefined)).toBe(false)\n    expect(isPlainObject({ x: 1, y: 2 })).toBe(true)\n  })",
+            "file": "utils/isPlainObject.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calls console.error when available",
+            "suites": [
+                "Utils",
+                "warning"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 42
+            },
+            "line": 6,
+            "code": "    it('calls console.error when available', () => {\n      const preSpy = console.error\n      const spy = jest.fn()\n      console.error = spy\n      try {\n        warning('Test')\n        expect(spy.mock.calls[0][0]).toBe('Test')\n      } finally {\n        spy.mockClear()\n        console.error = preSpy\n      }\n    })",
+            "file": "utils/warning.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not throw when console.error is not available",
+            "suites": [
+                "Utils",
+                "warning"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 58
+            },
+            "line": 19,
+            "code": "    it('does not throw when console.error is not available', () => {\n      const realConsole = global.console\n      Object.defineProperty(global, 'console', { value: {} })\n      try {\n        expect(() => warning('Test')).not.toThrow()\n      } finally {\n        Object.defineProperty(global, 'console', { value: realConsole })\n      }\n    })",
+            "file": "utils/warning.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not throw when console is not available",
+            "suites": [
+                "Utils",
+                "warning"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 52
+            },
+            "line": 29,
+            "code": "    it('does not throw when console is not available', () => {\n      const realConsole = global.console\n      Object.defineProperty(global, 'console', { value: undefined })\n      try {\n        expect(() => warning('Test')).not.toThrow()\n      } finally {\n        Object.defineProperty(global, 'console', { value: realConsole })\n      }\n    })",
+            "file": "utils/warning.spec.ts",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "reduxjs__redux.svg"
+}

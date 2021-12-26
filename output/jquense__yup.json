@@ -1,0 +1,3412 @@
+{
+    "repo": "jquense/yup",
+    "url": "https://github.com/jquense/yup",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "yup",
+            "lang": "ts",
+            "dir": "test",
+            "framework": "jest",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should parse json strings",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 5,
+                "column": 33
+            },
+            "line": 5,
+            "code": "    it('should parse json strings', () => {\n      array().cast('[2,3,5,6]').should.eql([2, 3, 5, 6]);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return null for failed casts",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 9,
+                "column": 43
+            },
+            "line": 9,
+            "code": "    it('should return null for failed casts', () => {\n      expect(array().cast('asfasf', { assert: false })).to.equal(null);\n\n      expect(array().cast(null, { assert: false })).to.equal(null);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should recursively cast fields",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 38
+            },
+            "line": 15,
+            "code": "    it('should recursively cast fields', () => {\n      array().of(number()).cast(['4', '5']).should.eql([4, 5]);\n\n      array()\n        .of(string())\n        .cast(['4', 5, false])\n        .should.eql(['4', '5', 'false']);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle DEFAULT",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 27
+            },
+            "line": 25,
+            "code": "  it('should handle DEFAULT', () => {\n    expect(array().getDefault()).to.equal(undefined);\n\n    array()\n      .default(() => [1, 2, 3])\n      .getDefault()\n      .should.eql([1, 2, 3]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should type check",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 23
+            },
+            "line": 34,
+            "code": "  it('should type check', () => {\n    var inst = array();\n\n    inst.isType([]).should.equal(true);\n    inst.isType({}).should.equal(false);\n    inst.isType('true').should.equal(false);\n    inst.isType(NaN).should.equal(false);\n    inst.isType(34545).should.equal(false);\n\n    expect(inst.isType(null)).to.equal(false);\n\n    inst.nullable().isType(null).should.equal(true);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should cast children",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 26
+            },
+            "line": 48,
+            "code": "  it('should cast children', () => {\n    array().of(number()).cast(['1', '3']).should.eql([1, 3]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should concat subType correctly",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 37
+            },
+            "line": 52,
+            "code": "  it('should concat subType correctly', async () => {\n    expect(array(number()).concat(array()).innerType).to.exist();\n\n    let merged = array(number()).concat(array(number().required()));\n\n    expect(merged.innerType.type).to.equal('number');\n\n    await expect(merged.validateAt('[0]', undefined)).to.be.rejected();\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass options to children",
+            "suites": [
+                "Array types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 62,
+                "column": 37
+            },
+            "line": 62,
+            "code": "  it('should pass options to children', () => {\n    array(object({ name: string() }))\n      .cast([{ id: 1, name: 'john' }], { stripUnknown: true })\n      .should.eql([{ name: 'john' }]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Basic validations fail: %s %p",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "line": 69,
+            "code": "    test.each([\n      ['missing', undefined, array().defined()],\n      ['required', undefined, array().required()],\n      ['required', null, array().required()],\n      ['null', null, array()],\n      ['length', [1, 2, 3], array().length(2)],\n    ])('Basic validations fail: %s %p', async (type, value, schema) => {\n      expect(await schema.isValid(value)).to.equal(false);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Basic validations pass: %s %p",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "line": 79,
+            "code": "    test.each([\n      ['missing', [], array().defined()],\n      ['required', [], array().required()],\n      ['nullable', null, array().nullable()],\n      ['length', [1, 2, 3], array().length(3)],\n    ])('Basic validations pass: %s %p', async (type, value, schema) => {\n      expect(await schema.isValid(value)).to.equal(true);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow undefined",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 88,
+                "column": 30
+            },
+            "line": 88,
+            "code": "    it('should allow undefined', async () => {\n      await array().of(number().max(5)).isValid().should.become(true);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "max should replace earlier tests",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 92,
+                "column": 40
+            },
+            "line": 92,
+            "code": "    it('max should replace earlier tests', async () => {\n      expect(await array().max(4).max(10).isValid(Array(5).fill(0))).to.equal(\n        true,\n      );\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "min should replace earlier tests",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 40
+            },
+            "line": 98,
+            "code": "    it('min should replace earlier tests', async () => {\n      expect(await array().min(10).min(4).isValid(Array(5).fill(0))).to.equal(\n        true,\n      );\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect subtype validations",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 104,
+                "column": 42
+            },
+            "line": 104,
+            "code": "    it('should respect subtype validations', async () => {\n      var inst = array().of(number().max(5));\n\n      await inst.isValid(['gg', 3]).should.become(false);\n      await inst.isValid([7, 3]).should.become(false);\n\n      let value = await inst.validate(['4', 3]);\n\n      value.should.eql([4, 3]);\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should prevent recursive casting",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 40
+            },
+            "line": 115,
+            "code": "    it('should prevent recursive casting', async () => {\n      let castSpy = sinon.spy(StringSchema.prototype, '_cast');\n\n      let value = await array(string()).validate([5]);\n\n      value[0].should.equal('5');\n\n      castSpy.should.have.been.calledOnce();\n      StringSchema.prototype._cast.restore();\n    });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect abortEarly",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 127,
+                "column": 31
+            },
+            "line": 127,
+            "code": "  it('should respect abortEarly', () => {\n    var inst = array()\n      .of(object({ str: string().required() }))\n      .test('name', 'oops', () => false);\n\n    return Promise.all([\n      inst\n        .validate([{ str: '' }])\n        .should.be.rejected()\n        .then((err) => {\n          err.value.should.eql([{ str: '' }]);\n          err.errors.length.should.equal(1);\n          err.errors.should.eql(['oops']);\n        }),\n      inst\n        .validate([{ str: '' }], { abortEarly: false })\n        .should.be.rejected()\n        .then((err) => {\n          err.value.should.eql([{ str: '' }]);\n          err.errors.length.should.equal(2);\n          err.errors.should.eql(['[0].str is a required field', 'oops']);\n        }),\n    ]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should compact arrays",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 152,
+                "column": 27
+            },
+            "line": 152,
+            "code": "  it('should compact arrays', () => {\n    var arr = ['', 1, 0, 4, false, null],\n      inst = array();\n\n    inst.compact().cast(arr).should.eql([1, 4]);\n\n    inst\n      .compact((v) => v == null)\n      .cast(arr)\n      .should.eql(['', 1, 0, 4, false]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should ensure arrays",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 164,
+                "column": 26
+            },
+            "line": 164,
+            "code": "  it('should ensure arrays', () => {\n    var inst = array().ensure();\n\n    const a = [1, 4];\n    inst.cast(a).should.equal(a);\n\n    inst.cast(null).should.eql([]);\n    // nullable is redundant since this should always produce an array\n    // but we want to ensure that null is actually turned into an array\n    inst.nullable().cast(null).should.eql([]);\n\n    inst.cast(1).should.eql([1]);\n    inst.nullable().cast(1).should.eql([1]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass resolved path to descendants",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 179,
+                "column": 46
+            },
+            "line": 179,
+            "code": "  it('should pass resolved path to descendants', async () => {\n    let value = ['2', '3'];\n    let expectedPaths = ['[0]', '[1]'];\n\n    let itemSchema = string().when([], function (_, context) {\n      let path = context.path || '';\n      path.should.be.oneOf(expectedPaths);\n      return string().required();\n    });\n\n    await array().of(itemSchema).validate(value);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should maintain array sparseness through validation",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 192,
+                "column": 57
+            },
+            "line": 192,
+            "code": "  it('should maintain array sparseness through validation', async () => {\n    let sparseArray = new Array(2);\n    sparseArray[1] = 1;\n    let value = await array().of(number()).validate(sparseArray);\n    expect(0 in sparseArray).to.be.false();\n    expect(0 in value).to.be.false();\n    // eslint-disable-next-line no-sparse-arrays\n    value.should.eql([, 1]);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validate empty slots in sparse array",
+            "suites": [
+                "Array types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 202,
+                "column": 49
+            },
+            "line": 202,
+            "code": "  it('should validate empty slots in sparse array', async () => {\n    let sparseArray = new Array(2);\n    sparseArray[1] = 1;\n    await array()\n      .of(number().required())\n      .isValid(sparseArray)\n      .should.become(false);\n  });",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should CAST correctly",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 27
+            },
+            "line": 4,
+            "code": "  it('should CAST correctly', () => {\n    let inst = bool();\n\n    inst.cast('true').should.equal(true);\n    inst.cast('True').should.equal(true);\n    inst.cast('false').should.equal(false);\n    inst.cast('False').should.equal(false);\n    inst.cast(1).should.equal(true);\n    inst.cast(0).should.equal(false);\n\n    TestHelpers.castAndShouldFail(inst, 'foo');\n\n    TestHelpers.castAndShouldFail(inst, 'bar1');\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle DEFAULT",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 27
+            },
+            "line": 19,
+            "code": "  it('should handle DEFAULT', () => {\n    let inst = bool();\n\n    expect(inst.getDefault()).to.equal(undefined);\n    inst.default(true).required().getDefault().should.equal(true);\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should type check",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 23
+            },
+            "line": 26,
+            "code": "  it('should type check', () => {\n    let inst = bool();\n\n    inst.isType(1).should.equal(false);\n    inst.isType(false).should.equal(true);\n    inst.isType('true').should.equal(false);\n    inst.isType(NaN).should.equal(false);\n    inst.isType(new Number('foooo')).should.equal(false);\n\n    inst.isType(34545).should.equal(false);\n    inst.isType(new Boolean(false)).should.equal(true);\n\n    expect(inst.isType(null)).to.equal(false);\n\n    inst.nullable().isType(null).should.equal(true);\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bool should VALIDATE correctly",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 36
+            },
+            "line": 43,
+            "code": "  it('bool should VALIDATE correctly', () => {\n    let inst = bool().required();\n\n    return Promise.all([\n      bool().isValid('1').should.eventually().equal(true),\n      bool().strict().isValid(null).should.eventually().equal(false),\n      bool().nullable().isValid(null).should.eventually().equal(true),\n      inst\n        .validate()\n        .should.be.rejected()\n        .then((err) => {\n          err.errors.length.should.equal(1);\n          err.errors[0].should.contain('required');\n        }),\n    ]);\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check isTrue correctly",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 35
+            },
+            "line": 60,
+            "code": "  it('should check isTrue correctly', () => {\n    return Promise.all([\n      bool()\n        .isTrue()\n        .isValid(true)\n        .should.eventually()\n        .equal(true),\n      bool()\n        .isTrue()\n        .isValid(false)\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check isFalse correctly",
+            "suites": [
+                "Boolean types"
+            ],
+            "updatePoint": {
+                "line": 75,
+                "column": 36
+            },
+            "line": 75,
+            "code": "  it('should check isFalse correctly', () => {\n    return Promise.all([\n      bool()\n        .isFalse()\n        .isValid(false)\n        .should.eventually()\n        .equal(true),\n      bool()\n        .isFalse()\n        .isValid(true)\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "bool.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should CAST correctly",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 27
+            },
+            "line": 8,
+            "code": "  it('should CAST correctly', () => {\n    var inst = date();\n\n    inst.cast(new Date()).should.be.a('date');\n    inst.cast('jan 15 2014').should.eql(new Date(2014, 0, 15));\n    inst.cast('2014-09-23T19:25:25Z').should.eql(new Date(1411500325000));\n    // Leading-zero milliseconds\n    inst.cast('2016-08-10T11:32:19.012Z').should.eql(new Date(1470828739012));\n    // Microsecond precision\n    inst.cast('2016-08-10T11:32:19.2125Z').should.eql(new Date(1470828739212));\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return invalid date for failed casts",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 49
+            },
+            "line": 20,
+            "code": "  it('should return invalid date for failed casts', function() {\n    var inst = date();\n\n    inst.cast(null, { assert: false }).should.not.satisfy(isValidDate);\n    inst.cast('', { assert: false }).should.not.satisfy(isValidDate);\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should type check",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 23
+            },
+            "line": 27,
+            "code": "  it('should type check', () => {\n    var inst = date();\n\n    inst.isType(new Date()).should.equal(true);\n    inst.isType(false).should.equal(false);\n    inst.isType(null).should.equal(false);\n    inst.isType(NaN).should.equal(false);\n    inst\n      .nullable()\n      .isType(new Date())\n      .should.equal(true);\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should VALIDATE correctly",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 31
+            },
+            "line": 40,
+            "code": "  it('should VALIDATE correctly', () => {\n    var inst = date()\n      .required()\n      .max(new Date(2014, 5, 15));\n\n    return Promise.all([\n      date()\n        .isValid(null)\n        .should.eventually()\n        .equal(false),\n      date()\n        .nullable()\n        .isValid(null)\n        .should.eventually()\n        .equal(true),\n\n      inst\n        .isValid(new Date(2014, 0, 15))\n        .should.eventually()\n        .equal(true),\n      inst\n        .isValid(new Date(2014, 7, 15))\n        .should.eventually()\n        .equal(false),\n      inst\n        .isValid('5')\n        .should.eventually()\n        .equal(true),\n\n      inst\n        .validate()\n        .should.be.rejected()\n        .then(err => {\n          err.errors.length.should.equal(1);\n          err.errors[0].should.contain('required');\n        }),\n    ]);\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MIN correctly",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 79,
+                "column": 32
+            },
+            "line": 79,
+            "code": "  it('should check MIN correctly', () => {\n    var min = new Date(2014, 3, 15),\n      invalid = new Date(2014, 1, 15),\n      valid = new Date(2014, 5, 15);\n    (function() {\n      date().max('hello');\n    }.should.throw(TypeError));\n    (function() {\n      date().max(ref('$foo'));\n    }.should.not.throw());\n\n    return Promise.all([\n      date()\n        .min(min)\n        .isValid(valid)\n        .should.eventually()\n        .equal(true),\n      date()\n        .min(min)\n        .isValid(invalid)\n        .should.eventually()\n        .equal(false),\n      date()\n        .min(min)\n        .isValid(null)\n        .should.eventually()\n        .equal(false),\n\n      date()\n        .min(ref('$foo'))\n        .isValid(valid, { context: { foo: min } })\n        .should.eventually()\n        .equal(true),\n      date()\n        .min(ref('$foo'))\n        .isValid(invalid, { context: { foo: min } })\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MAX correctly",
+            "suites": [
+                "Date types"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 32
+            },
+            "line": 120,
+            "code": "  it('should check MAX correctly', () => {\n    var max = new Date(2014, 7, 15),\n      invalid = new Date(2014, 9, 15),\n      valid = new Date(2014, 5, 15);\n    (function() {\n      date().max('hello');\n    }.should.throw(TypeError));\n    (function() {\n      date().max(ref('$foo'));\n    }.should.not.throw());\n\n    return Promise.all([\n      date()\n        .max(max)\n        .isValid(valid)\n        .should.eventually()\n        .equal(true),\n      date()\n        .max(max)\n        .isValid(invalid)\n        .should.eventually()\n        .equal(false),\n      date()\n        .max(max)\n        .nullable(true)\n        .isValid(null)\n        .should.eventually()\n        .equal(true),\n\n      date()\n        .max(ref('$foo'))\n        .isValid(valid, { context: { foo: max } })\n        .should.eventually()\n        .equal(true),\n      date()\n        .max(ref('$foo'))\n        .isValid(invalid, { context: { foo: max } })\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "date.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should cast  to ",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 65
+            },
+            "line": 12,
+            "code": "    it(`should cast ${printValue(value)} to ${printValue(result)}`, () => {\n      expect(schema.cast(value)).to.equal(result);\n    });",
+            "file": "helpers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not cast ",
+            "suites": [],
+            "updatePoint": {
+                "line": 18,
+                "column": 44
+            },
+            "line": 18,
+            "code": "    it(`should not cast ${printValue(value)}`, () => {\n      castAndShouldFail(inst, value);\n    });",
+            "file": "helpers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "",
+            "suites": [
+                "invalid:"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 60
+            },
+            "line": 41,
+            "code": "      it(`${printValue(value)}${message && `  (${message})`}`, async () => {\n        await schema.isValid(value).should.become(isValid);\n      });",
+            "file": "helpers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw on a non-schema value",
+            "suites": [
+                "lazy"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 40
+            },
+            "line": 4,
+            "code": "  it('should throw on a non-schema value', () => {\n    (() => lazy(() => undefined).validate()).should.throw();\n  });",
+            "file": "lazy.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call with value",
+            "suites": [
+                "lazy",
+                "mapper"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 30
+            },
+            "line": 17,
+            "code": "    it('should call with value', () => {\n      lazy(mapper).validate(value);\n      mapper.should.have.been.calledWith(value);\n    });",
+            "file": "lazy.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call with context",
+            "suites": [
+                "lazy",
+                "mapper"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 32
+            },
+            "line": 22,
+            "code": "    it('should call with context', () => {\n      const context = {\n        a: 1,\n      };\n      lazy(mapper).validate(value, context);\n      mapper.should.have.been.calledWithExactly(value, context);\n    });",
+            "file": "lazy.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "[internal] normal methods should be running in sync Mode",
+            "suites": [],
+            "updatePoint": {
+                "line": 19,
+                "column": 62
+            },
+            "line": 19,
+            "code": "  it('[internal] normal methods should be running in sync Mode', async () => {\n    let schema = number();\n\n    // test negative ensure case\n    await ensureSync(() => Promise.resolve()).should.be.rejectedWith(\n      Error,\n      'Did not execute synchronously',\n    );\n    // test positive case\n    await ensureSync(() => schema.isValid(1)).should.be.become(true);\n\n    // ensureit fails with the correct message in sync mode\n    let err = await ensureSync(() =>\n      schema.validate('john'),\n    ).should.be.rejected();\n\n    expect(err.message).to.match(\n      /the final value was: `NaN`.+cast from the value `\"john\"`/,\n    );\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cast should return a default when undefined",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 49
+            },
+            "line": 60,
+            "code": "  it('cast should return a default when undefined', () => {\n    let inst = mixed().default('hello');\n\n    inst.cast(undefined).should.equal('hello');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "getDefault should return the default value",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 48
+            },
+            "line": 66,
+            "code": "  it('getDefault should return the default value', function () {\n    let inst = string().default('hi');\n    inst.getDefault({}).should.equal('hi');\n    inst.getDefault().should.equal('hi');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "getDefault should return the default value using context",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 62
+            },
+            "line": 72,
+            "code": "  it('getDefault should return the default value using context', function () {\n    let inst = string().when('$foo', {\n      is: 'greet',\n      then: string().default('hi'),\n    });\n    inst.getDefault({ context: { foo: 'greet' } }).should.equal('hi');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should warn about null types",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 80,
+                "column": 34
+            },
+            "line": 80,
+            "code": "  it('should warn about null types', async () => {\n    let error = await string().strict().validate(null).should.be.rejected();\n\n    expect(error.message).to.match(/If \"null\" is intended/);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validateAt",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 86,
+                "column": 23
+            },
+            "line": 86,
+            "code": "  it('should validateAt', async () => {\n    const schema = object({\n      foo: array().of(\n        object({\n          loose: bool(),\n          bar: string().when('loose', {\n            is: true,\n            otherwise: (s) => s.strict(),\n          }),\n        }),\n      ),\n    });\n    const value = {\n      foo: [{ bar: 1 }, { bar: 1, loose: true }],\n    };\n\n    await schema.validateAt('foo[1].bar', value).should.be.fulfilled();\n\n    const err = await schema\n      .validateAt('foo[0].bar', value)\n      .should.be.rejected();\n\n    expect(err.message).to.match(/bar must be a `string` type/);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should print the original value",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 129,
+                "column": 37
+            },
+            "line": 129,
+            "code": "  it('should print the original value', async () => {\n    let error = await number().validate('john').should.be.rejected();\n\n    expect(error.message).to.match(\n      /the final value was: `NaN`.+cast from the value `\"john\"`/,\n    );\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow function messages",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 137,
+                "column": 36
+            },
+            "line": 137,
+            "code": "  it('should allow function messages', async () => {\n    let error = await string()\n      .label('My string')\n      .required((d) => `${d.label} is required`)\n      .validate()\n      .should.be.rejected();\n\n    expect(error.message).to.match(/My string is required/);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check types",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 147,
+                "column": 24
+            },
+            "line": 147,
+            "code": "  it('should check types', async () => {\n    let inst = string().strict().typeError('must be a ${type}!');\n\n    let error = await inst.validate(5).should.be.rejected();\n\n    error.type.should.equal('typeError');\n    error.message.should.equal('must be a string!');\n    error.inner.length.should.equal(0);\n\n    error = await inst.validate(5, { abortEarly: false }).should.be.rejected();\n\n    expect(error.type).to.not.exist();\n    error.message.should.equal('must be a string!');\n    error.inner.length.should.equal(1);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should limit values",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 163,
+                "column": 25
+            },
+            "line": 163,
+            "code": "  it('should limit values', async () => {\n    let inst = mixed().oneOf([5, 'hello']);\n\n    await inst.isValid(5).should.eventually().equal(true);\n    await inst.isValid('hello').should.eventually().equal(true);\n\n    let err = await inst.validate(6).should.be.rejected();\n\n    err.errors[0].should.equal(\n      'this must be one of the following values: 5, hello',\n    );\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should limit values with a ref",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 176,
+                "column": 36
+            },
+            "line": 176,
+            "code": "  it('should limit values with a ref', async () => {\n    let someValues = [1, 2, 3];\n    let context = { someValues };\n    let inst = mixed().oneOf([\n      ref('$someValues[0]'),\n      ref('$someValues[1]'),\n      ref('$someValues[2]'),\n    ]);\n    await inst.validate(1, { context }).should.eventually.equal(1);\n    await inst\n      .validate(4, { context })\n      .should.be.rejected()\n      .then((err) => {\n        err.type.should.equal('oneOf');\n        expect(err.params.resolved).to.deep.equal(someValues);\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not require field when notRequired was set",
+            "suites": [
+                "Mixed Types "
+            ],
+            "updatePoint": {
+                "line": 194,
+                "column": 55
+            },
+            "line": 194,
+            "code": "  it('should not require field when notRequired was set', async () => {\n    let inst = mixed().required();\n\n    await inst.isValid('test').should.eventually().equal(true);\n    await inst.isValid(1).should.eventually.equal(true);\n\n    let err = await inst.validate().should.be.rejected();\n\n    err.errors[0].should.equal('this is a required field');\n\n    inst = inst.notRequired();\n\n    await inst.isValid().should.eventually.equal(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validate synchronously",
+            "suites": [
+                "Mixed Types ",
+                "synchronous methods"
+            ],
+            "updatePoint": {
+                "line": 211,
+                "column": 39
+            },
+            "line": 211,
+            "code": "      it('should validate synchronously', async () => {\n        let schema = number();\n\n        schema.isValidSync('john').should.equal(false);\n\n        expect(() => schema.validateSync('john')).to.throw(\n          /the final value was: `NaN`.+cast from the value `\"john\"`/,\n        );\n      });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should isValid synchronously",
+            "suites": [
+                "Mixed Types ",
+                "synchronous methods"
+            ],
+            "updatePoint": {
+                "line": 221,
+                "column": 38
+            },
+            "line": 221,
+            "code": "      it('should isValid synchronously', async () => {\n        let schema = number();\n\n        schema.isValidSync('john').should.equal(false);\n      });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw on async test",
+            "suites": [
+                "Mixed Types ",
+                "synchronous methods"
+            ],
+            "updatePoint": {
+                "line": 227,
+                "column": 36
+            },
+            "line": 227,
+            "code": "      it('should throw on async test', async () => {\n        let schema = mixed().test('test', 'foo', () => Promise.resolve());\n\n        let err = await ensureSync(() =>\n          schema.validate('john'),\n        ).should.be.rejected();\n\n        expect(err.message).to.match(/Validation test of type: \"test\"/);\n      });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with refs",
+            "suites": [
+                "Mixed Types ",
+                "oneOf"
+            ],
+            "updatePoint": {
+                "line": 251,
+                "column": 29
+            },
+            "line": 251,
+            "code": "    it('should work with refs', async () => {\n      let inst = object({\n        foo: string(),\n        bar: string().oneOf([ref('foo'), 'b']),\n      });\n\n      await inst.validate({ foo: 'a', bar: 'a' }).should.be.fulfilled();\n\n      await inst.validate({ foo: 'foo', bar: 'bar' }).should.be.rejected();\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw the correct error",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 271,
+                "column": 38
+            },
+            "line": 271,
+            "code": "    it('should throw the correct error', async () => {\n      let err = await inst.validate(5).should.be.rejected();\n\n      err.errors[0].should.equal(\n        'this must not be one of the following values: 5, hello',\n      );\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should run subset of validations first",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 280,
+                "column": 44
+            },
+            "line": 280,
+            "code": "  it('should run subset of validations first', () => {\n    let called = false;\n    let inst = string()\n      .strict()\n      .test('test', 'boom', () => (called = true));\n\n    return inst\n      .validate(25)\n      .should.be.rejected()\n      .then(() => {\n        called.should.equal(false);\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect strict",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 294,
+                "column": 27
+            },
+            "line": 294,
+            "code": "  it('should respect strict', () => {\n    let inst = string().equals(['hello', '5']);\n\n    return Promise.all([\n      inst.isValid(5).should.eventually().equal(true),\n      inst.strict().isValid(5).should.eventually().equal(false),\n    ]);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect abortEarly",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 303,
+                "column": 31
+            },
+            "line": 303,
+            "code": "  it('should respect abortEarly', () => {\n    let inst = string().trim().min(10);\n\n    return Promise.all([\n      inst\n        .strict()\n        .validate(' hi ')\n        .should.be.rejected()\n        .then((err) => {\n          err.errors.length.should.equal(1);\n        }),\n\n      inst\n        .strict()\n        .validate(' hi ', { abortEarly: false })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors.length.should.equal(2);\n        }),\n    ]);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should overload test()",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 325,
+                "column": 28
+            },
+            "line": 325,
+            "code": "  it('should overload test()', () => {\n    let inst = mixed().test('test', noop);\n\n    inst.tests.length.should.equal(1);\n    inst.tests[0].OPTIONS.test.should.equal(noop);\n    inst.tests[0].OPTIONS.message.should.equal('${path} is invalid');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fallback to default message",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 333,
+                "column": 40
+            },
+            "line": 333,
+            "code": "  it('should fallback to default message', async () => {\n    let inst = mixed().test(() => false);\n\n    await inst\n      .validate('foo')\n      .should.be.rejectedWith(ValidationError, 'this is invalid');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow non string messages",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 341,
+                "column": 38
+            },
+            "line": 341,
+            "code": "  it('should allow non string messages', async () => {\n    let message = { key: 'foo' };\n    let inst = mixed().test('test', message, () => false);\n\n    inst.tests.length.should.equal(1);\n    inst.tests[0].OPTIONS.message.should.equal(message);\n\n    let error = await inst.validate('foo').should.be.rejected();\n\n    error.message.should.equal(message);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should dedupe tests with the same test function",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 353,
+                "column": 53
+            },
+            "line": 353,
+            "code": "  it('should dedupe tests with the same test function', () => {\n    let inst = mixed().test('test', ' ', noop).test('test', 'asdasd', noop);\n\n    inst.tests.length.should.equal(1);\n    inst.tests[0].OPTIONS.message.should.equal('asdasd');\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not dedupe tests with the same test function and different type",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 360,
+                "column": 76
+            },
+            "line": 360,
+            "code": "  it('should not dedupe tests with the same test function and different type', () => {\n    let inst = mixed().test('test', ' ', noop).test('test-two', 'asdasd', noop);\n\n    inst.tests.length.should.equal(2);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect exclusive validation",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 366,
+                "column": 41
+            },
+            "line": 366,
+            "code": "  it('should respect exclusive validation', () => {\n    let inst = mixed()\n      .test({\n        message: 'invalid',\n        exclusive: true,\n        name: 'test',\n        test: () => {},\n      })\n      .test({ message: 'also invalid', name: 'test', test: () => {} });\n\n    inst.tests.length.should.equal(1);\n\n    inst = mixed()\n      .test({ message: 'invalid', name: 'test', test: () => {} })\n      .test({ message: 'also invalid', name: 'test', test: () => {} });\n\n    inst.tests.length.should.equal(2);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should non-exclusive tests should stack",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 385,
+                "column": 45
+            },
+            "line": 385,
+            "code": "  it('should non-exclusive tests should stack', () => {\n    let inst = mixed()\n      .test({ name: 'test', message: ' ', test: () => {} })\n      .test({ name: 'test', message: ' ', test: () => {} });\n\n    inst.tests.length.should.equal(2);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should replace existing tests, with exclusive test ",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 393,
+                "column": 57
+            },
+            "line": 393,
+            "code": "  it('should replace existing tests, with exclusive test ', () => {\n    let inst = mixed()\n      .test({ name: 'test', message: ' ', test: noop })\n      .test({ name: 'test', exclusive: true, message: ' ', test: noop });\n\n    inst.tests.length.should.equal(1);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should replace existing exclusive tests, with non-exclusive",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 401,
+                "column": 65
+            },
+            "line": 401,
+            "code": "  it('should replace existing exclusive tests, with non-exclusive', () => {\n    let inst = mixed()\n      .test({ name: 'test', exclusive: true, message: ' ', test: () => {} })\n      .test({ name: 'test', message: ' ', test: () => {} })\n      .test({ name: 'test', message: ' ', test: () => {} });\n\n    inst.tests.length.should.equal(2);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exclusive tests should throw without a name",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 410,
+                "column": 49
+            },
+            "line": 410,
+            "code": "  it('exclusive tests should throw without a name', () => {\n    (() => {\n      mixed().test({ message: 'invalid', exclusive: true, test: noop });\n    }).should.throw();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exclusive tests should replace previous ones",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 416,
+                "column": 50
+            },
+            "line": 416,
+            "code": "  it('exclusive tests should replace previous ones', async () => {\n    let inst = mixed().test({\n      message: 'invalid',\n      exclusive: true,\n      name: 'max',\n      test: (v) => v < 5,\n    });\n\n    (await inst.isValid(8)).should.equal(false);\n\n    (\n      await inst\n        .test({\n          message: 'invalid',\n          exclusive: true,\n          name: 'max',\n          test: (v) => v < 10,\n        })\n        .isValid(8)\n    ).should.equal(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "tests should be called with the correct `this`",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 438,
+                "column": 52
+            },
+            "line": 438,
+            "code": "  it('tests should be called with the correct `this`', async () => {\n    let called = false;\n    let inst = object({\n      other: mixed(),\n      test: mixed().test({\n        message: 'invalid',\n        exclusive: true,\n        name: 'max',\n        test() {\n          this.path.should.equal('test');\n          this.parent.should.eql({ other: 5, test: 'hi' });\n          this.options.context.should.eql({ user: 'jason' });\n          called = true;\n          return true;\n        },\n      }),\n    });\n\n    await inst.validate(\n      { other: 5, test: 'hi' },\n      { context: { user: 'jason' } },\n    );\n\n    called.should.equal(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "tests should be able to access nested parent",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 464,
+                "column": 50
+            },
+            "line": 464,
+            "code": "  it('tests should be able to access nested parent', async () => {\n    let finalFrom, finalOptions;\n    let testFixture = {\n      firstField: 'test',\n      second: [\n        {\n          thirdField: 'test3',\n        },\n        {\n          thirdField: 'test4',\n        },\n      ],\n    };\n\n    let third = object({\n      thirdField: mixed().test({\n        test() {\n          finalFrom = this.from;\n          finalOptions = this.options;\n          return true;\n        },\n      }),\n    });\n\n    let second = array().of(third);\n\n    let first = object({\n      firstField: mixed(),\n      second,\n    });\n\n    await first.validate(testFixture);\n    // console.log(finalFrom);\n    finalFrom[0].value.should.eql(testFixture.second[finalOptions.index]);\n    finalFrom[0].schema.should.equal(third);\n    finalFrom[1].value.should.equal(testFixture);\n    finalFrom[1].schema.should.equal(first);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "tests can return an error",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 503,
+                "column": 31
+            },
+            "line": 503,
+            "code": "  it('tests can return an error', () => {\n    let inst = mixed().test({\n      message: 'invalid ${path}',\n      name: 'max',\n      test() {\n        return this.createError({ path: 'my.path' });\n      },\n    });\n\n    return inst\n      .validate('')\n      .should.be.rejected()\n      .then(function (e) {\n        e.path.should.equal('my.path');\n        e.errors[0].should.equal('invalid my.path');\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use returned error path and message",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 521,
+                "column": 48
+            },
+            "line": 521,
+            "code": "  it('should use returned error path and message', () => {\n    let inst = mixed().test({\n      message: 'invalid ${path}',\n      name: 'max',\n      test: function () {\n        return this.createError({ message: '${path} nope!', path: 'my.path' });\n      },\n    });\n\n    return inst\n      .validate({ other: 5, test: 'hi' })\n      .should.be.rejected()\n      .then(function (e) {\n        e.path.should.equal('my.path');\n        e.errors[0].should.equal('my.path nope!');\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow custom validation",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 539,
+                "column": 36
+            },
+            "line": 539,
+            "code": "  it('should allow custom validation', async () => {\n    let inst = string().test('name', 'test a', (val) => val === 'jim');\n\n    return inst\n      .validate('joe')\n      .should.be.rejected()\n      .then((e) => {\n        e.errors[0].should.equal('test a');\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fail when the test function returns a rejected Promise",
+            "suites": [
+                "Mixed Types ",
+                "should exclude values"
+            ],
+            "updatePoint": {
+                "line": 550,
+                "column": 67
+            },
+            "line": 550,
+            "code": "  it('should fail when the test function returns a rejected Promise', async () => {\n    let inst = string().test(() => {\n      return Promise.reject(new Error('oops an error occurred'));\n    });\n\n    return inst.validate('joe').should.be.rejected();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass the same instance to a provided function",
+            "suites": [
+                "Mixed Types ",
+                "withMutation"
+            ],
+            "updatePoint": {
+                "line": 559,
+                "column": 60
+            },
+            "line": 559,
+            "code": "    it('should pass the same instance to a provided function', () => {\n      let inst = mixed();\n      let func = sinon.spy();\n\n      inst.withMutation(func);\n\n      func.should.have.been.calledOnceWithExactly(inst);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should temporarily make mutable",
+            "suites": [
+                "Mixed Types ",
+                "withMutation"
+            ],
+            "updatePoint": {
+                "line": 568,
+                "column": 39
+            },
+            "line": 568,
+            "code": "    it('should temporarily make mutable', () => {\n      let inst = mixed();\n\n      let update = () => {\n        inst.withMutation((inst) => {\n          inst.test('a', () => true);\n        });\n      };\n\n      update.should.increase(() => inst.tests.length).by(1);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return immutability",
+            "suites": [
+                "Mixed Types ",
+                "withMutation"
+            ],
+            "updatePoint": {
+                "line": 580,
+                "column": 34
+            },
+            "line": 580,
+            "code": "    it('should return immutability', () => {\n      let inst = mixed();\n      inst.withMutation(() => {});\n\n      let update = () => {\n        inst.test('a', () => true);\n      };\n\n      update.should.not.increase(() => inst.tests.length);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with nesting",
+            "suites": [
+                "Mixed Types ",
+                "withMutation"
+            ],
+            "updatePoint": {
+                "line": 591,
+                "column": 32
+            },
+            "line": 591,
+            "code": "    it('should work with nesting', () => {\n      let inst = mixed();\n\n      let update = () => {\n        inst.withMutation((inst) => {\n          inst.withMutation((inst) => {\n            inst.test('a', () => true);\n          });\n          inst.test('b', () => true);\n        });\n      };\n\n      update.should.increase(() => inst.tests.length).by(2);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should have the correct number of tests",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 628,
+                "column": 47
+            },
+            "line": 628,
+            "code": "    it('should have the correct number of tests', () => {\n      reach(next, 'str').tests.length.should.equal(2);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should have the tests in the correct order",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 632,
+                "column": 50
+            },
+            "line": 632,
+            "code": "    it('should have the tests in the correct order', () => {\n      reach(next, 'str').tests[0].OPTIONS.name.should.equal('required');\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validate correctly",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 636,
+                "column": 33
+            },
+            "line": 636,
+            "code": "    it('should validate correctly', async () => {\n      await inst\n        .isValid({ str: 'hi', str2: 'hi', obj: {} })\n        .should.become(true);\n      (\n        await next\n          .validate({ str: ' hi  ', str2: 'hi', obj: { str: 'hi' } })\n          .should.be.fulfilled()\n      ).should.deep.eql({\n        str: 'hi',\n        str2: 'hi',\n        obj: { str: 'hi' },\n      });\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw the correct validation errors",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 651,
+                "column": 50
+            },
+            "line": 651,
+            "code": "    it('should throw the correct validation errors', async () => {\n      let result = await next\n        .validate({ str: 'hi', str2: 'hi', obj: {} })\n        .should.be.rejected();\n\n      result.message.should.contain('obj.str is a required field');\n\n      result = await next\n        .validate({ str2: 'hi', obj: { str: 'hi' } })\n        .should.be.rejected();\n\n      result.message.should.contain('str is a required field');\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should carry over transforms",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 666,
+                "column": 41
+            },
+            "line": 666,
+            "code": "  it('concat should carry over transforms', async () => {\n    let inst = string().trim();\n\n    await expect(inst.concat(string().min(4)).cast(' hello  ')).to.equal(\n      'hello',\n    );\n\n    await expect(inst.concat(string().min(4)).isValid(' he  ')).to.become(\n      false,\n    );\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should fail on different types",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 678,
+                "column": 43
+            },
+            "line": 678,
+            "code": "  it('concat should fail on different types', function () {\n    let inst = string().default('hi');\n\n    (function () {\n      inst.concat(object());\n    }.should.throw(TypeError));\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should not overwrite label and meta with undefined",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 686,
+                "column": 63
+            },
+            "line": 686,
+            "code": "  it('concat should not overwrite label and meta with undefined', function () {\n    const testLabel = 'Test Label';\n    const testMeta = {\n      testField: 'test field',\n    };\n    let baseSchema = mixed().label(testLabel).meta(testMeta);\n    const otherSchema = mixed();\n\n    baseSchema = baseSchema.concat(otherSchema);\n    expect(baseSchema.spec.label).to.equal(testLabel);\n    expect(baseSchema.spec.meta.testField).to.equal(testMeta.testField);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should allow mixed and other type",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 699,
+                "column": 46
+            },
+            "line": 699,
+            "code": "  it('concat should allow mixed and other type', function () {\n    let inst = mixed().default('hi');\n\n    (function () {\n      inst.concat(string())._type.should.equal('string');\n    }.should.not.throw(TypeError));\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should validate with mixed and other type",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 707,
+                "column": 54
+            },
+            "line": 707,
+            "code": "  it('concat should validate with mixed and other type', async function () {\n    let inst = mixed().concat(number());\n\n    await inst\n      .validate([])\n      .should.be.rejected(ValidationError, /should be a `number`/);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should maintain undefined defaults",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 715,
+                "column": 47
+            },
+            "line": 715,
+            "code": "  it('concat should maintain undefined defaults', function () {\n    let inst = string().default('hi');\n\n    expect(inst.concat(string().default(undefined)).getDefault()).to.equal(\n      undefined,\n    );\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should preserve oneOf",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 723,
+                "column": 34
+            },
+            "line": 723,
+            "code": "  it('concat should preserve oneOf', async function () {\n    let inst = string().oneOf(['a']).concat(string().default('hi'));\n\n    await inst.isValid('a').should.become(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concat should maintain explicit presence",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 735,
+                "column": 46
+            },
+            "line": 735,
+            "code": "  it('concat should maintain explicit presence', async function () {\n    let inst = string().required().concat(string());\n\n    await inst.isValid(undefined).should.become(false);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "gives whitelist precedence to second in concat",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 741,
+                "column": 52
+            },
+            "line": 741,
+            "code": "  it('gives whitelist precedence to second in concat', async function () {\n    let inst = string()\n      .oneOf(['a', 'b', 'c'])\n      .concat(string().notOneOf(['b']));\n\n    await inst.isValid('a').should.become(true);\n    await inst.isValid('b').should.become(false);\n    await inst.isValid('c').should.become(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "gives blacklist precedence to second in concat",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 751,
+                "column": 52
+            },
+            "line": 751,
+            "code": "  it('gives blacklist precedence to second in concat', async function () {\n    let inst = string()\n      .notOneOf(['a', 'b', 'c'])\n      .concat(string().oneOf(['b', 'c']));\n\n    await inst.isValid('a').should.become(false);\n    await inst.isValid('b').should.become(true);\n    await inst.isValid('c').should.become(true);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "concats whitelist with refs",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 761,
+                "column": 33
+            },
+            "line": 761,
+            "code": "  it('concats whitelist with refs', async function () {\n    let inst = object({\n      x: string().required(),\n      y: string()\n        .oneOf([ref('$x'), 'b', 'c'])\n        .concat(string().notOneOf(['c', ref('$x')])),\n    });\n\n    await inst.isValid({ x: 'a', y: 'a' }).should.become(false);\n    await inst.isValid({ x: 'a', y: 'b' }).should.become(true);\n    await inst.isValid({ x: 'a', y: 'c' }).should.become(false);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "defaults should be validated but not transformed",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 774,
+                "column": 54
+            },
+            "line": 774,
+            "code": "  it('defaults should be validated but not transformed', function () {\n    let inst = string().trim().default('  hi  ');\n\n    return inst\n      .validate(undefined)\n      .should.be.rejected()\n      .then(function (err) {\n        err.message.should.equal('this must be a trimmed string');\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle conditionals",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 785,
+                "column": 32
+            },
+            "line": 785,
+            "code": "  it('should handle conditionals', async function () {\n    let inst = mixed().when('prop', {\n      is: 5,\n      then: mixed().required('from parent'),\n    });\n\n    await inst\n      .validate(undefined, { parent: { prop: 5 } })\n      .should.be.rejected();\n    await inst\n      .validate(undefined, { parent: { prop: 1 } })\n      .should.be.fulfilled();\n    await inst.validate('hello', { parent: { prop: 5 } }).should.be.fulfilled();\n\n    inst = string().when('prop', {\n      is: function (val) {\n        return val === 5;\n      },\n      then: string().required(),\n      otherwise: string().min(4),\n    });\n\n    await inst\n      .validate(undefined, { parent: { prop: 5 } })\n      .should.be.rejected();\n    await inst.validate('hello', { parent: { prop: 1 } }).should.be.fulfilled();\n    await inst.validate('hel', { parent: { prop: 1 } }).should.be.rejected();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle multiple conditionals",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 814,
+                "column": 41
+            },
+            "line": 814,
+            "code": "  it('should handle multiple conditionals', function () {\n    let called = false;\n    let inst = mixed().when(['$prop', '$other'], function (prop, other) {\n      other.should.equal(true);\n      prop.should.equal(1);\n      called = true;\n    });\n\n    inst.cast({}, { context: { prop: 1, other: true } });\n    called.should.equal(true);\n\n    inst = mixed().when(['$prop', '$other'], {\n      is: 5,\n      then: mixed().required(),\n    });\n\n    return inst\n      .isValid(undefined, { context: { prop: 5, other: 5 } })\n      .should.eventually()\n      .equal(false);\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should require context when needed",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 836,
+                "column": 40
+            },
+            "line": 836,
+            "code": "  it('should require context when needed', async function () {\n    let inst = mixed().when('$prop', {\n      is: 5,\n      then: mixed().required('from context'),\n    });\n\n    await inst\n      .validate(undefined, { context: { prop: 5 } })\n      .should.be.rejected();\n    await inst\n      .validate(undefined, { context: { prop: 1 } })\n      .should.be.fulfilled();\n    await inst\n      .validate('hello', { context: { prop: 5 } })\n      .should.be.fulfilled();\n\n    inst = string().when('$prop', {\n      is: function (val) {\n        return val === 5;\n      },\n      then: string().required(),\n      otherwise: string().min(4),\n    });\n\n    await inst\n      .validate(undefined, { context: { prop: 5 } })\n      .should.be.rejected();\n    await inst\n      .validate('hello', { context: { prop: 1 } })\n      .should.be.fulfilled();\n    await inst.validate('hel', { context: { prop: 1 } }).should.be.rejected();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not use context refs in object calculations",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 869,
+                "column": 56
+            },
+            "line": 869,
+            "code": "  it('should not use context refs in object calculations', function () {\n    let inst = object({\n      prop: string().when('$prop', {\n        is: 5,\n        then: string().required('from context'),\n      }),\n    });\n\n    inst.getDefault().should.eql({ prop: undefined });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should support self references in conditions",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 880,
+                "column": 50
+            },
+            "line": 880,
+            "code": "  it('should support self references in conditions', async function () {\n    let inst = number().when('.', {\n      is: (value) => value > 0,\n      then: number().min(5),\n    });\n\n    await inst\n      .validate(4)\n      .should.be.rejectedWith(ValidationError, /must be greater/);\n\n    await inst.validate(5).should.be.fulfilled();\n\n    await inst.validate(-1).should.be.fulfilled();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should support conditional single argument as options shortcut",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 895,
+                "column": 68
+            },
+            "line": 895,
+            "code": "  it('should support conditional single argument as options shortcut', async function () {\n    let inst = number().when({\n      is: (value) => value > 0,\n      then: number().min(5),\n    });\n\n    await inst\n      .validate(4)\n      .should.be.rejectedWith(ValidationError, /must be greater/);\n\n    await inst.validate(5).should.be.fulfilled();\n\n    await inst.validate(-1).should.be.fulfilled();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow nested conditions and lazies",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 910,
+                "column": 47
+            },
+            "line": 910,
+            "code": "  it('should allow nested conditions and lazies', async function () {\n    let inst = string().when('$check', {\n      is: (value) => typeof value === 'string',\n      then: string().when('$check', {\n        is: (value) => /hello/.test(value),\n        then: lazy(() => string().min(6)),\n      }),\n    });\n\n    await inst\n      .validate('pass', { context: { check: false } })\n      .should.be.fulfilled();\n\n    await inst\n      .validate('pass', { context: { check: 'hello' } })\n      .should.be.rejectedWith(ValidationError, /must be at least/);\n\n    await inst\n      .validate('passes', { context: { check: 'hello' } })\n      .should.be.fulfilled();\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use label in error message",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 932,
+                "column": 39
+            },
+            "line": 932,
+            "code": "  it('should use label in error message', async function () {\n    let label = 'Label';\n    let inst = object({\n      prop: string().required().label(label),\n    });\n\n    await inst\n      .validate({})\n      .should.be.rejected()\n      .then(function (err) {\n        err.message.should.equal(`${label} is a required field`);\n      });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should add meta() data",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 946,
+                "column": 28
+            },
+            "line": 946,
+            "code": "  it('should add meta() data', () => {\n    string().meta({ input: 'foo' }).meta({ foo: 'bar' }).meta().should.eql({\n      input: 'foo',\n      foo: 'bar',\n    });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should describe",
+            "suites": [
+                "Mixed Types ",
+                "concat"
+            ],
+            "updatePoint": {
+                "line": 953,
+                "column": 21
+            },
+            "line": 953,
+            "code": "  it('should describe', () => {\n    const desc = object({\n      foo: array(number().integer()).required(),\n      bar: string()\n        .max(2)\n        .meta({ input: 'foo' })\n        .label('str!')\n        .oneOf(['a', 'b'])\n        .notOneOf([ref('foo')]),\n    }).describe();\n\n    desc.should.eql({\n      type: 'object',\n      meta: undefined,\n      label: undefined,\n      tests: [],\n      oneOf: [],\n      notOneOf: [],\n      fields: {\n        foo: {\n          type: 'array',\n          meta: undefined,\n          label: undefined,\n          tests: [\n            {\n              name: 'required',\n              params: undefined,\n            },\n          ],\n\n          oneOf: [],\n          notOneOf: [],\n          innerType: {\n            type: 'number',\n            meta: undefined,\n            label: undefined,\n            oneOf: [],\n            notOneOf: [],\n            tests: [\n              {\n                name: 'integer',\n                params: undefined,\n              },\n            ],\n          },\n        },\n        bar: {\n          type: 'string',\n          label: 'str!',\n          tests: [{ name: 'max', params: { max: 2 } }],\n          meta: {\n            input: 'foo',\n          },\n          oneOf: ['a', 'b'],\n          notOneOf: [\n            {\n              type: 'ref',\n              key: 'foo',\n            },\n          ],\n        },\n      },\n    });\n  });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fail when value is undefined",
+            "suites": [
+                "Mixed Types ",
+                "defined"
+            ],
+            "updatePoint": {
+                "line": 1019,
+                "column": 43
+            },
+            "line": 1019,
+            "code": "    it('should fail when value is undefined', async () => {\n      let inst = object({\n        prop: string().defined(),\n      });\n\n      await inst\n        .validate({})\n        .should.be.rejected()\n        .then(function (err) {\n          err.message.should.equal('prop must be defined');\n        });\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass when value is null",
+            "suites": [
+                "Mixed Types ",
+                "defined"
+            ],
+            "updatePoint": {
+                "line": 1032,
+                "column": 38
+            },
+            "line": 1032,
+            "code": "    it('should pass when value is null', async () => {\n      let inst = object({\n        prop: string().nullable().defined(),\n      });\n\n      await inst.isValid({ prop: null }).should.eventually().equal(true);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass when value is not undefined",
+            "suites": [
+                "Mixed Types ",
+                "defined"
+            ],
+            "updatePoint": {
+                "line": 1040,
+                "column": 47
+            },
+            "line": 1040,
+            "code": "    it('should pass when value is not undefined', async () => {\n      let inst = object({\n        prop: string().defined(),\n      });\n\n      await inst\n        .isValid({ prop: 'prop value' })\n        .should.eventually()\n        .equal(true);\n    });",
+            "file": "mixed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is extensible",
+            "suites": [
+                "Number types"
+            ],
+            "updatePoint": {
+                "line": 11,
+                "column": 19
+            },
+            "line": 11,
+            "code": "  it('is extensible', () => {\n    class MyNumber extends NumberSchema {\n      foo() {\n        return this;\n      }\n    }\n\n    new MyNumber().foo().integer().required();\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should round",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 20
+            },
+            "line": 34,
+            "code": "    it('should round', () => {\n      // schema.round('floor').cast(45.99999).should.equal(45);\n      schema.round('ceIl').cast(45.1111).should.equal(46);\n      schema.round().cast(45.444444).should.equal(45);\n\n      expect(schema.nullable().integer().round().cast(null)).to.equal(null);\n      (function () {\n        schema.round('fasf');\n      }.should.throw(TypeError));\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should truncate",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 23
+            },
+            "line": 45,
+            "code": "    it('should truncate', () => {\n      schema.truncate().cast(45.55).should.equal(45);\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return NaN for failed casts",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 49,
+                "column": 42
+            },
+            "line": 49,
+            "code": "    it('should return NaN for failed casts', () => {\n      expect(number().cast('asfasf', { assert: false })).to.eql(NaN);\n\n      expect(number().cast(null, { assert: false })).to.eql(NaN);\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle DEFAULT",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 56,
+                "column": 27
+            },
+            "line": 56,
+            "code": "  it('should handle DEFAULT', function () {\n    var inst = number().default(0);\n\n    inst.getDefault().should.equal(0);\n    inst.default(5).required().getDefault().should.equal(5);\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should type check",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 23
+            },
+            "line": 63,
+            "code": "  it('should type check', function () {\n    var inst = number();\n\n    inst.isType(5).should.equal(true);\n    inst.isType(new Number(5)).should.equal(true);\n    inst.isType(new Number('foo')).should.equal(false);\n    inst.isType(false).should.equal(false);\n    inst.isType(null).should.equal(false);\n    inst.isType(NaN).should.equal(false);\n    inst.nullable().isType(null).should.equal(true);\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should VALIDATE correctly",
+            "suites": [
+                "Number types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 75,
+                "column": 31
+            },
+            "line": 75,
+            "code": "  it('should VALIDATE correctly', function () {\n    var inst = number().required().min(4);\n\n    return Promise.all([\n      number().isValid(null).should.eventually().equal(false),\n      number().nullable().isValid(null).should.eventually().equal(true),\n      number().isValid(' ').should.eventually().equal(false),\n      number().isValid('12abc').should.eventually().equal(false),\n      number().isValid(0xff).should.eventually.equal(true),\n      number().isValid('0xff').should.eventually.equal(true),\n\n      inst.isValid(5).should.eventually().equal(true),\n      inst.isValid(2).should.eventually().equal(false),\n\n      inst\n        .validate()\n        .should.be.rejected()\n        .then(function (err) {\n          err.errors.length.should.equal(1);\n          err.errors[0].should.contain('required');\n        }),\n    ]);\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return default message",
+            "suites": [
+                "Number types",
+                "lessThan"
+            ],
+            "updatePoint": {
+                "line": 125,
+                "column": 37
+            },
+            "line": 125,
+            "code": "    it('should return default message', async () => {\n      await schema\n        .validate(6)\n        .should.be.rejected.and.eventually.have.property('errors')\n        .that.contain('this must be less than 5');\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return default message",
+            "suites": [
+                "Number types",
+                "moreThan"
+            ],
+            "updatePoint": {
+                "line": 141,
+                "column": 37
+            },
+            "line": 141,
+            "code": "    it('should return default message', async () => {\n      await schema\n        .validate(4)\n        .should.be.rejected.and.eventually.have.property('errors')\n        .that.contain('this must be greater than 5');\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return default message",
+            "suites": [
+                "Number types",
+                "integer"
+            ],
+            "updatePoint": {
+                "line": 157,
+                "column": 37
+            },
+            "line": 157,
+            "code": "    it('should return default message', async () => {\n      await schema\n        .validate(10.53)\n        .should.be.rejected.and.eventually.have.property('errors')\n        .that.contain('this must be an integer');\n    });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check POSITIVE correctly",
+            "suites": [
+                "Number types",
+                "integer"
+            ],
+            "updatePoint": {
+                "line": 165,
+                "column": 37
+            },
+            "line": 165,
+            "code": "  it('should check POSITIVE correctly', function () {\n    var v = number().positive();\n\n    return Promise.all([\n      v.isValid(7).should.eventually().equal(true),\n\n      v.isValid(0).should.eventually().equal(false),\n\n      v\n        .validate(0)\n        .should.be.rejected()\n        .then(null, function (err) {\n          err.errors[0].should.contain('this must be a positive number');\n        }),\n    ]);\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check NEGATIVE correctly",
+            "suites": [
+                "Number types",
+                "integer"
+            ],
+            "updatePoint": {
+                "line": 182,
+                "column": 37
+            },
+            "line": 182,
+            "code": "  it('should check NEGATIVE correctly', function () {\n    var v = number().negative();\n\n    return Promise.all([\n      v.isValid(-4).should.eventually().equal(true),\n\n      v.isValid(0).should.eventually().equal(false),\n\n      v\n        .validate(10)\n        .should.be.rejected()\n        .then(null, function (err) {\n          err.errors[0].should.contain('this must be a negative number');\n        }),\n    ]);\n  });",
+            "file": "number.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse json strings",
+            "suites": [
+                "Object types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 33
+            },
+            "line": 33,
+            "code": "    it('should parse json strings', () => {\n      object({ hello: number() }).cast('{ \"hello\": \"5\" }').should.eql({\n        hello: 5,\n      });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return null for failed casts",
+            "suites": [
+                "Object types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 43
+            },
+            "line": 39,
+            "code": "    it('should return null for failed casts', () => {\n      expect(object().cast('dfhdfh', { assert: false })).to.equal(null);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should recursively cast fields",
+            "suites": [
+                "Object types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 38
+            },
+            "line": 43,
+            "code": "    it('should recursively cast fields', () => {\n      let obj = {\n        num: '5',\n        str: 'hello',\n        arr: ['4', 5],\n        dte: '2014-09-23T19:25:25Z',\n        nested: { str: 5 },\n        arrNested: [{ num: 5 }, { num: '5' }],\n      };\n\n      const cast = inst.cast(obj);\n\n      cast.should.eql({\n        num: 5,\n        str: 'hello',\n        arr: [4, 5],\n        dte: new Date(1411500325000),\n        nested: { str: '5' },\n        arrNested: [{ num: 5 }, { num: 5 }],\n      });\n\n      cast.arrNested[0].should.equal(obj.arrNested[0], 'should be kept as is');\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the same object if all props are already cast",
+            "suites": [
+                "Object types",
+                "casting"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 67
+            },
+            "line": 67,
+            "code": "    it('should return the same object if all props are already cast', () => {\n      let obj = {\n        num: 5,\n        str: 'hello',\n        arr: [4, 5],\n        dte: new Date(1411500325000),\n        nested: { str: '5' },\n        arrNested: [{ num: 5 }, { num: 5 }],\n      };\n\n      inst.cast(obj).should.equal(obj);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should run validations recursively",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 42
+            },
+            "line": 105,
+            "code": "    it('should run validations recursively', async () => {\n      await inst.isValid().should.eventually().equal(true);\n\n      let error = await inst.validate(obj).should.be.rejected();\n\n      error.errors.length.should.equal(1);\n      error.errors[0].should.contain('nested.str');\n\n      obj.nested.str = 'hello';\n      obj.arr[1] = 8;\n\n      error = await inst.validate(obj).should.be.rejected();\n      error.errors[0].should.contain('arr[1]');\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should prevent recursive casting",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 40
+            },
+            "line": 120,
+            "code": "    it('should prevent recursive casting', async () => {\n      let castSpy = sinon.spy(StringSchema.prototype, '_cast');\n\n      inst = object({\n        field: string(),\n      });\n\n      let value = await inst.validate({ field: 5 });\n\n      value.field.should.equal('5');\n\n      castSpy.should.have.been.calledOnce();\n\n      StringSchema.prototype._cast.restore();\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect strict for nested values",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 47
+            },
+            "line": 136,
+            "code": "    it('should respect strict for nested values', async () => {\n      inst = object({\n        field: string(),\n      }).strict();\n\n      let err = await inst.validate({ field: 5 }).should.be.rejected();\n\n      err.message.should.match(/must be a `string` type/);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect strict for nested object values",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 146,
+                "column": 54
+            },
+            "line": 146,
+            "code": "    it('should respect strict for nested object values', async () => {\n      inst = object({\n        obj: object({\n          field: string().strict(),\n        }),\n      });\n\n      let err = await inst.validate({ obj: { field: 5 } }).should.be.rejected();\n\n      err.message.should.match(/must be a `string` type/);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect child schema with strict()",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 158,
+                "column": 49
+            },
+            "line": 158,
+            "code": "    it('should respect child schema with strict()', async () => {\n      inst = object({\n        field: number().strict(),\n      });\n\n      let err = await inst.validate({ field: '5' }).should.be.rejected();\n\n      err.message.should.match(/must be a `number` type/);\n\n      inst.cast({ field: '5' }).should.eql({ field: 5 });\n\n      err = await object({\n        port: number().strict().integer(),\n      })\n        .validate({ port: 'asdad' })\n        .should.be.rejected();\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle custom validation",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 176,
+                "column": 39
+            },
+            "line": 176,
+            "code": "    it('should handle custom validation', async () => {\n      let inst = object()\n        .shape({\n          prop: mixed(),\n          other: mixed(),\n        })\n        .test('test', '${path} oops', () => false);\n\n      let err = await inst.validate({}).should.be.rejected();\n\n      err.errors[0].should.equal('this oops');\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not clone during validating",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 189,
+                "column": 42
+            },
+            "line": 189,
+            "code": "    it('should not clone during validating', async function () {\n      let base = MixedSchema.prototype.clone;\n\n      MixedSchema.prototype.clone = function (...args) {\n        if (!this._mutate) throw new Error('should not call clone');\n\n        return base.apply(this, args);\n      };\n\n      try {\n        await inst.validate({\n          nested: { str: 'jimmm' },\n          arrNested: [{ num: 5 }, { num: '2' }],\n        });\n        await inst.validate({\n          nested: { str: 5 },\n          arrNested: [{ num: 5 }, { num: '2' }],\n        });\n      } catch (err) {\n        /* ignore */\n      } finally {\n        //eslint-disable-line\n        MixedSchema.prototype.clone = base;\n      }\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass options to children",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 216,
+                "column": 37
+            },
+            "line": 216,
+            "code": "  it('should pass options to children', function () {\n    object({\n      names: object({\n        first: string(),\n      }),\n    })\n      .cast(\n        {\n          extra: true,\n          names: { first: 'john', extra: true },\n        },\n        { stripUnknown: true },\n      )\n      .should.eql({\n        names: {\n          first: 'john',\n        },\n      });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call shape with constructed with an arg",
+            "suites": [
+                "Object types",
+                "validation"
+            ],
+            "updatePoint": {
+                "line": 236,
+                "column": 52
+            },
+            "line": 236,
+            "code": "  it('should call shape with constructed with an arg', () => {\n    let inst = object({\n      prop: mixed(),\n    });\n\n    expect(inst.fields.prop).to.exist();\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should expand objects by default",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 255,
+                "column": 40
+            },
+            "line": 255,
+            "code": "    it('should expand objects by default', () => {\n      objSchema.getDefault().should.eql({\n        nest: { str: 'hi' },\n      });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should accept a user provided default",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 261,
+                "column": 45
+            },
+            "line": 261,
+            "code": "    it('should accept a user provided default', () => {\n      objSchema = objSchema.default({ boom: 'hi' });\n\n      objSchema.getDefault().should.eql({\n        boom: 'hi',\n      });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should add empty keys when sub schema has no default",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 269,
+                "column": 60
+            },
+            "line": 269,
+            "code": "    it('should add empty keys when sub schema has no default', () => {\n      object({\n        str: string(),\n        nest: object({ str: string() }),\n      })\n        .getDefault()\n        .should.eql({\n          nest: { str: undefined },\n          str: undefined,\n        });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create defaults for missing object fields",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 281,
+                "column": 56
+            },
+            "line": 281,
+            "code": "    it('should create defaults for missing object fields', () => {\n      object({\n        prop: mixed(),\n        other: object({\n          x: object({ b: string() }),\n        }),\n      })\n        .cast({ prop: 'foo' })\n        .should.eql({\n          prop: 'foo',\n          other: { x: { b: undefined } },\n        });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle empty keys",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 296,
+                "column": 30
+            },
+            "line": 296,
+            "code": "  it('should handle empty keys', () => {\n    let inst = object().shape({\n      prop: mixed(),\n    });\n\n    return Promise.all([\n      inst.isValid({}).should.eventually().equal(true),\n\n      inst\n        .shape({ prop: mixed().required() })\n        .isValid({})\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with noUnknown",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 312,
+                "column": 32
+            },
+            "line": 312,
+            "code": "  it('should work with noUnknown', () => {\n    let inst = object().shape({\n      prop: mixed(),\n      other: mixed(),\n    });\n\n    return Promise.all([\n      inst\n        .noUnknown('hi')\n        .validate({ extra: 'field' }, { strict: true })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors[0].should.equal('hi');\n        }),\n\n      inst\n        .noUnknown()\n        .validate({ extra: 'field' }, { strict: true })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors[0].should.be.a('string').that.include('extra');\n        }),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with noUnknown override",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 337,
+                "column": 41
+            },
+            "line": 337,
+            "code": "  it('should work with noUnknown override', async () => {\n    let inst = object()\n      .shape({\n        prop: mixed(),\n      })\n      .noUnknown()\n      .noUnknown(false);\n\n    await inst.validate({ extra: 'field' }).should.become({ extra: 'field' });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should strip specific fields",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 348,
+                "column": 34
+            },
+            "line": 348,
+            "code": "  it('should strip specific fields', () => {\n    let inst = object().shape({\n      prop: mixed().strip(false),\n      other: mixed().strip(),\n    });\n\n    inst.cast({ other: 'boo', prop: 'bar' }).should.eql({\n      prop: 'bar',\n    });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle field striping with `when`",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 359,
+                "column": 46
+            },
+            "line": 359,
+            "code": "  it('should handle field striping with `when`', () => {\n    let inst = object().shape({\n      other: bool(),\n      prop: mixed().when('other', {\n        is: true,\n        then: (s) => s.strip(),\n      }),\n    });\n\n    inst.cast({ other: true, prop: 'bar' }).should.eql({\n      other: true,\n    });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow refs",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 373,
+                "column": 23
+            },
+            "line": 373,
+            "code": "  it('should allow refs', async function () {\n    let schema = object({\n      quz: ref('baz'),\n      baz: ref('foo.bar'),\n      foo: object({\n        bar: string(),\n      }),\n      x: ref('$x'),\n    });\n\n    let value = await schema.validate(\n      {\n        foo: { bar: 'boom' },\n      },\n      { context: { x: 5 } },\n    );\n\n    //console.log(value)\n    value.should.eql({\n      foo: {\n        bar: 'boom',\n      },\n      baz: 'boom',\n      quz: 'boom',\n      x: 5,\n    });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow refs with abortEarly false",
+            "suites": [
+                "Object types",
+                "object defaults"
+            ],
+            "updatePoint": {
+                "line": 401,
+                "column": 45
+            },
+            "line": 401,
+            "code": "  it('should allow refs with abortEarly false', async () => {\n    let schema = object().shape({\n      field: string(),\n      dupField: ref('field'),\n    });\n\n    let actual = await schema\n      .validate(\n        {\n          field: 'test',\n        },\n        { abortEarly: false },\n      )\n      .should.not.be.rejected();\n\n    actual.should.eql({ field: 'test', dupField: 'test' });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be cast-able",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 425,
+                "column": 27
+            },
+            "line": 425,
+            "code": "    it('should be cast-able', () => {\n      let inst = lazy(() => number());\n\n      inst.cast.should.be.a('function');\n      inst.cast('4').should.equal(4);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be validatable",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 432,
+                "column": 29
+            },
+            "line": 432,
+            "code": "    it('should be validatable', async () => {\n      let inst = lazy(() => string().trim('trim me!').strict());\n\n      inst.validate.should.be.a('function');\n\n      try {\n        await inst.validate('  john  ');\n      } catch (err) {\n        err.message.should.equal('trim me!');\n      }\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve to schema",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 444,
+                "column": 32
+            },
+            "line": 444,
+            "code": "    it('should resolve to schema', () => {\n      let inst = object({\n        nested: lazy(() => inst),\n        x: object({\n          y: lazy(() => inst),\n        }),\n      });\n\n      reach(inst, 'nested').resolve({}).should.equal(inst);\n      reach(inst, 'x.y').resolve({}).should.equal(inst);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be passed the value",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 456,
+                "column": 34
+            },
+            "line": 456,
+            "code": "    it('should be passed the value', (done) => {\n      let inst = object({\n        nested: lazy((value) => {\n          value.should.equal('foo');\n          done();\n          return string();\n        }),\n      });\n\n      inst.cast({ nested: 'foo' });\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be passed the options",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 468,
+                "column": 36
+            },
+            "line": 468,
+            "code": "    it('should be passed the options', (done) => {\n      let opts = {};\n      let inst = lazy((_, options) => {\n        options.should.equal(opts);\n        done();\n        return object();\n      });\n\n      inst.cast({ nested: 'foo' }, opts);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should always return a schema",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 479,
+                "column": 37
+            },
+            "line": 479,
+            "code": "    it('should always return a schema', () => {\n      (() => lazy(() => {}).cast()).should.throw(/must return a valid schema/);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set the correct path",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 483,
+                "column": 35
+            },
+            "line": 483,
+            "code": "    it('should set the correct path', async () => {\n      let inst = object({\n        str: string().required().nullable(),\n        nested: lazy(() => inst.default(undefined)),\n      });\n\n      let value = {\n        nested: { str: null },\n        str: 'foo',\n      };\n\n      try {\n        await inst.validate(value, { strict: true });\n      } catch (err) {\n        err.path.should.equal('nested.str');\n        err.message.should.match(/required/);\n      }\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set the correct path with dotted keys",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 502,
+                "column": 52
+            },
+            "line": 502,
+            "code": "    it('should set the correct path with dotted keys', async () => {\n      let inst = object({\n        'dotted.str': string().required().nullable(),\n        nested: lazy(() => inst.default(undefined)),\n      });\n\n      let value = {\n        nested: { 'dotted.str': null },\n        'dotted.str': 'foo',\n      };\n\n      try {\n        await inst.validate(value, { strict: true });\n      } catch (err) {\n        err.path.should.equal('nested[\"dotted.str\"]');\n        err.message.should.match(/required/);\n      }\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve array sub types",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 521,
+                "column": 38
+            },
+            "line": 521,
+            "code": "    it('should resolve array sub types', async () => {\n      let inst = object({\n        str: string().required().nullable(),\n        nested: array().of(lazy(() => inst.default(undefined))),\n      });\n\n      let value = {\n        nested: [{ str: null }],\n        str: 'foo',\n      };\n\n      try {\n        await inst.validate(value, { strict: true });\n      } catch (err) {\n        err.path.should.equal('nested[0].str');\n        err.message.should.match(/required/);\n      }\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve for each array item",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 540,
+                "column": 42
+            },
+            "line": 540,
+            "code": "    it('should resolve for each array item', async () => {\n      let inst = array().of(lazy((value) => types[typeof value]));\n\n      let val = await inst.validate(['john', 4], { strict: true });\n\n      val.should.eql(['john', 4]);\n    });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect abortEarly",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 549,
+                "column": 31
+            },
+            "line": 549,
+            "code": "  it('should respect abortEarly', () => {\n    let inst = object({\n      nest: object({\n        str: string().required(),\n      }).test('name', 'oops', () => false),\n    });\n\n    return Promise.all([\n      inst\n        .validate({ nest: { str: '' } })\n        .should.be.rejected()\n        .then((err) => {\n          err.value.should.eql({ nest: { str: '' } });\n          err.errors.length.should.equal(1);\n          err.errors.should.eql(['oops']);\n\n          err.path.should.equal('nest');\n        }),\n\n      inst\n        .validate({ nest: { str: '' } }, { abortEarly: false })\n        .should.be.rejected()\n        .then((err) => {\n          err.value.should.eql({ nest: { str: '' } });\n          err.errors.length.should.equal(2);\n          err.errors.should.eql(['nest.str is a required field', 'oops']);\n        }),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should sort errors by insertion order",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 579,
+                "column": 43
+            },
+            "line": 579,
+            "code": "  it('should sort errors by insertion order', async () => {\n    let inst = object({\n      // use `when` to make sure it is validated second\n      foo: string().when('bar', () => string().min(5)),\n      bar: string().required(),\n    });\n\n    let err = await inst\n      .validate({ foo: 'foo' }, { abortEarly: false })\n      .should.rejected();\n\n    err.errors.should.eql([\n      'foo must be at least 5 characters',\n      'bar is a required field',\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respect recursive",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 596,
+                "column": 30
+            },
+            "line": 596,
+            "code": "  it('should respect recursive', () => {\n    let inst = object({\n      nest: object({\n        str: string().required(),\n      }),\n    }).test('name', 'oops', () => false);\n\n    let val = { nest: { str: null } };\n\n    return Promise.all([\n      inst\n        .validate(val, { abortEarly: false })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors.length.should.equal(2);\n        }),\n\n      inst\n        .validate(val, { abortEarly: false, recursive: false })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors.length.should.equal(1);\n          err.errors.should.eql(['oops']);\n        }),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should alias or move keys",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 623,
+                "column": 31
+            },
+            "line": 623,
+            "code": "  it('should alias or move keys', () => {\n    let inst = object()\n      .shape({\n        myProp: mixed(),\n        Other: mixed(),\n      })\n      .from('prop', 'myProp')\n      .from('other', 'Other', true);\n\n    inst\n      .cast({ prop: 5, other: 6 })\n      .should.eql({ myProp: 5, other: 6, Other: 6 });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should alias nested keys",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 637,
+                "column": 30
+            },
+            "line": 637,
+            "code": "  it('should alias nested keys', () => {\n    let inst = object({\n      foo: object({\n        bar: string(),\n      }),\n    }).from('foo.bar', 'foobar', true);\n\n    inst\n      .cast({ foo: { bar: 'quz' } })\n      .should.eql({ foobar: 'quz', foo: { bar: 'quz' } });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not move keys when it does not exist",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 649,
+                "column": 49
+            },
+            "line": 649,
+            "code": "  it('should not move keys when it does not exist', () => {\n    let inst = object()\n      .shape({\n        myProp: mixed(),\n      })\n      .from('prop', 'myProp');\n\n    inst.cast({ myProp: 5 }).should.eql({ myProp: 5 });\n\n    inst.cast({ myProp: 5, prop: 7 }).should.eql({ myProp: 7 });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle conditionals",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 661,
+                "column": 32
+            },
+            "line": 661,
+            "code": "  it('should handle conditionals', () => {\n    let inst = object().shape({\n      noteDate: number()\n        .when('stats.isBig', { is: true, then: number().min(5) })\n        .when('other', function (v) {\n          if (v === 4) return this.max(6);\n        }),\n      stats: object({ isBig: bool() }),\n      other: number().min(1).when('stats', { is: 5, then: number() }),\n    });\n\n    return Promise.all([\n      inst\n        .isValid({ stats: { isBig: true }, rand: 5, noteDate: 7, other: 4 })\n        .should.eventually()\n        .equal(false),\n      inst\n        .isValid({ stats: { isBig: true }, noteDate: 1, other: 4 })\n        .should.eventually()\n        .equal(false),\n\n      inst\n        .isValid({ stats: { isBig: true }, noteDate: 7, other: 6 })\n        .should.eventually()\n        .equal(true),\n      inst\n        .isValid({ stats: { isBig: true }, noteDate: 7, other: 4 })\n        .should.eventually()\n        .equal(false),\n\n      inst\n        .isValid({ stats: { isBig: false }, noteDate: 4, other: 4 })\n        .should.eventually()\n        .equal(true),\n\n      inst\n        .isValid({ stats: { isBig: true }, noteDate: 1, other: 4 })\n        .should.eventually()\n        .equal(false),\n      inst\n        .isValid({ stats: { isBig: true }, noteDate: 6, other: 4 })\n        .should.eventually()\n        .equal(true),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle conditionals with unknown dependencies",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 707,
+                "column": 58
+            },
+            "line": 707,
+            "code": "  it('should handle conditionals with unknown dependencies', () => {\n    let inst = object().shape({\n      value: number().when('isRequired', {\n        is: true,\n        then: number().required(),\n      }),\n    });\n\n    return Promise.all([\n      inst\n        .isValid({\n          isRequired: true,\n          value: 1234,\n        })\n        .should.eventually.equal(true),\n      inst\n        .isValid({\n          isRequired: true,\n        })\n        .should.eventually.equal(false),\n\n      inst\n        .isValid({\n          isRequired: false,\n          value: 1234,\n        })\n        .should.eventually.equal(true),\n      inst\n        .isValid({\n          value: 1234,\n        })\n        .should.eventually.equal(true),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle conditionals synchronously",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 742,
+                "column": 46
+            },
+            "line": 742,
+            "code": "  it('should handle conditionals synchronously', () => {\n    let inst = object().shape({\n      knownDependency: bool(),\n      value: number().when(['unknownDependency', 'knownDependency'], {\n        is: true,\n        then: number().required(),\n      }),\n    });\n\n    // expect(() =>\n    //   inst.validateSync({\n    //     unknownDependency: true,\n    //     knownDependency: true,\n    //     value: 1234,\n    //   }),\n    // ).not.throw();\n\n    expect(() =>\n      inst.validateSync({\n        unknownDependency: true,\n        knownDependency: true,\n      }),\n    ).to.throw(/required/);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow opt out of topo sort on specific edges",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 767,
+                "column": 57
+            },
+            "line": 767,
+            "code": "  it('should allow opt out of topo sort on specific edges', () => {\n    (function () {\n      object().shape({\n        orgID: number().when('location', function (v) {\n          if (v == null) return this.required();\n        }),\n        location: string().when('orgID', function (v) {\n          if (v == null) return this.required();\n        }),\n      });\n    }.should.throw('Cyclic dependency, node was:\"location\"'));\n    (function () {\n      object().shape(\n        {\n          orgID: number().when('location', function (v) {\n            if (v == null) return this.required();\n          }),\n          location: string().when('orgID', function (v) {\n            if (v == null) return this.required();\n          }),\n        },\n        [['location', 'orgID']],\n      );\n    }.should.not.throw());\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use correct default when concating",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 793,
+                "column": 47
+            },
+            "line": 793,
+            "code": "  it('should use correct default when concating', () => {\n    let inst = object({\n      other: bool(),\n    }).default(undefined);\n\n    expect(inst.concat(object()).getDefault()).to.equal(undefined);\n\n    expect(inst.concat(object().default({})).getDefault()).to.eql({});\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should maintain excluded edges when concating",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 803,
+                "column": 51
+            },
+            "line": 803,
+            "code": "  it('should maintain excluded edges when concating', async () => {\n    const schema = object().shape(\n      {\n        a1: string().when('a2', {\n          is: undefined,\n          then: string().required(),\n        }),\n        a2: string().when('a1', {\n          is: undefined,\n          then: string().required(),\n        }),\n      },\n      [['a1', 'a2']],\n    );\n\n    await expect(schema.concat(object()).isValid({ a1: null })).to.become(\n      false,\n    );\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle nested conditionals",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 823,
+                "column": 39
+            },
+            "line": 823,
+            "code": "  it('should handle nested conditionals', () => {\n    let countSchema = number().when('isBig', {\n      is: true,\n      then: number().min(5),\n    });\n    let inst = object({\n      other: bool(),\n      stats: object({\n        isBig: bool(),\n        count: countSchema,\n      })\n        .default(undefined)\n        .when('other', { is: true, then: object().required() }),\n    });\n\n    return Promise.all([\n      inst\n        .validate({ stats: undefined, other: true })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors[0].should.contain('required');\n        }),\n\n      inst\n        .validate({ stats: { isBig: true, count: 3 }, other: true })\n        .should.be.rejected()\n        .then((err) => {\n          err.errors[0].should.contain('must be greater than or equal to 5');\n        }),\n\n      inst\n        .validate({ stats: { isBig: true, count: 10 }, other: true })\n        .should.be.fulfilled()\n        .then((value) => {\n          value.should.deep.equal({\n            stats: { isBig: true, count: 10 },\n            other: true,\n          });\n        }),\n\n      countSchema\n        .validate(10, { context: { isBig: true } })\n        .should.be.fulfilled()\n        .then((value) => {\n          value.should.deep.equal(10);\n        }),\n    ]);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should camelCase keys",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 872,
+                "column": 27
+            },
+            "line": 872,
+            "code": "  it('should camelCase keys', () => {\n    let inst = object()\n      .shape({\n        conStat: number(),\n        caseStatus: number(),\n        hiJohn: number(),\n      })\n      .camelCase();\n\n    inst\n      .cast({ CON_STAT: 5, CaseStatus: 6, 'hi john': 4 })\n      .should.eql({ conStat: 5, caseStatus: 6, hiJohn: 4 });\n\n    expect(inst.nullable().cast(null)).to.equal(null);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should CONSTANT_CASE keys",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 888,
+                "column": 31
+            },
+            "line": 888,
+            "code": "  it('should CONSTANT_CASE keys', () => {\n    let inst = object()\n      .shape({\n        CON_STAT: number(),\n        CASE_STATUS: number(),\n        HI_JOHN: number(),\n      })\n      .constantCase();\n\n    inst\n      .cast({ conStat: 5, CaseStatus: 6, 'hi john': 4 })\n      .should.eql({ CON_STAT: 5, CASE_STATUS: 6, HI_JOHN: 4 });\n\n    expect(inst.nullable().cast(null)).to.equal(null);\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pick",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 904,
+                "column": 17
+            },
+            "line": 904,
+            "code": "  it('should pick', async () => {\n    let inst = object({\n      age: number().default(30).required(),\n      name: string().default('pat').required(),\n      color: string().default('red').required(),\n    });\n\n    expect(inst.pick(['age', 'name']).getDefault()).to.eql({\n      age: 30,\n      name: 'pat',\n    });\n\n    expect(\n      await inst.pick(['age', 'name']).validate({ age: 24, name: 'Bill' }),\n    ).to.eql({\n      age: 24,\n      name: 'Bill',\n    });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should omit",
+            "suites": [
+                "Object types",
+                "lazy evaluation"
+            ],
+            "updatePoint": {
+                "line": 924,
+                "column": 17
+            },
+            "line": 924,
+            "code": "  it('should omit', async () => {\n    let inst = object({\n      age: number().default(30).required(),\n      name: string().default('pat').required(),\n      color: string().default('red').required(),\n    });\n\n    expect(inst.omit(['age', 'name']).getDefault()).to.eql({\n      color: 'red',\n    });\n\n    expect(\n      await inst.omit(['age', 'name']).validate({ color: 'mauve' }),\n    ).to.eql({ color: 'mauve' });\n  });",
+            "file": "object.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should get default locale",
+            "suites": [
+                "Custom locale"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 31
+            },
+            "line": 4,
+            "code": "  it('should get default locale', () => {\n    const locale = require('../src/locale').default;\n    expect(locale.string.email).to.equal('${path} must be a valid email');\n  });",
+            "file": "setLocale.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set a new locale",
+            "suites": [
+                "Custom locale"
+            ],
+            "updatePoint": {
+                "line": 9,
+                "column": 29
+            },
+            "line": 9,
+            "code": "  it('should set a new locale', () => {\n    const locale = require('../src/locale').default;\n    const dict = {\n      string: {\n        email: 'Invalid email',\n      },\n    };\n\n    setLocale(dict);\n\n    expect(locale.string.email).to.equal(dict.string.email);\n  });",
+            "file": "setLocale.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should update the main locale",
+            "suites": [
+                "Custom locale"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 35
+            },
+            "line": 22,
+            "code": "  it('should update the main locale', () => {\n    const locale = require('../src/locale').default;\n    expect(locale.string.email).to.equal('Invalid email');\n  });",
+            "file": "setLocale.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not allow prototype pollution",
+            "suites": [
+                "Custom locale"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 42
+            },
+            "line": 27,
+            "code": "  it('should not allow prototype pollution', () => {\n    const payload = JSON.parse('{\"__proto__\":{\"polluted\":\"Yes! Its Polluted\"}}');\n\n    expect(() => setLocale(payload)).to.throw();\n\n    expect(payload).not.to.have.property('polluted');\n  });",
+            "file": "setLocale.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not pollute Object.prototype builtins",
+            "suites": [
+                "Custom locale"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 50
+            },
+            "line": 35,
+            "code": "  it('should not pollute Object.prototype builtins', () => {\n    const payload = { toString: { polluted: 'oh no' } };\n\n    expect(() => setLocale(payload)).to.throw();\n\n    expect(Object.prototype.toString).not.to.have.property('polluted');\n  });",
+            "file": "setLocale.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should trim",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 44,
+                "column": 19
+            },
+            "line": 44,
+            "code": "    it('should trim', () => {\n      schema.trim().cast(' 3  ').should.equal('3');\n    });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should transform to lowercase",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 37
+            },
+            "line": 48,
+            "code": "    it('should transform to lowercase', () => {\n      schema.lowercase().cast('HellO JohN').should.equal('hello john');\n    });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should transform to uppercase",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 37
+            },
+            "line": 52,
+            "code": "    it('should transform to uppercase', () => {\n      schema.uppercase().cast('HellO JohN').should.equal('HELLO JOHN');\n    });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle nulls",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 56,
+                "column": 27
+            },
+            "line": 56,
+            "code": "    it('should handle nulls', () => {\n      expect(\n        schema.nullable().trim().lowercase().uppercase().cast(null),\n      ).to.equal(null);\n    });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle DEFAULT",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 27
+            },
+            "line": 63,
+            "code": "  it('should handle DEFAULT', function () {\n    var inst = string();\n\n    inst.default('my_value').required().getDefault().should.equal('my_value');\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should type check",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 69,
+                "column": 23
+            },
+            "line": 69,
+            "code": "  it('should type check', function () {\n    var inst = string();\n\n    inst.isType('5').should.equal(true);\n    inst.isType(new String('5')).should.equal(true);\n    inst.isType(false).should.equal(false);\n    inst.isType(null).should.equal(false);\n    inst.nullable(false).isType(null).should.equal(false);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should VALIDATE correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 79,
+                "column": 31
+            },
+            "line": 79,
+            "code": "  it('should VALIDATE correctly', function () {\n    var inst = string().required().min(4).strict();\n\n    return Promise.all([\n      string().strict().isValid(null).should.eventually().equal(false),\n\n      string()\n        .strict()\n        .nullable(true)\n        .isValid(null)\n        .should.eventually()\n        .equal(true),\n\n      inst.isValid('hello').should.eventually().equal(true),\n\n      inst.isValid('hel').should.eventually().equal(false),\n\n      inst\n        .validate('')\n        .should.be.rejected()\n        .then(function (err) {\n          err.errors.length.should.equal(1);\n        }),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MATCHES correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 36
+            },
+            "line": 105,
+            "code": "  it('should check MATCHES correctly', function () {\n    var v = string().matches(/(hi|bye)/, 'A message');\n\n    return Promise.all([\n      v.isValid('hi').should.eventually().equal(true),\n      v.isValid('nope').should.eventually().equal(false),\n      v.isValid('bye').should.eventually().equal(true),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MATCHES correctly with global and sticky flags",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 65
+            },
+            "line": 115,
+            "code": "  it('should check MATCHES correctly with global and sticky flags', function () {\n    var v = string().matches(/hi/gy);\n\n    return Promise.all([\n      v.isValid('hi').should.eventually().equal(true),\n      v.isValid('hi').should.eventually().equal(true),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "MATCHES should include empty strings",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 124,
+                "column": 42
+            },
+            "line": 124,
+            "code": "  it('MATCHES should include empty strings', () => {\n    let v = string().matches(/(hi|bye)/);\n\n    return v.isValid('').should.eventually().equal(false);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "MATCHES should exclude empty strings",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 130,
+                "column": 42
+            },
+            "line": 130,
+            "code": "  it('MATCHES should exclude empty strings', () => {\n    let v = string().matches(/(hi|bye)/, { excludeEmptyString: true });\n\n    return v.isValid('').should.eventually().equal(true);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "EMAIL should exclude empty strings",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 40
+            },
+            "line": 136,
+            "code": "  it('EMAIL should exclude empty strings', () => {\n    let v = string().email();\n\n    return v.isValid('').should.eventually().equal(true);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MIN correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 142,
+                "column": 32
+            },
+            "line": 142,
+            "code": "  it('should check MIN correctly', function () {\n    var v = string().min(5);\n    var obj = object({\n      len: number(),\n      name: string().min(ref('len')),\n    });\n\n    return Promise.all([\n      v.isValid('hiiofff').should.eventually().equal(true),\n      v.isValid('big').should.eventually().equal(false),\n      v.isValid('noffasfasfasf saf').should.eventually().equal(true),\n\n      v.isValid(null).should.eventually().equal(false), // null -> ''\n      v.nullable().isValid(null).should.eventually().equal(true), // null -> null\n\n      obj.isValid({ len: 10, name: 'john' }).should.eventually().equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check MAX correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 161,
+                "column": 32
+            },
+            "line": 161,
+            "code": "  it('should check MAX correctly', function () {\n    var v = string().max(5);\n    var obj = object({\n      len: number(),\n      name: string().max(ref('len')),\n    });\n    return Promise.all([\n      v.isValid('adgf').should.eventually().equal(true),\n      v.isValid('bigdfdsfsdf').should.eventually().equal(false),\n      v.isValid('no').should.eventually().equal(true),\n\n      v.isValid(null).should.eventually().equal(false),\n\n      v.nullable().isValid(null).should.eventually().equal(true),\n\n      obj.isValid({ len: 3, name: 'john' }).should.eventually().equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check LENGTH correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 35
+            },
+            "line": 180,
+            "code": "  it('should check LENGTH correctly', function () {\n    var v = string().length(5);\n    var obj = object({\n      len: number(),\n      name: string().length(ref('len')),\n    });\n\n    return Promise.all([\n      v.isValid('exact').should.eventually().equal(true),\n      v.isValid('sml').should.eventually().equal(false),\n      v.isValid('biiiig').should.eventually().equal(false),\n\n      v.isValid(null).should.eventually().equal(false),\n      v.nullable().isValid(null).should.eventually().equal(true),\n\n      obj.isValid({ len: 5, name: 'foo' }).should.eventually().equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check url correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 199,
+                "column": 32
+            },
+            "line": 199,
+            "code": "  it('should check url correctly', function () {\n    var v = string().url();\n\n    return Promise.all([\n      v.isValid('//www.github.com/').should.eventually().equal(true),\n      v.isValid('https://www.github.com/').should.eventually().equal(true),\n      v.isValid('this is not a url').should.eventually().equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check UUID correctly",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 209,
+                "column": 33
+            },
+            "line": 209,
+            "code": "  it('should check UUID correctly', function () {\n    var v = string().uuid();\n\n    return Promise.all([\n      v\n        .isValid('0c40428c-d88d-4ff0-a5dc-a6755cb4f4d1')\n        .should.eventually()\n        .equal(true),\n      v\n        .isValid('42c4a747-3e3e-42be-af30-469cfb9c1913')\n        .should.eventually()\n        .equal(true),\n      v\n        .isValid('42c4a747-3e3e-zzzz-af30-469cfb9c1913')\n        .should.eventually()\n        .equal(false),\n      v.isValid('this is not a uuid').should.eventually().equal(false),\n      v.isValid('').should.eventually().equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should check allowed values at the end",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 230,
+                "column": 44
+            },
+            "line": 230,
+            "code": "  it('should check allowed values at the end',() => {\n    return Promise.all([\n      string()\n        .required('Required')\n        .notOneOf([ref('$someKey')])\n        .validate('',{context:{someKey:''}})\n        .should.be.rejected().then(err => {\n          err.type.should.equal('required')\n        }),\n      object({\n        email:string().required('Email Required'),\n        password:string().required('Password Required').notOneOf([ref('email')]),\n      }).validate({email:'',password:''},{abortEarly:false})\n      .should.be.rejected().then(err => {\n        err.errors.should.include('Email Required');\n        err.errors.should.include('Password Required');\n      })\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validate transforms",
+            "suites": [
+                "String types",
+                "casting",
+                "ensure"
+            ],
+            "updatePoint": {
+                "line": 250,
+                "column": 32
+            },
+            "line": 250,
+            "code": "  it('should validate transforms', function () {\n    return Promise.all([\n      string().trim().isValid(' 3  ').should.eventually().equal(true),\n\n      string()\n        .lowercase()\n        .isValid('HellO JohN')\n        .should.eventually()\n        .equal(true),\n\n      string()\n        .uppercase()\n        .isValid('HellO JohN')\n        .should.eventually()\n        .equal(true),\n\n      string()\n        .trim()\n        .isValid(' 3  ', { strict: true })\n        .should.eventually()\n        .equal(false),\n\n      string()\n        .lowercase()\n        .isValid('HellO JohN', { strict: true })\n        .should.eventually()\n        .equal(false),\n\n      string()\n        .uppercase()\n        .isValid('HellO JohN', { strict: true })\n        .should.eventually()\n        .equal(false),\n    ]);\n  });",
+            "file": "string.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should insert the params into the message",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 5,
+                "column": 49
+            },
+            "line": 5,
+            "code": "    it('should insert the params into the message', function () {\n      const str = ValidationError.formatError('Some message ${param}', {\n        param: 'here',\n      });\n      str.should.contain('here');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should auto include any param named 'label' or 'path' as the 'path' param",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 12,
+                "column": 81
+            },
+            "line": 12,
+            "code": "    it(`should auto include any param named 'label' or 'path' as the 'path' param`, function () {\n      const str = ValidationError.formatError('${path} goes here', {\n        label: 'label',\n      });\n      str.should.contain('label');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use 'this' if a 'label' or 'path' param is not provided",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 70
+            },
+            "line": 19,
+            "code": "    it(`should use 'this' if a 'label' or 'path' param is not provided`, function () {\n      const str = ValidationError.formatError('${path} goes here', {});\n      str.should.contain('this');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should include \"undefined\" in the message if undefined is provided as a param",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 85
+            },
+            "line": 24,
+            "code": "    it(`should include \"undefined\" in the message if undefined is provided as a param`, function () {\n      const str = ValidationError.formatError('${path} value is ${min}', {\n        min: undefined,\n      });\n      str.should.contain('undefined');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should include \"null\" in the message if null is provided as a param",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 75
+            },
+            "line": 31,
+            "code": "    it(`should include \"null\" in the message if null is provided as a param`, function () {\n      const str = ValidationError.formatError('${path} value is ${min}', {\n        min: null,\n      });\n      str.should.contain('null');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should include \"NaN\" in the message if null is provided as a param",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 74
+            },
+            "line": 38,
+            "code": "    it(`should include \"NaN\" in the message if null is provided as a param`, function () {\n      const str = ValidationError.formatError('${path} value is ${min}', {\n        min: NaN,\n      });\n      str.should.contain('NaN');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should include 0 in the message if 0 is provided as a param",
+            "suites": [
+                "ValidationError",
+                "formatError"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 67
+            },
+            "line": 45,
+            "code": "    it(`should include 0 in the message if 0 is provided as a param`, function () {\n      const str = ValidationError.formatError('${path} value is ${min}', {\n        min: 0,\n      });\n      str.should.contain('0');\n    });",
+            "file": "ValidationError.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cast should not assert on undefined",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 41
+            },
+            "line": 24,
+            "code": "  it('cast should not assert on undefined', () => {\n    (() => string().cast(undefined)).should.not.throw();\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cast should assert on undefined cast results",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 50
+            },
+            "line": 28,
+            "code": "  it('cast should assert on undefined cast results', () => {\n    (() =>\n      string()\n        .transform(() => undefined)\n        .cast('foo')).should.throw();\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cast should respect assert option",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 39
+            },
+            "line": 35,
+            "code": "  it('cast should respect assert option', () => {\n    (() => string().cast(null)).should.throw();\n\n    (() => string().cast(null, { assert: false })).should.not.throw();\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should getIn correctly",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 28
+            },
+            "line": 41,
+            "code": "  it('should getIn correctly', async () => {\n    let num = number();\n    let shape = object({ 'num-1': num });\n    let inst = object({\n      num: number().max(4),\n\n      nested: object({\n        arr: array().of(shape),\n      }),\n    });\n\n    const value = { nested: { arr: [{}, { 'num-1': 2 }] } };\n    let { schema, parent, parentPath } = getIn(\n      inst,\n      'nested.arr[1].num-1',\n      value,\n    );\n\n    expect(schema).to.equal(num);\n    expect(parentPath).to.equal('num-1');\n    expect(parent).to.equal(value.nested.arr[1]);\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should getIn array correctly",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 64,
+                "column": 34
+            },
+            "line": 64,
+            "code": "  it('should getIn array correctly', async () => {\n    let num = number();\n    let shape = object({ 'num-1': num });\n    let inst = object({\n      num: number().max(4),\n\n      nested: object({\n        arr: array().of(shape),\n      }),\n    });\n\n    const value = {\n      nested: {\n        arr: [{}, { 'num-1': 2 }],\n      },\n    };\n\n    const { schema, parent, parentPath } = getIn(inst, 'nested.arr[1]', value);\n\n    expect(schema).to.equal(shape);\n    expect(parentPath).to.equal('1');\n    expect(parent).to.equal(value.nested.arr);\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should REACH correctly",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 88,
+                "column": 28
+            },
+            "line": 88,
+            "code": "  it('should REACH correctly', async () => {\n    let num = number();\n    let shape = object({ num });\n\n    let inst = object({\n      num: number().max(4),\n\n      nested: object({\n        arr: array().of(shape),\n      }),\n    });\n\n    reach(inst, '').should.equal(inst);\n\n    reach(inst, 'nested.arr[0].num').should.equal(num);\n    reach(inst, 'nested.arr[].num').should.equal(num);\n    reach(inst, 'nested.arr[1].num').should.equal(num);\n    reach(inst, 'nested.arr[1]').should.equal(shape);\n\n    reach(inst, 'nested[\"arr\"][1].num').should.not.equal(number());\n\n    let valid = await reach(inst, 'nested.arr[0].num').isValid(5);\n    valid.should.equal(true);\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should REACH conditionally correctly",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 42
+            },
+            "line": 113,
+            "code": "  it('should REACH conditionally correctly', async function () {\n    var num = number().oneOf([4]),\n      inst = object().shape({\n        num: number().max(4),\n        nested: object().shape({\n          arr: array().when('$bar', function (bar) {\n            return bar !== 3\n              ? array().of(number())\n              : array().of(\n                  object().shape({\n                    foo: number(),\n                    num: number().when('foo', (foo) => {\n                      if (foo === 5) return num;\n                    }),\n                  }),\n                );\n          }),\n        }),\n      });\n\n    let context = { bar: 3 };\n    let value = {\n      bar: 3,\n      nested: {\n        arr: [{ foo: 5 }, { foo: 3 }],\n      },\n    };\n\n    let options = {};\n    options.parent = value.nested.arr[0];\n    options.value = options.parent.num;\n    reach(inst, 'nested.arr.num', value).resolve(options).should.equal(num);\n    reach(inst, 'nested.arr[].num', value).resolve(options).should.equal(num);\n\n    options.context = context;\n    reach(inst, 'nested.arr.num', value, context)\n      .resolve(options)\n      .should.equal(num);\n    reach(inst, 'nested.arr[].num', value, context)\n      .resolve(options)\n      .should.equal(num);\n    reach(inst, 'nested.arr[0].num', value, context)\n      .resolve(options)\n      .should.equal(num);\n\n    // // should fail b/c item[1] is used to resolve the schema\n    options.parent = value.nested.arr[1];\n    options.value = options.parent.num;\n    reach(inst, 'nested[\"arr\"][1].num', value, context)\n      .resolve(options)\n      .should.not.equal(num);\n\n    let reached = reach(inst, 'nested.arr[].num', value, context);\n\n    await reached.validate(5, { context, parent: { foo: 4 } }).should.be\n      .fulfilled;\n\n    await reached\n      .validate(5, { context, parent: { foo: 5 } })\n      .should.be.rejectedWith(ValidationError, /one of the following/);\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reach through lazy",
+            "suites": [
+                "Yup"
+            ],
+            "updatePoint": {
+                "line": 175,
+                "column": 31
+            },
+            "line": 175,
+            "code": "  it('should reach through lazy', async () => {\n    let types = {\n      1: object({ foo: string() }),\n      2: object({ foo: number() }),\n    };\n\n    let err = await object({\n      x: array(lazy((val) => types[val.type])),\n    })\n      .strict()\n      .validate({\n        x: [\n          { type: 1, foo: '4' },\n          { type: 2, foo: '5' },\n        ],\n      })\n      .should.be.rejected();\n    err.message.should.match(/must be a `number` type/);\n  });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "extending mixed should make method accessible everywhere",
+            "suites": [
+                "Yup",
+                "addMethod"
+            ],
+            "updatePoint": {
+                "line": 196,
+                "column": 64
+            },
+            "line": 196,
+            "code": "    it('extending mixed should make method accessible everywhere', () => {\n      addMethod(mixed, 'foo', () => 'here');\n\n      expect(string().foo()).to.equal('here');\n    });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "extending Mixed should make method accessible everywhere",
+            "suites": [
+                "Yup",
+                "addMethod"
+            ],
+            "updatePoint": {
+                "line": 202,
+                "column": 64
+            },
+            "line": 202,
+            "code": "    it('extending Mixed should make method accessible everywhere', () => {\n      addMethod(MixedSchema, 'foo', () => 'here');\n\n      expect(string().foo()).to.equal('here');\n    });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with factories: %s",
+            "suites": [
+                "Yup",
+                "addMethod"
+            ],
+            "line": 208,
+            "code": "    test.each([\n      ['object', object],\n      ['array', array],\n      ['string', string],\n      ['number', number],\n      ['boolean', boolean],\n      ['date', date],\n    ])('should work with factories: %s', (_msg, factory) => {\n      addMethod(factory, 'foo', () => 'here');\n\n      expect(factory().foo()).to.equal('here');\n    });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with classes: %s",
+            "suites": [
+                "Yup",
+                "addMethod"
+            ],
+            "line": 221,
+            "code": "    test.each([\n      ['object', ObjectSchema],\n      ['array', ArraySchema],\n      ['string', StringSchema],\n      ['number', NumberSchema],\n      ['boolean', BooleanSchema],\n      ['date', DateSchema],\n    ])('should work with classes: %s', (_msg, ctor) => {\n      addMethod(ctor, 'foo', () => 'here');\n\n      expect(new ctor().foo()).to.equal('here');\n    });",
+            "file": "yup.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "jquense__yup.svg"
+}

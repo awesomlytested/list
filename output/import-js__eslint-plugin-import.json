@@ -1,0 +1,1069 @@
+{
+    "repo": "import-js/eslint-plugin-import",
+    "url": "https://github.com/import-js/eslint-plugin-import",
+    "branch": "main",
+    "configs": [
+        {
+            "package": "eslint-plugin-import",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        },
+        {
+            "package": "eslint-import-resolver-node",
+            "lang": "js",
+            "dir": "resolvers/node/test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        },
+        {
+            "package": "eslint-import-resolver-webpack",
+            "lang": "js",
+            "dir": "resolvers/webpack/test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "captures module",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 21
+            },
+            "line": 13,
+            "code": "  it('captures module', function () {\n    expect(resolver.resolve('./module', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "captures jsnext",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 21
+            },
+            "line": 16,
+            "code": "  it('captures jsnext', function () {\n    expect(resolver.resolve('./jsnext', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'jsnext', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "captures module instead of jsnext",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 39
+            },
+            "line": 19,
+            "code": "  it('captures module instead of jsnext', function () {\n    expect(resolver.resolve('./module-and-jsnext', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module-and-jsnext', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "falls back from a missing \"module\" to \"main\"",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 50
+            },
+            "line": 22,
+            "code": "  it('falls back from a missing \"module\" to \"main\"', function () {\n    expect(resolver.resolve('./module-broken', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module-broken', 'main.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "handles base path relative to CWD",
+            "suites": [
+                "paths"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 39
+            },
+            "line": 8,
+            "code": "  it('handles base path relative to CWD', function () {\n    expect(node.resolve('../', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, '../index.js'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "returns found, but null path, for core Node modules",
+            "suites": [
+                "core"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 57
+            },
+            "line": 13,
+            "code": "  it('returns found, but null path, for core Node modules', function () {\n    const resolved = node.resolve('fs', './test/file.js');\n    expect(resolved).has.property('found', true);\n    expect(resolved).has.property('path', null);\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "finds .json files",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 23
+            },
+            "line": 20,
+            "code": "  it('finds .json files', function () {\n    expect(node.resolve('./data', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, './data.json'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "ignores .json files if 'extensions' is redefined",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 54
+            },
+            "line": 23,
+            "code": "  it(\"ignores .json files if 'extensions' is redefined\", function () {\n    expect(node.resolve('./data', './test/file.js', {\n      extensions: ['.js']\n    })).to.have.property('found', false);\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "finds mjs modules, with precedence over .js",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 49
+            },
+            "line": 28,
+            "code": "  it('finds mjs modules, with precedence over .js', function () {\n    expect(node.resolve('./native', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, './native.mjs'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "finds .node modules, with lowest precedence",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 49
+            },
+            "line": 31,
+            "code": "  it('finds .node modules, with lowest precedence', function () {\n    expect(node.resolve('./native.node', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, './native.node'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "finds .node modules",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 25
+            },
+            "line": 34,
+            "code": "  it('finds .node modules', function () {\n    expect(node.resolve('./dot-node', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, './dot-node.node'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "still finds .js if explicit",
+            "suites": [
+                "default options"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 33
+            },
+            "line": 37,
+            "code": "  it('still finds .js if explicit', function () {\n    expect(node.resolve('./native.js', './test/file.js')).to.have.property('path').equal(path.resolve(__dirname, './native.js'));\n  });",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "resolvers/node/test"
+        },
+        {
+            "name": "is found",
+            "suites": [
+                "resolve.alias"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 14
+            },
+            "line": 17,
+            "code": "  it('is found', function () {\n    expect(resolved).to.have.property('found', true);\n  });",
+            "file": "alias.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "is correct",
+            "suites": [
+                "resolve.alias"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 16
+            },
+            "line": 20,
+            "code": "  it('is correct', function () {\n    expect(resolved).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "alias.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds webpack.config.js in parent directories",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 51
+            },
+            "line": 17,
+            "code": "  it('finds webpack.config.js in parent directories', function () {\n    expect(resolve('main-module', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds absolute webpack.config.js files",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 44
+            },
+            "line": 20,
+            "code": "  it('finds absolute webpack.config.js files', function () {\n    expect(resolve('foo', file, absoluteSettings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'absolutely', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds compile-to-js configs",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 33
+            },
+            "line": 23,
+            "code": "  it('finds compile-to-js configs', function () {\n    const settings = {\n      config: path.join(__dirname, './files/webpack.config.babel.js')\n    };\n    expect(resolve('main-module', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds compile-to-js config in parent directories",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 54
+            },
+            "line": 29,
+            "code": "  it('finds compile-to-js config in parent directories', function () {\n    expect(resolve('main-module', extensionFile)).to.have.property('path').and.equal(path.join(__dirname, 'config-extensions', 'src', 'main-module.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the first config with a resolve section",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 51
+            },
+            "line": 32,
+            "code": "  it('finds the first config with a resolve section', function () {\n    const settings = {\n      config: path.join(__dirname, './files/webpack.config.multiple.js')\n    };\n    expect(resolve('main-module', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the config at option config-index",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 45
+            },
+            "line": 38,
+            "code": "  it('finds the config at option config-index', function () {\n    const settings = {\n      config: path.join(__dirname, './files/webpack.config.multiple.js'),\n      'config-index': 2\n    };\n    expect(resolve('foo', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "doesn't swallow config load errors (#435)",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 47
+            },
+            "line": 45,
+            "code": "  it(\"doesn't swallow config load errors (#435)\", function () {\n    const settings = {\n      config: path.join(__dirname, './files/webpack.config.garbage.js')\n    };\n    expect(function () {\n      resolve('foo', file, settings);\n    }).to.throw(Error);\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds config object when config is an object",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 50
+            },
+            "line": 53,
+            "code": "  it('finds config object when config is an object', function () {\n    const settings = {\n      config: require(path.join(__dirname, 'files', 'some', 'absolute.path.webpack.config.js'))\n    };\n    expect(resolve('foo', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'absolutely', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds config object when config uses a path relative to working dir",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 59,
+                "column": 73
+            },
+            "line": 59,
+            "code": "  it('finds config object when config uses a path relative to working dir', function () {\n    const settings = {\n      config: './test/files/some/absolute.path.webpack.config.js'\n    };\n    expect(resolve('foo', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'absolutely', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the first config with a resolve section when config is an array of config objects",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 65,
+                "column": 93
+            },
+            "line": 65,
+            "code": "  it('finds the first config with a resolve section when config is an array of config objects', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.config.multiple.js'))\n    };\n    expect(resolve('main-module', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the config at option config-index when config is an array of config objects",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 87
+            },
+            "line": 71,
+            "code": "  it('finds the config at option config-index when config is an array of config objects', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.config.multiple.js')),\n      'config-index': 2\n    };\n    expect(resolve('foo', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'goofy', 'path', 'foo.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the config at option env when config is a function",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 78,
+                "column": 62
+            },
+            "line": 78,
+            "code": "  it('finds the config at option env when config is a function', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.function.config.js')),\n      env: {\n        dummy: true\n      }\n    };\n    expect(resolve('bar', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'goofy', 'path', 'bar.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds the config at option env when config is an array of functions",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 87,
+                "column": 73
+            },
+            "line": 87,
+            "code": "  it('finds the config at option env when config is an array of functions', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.function.config.multiple.js')),\n      env: {\n        dummy: true\n      }\n    };\n    expect(resolve('bar', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'goofy', 'path', 'bar.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "passes argv to config when it is a function",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 96,
+                "column": 49
+            },
+            "line": 96,
+            "code": "  it('passes argv to config when it is a function', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.function.config.js')),\n      argv: {\n        mode: 'test'\n      }\n    };\n    expect(resolve('baz', file, settings)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'bar', 'bar.js'));\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "passes a default empty argv object to config when it is a function",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 72
+            },
+            "line": 105,
+            "code": "  it('passes a default empty argv object to config when it is a function', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.function.config.js')),\n      argv: undefined\n    };\n    expect(function () {\n      resolve('baz', file, settings);\n    }).to.not.throw(Error);\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "prevents async config using",
+            "suites": [
+                "config"
+            ],
+            "updatePoint": {
+                "line": 114,
+                "column": 33
+            },
+            "line": 114,
+            "code": "  it('prevents async config using', function () {\n    const settings = {\n      config: require(path.join(__dirname, './files/webpack.config.async.js'))\n    };\n    const result = resolve('foo', file, settings);\n    expect(result).not.to.have.property('path');\n    expect(result).to.have.property('found').to.be.false;\n  });",
+            "file": "config.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "respects the defaults",
+            "suites": [
+                "extensions"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 27
+            },
+            "line": 14,
+            "code": "  it('respects the defaults', function () {\n    expect(resolve('./foo', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'foo.web.js'));\n  });",
+            "file": "extensions.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works",
+            "suites": [
+                "extensions",
+                "resolve.extensions set"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 13
+            },
+            "line": 18,
+            "code": "    it('works', function () {\n      expect(resolve('./foo', extensions)).to.have.property('path').and.equal(path.join(__dirname, 'custom-extensions', 'foo.js'));\n    });",
+            "file": "extensions.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "replaces defaults",
+            "suites": [
+                "extensions",
+                "resolve.extensions set"
+            ],
+            "updatePoint": {
+                "line": 21,
+                "column": 25
+            },
+            "line": 21,
+            "code": "    it('replaces defaults', function () {\n      expect(resolve('./baz', extensions)).to.have.property('found', false);\n    });",
+            "file": "extensions.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds .coffee",
+            "suites": [
+                "extensions",
+                "resolve.extensions set"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 21
+            },
+            "line": 24,
+            "code": "    it('finds .coffee', function () {\n      expect(resolve('./bar', extensions)).to.have.property('path').and.equal(path.join(__dirname, 'custom-extensions', 'bar.coffee'));\n    });",
+            "file": "extensions.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works on just a string",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 28
+            },
+            "line": 18,
+            "code": "  it('works on just a string', function () {\n    const resolved = webpack.resolve('bootstrap', file);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works on object-map",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 25
+            },
+            "line": 23,
+            "code": "  it('works on object-map', function () {\n    const resolved = webpack.resolve('jquery', file);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works on a function",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 25
+            },
+            "line": 28,
+            "code": "  it('works on a function', function () {\n    const resolved = webpack.resolve('underscore', file);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "returns null for core modules",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 35
+            },
+            "line": 33,
+            "code": "  it('returns null for core modules', function () {\n    const resolved = webpack.resolve('fs', file);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works on a function (synchronous) for webpack 5",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 53
+            },
+            "line": 38,
+            "code": "  it('works on a function (synchronous) for webpack 5', function () {\n    const resolved = webpack.resolve('underscore', file, settingsWebpack5);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works on a function (synchronous) which uses getResolve for webpack 5",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 75
+            },
+            "line": 43,
+            "code": "  it('works on a function (synchronous) which uses getResolve for webpack 5', function () {\n    const resolved = webpack.resolve('graphql', file, settingsWebpack5);\n    expect(resolved).to.have.property('found', true);\n    expect(resolved).to.have.property('path', null);\n  });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "prevents using an asynchronous function for webpack 5",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 61
+            },
+            "line": 53,
+            "code": "    it('prevents using an asynchronous function for webpack 5', function () {\n      const resolved = webpack.resolve('underscore', file, settingsWebpack5Async());\n      expect(resolved).to.have.property('found', false);\n    });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "prevents using a function which uses Promise returned by getResolve for webpack 5",
+            "suites": [
+                "externals"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 89
+            },
+            "line": 57,
+            "code": "    it('prevents using a function which uses Promise returned by getResolve for webpack 5', function () {\n      const resolved = webpack.resolve('graphql', file, settingsWebpack5Async());\n      expect(resolved).to.have.property('found', false);\n    });",
+            "file": "externals.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works",
+            "suites": [
+                "fallback"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 11
+            },
+            "line": 13,
+            "code": "  it('works', function () {\n    expect(resolve('fb-module', file)).property('path').to.equal(path.join(__dirname, 'files', 'fallback', 'fb-module.js'));\n  });",
+            "file": "fallback.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "really works",
+            "suites": [
+                "fallback"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 18
+            },
+            "line": 16,
+            "code": "  it('really works', function () {\n    expect(resolve('jsx/some-fb-file', file)).property('path').to.equal(path.join(__dirname, 'files', 'fallback', 'jsx', 'some-fb-file.js'));\n  });",
+            "file": "fallback.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "prefer root",
+            "suites": [
+                "fallback"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 17
+            },
+            "line": 19,
+            "code": "  it('prefer root', function () {\n    expect(resolve('jsx/some-file', file)).property('path').to.equal(path.join(__dirname, 'files', 'src', 'jsx', 'some-file.js'));\n  });",
+            "file": "fallback.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "supports definition as an array",
+            "suites": [
+                "fallback"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 37
+            },
+            "line": 22,
+            "code": "  it('supports definition as an array', function () {\n    expect(resolve('fb-module', file, {\n      config: 'webpack.array-root.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'files', 'fallback', 'fb-module.js'));\n  });",
+            "file": "fallback.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "strips bang-loaders",
+            "suites": [
+                "inline loader syntax"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 25
+            },
+            "line": 13,
+            "code": "  it('strips bang-loaders', function () {\n    expect(resolve('css-loader!./src/main-module', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "loaders.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "strips loader query string",
+            "suites": [
+                "inline loader syntax"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 32
+            },
+            "line": 16,
+            "code": "  it('strips loader query string', function () {\n    expect(resolve('some-loader?param=value!./src/main-module', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "loaders.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "strips resource query string",
+            "suites": [
+                "inline loader syntax"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 34
+            },
+            "line": 19,
+            "code": "  it('strips resource query string', function () {\n    expect(resolve('./src/main-module?otherParam=otherValue', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "loaders.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "strips everything",
+            "suites": [
+                "inline loader syntax"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 23
+            },
+            "line": 22,
+            "code": "  it('strips everything', function () {\n    expect(resolve('some-loader?param=value!./src/main-module?otherParam=otherValue', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "loaders.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds a node module",
+            "suites": [
+                "resolve.moduleDirectories"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 25
+            },
+            "line": 13,
+            "code": "  it('finds a node module', function () {\n    expect(resolve('some-module', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'node_modules', 'some-module', 'index.js'));\n  });",
+            "file": "modules.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "finds a bower module",
+            "suites": [
+                "resolve.moduleDirectories"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 26
+            },
+            "line": 16,
+            "code": "  it('finds a bower module', function () {\n    expect(resolve('typeahead.js', file)).to.have.property('path').and.equal(path.join(__dirname, 'files', 'bower_components', 'typeahead.js'));\n  });",
+            "file": "modules.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "captures module",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 21
+            },
+            "line": 13,
+            "code": "  it('captures module', function () {\n    expect(resolver.resolve('./module', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "captures jsnext",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 21
+            },
+            "line": 16,
+            "code": "  it('captures jsnext', function () {\n    expect(resolver.resolve('./jsnext', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'jsnext', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "captures module instead of jsnext",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 39
+            },
+            "line": 19,
+            "code": "  it('captures module instead of jsnext', function () {\n    expect(resolver.resolve('./module-and-jsnext', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module-and-jsnext', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "falls back from a missing \"module\" to \"main\"",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 50
+            },
+            "line": 22,
+            "code": "  it('falls back from a missing \"module\" to \"main\"', function () {\n    expect(resolver.resolve('./module-broken', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'module-broken', 'main.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "captures webpack",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 22
+            },
+            "line": 25,
+            "code": "  it('captures webpack', function () {\n    expect(resolver.resolve('./webpack', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'webpack', 'webpack.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "captures jam (array path)",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 31
+            },
+            "line": 28,
+            "code": "  it('captures jam (array path)', function () {\n    expect(resolver.resolve('./jam', file)).property('path').to.equal(path.join(__dirname, 'package-mains', 'jam', 'jam.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "uses configured packageMains, if provided",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 47
+            },
+            "line": 31,
+            "code": "  it('uses configured packageMains, if provided', function () {\n    expect(resolver.resolve('./webpack', file, {\n      config: 'webpack.alt.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'package-mains', 'webpack', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "always defers to module, regardless of config",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 51
+            },
+            "line": 36,
+            "code": "  it('always defers to module, regardless of config', function () {\n    expect(resolver.resolve('./module', file, {\n      config: 'webpack.alt.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'package-mains', 'module', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "always defers to jsnext:main, regardless of config",
+            "suites": [
+                "packageMains"
+            ],
+            "updatePoint": {
+                "line": 41,
+                "column": 56
+            },
+            "line": 41,
+            "code": "  it('always defers to jsnext:main, regardless of config', function () {\n    expect(resolver.resolve('./jsnext', file, {\n      config: 'webpack.alt.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'package-mains', 'jsnext', 'src', 'index.js'));\n  });",
+            "file": "packageMains.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "work",
+            "suites": [
+                "plugins"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 10
+            },
+            "line": 19,
+            "code": "  it('work', function () {\n    expect(resolved).to.have.property('found', true);\n  });",
+            "file": "plugins.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "is correct",
+            "suites": [
+                "plugins"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 16
+            },
+            "line": 22,
+            "code": "  it('is correct', function () {\n    expect(resolved).to.have.property('path').and.equal(path.join(__dirname, 'files', 'some', 'bar', 'bar.js'));\n  });",
+            "file": "plugins.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "work with alias",
+            "suites": [
+                "plugins"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 21
+            },
+            "line": 25,
+            "code": "  it('work with alias', function () {\n    expect(aliasResolved).to.have.property('found', true);\n  });",
+            "file": "plugins.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "works",
+            "suites": [
+                "root"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 11
+            },
+            "line": 14,
+            "code": "  it('works', function () {\n    expect(resolve('main-module', file)).property('path').to.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n  });",
+            "file": "root.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "really works",
+            "suites": [
+                "root"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 18
+            },
+            "line": 17,
+            "code": "  it('really works', function () {\n    expect(resolve('jsx/some-file', file)).property('path').to.equal(path.join(__dirname, 'files', 'src', 'jsx', 'some-file.js'));\n  });",
+            "file": "root.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "supports definition as an array",
+            "suites": [
+                "root"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 37
+            },
+            "line": 20,
+            "code": "  it('supports definition as an array', function () {\n    expect(resolve('main-module', file, {\n      config: 'webpack.array-root.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n    expect(resolve('typeahead', file, {\n      config: 'webpack.array-root.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'files', 'bower_components', 'typeahead.js'));\n  });",
+            "file": "root.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "supports definition as a function",
+            "suites": [
+                "root"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 39
+            },
+            "line": 28,
+            "code": "  it('supports definition as a function', function () {\n    expect(resolve('main-module', file, {\n      config: 'webpack.function.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n    expect(resolve('typeahead', file, {\n      config: 'webpack.function.config.js'\n    })).property('path').to.equal(path.join(__dirname, 'files', 'bower_components', 'typeahead.js'));\n  });",
+            "file": "root.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        },
+        {
+            "name": "supports passing a different directory to load webpack from",
+            "suites": [
+                "root"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 65
+            },
+            "line": 36,
+            "code": "  it('supports passing a different directory to load webpack from', function () {\n    // Webpack should still be able to resolve the config here\n    expect(resolve('main-module', file, {\n      config: 'webpack.config.js',\n      cwd: webpackDir\n    })).property('path').to.equal(path.join(__dirname, 'files', 'src', 'main-module.js'));\n    expect(resolve('typeahead', file, {\n      config: 'webpack.config.js',\n      cwd: webpackDir\n    })).property('path').to.equal(path.join(__dirname, 'files', 'bower_components', 'typeahead.js'));\n  });",
+            "file": "root.js",
+            "skipped": false,
+            "dir": "resolvers/webpack/test"
+        }
+    ],
+    "badge": "import-js__eslint-plugin-import.svg"
+}

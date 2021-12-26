@@ -1,0 +1,174 @@
+{
+    "repo": "peers/peerjs",
+    "url": "https://github.com/peers/peerjs",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "peerjs",
+            "lang": "ts",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should be disabled by default",
+            "suites": [
+                "Logger"
+            ],
+            "updatePoint": {
+                "line": 11,
+                "column": 37
+            },
+            "line": 11,
+            "code": "    it(\"should be disabled by default\", function () {\n        expect(Logger.logLevel).to.eq(LogLevel.Disabled);\n    });",
+            "file": "logger.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be accept new log level",
+            "suites": [
+                "Logger"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 38
+            },
+            "line": 15,
+            "code": "    it(\"should be accept new log level\", function () {\n        const checkedLevels = [];\n\n        Logger.setLogFunction((logLevel) => {\n            checkedLevels.push(logLevel);\n        });\n\n        Logger.logLevel = LogLevel.Warnings;\n\n        expect(Logger.logLevel).to.eq(LogLevel.Warnings);\n\n        Logger.log('');\n        Logger.warn('');\n        Logger.error('');\n\n        expect(checkedLevels).to.deep.eq([LogLevel.Warnings, LogLevel.Errors]);\n    });",
+            "file": "logger.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should accept new log function",
+            "suites": [
+                "Logger"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 38
+            },
+            "line": 33,
+            "code": "    it(\"should accept new log function\", function () {\n        Logger.logLevel = LogLevel.All;\n\n        const checkedLevels = [];\n        const testMessage = 'test it';\n\n        Logger.setLogFunction((logLevel, ...args) => {\n            checkedLevels.push(logLevel);\n\n            expect(args[0]).to.eq(testMessage);\n        });\n\n        Logger.log(testMessage);\n        Logger.warn(testMessage);\n        Logger.error(testMessage);\n\n        expect(checkedLevels).to.deep.eq([LogLevel.All, LogLevel.Warnings, LogLevel.Errors]);\n    });",
+            "file": "logger.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shouldn't contains any connection",
+            "suites": [
+                "Peer",
+                "after construct without parameters"
+            ],
+            "updatePoint": {
+                "line": 24,
+                "column": 45
+            },
+            "line": 24,
+            "code": "        it(\"shouldn't contains any connection\", function () {\n            const peer = new Peer();\n\n            expect(peer.open).to.be.false;\n            expect(peer.connections).to.be.empty;\n            expect(peer.id).to.be.null;\n            expect(peer.disconnected).to.be.false;\n            expect(peer.destroyed).to.be.false;\n\n            peer.destroy();\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should contains id and key",
+            "suites": [
+                "Peer",
+                "after construct with parameters"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 38
+            },
+            "line": 38,
+            "code": "        it(\"should contains id and key\", function () {\n            const peer = new Peer('1', { key: 'anotherKey' });\n\n            expect(peer.id).to.eq('1');\n            expect(peer.options.key).to.eq('anotherKey');\n\n            peer.destroy();\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Peer#1 should has id #1",
+            "suites": [
+                "Peer",
+                "after call to peer #2"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 35
+            },
+            "line": 55,
+            "code": "        it(\"Peer#1 should has id #1\", function (done) {\n            const peer1 = new Peer('1', { port: 8080, host: 'localhost' });\n            expect(peer1.open).to.be.false;\n\n            const mediaOptions = {\n                metadata: { var: '123' },\n                constraints: {\n                    mandatory: {\n                        OfferToReceiveAudio: true,\n                        OfferToReceiveVideo: true\n                    }\n                }\n            };\n\n            const track = new MediaStreamTrack();\n            const mediaStream = new MediaStream([track]);\n\n            const mediaConnection = peer1.call('2', mediaStream, { ...mediaOptions });\n\n            expect(mediaConnection.connectionId).to.be.a('string');\n            expect(mediaConnection.type).to.eq(ConnectionType.Media);\n            expect(mediaConnection.peer).to.eq('2');\n            expect(mediaConnection.options).to.include(mediaOptions);\n            expect(mediaConnection.metadata).to.deep.eq(mediaOptions.metadata);\n            expect(mediaConnection.peerConnection.getSenders()[0].track.id).to.eq(track.id);\n\n            peer1.once('open', (id) => {\n                expect(id).to.be.eq('1');\n                //@ts-ignore\n                expect(peer1._lastServerId).to.be.eq('1');\n                expect(peer1.disconnected).to.be.false;\n                expect(peer1.destroyed).to.be.false;\n                expect(peer1.open).to.be.true;\n\n                peer1.destroy();\n\n                expect(peer1.disconnected).to.be.true;\n                expect(peer1.destroyed).to.be.true;\n                expect(peer1.open).to.be.false;\n                expect(peer1.connections).to.be.empty;\n\n                done();\n            });\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "connect to server => disconnect => reconnect => destroy",
+            "suites": [
+                "Peer",
+                "reconnect"
+            ],
+            "updatePoint": {
+                "line": 112,
+                "column": 67
+            },
+            "line": 112,
+            "code": "        it(\"connect to server => disconnect => reconnect => destroy\", function (done) {\n            const peer1 = new Peer('1', { port: 8080, host: 'localhost' });\n\n            peer1.once('open', () => {\n                expect(peer1.open).to.be.true;\n\n                peer1.once('disconnected', () => {\n                    expect(peer1.disconnected).to.be.true;\n                    expect(peer1.destroyed).to.be.false;\n                    expect(peer1.open).to.be.false;\n\n                    peer1.once('open', (id) => {\n                        expect(id).to.be.eq('1');\n                        expect(peer1.disconnected).to.be.false;\n                        expect(peer1.destroyed).to.be.false;\n                        expect(peer1.open).to.be.true;\n\n                        peer1.once('disconnected', () => {\n                            expect(peer1.disconnected).to.be.true;\n                            expect(peer1.destroyed).to.be.false;\n                            expect(peer1.open).to.be.false;\n\n                            peer1.once('close', () => {\n                                expect(peer1.disconnected).to.be.true;\n                                expect(peer1.destroyed).to.be.true;\n                                expect(peer1.open).to.be.false;\n\n                                done();\n                            });\n                        });\n\n                        peer1.destroy();\n                    });\n\n                    peer1.reconnect();\n                });\n\n                peer1.disconnect();\n            });\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "disconnect => reconnect => destroy",
+            "suites": [
+                "Peer",
+                "reconnect"
+            ],
+            "updatePoint": {
+                "line": 153,
+                "column": 46
+            },
+            "line": 153,
+            "code": "        it(\"disconnect => reconnect => destroy\", function (done) {\n            mockServer.stop();\n\n            const peer1 = new Peer('1', { port: 8080, host: 'localhost' });\n\n            peer1.once('disconnected', (id) => {\n                expect(id).to.be.eq('1');\n                expect(peer1.disconnected).to.be.true;\n                expect(peer1.destroyed).to.be.false;\n                expect(peer1.open).to.be.false;\n\n                peer1.once('open', (id) => {\n                    expect(id).to.be.eq('1');\n                    expect(peer1.disconnected).to.be.false;\n                    expect(peer1.destroyed).to.be.false;\n                    expect(peer1.open).to.be.true;\n\n                    peer1.once('disconnected', () => {\n                        expect(peer1.disconnected).to.be.true;\n                        expect(peer1.destroyed).to.be.false;\n                        expect(peer1.open).to.be.false;\n\n                        peer1.once('close', () => {\n                            expect(peer1.disconnected).to.be.true;\n                            expect(peer1.destroyed).to.be.true;\n                            expect(peer1.open).to.be.false;\n\n                            done();\n                        });\n                    });\n\n                    peer1.destroy();\n                });\n\n                mockServer = createMockServer();\n\n                peer1.reconnect();\n            });\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "destroy peer if no id and no connection",
+            "suites": [
+                "Peer",
+                "reconnect"
+            ],
+            "updatePoint": {
+                "line": 193,
+                "column": 51
+            },
+            "line": 193,
+            "code": "        it(\"destroy peer if no id and no connection\", function (done) {\n            mockServer.stop();\n\n            const peer1 = new Peer({ port: 8080, host: 'localhost' });\n\n            peer1.once(PeerEventType.Error, (error) => {\n                expect(error.type).to.be.eq(PeerErrorType.ServerError);\n\n                peer1.once(PeerEventType.Close, () => {\n                    expect(peer1.disconnected).to.be.true;\n                    expect(peer1.destroyed).to.be.true;\n                    expect(peer1.open).to.be.false;\n\n                    done();\n                });\n\n                mockServer = createMockServer();\n            });\n        });",
+            "file": "peer.ts",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be 16300",
+            "suites": [
+                "util",
+                "#chunkedMTU"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 23
+            },
+            "line": 7,
+            "code": "    it(\"should be 16300\", function () {\n      expect(util.chunkedMTU).to.eq(16300);\n    });",
+            "file": "util.ts",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "peers__peerjs.svg"
+}

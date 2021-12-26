@@ -1,0 +1,692 @@
+{
+    "repo": "GoogleChromeLabs/comlink",
+    "url": "https://github.com/GoogleChromeLabs/comlink",
+    "branch": "main",
+    "configs": [
+        {
+            "package": "comlink",
+            "lang": "ts",
+            "dir": "tests",
+            "framework": "mocha",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "can communicate",
+            "suites": [
+                "Comlink across iframes"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 21
+            },
+            "line": 29,
+            "code": "  it(\"can communicate\", async function () {\n    const proxy = Comlink.wrap(Comlink.windowEndpoint(this.ifr.contentWindow));\n    expect(await proxy(1, 3)).to.equal(4);\n  });",
+            "file": "iframe.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with objects",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 27
+            },
+            "line": 77,
+            "code": "  it(\"can work with objects\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose({ value: 4 }, this.port2);\n    expect(await thing.value).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with functions on an object",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 83,
+                "column": 42
+            },
+            "line": 83,
+            "code": "  it(\"can work with functions on an object\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose({ f: (_) => 4 }, this.port2);\n    expect(await thing.f()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with functions",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 29
+            },
+            "line": 89,
+            "code": "  it(\"can work with functions\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((_) => 4, this.port2);\n    expect(await thing()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with objects that have undefined properties",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 95,
+                "column": 58
+            },
+            "line": 95,
+            "code": "  it(\"can work with objects that have undefined properties\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose({ x: undefined }, this.port2);\n    expect(await thing.x).to.be.undefined;\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can keep the stack and message of thrown errors",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 101,
+                "column": 53
+            },
+            "line": 101,
+            "code": "  it(\"can keep the stack and message of thrown errors\", async function () {\n    let stack;\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((_) => {\n      const error = Error(\"OMG\");\n      stack = error.stack;\n      throw error;\n    }, this.port2);\n    try {\n      await thing();\n      throw \"Should have thrown\";\n    } catch (err) {\n      expect(err).to.not.eq(\"Should have thrown\");\n      expect(err.message).to.equal(\"OMG\");\n      expect(err.stack).to.equal(stack);\n    }\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can forward an async function error",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 119,
+                "column": 41
+            },
+            "line": 119,
+            "code": "  it(\"can forward an async function error\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(\n      {\n        async throwError() {\n          throw new Error(\"Should have thrown\");\n        },\n      },\n      this.port2\n    );\n    try {\n      await thing.throwError();\n    } catch (err) {\n      expect(err.message).to.equal(\"Should have thrown\");\n    }\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can rethrow non-error objects",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 35
+            },
+            "line": 136,
+            "code": "  it(\"can rethrow non-error objects\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((_) => {\n      throw { test: true };\n    }, this.port2);\n    try {\n      await thing();\n      throw \"Should have thrown\";\n    } catch (err) {\n      expect(err).to.not.equal(\"Should have thrown\");\n      expect(err.test).to.equal(true);\n    }\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can rethrow scalars",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 150,
+                "column": 25
+            },
+            "line": 150,
+            "code": "  it(\"can rethrow scalars\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((_) => {\n      throw \"oops\";\n    }, this.port2);\n    try {\n      await thing();\n      throw \"Should have thrown\";\n    } catch (err) {\n      expect(err).to.not.equal(\"Should have thrown\");\n      expect(err).to.equal(\"oops\");\n      expect(typeof err).to.equal(\"string\");\n    }\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can rethrow null",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 165,
+                "column": 22
+            },
+            "line": 165,
+            "code": "  it(\"can rethrow null\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((_) => {\n      throw null;\n    }, this.port2);\n    try {\n      await thing();\n      throw \"Should have thrown\";\n    } catch (err) {\n      expect(err).to.not.equal(\"Should have thrown\");\n      expect(err).to.equal(null);\n      expect(typeof err).to.equal(\"object\");\n    }\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with parameterized functions",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 43
+            },
+            "line": 180,
+            "code": "  it(\"can work with parameterized functions\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((a, b) => a + b, this.port2);\n    expect(await thing(1, 3)).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with functions that return promises",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 186,
+                "column": 50
+            },
+            "line": 186,
+            "code": "  it(\"can work with functions that return promises\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(\n      (_) => new Promise((resolve) => setTimeout((_) => resolve(4), 100)),\n      this.port2\n    );\n    expect(await thing()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with classes",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 195,
+                "column": 27
+            },
+            "line": 195,
+            "code": "  it(\"can work with classes\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.method()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can pass parameters to class constructor",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 202,
+                "column": 46
+            },
+            "line": 202,
+            "code": "  it(\"can pass parameters to class constructor\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing(23);\n    expect(await instance.counter).to.equal(23);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can access a class in an object",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 209,
+                "column": 37
+            },
+            "line": 209,
+            "code": "  it(\"can access a class in an object\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose({ SampleClass }, this.port2);\n    const instance = await new thing.SampleClass();\n    expect(await instance.method()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance properties",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 216,
+                "column": 45
+            },
+            "line": 216,
+            "code": "  it(\"can work with class instance properties\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance._counter).to.equal(1);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can set class instance properties",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 223,
+                "column": 39
+            },
+            "line": 223,
+            "code": "  it(\"can set class instance properties\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance._counter).to.equal(1);\n    await (instance._counter = 4);\n    expect(await instance._counter).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance methods",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 232,
+                "column": 42
+            },
+            "line": 232,
+            "code": "  it(\"can work with class instance methods\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.counter).to.equal(1);\n    await instance.increaseCounter();\n    expect(await instance.counter).to.equal(2);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can handle throwing class instance methods",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 241,
+                "column": 48
+            },
+            "line": 241,
+            "code": "  it(\"can handle throwing class instance methods\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    return instance\n      .throwsAnError()\n      .then((_) => Promise.reject())\n      .catch((err) => {});\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance methods multiple times",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 251,
+                "column": 57
+            },
+            "line": 251,
+            "code": "  it(\"can work with class instance methods multiple times\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.counter).to.equal(1);\n    await instance.increaseCounter();\n    await instance.increaseCounter(5);\n    expect(await instance.counter).to.equal(7);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance methods that return promises",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 261,
+                "column": 63
+            },
+            "line": 261,
+            "code": "  it(\"can work with class instance methods that return promises\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.promiseFunc()).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance properties that are promises",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 268,
+                "column": 63
+            },
+            "line": 268,
+            "code": "  it(\"can work with class instance properties that are promises\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance._promise).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance getters that are promises",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 275,
+                "column": 60
+            },
+            "line": 275,
+            "code": "  it(\"can work with class instance getters that are promises\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.promise).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with static class properties",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 282,
+                "column": 43
+            },
+            "line": 282,
+            "code": "  it(\"can work with static class properties\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    expect(await thing.SOME_NUMBER).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with static class methods",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 288,
+                "column": 40
+            },
+            "line": 288,
+            "code": "  it(\"can work with static class methods\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    expect(await thing.ADD(1, 3)).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with bound class instance methods",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 294,
+                "column": 48
+            },
+            "line": 294,
+            "code": "  it(\"can work with bound class instance methods\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.counter).to.equal(1);\n    const method = instance.increaseCounter.bind(instance);\n    await method();\n    expect(await instance.counter).to.equal(2);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance getters",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 304,
+                "column": 42
+            },
+            "line": 304,
+            "code": "  it(\"can work with class instance getters\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance.counter).to.equal(1);\n    await instance.increaseCounter();\n    expect(await instance.counter).to.equal(2);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can work with class instance setters",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 313,
+                "column": 42
+            },
+            "line": 313,
+            "code": "  it(\"can work with class instance setters\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    expect(await instance._counter).to.equal(1);\n    await (instance.counter = 4);\n    expect(await instance._counter).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will transfer a message port",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 381,
+                "column": 34
+            },
+            "line": 381,
+            "code": "  it(\"will transfer a message port\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose((a) => a.postMessage(\"ohai\"), this.port2);\n    const { port1, port2 } = new MessageChannel();\n    await thing(Comlink.transfer(port2, [port2]));\n    return new Promise((resolve) => {\n      port1.onmessage = (event) => {\n        expect(event.data).to.equal(\"ohai\");\n        resolve();\n      };\n    });\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap marked return values",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 394,
+                "column": 36
+            },
+            "line": 394,
+            "code": "  it(\"will wrap marked return values\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(\n      (_) =>\n        Comlink.proxy({\n          counter: 0,\n          inc() {\n            this.counter += 1;\n          },\n        }),\n      this.port2\n    );\n    const obj = await thing();\n    expect(await obj.counter).to.equal(0);\n    await obj.inc();\n    expect(await obj.counter).to.equal(1);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap marked return values from class instance methods",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 412,
+                "column": 64
+            },
+            "line": 412,
+            "code": "  it(\"will wrap marked return values from class instance methods\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    const obj = await instance.proxyFunc();\n    expect(await obj.counter).to.equal(0);\n    await obj.inc();\n    expect(await obj.counter).to.equal(1);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap marked parameter values",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 422,
+                "column": 39
+            },
+            "line": 422,
+            "code": "  it(\"will wrap marked parameter values\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    const local = {\n      counter: 0,\n      inc() {\n        this.counter++;\n      },\n    };\n    Comlink.expose(async function (f) {\n      await f.inc();\n    }, this.port2);\n    expect(local.counter).to.equal(0);\n    await thing(Comlink.proxy(local));\n    expect(await local.counter).to.equal(1);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap marked assignments",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 438,
+                "column": 34
+            },
+            "line": 438,
+            "code": "  it(\"will wrap marked assignments\", function (done) {\n    const thing = Comlink.wrap(this.port1);\n    const obj = {\n      onready: null,\n      call() {\n        this.onready();\n      },\n    };\n    Comlink.expose(obj, this.port2);\n\n    thing.onready = Comlink.proxy(() => done());\n    thing.call();\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap marked parameter values, simple function",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 452,
+                "column": 56
+            },
+            "line": 452,
+            "code": "  it(\"will wrap marked parameter values, simple function\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(async function (f) {\n      await f();\n    }, this.port2);\n    // Weird code because Mocha\n    await new Promise(async (resolve) => {\n      thing(Comlink.proxy((_) => resolve()));\n    });\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will wrap multiple marked parameter values, simple function",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 463,
+                "column": 65
+            },
+            "line": 463,
+            "code": "  it(\"will wrap multiple marked parameter values, simple function\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(async function (f1, f2, f3) {\n      return (await f1()) + (await f2()) + (await f3());\n    }, this.port2);\n    // Weird code because Mocha\n    expect(\n      await thing(\n        Comlink.proxy((_) => 1),\n        Comlink.proxy((_) => 2),\n        Comlink.proxy((_) => 3)\n      )\n    ).to.equal(6);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will proxy deeply nested values",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 478,
+                "column": 37
+            },
+            "line": 478,
+            "code": "  it(\"will proxy deeply nested values\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    const obj = {\n      a: {\n        v: 4,\n      },\n      b: Comlink.proxy({\n        v: 5,\n      }),\n    };\n    Comlink.expose(obj, this.port2);\n\n    const a = await thing.a;\n    const b = await thing.b;\n    expect(await a.v).to.equal(4);\n    expect(await b.v).to.equal(5);\n    await (a.v = 8);\n    await (b.v = 9);\n    // Workaround for a weird scheduling inconsistency in Firefox.\n    // This test failed, but not when run in isolation, and only\n    // in Firefox. I think there might be problem with task ordering.\n    await new Promise((resolve) => setTimeout(resolve, 1));\n    expect(await thing.a.v).to.equal(4);\n    expect(await thing.b.v).to.equal(9);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "will handle undefined parameters",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 504,
+                "column": 38
+            },
+            "line": 504,
+            "code": "  it(\"will handle undefined parameters\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose({ f: (_) => 4 }, this.port2);\n    expect(await thing.f(undefined)).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can handle destructuring",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 510,
+                "column": 30
+            },
+            "line": 510,
+            "code": "  it(\"can handle destructuring\", async function () {\n    Comlink.expose(\n      {\n        a: 4,\n        get b() {\n          return 5;\n        },\n        c() {\n          return 6;\n        },\n      },\n      this.port2\n    );\n    const { a, b, c } = Comlink.wrap(this.port1);\n    expect(await a).to.equal(4);\n    expect(await b).to.equal(5);\n    expect(await c()).to.equal(6);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "lets users define transfer handlers",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 529,
+                "column": 41
+            },
+            "line": 529,
+            "code": "  it(\"lets users define transfer handlers\", function (done) {\n    Comlink.transferHandlers.set(\"event\", {\n      canHandle(obj) {\n        return obj instanceof Event;\n      },\n      serialize(obj) {\n        return [obj.data, []];\n      },\n      deserialize(data) {\n        return new MessageEvent(\"message\", { data });\n      },\n    });\n\n    Comlink.expose((ev) => {\n      expect(ev).to.be.an.instanceOf(Event);\n      expect(ev.data).to.deep.equal({ a: 1 });\n      done();\n    }, this.port1);\n    const thing = Comlink.wrap(this.port2);\n\n    const { port1, port2 } = new MessageChannel();\n    port1.addEventListener(\"message\", thing.bind(this));\n    port1.start();\n    port2.postMessage({ a: 1 });\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can tunnels a new endpoint with createEndpoint",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 555,
+                "column": 52
+            },
+            "line": 555,
+            "code": "  it(\"can tunnels a new endpoint with createEndpoint\", async function () {\n    Comlink.expose(\n      {\n        a: 4,\n        c() {\n          return 5;\n        },\n      },\n      this.port2\n    );\n    const proxy = Comlink.wrap(this.port1);\n    const otherEp = await proxy[Comlink.createEndpoint]();\n    const otherProxy = Comlink.wrap(otherEp);\n    expect(await otherProxy.a).to.equal(4);\n    expect(await proxy.a).to.equal(4);\n    expect(await otherProxy.c()).to.equal(5);\n    expect(await proxy.c()).to.equal(5);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "released proxy should no longer be useable and throw an exception",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 574,
+                "column": 71
+            },
+            "line": 574,
+            "code": "  it(\"released proxy should no longer be useable and throw an exception\", async function () {\n    const thing = Comlink.wrap(this.port1);\n    Comlink.expose(SampleClass, this.port2);\n    const instance = await new thing();\n    await instance[Comlink.releaseProxy]();\n    expect(() => instance.method()).to.throw();\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can proxy with a given target",
+            "suites": [
+                "Comlink in the same realm"
+            ],
+            "updatePoint": {
+                "line": 582,
+                "column": 35
+            },
+            "line": 582,
+            "code": "  it(\"can proxy with a given target\", async function () {\n    const thing = Comlink.wrap(this.port1, { value: {} });\n    Comlink.expose({ value: 4 }, this.port2);\n    expect(await thing.value).to.equal(4);\n  });",
+            "file": "same_window.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can communicate both ways",
+            "suites": [
+                "Comlink across iframes"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 31
+            },
+            "line": 29,
+            "code": "  it(\"can communicate both ways\", async function () {\n    let called = false;\n    const iframe = Comlink.windowEndpoint(this.ifr.contentWindow);\n    Comlink.expose((a) => {\n      called = true;\n      return ++a;\n    }, iframe);\n    const proxy = Comlink.wrap(iframe);\n    expect(await proxy(1, 3)).to.equal(5);\n    expect(called).to.equal(true);\n  });",
+            "file": "two-way-iframe.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can communicate",
+            "suites": [
+                "Comlink across workers"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 21
+            },
+            "line": 25,
+            "code": "  it(\"can communicate\", async function () {\n    const proxy = Comlink.wrap(this.worker);\n    expect(await proxy(1, 3)).to.equal(4);\n  });",
+            "file": "worker.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "can tunnels a new endpoint with createEndpoint",
+            "suites": [
+                "Comlink across workers"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 52
+            },
+            "line": 30,
+            "code": "  it(\"can tunnels a new endpoint with createEndpoint\", async function () {\n    const proxy = Comlink.wrap(this.worker);\n    const otherEp = await proxy[Comlink.createEndpoint]();\n    const otherProxy = Comlink.wrap(otherEp);\n    expect(await otherProxy(20, 1)).to.equal(21);\n  });",
+            "file": "worker.comlink.test.js",
+            "skipped": false,
+            "dir": "tests"
+        }
+    ],
+    "badge": "GoogleChromeLabs__comlink.svg"
+}

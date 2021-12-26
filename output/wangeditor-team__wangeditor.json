@@ -1,0 +1,887 @@
+{
+    "repo": "wangeditor-team/wangEditor",
+    "url": "https://github.com/wangeditor-team/wangEditor",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "wangeditor",
+            "lang": "ts",
+            "dir": "cypress",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "初始化基本的编辑器",
+            "suites": [
+                "Editor init"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 17
+            },
+            "line": 10,
+            "code": "    it('初始化基本的编辑器', () => {\n        cy.get('#div1').contains('欢迎使用 wangEditor 富文本编辑器')\n\n        cy.getEditor().then((editor: Editor) => {\n            const menusLen = editor.menus.menuList.length\n            cy.getByClass('toolbar')\n                .children()\n                .should('have.length', menusLen + 2)\n        })\n\n        cy.get('#div1')\n            .find('.w-e-text-container')\n            .children()\n            .first()\n            .as('Editable')\n            .should('have.attr', 'contenteditable', 'true')\n\n        cy.get('@Editable').clear()\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n    })",
+            "file": "integration/e2e/editor.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能监听编辑器focus事件",
+            "suites": [
+                "Editor init"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 21
+            },
+            "line": 32,
+            "code": "    it('能监听编辑器focus事件', () => {\n        const fn = cy.stub().as('foucsHandler')\n        cy.getEditor().then((editor: Editor) => {\n            editor.config.onfocus = fn\n\n            //先失焦\n            cy.get('body').children().eq(0).click()\n\n            cy.get('#div1').find('.w-e-text-container').children().first().as('Editable').click()\n\n            cy.get('@foucsHandler').should('be.called')\n        })\n    })",
+            "file": "integration/e2e/editor.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能监听编辑器blur事件",
+            "suites": [
+                "Editor init"
+            ],
+            "updatePoint": {
+                "line": 46,
+                "column": 20
+            },
+            "line": 46,
+            "code": "    it('能监听编辑器blur事件', () => {\n        const fn = cy.stub().as('blurHandler')\n        cy.getEditor().then((editor: Editor) => {\n            editor.config.onblur = fn\n\n            // 先focus\n            cy.get('#div1').find('.w-e-text-container').children().first().as('Editable').click()\n\n            // 获取含有Wandeditor demo文案的dom，来测试富文本失去焦点的情况\n            cy.get('body').children().eq(0).click()\n\n            cy.get('@blurHandler').should('be.called')\n        })\n    })",
+            "file": "integration/e2e/editor.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "实现内容居中对齐",
+            "suites": [
+                "对齐方式"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 16
+            },
+            "line": 15,
+            "code": "    it('实现内容居中对齐', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.get('@Editable').find('p').should('not.have.css', 'text-align', 'center')\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('对齐方式')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 4)\n            .eq(1)\n            .contains('居中')\n\n        cy.get('@droplist').find('.w-e-list').children().eq(1).click()\n\n        cy.get('@Editable').find('p').should('have.css', 'text-align', 'center')\n    })",
+            "file": "integration/e2e/menus/align.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "实现内容左对齐",
+            "suites": [
+                "对齐方式"
+            ],
+            "updatePoint": {
+                "line": 46,
+                "column": 15
+            },
+            "line": 46,
+            "code": "    it('实现内容左对齐', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.get('@Editable').find('p').should('not.have.css', 'text-align', 'left')\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('对齐方式')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 4)\n            .eq(0)\n            .contains('靠左')\n\n        // 先居中，在点击居左\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 4)\n            .eq(1)\n            .contains('居中')\n            .click()\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n        cy.wait(200)\n\n        cy.get('@droplist').find('.w-e-list').children().eq(0).click()\n\n        cy.get('@Editable').find('p').should('have.css', 'text-align', 'left')\n    })",
+            "file": "integration/e2e/menus/align.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "实现内容右对齐",
+            "suites": [
+                "对齐方式"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 15
+            },
+            "line": 89,
+            "code": "    it('实现内容右对齐', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.get('@Editable').find('p').should('not.have.css', 'text-align', 'right')\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('对齐方式')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 4)\n            .eq(2)\n            .contains('靠右')\n\n        cy.get('@droplist').find('.w-e-list').children().eq(2).click()\n\n        cy.get('@Editable').find('p').should('have.css', 'text-align', 'right')\n    })",
+            "file": "integration/e2e/menus/align.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "实现内容两端对齐",
+            "suites": [
+                "对齐方式"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 16
+            },
+            "line": 120,
+            "code": "    it('实现内容两端对齐', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.get('@Editable').find('p').should('not.have.css', 'text-align', 'justify')\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('对齐方式')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 4)\n            .eq(3)\n            .contains('两端')\n\n        cy.get('@droplist').find('.w-e-list').children().eq(3).click()\n\n        cy.get('@Editable').find('p').should('have.css', 'text-align', 'justify')\n    })",
+            "file": "integration/e2e/menus/align.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单能打开设置文字背景颜色的下拉",
+            "suites": [
+                "背景颜色"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 26
+            },
+            "line": 30,
+            "code": "    it('点击菜单能打开设置文字背景颜色的下拉', () => {\n        cy.getByClass('toolbar').children().eq(menuIndex).as('bgColor').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@bgColor')\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('背景颜色')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const droplistLen = droplist.length\n\n            cy.get('@droplist').find('.w-e-block').children().should('have.length', droplistLen)\n        })\n    })",
+            "file": "integration/e2e/menus/bg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给文字添加指定的背景颜色",
+            "suites": [
+                "背景颜色"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 21
+            },
+            "line": 51,
+            "code": "    it('能给文字添加指定的背景颜色', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(menuIndex).as('bgColor').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@bgColor').find('.w-e-droplist').as('droplist')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const droplistLen = droplist.length\n            const bgColor = droplist[dropItemIndex].value\n            const isSelectEmpty = editor.selection.isSelectionEmpty()\n\n            // 必须创建空白range才能成功\n            if (isSelectEmpty) {\n                // 选区范围是空的，插入并选中一个“空白”\n                editor.selection.createEmptyRange()\n            }\n\n            cy.get('@droplist').find('.w-e-block').children().should('have.length', droplistLen)\n\n            cy.get('@droplist').find('.w-e-block').children().eq(dropItemIndex).click()\n\n            cy.get('@Editable')\n                .find('p span')\n                .then($span => {\n                    const result = $span.get(0).style.backgroundColor\n                    expect(result).to.eq(hexToRgb(bgColor))\n                })\n        })\n    })",
+            "file": "integration/e2e/menus/bg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击引用菜单插入引用样式",
+            "suites": [
+                "添加引用"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 20
+            },
+            "line": 15,
+            "code": "    it('点击引用菜单插入引用样式', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.getByClass('toolbar').children().eq(pos).should('have.class', 'w-e-active')\n\n        cy.get('@Editable').find('blockquote').should('contain.text', text)\n    })",
+            "file": "integration/e2e/menus/blockquote.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "再次点击引用菜单插入移除引用样式",
+            "suites": [
+                "添加引用"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 24
+            },
+            "line": 25,
+            "code": "    it('再次点击引用菜单插入移除引用样式', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('quoteMenu').click()\n        cy.getByClass('toolbar').children().eq(pos).should('have.class', 'w-e-active')\n\n        cy.get('@Editable').find('blockquote').should('contain.text', text)\n\n        cy.get('@quoteMenu').click()\n        cy.get('@quoteMenu').should('not.have.class', 'w-e-active')\n\n        cy.get('@Editable').find('blockquote').should('not.exist')\n        cy.get('@Editable').find('p').contains(text)\n    })",
+            "file": "integration/e2e/menus/blockquote.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的加粗样式",
+            "suites": [
+                "加粗"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 24
+            },
+            "line": 15,
+            "code": "    it('能给选中的内容添加对应的加粗样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.saveRange()\n\n        cy.getEditor().then(editor => {\n            console.log(editor)\n        })\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.get('@Editable').find('b').should('contains.text', text)\n    })",
+            "file": "integration/e2e/menus/bold.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单打开插入代码的面板",
+            "suites": [
+                "插入代码"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 21
+            },
+            "line": 27,
+            "code": "    it('点击菜单打开插入代码的面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('codeMenu').click()\n\n        cy.get('@codeMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入代码')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close')\n        cy.get('@Panel').find('.w-e-panel-tab-content select').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-content textarea').should('be.visible')\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-content .w-e-button-container button')\n            .contains('插入')\n    })",
+            "file": "integration/e2e/menus/code.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击插入代码的面板的关闭按钮可以收起面板",
+            "suites": [
+                "插入代码"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 28
+            },
+            "line": 40,
+            "code": "    it('点击插入代码的面板的关闭按钮可以收起面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('codeMenu').click()\n\n        cy.get('@codeMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入代码')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close').click()\n        cy.get('@Panel').should('not.exist')\n    })",
+            "file": "integration/e2e/menus/code.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入代码，默认为bash",
+            "suites": [
+                "插入代码"
+            ],
+            "updatePoint": {
+                "line": 49,
+                "column": 22
+            },
+            "line": 49,
+            "code": "    it('可以插入代码，默认为bash', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('codeMenu').click()\n        cy.get('@codeMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content textarea').type(bashCode)\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button').click()\n\n        cy.get('@Editable')\n            .find('pre')\n            .contains(bashCode)\n            .children()\n            .first()\n            .should('have.class', 'Bash')\n    })",
+            "file": "integration/e2e/menus/code.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入代码，指定支持的编程语言",
+            "suites": [
+                "插入代码"
+            ],
+            "updatePoint": {
+                "line": 65,
+                "column": 24
+            },
+            "line": 65,
+            "code": "    it('可以插入代码，指定支持的编程语言', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('codeMenu').click()\n        cy.get('@codeMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content select').select('JavaScript')\n        cy.get('@Panel').find('.w-e-panel-tab-content textarea').type(jsCode)\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button').click()\n\n        cy.get('@Editable')\n            .find('pre')\n            .contains(jsCode)\n            .children()\n            .first()\n            .should('have.class', 'JavaScript')\n    })",
+            "file": "integration/e2e/menus/code.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单打开表情选择面板",
+            "suites": [
+                "表情"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 20
+            },
+            "line": 19,
+            "code": "    it('点击菜单打开表情选择面板', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('emotionMenu').click()\n\n        cy.get('@emotionMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').children().should('have.length', length)\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-title')\n            .children()\n            .eq(0)\n            .should('have.class', 'w-e-active')\n            .and('contain.text', panelType[0])\n    })",
+            "file": "integration/e2e/menus/emotion.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击表情选择面板关闭按钮可以关闭面板",
+            "suites": [
+                "表情"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 26
+            },
+            "line": 35,
+            "code": "    it('点击表情选择面板关闭按钮可以关闭面板', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('emotionMenu').click()\n\n        cy.get('@emotionMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-close').click()\n\n        cy.get('@emotionMenu').find('.w-e-panel-container').should('not.exist')\n    })",
+            "file": "integration/e2e/menus/emotion.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入表情",
+            "suites": [
+                "表情"
+            ],
+            "updatePoint": {
+                "line": 47,
+                "column": 14
+            },
+            "line": 47,
+            "code": "    it('可以插入表情', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('emotionMenu').click()\n\n        cy.get('@emotionMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').children().should('have.length', length)\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-title')\n            .children()\n            .eq(length - 1)\n            .click()\n\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-title')\n            .children()\n            .eq(length - 1)\n            .should('have.class', 'w-e-active')\n            .and('contain.text', panelType[length - 1])\n\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-content')\n            .children()\n            .eq(length - 1)\n            .children()\n            .as('emotionList')\n\n        cy.get('@emotionList')\n            .eq(0)\n            .as('emotion')\n            .click()\n            .then($el => {\n                const emotionValue = $el.get(0).innerText\n\n                cy.get('@Editable').should('contain.text', emotionValue)\n            })\n    })",
+            "file": "integration/e2e/menus/emotion.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单能打开设置文字颜色的下拉",
+            "suites": [
+                "文字颜色"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 24
+            },
+            "line": 19,
+            "code": "    it('点击菜单能打开设置文字颜色的下拉', () => {\n        cy.getByClass('toolbar').children().eq(menuIndex).as('textColor').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@textColor')\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('文字颜色')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const droplistLen = droplist.length\n\n            cy.get('@droplist').find('.w-e-block').children().should('have.length', droplistLen)\n        })\n    })",
+            "file": "integration/e2e/menus/fontColor.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给文字添加指定的颜色",
+            "suites": [
+                "文字颜色"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 19
+            },
+            "line": 40,
+            "code": "    it('能给文字添加指定的颜色', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(menuIndex).as('textColor').trigger('click')\n\n        cy.wait(200)\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const textColor = droplist[dropItemIndex].value\n            const isSelectEmpty = editor.selection.isSelectionEmpty()\n\n            // 必须创建空白range才能成功\n            if (isSelectEmpty) {\n                // 选区范围是空的，插入并选中一个“空白”\n                editor.selection.createEmptyRange()\n            }\n\n            cy.get('@textColor')\n                .find('.w-e-droplist')\n                .find('.w-e-block')\n                .children()\n                .eq(dropItemIndex)\n                .click()\n\n            cy.get('@Editable')\n                .find('p font')\n                .should('contain.text', text)\n                .and('have.attr', 'color', textColor)\n        })\n    })",
+            "file": "integration/e2e/menus/fontColor.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单能打开设置文体的下拉菜单",
+            "suites": [
+                "字体"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 24
+            },
+            "line": 18,
+            "code": "    it('点击菜单能打开设置文体的下拉菜单', () => {\n        cy.getByClass('toolbar').children().eq(menuIndex).as('fontFamily').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@fontFamily')\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('设置字体')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const droplistLen = droplist.length\n\n            cy.get('@droplist').find('.w-e-list').children().should('have.length', droplistLen)\n        })\n    })",
+            "file": "integration/e2e/menus/fontFamily.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的字体样式",
+            "suites": [
+                "字体"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 24
+            },
+            "line": 39,
+            "code": "    it('能给选中的内容添加对应的字体样式', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(menuIndex).as('fontFamily').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@fontFamily').find('.w-e-droplist').as('droplist')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const fontFamilyVal = droplist[dropItemIndex].value\n\n            const isSelectEmpty = editor.selection.isSelectionEmpty()\n\n            // 必须创建空白range才能成功\n            if (isSelectEmpty) {\n                // 选区范围是空的，插入并选中一个“空白”\n                editor.selection.createEmptyRange()\n            }\n\n            cy.get('@droplist').find('.w-e-list').children().eq(dropItemIndex).click()\n\n            cy.get('@Editable')\n                .find('p font')\n                .should('contain.text', text)\n                .and('have.attr', 'face', fontFamilyVal)\n        })\n    })",
+            "file": "integration/e2e/menus/fontFamily.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单能打开设置文字大小的下拉菜单",
+            "suites": [
+                "设置文字大小"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 26
+            },
+            "line": 17,
+            "code": "    it('点击菜单能打开设置文字大小的下拉菜单', () => {\n        cy.getByClass('toolbar').children().eq(menuIndex).as('fontSize').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@fontSize')\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('设置字号')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const droplistLen = droplist.length\n\n            cy.get('@droplist').find('.w-e-list').children().should('have.length', droplistLen)\n        })\n    })",
+            "file": "integration/e2e/menus/fontSize.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的字体大小样式",
+            "suites": [
+                "设置文字大小"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 26
+            },
+            "line": 38,
+            "code": "    it('能给选中的内容添加对应的字体大小样式', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(menuIndex).as('fontSize').trigger('click')\n\n        cy.wait(200)\n\n        cy.get('@fontSize').find('.w-e-droplist').as('droplist')\n\n        cy.getEditor().then((editor: Editor) => {\n            const droplist = (editor.menus.menuList[menuIndex] as any).dropList.conf.list\n            const fontSizeVal = droplist[dropItemIndex].value\n\n            const isSelectEmpty = editor.selection.isSelectionEmpty()\n\n            // 必须创建空白range才能成功\n            if (isSelectEmpty) {\n                // 选区范围是空的，插入并选中一个“空白”\n                editor.selection.createEmptyRange()\n            }\n\n            cy.get('@droplist').find('.w-e-list').children().eq(dropItemIndex).click()\n\n            cy.get('@Editable')\n                .find('p font')\n                .should('contain.text', text)\n                .and('have.attr', 'size', fontSizeVal)\n        })\n    })",
+            "file": "integration/e2e/menus/fontSize.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加标题样式",
+            "suites": [
+                "标题样式"
+            ],
+            "updatePoint": {
+                "line": 12,
+                "column": 21
+            },
+            "line": 12,
+            "code": "    it('能给选中的内容添加标题样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.getByClass('toolbar').children().first().as('H').click()\n\n        cy.getByClass('droplist').as('dropList').should('be.visible')\n\n        cy.get('@dropList').find('.w-e-dp-title').contains('设置标题')\n\n        cy.get('@dropList').find('.w-e-list').children().first().click()\n\n        cy.get('@H').should('have.class', 'w-e-active')\n\n        cy.get('@Editable').find('h1').contains(text)\n    })",
+            "file": "integration/e2e/menus/header.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入分割线",
+            "suites": [
+                "插入分割线"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 15
+            },
+            "line": 13,
+            "code": "    it('可以插入分割线', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('hrMenu').click()\n\n        cy.get('@Editable').children().should('have.length', 3).contains(text)\n        cy.get('@Editable').find('hr').should('be.visible')\n    })",
+            "file": "integration/e2e/menus/hr.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以点击菜单打开设置缩进的下拉菜单",
+            "suites": [
+                "缩进"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 25
+            },
+            "line": 17,
+            "code": "    it('可以点击菜单打开设置缩进的下拉菜单', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('indentMenu').trigger('click')\n        cy.wait(200)\n\n        cy.get('@indentMenu').find('.w-e-droplist').as('droplist').should('be.visible')\n        cy.get('@droplist').find('.w-e-dp-title').contains('设置缩进')\n        cy.getEditor().then((editor: Editor) => {\n            const listLen = (editor.menus.menuList[pos] as any).dropList.conf.list.length\n            cy.get('@droplist').find('.w-e-list').children().should('have.length', listLen)\n        })\n    })",
+            "file": "integration/e2e/menus/indent.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以给选中的文本添加对应的缩进样式，并且多次点击会叠加indent样式",
+            "suites": [
+                "缩进"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 43
+            },
+            "line": 29,
+            "code": "    it('可以给选中的文本添加对应的缩进样式，并且多次点击会叠加indent样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('indentMenu').trigger('click')\n        cy.wait(200)\n\n        cy.get('@indentMenu')\n            .find('.w-e-droplist .w-e-list')\n            .children()\n            .eq(0)\n            .as('addIndentBtn')\n            .contains('增加缩进')\n\n        let clickCount = 0\n        const basePadding = 2\n\n        cy.get('@addIndentBtn')\n            .click()\n            .then(() => {\n                clickCount += 1\n\n                cy.get('@Editable')\n                    .find('p')\n                    .then($p => {\n                        expect($p.get(0).style.paddingLeft).to.eq(`${clickCount * basePadding}em`)\n                    })\n\n                cy.getByClass('toolbar').children().eq(pos).as('indentMenu').trigger('click')\n                cy.wait(200)\n\n                cy.get('@addIndentBtn')\n                    .click()\n                    .then(() => {\n                        clickCount += 1\n\n                        cy.get('@Editable')\n                            .find('p')\n                            .then($p => {\n                                expect($p.get(0).style.paddingLeft).to.eq(\n                                    `${clickCount * basePadding}em`\n                                )\n                            })\n                    })\n            })\n    })",
+            "file": "integration/e2e/menus/indent.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以给选中的文本减少对应的缩进样式",
+            "suites": [
+                "缩进"
+            ],
+            "updatePoint": {
+                "line": 75,
+                "column": 25
+            },
+            "line": 75,
+            "code": "    it('可以给选中的文本减少对应的缩进样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('indentMenu').trigger('click')\n        cy.wait(200)\n\n        cy.get('@indentMenu')\n            .find('.w-e-droplist .w-e-list')\n            .children()\n            .eq(0)\n            .as('addIndentBtn')\n            .contains('增加缩进')\n        cy.get('@indentMenu')\n            .find('.w-e-droplist .w-e-list')\n            .children()\n            .eq(1)\n            .as('decreaseIndentBtn')\n            .contains('减少缩进')\n\n        let clickCount = 0\n        const basePadding = 2\n\n        cy.get('@addIndentBtn')\n            .click()\n            .then(() => {\n                clickCount += 1\n\n                cy.get('@Editable')\n                    .find('p')\n                    .then($p => {\n                        expect($p.get(0).style.paddingLeft).to.eq(`${clickCount * basePadding}em`)\n                    })\n\n                cy.getByClass('toolbar').children().eq(pos).as('indentMenu').trigger('click')\n                cy.wait(200)\n\n                cy.get('@decreaseIndentBtn')\n                    .click()\n                    .then(() => {\n                        clickCount -= 1\n\n                        cy.get('@Editable')\n                            .find('p')\n                            .then($p => {\n                                const result =\n                                    clickCount * basePadding === 0\n                                        ? ''\n                                        : `${clickCount * basePadding}em`\n                                expect($p.get(0).style.paddingLeft).to.eq(result)\n                            })\n                    })\n            })\n    })",
+            "file": "integration/e2e/menus/indent.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单打开插入图片的面板",
+            "suites": [
+                "插入网络图片"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 21
+            },
+            "line": 17,
+            "code": "    it('点击菜单打开插入图片的面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n\n        cy.get('@imgMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('网络图片')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close')\n        cy.get('@Panel').find('.w-e-panel-tab-content input')\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button')\n    })",
+            "file": "integration/e2e/menus/insertImg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击图片上传的面板的关闭按钮可以收起面板",
+            "suites": [
+                "插入网络图片"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 28
+            },
+            "line": 27,
+            "code": "    it('点击图片上传的面板的关闭按钮可以收起面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n\n        cy.get('@imgMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('网络图片')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close').click()\n        cy.get('@Panel').should('not.exist')\n    })",
+            "file": "integration/e2e/menus/insertImg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "插入网络图片",
+            "suites": [
+                "插入网络图片"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 14
+            },
+            "line": 36,
+            "code": "    it('插入网络图片', () => {\n        cy.get('@Editable').find('img').should('not.exist')\n\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n        cy.get('@imgMenu').find('.w-e-panel-container').as('Panel').find('input').eq(0).type(imgUrl)\n        cy.get('@imgMenu').find('.w-e-panel-container').as('Panel').find('input').eq(1).type(alt)\n        cy.get('@imgMenu')\n            .find('.w-e-panel-container')\n            .as('Panel')\n            .find('input')\n            .eq(2)\n            .type(clickUrl)\n        cy.get('@Panel').find('.w-e-button-container button').click()\n\n        cy.get('@Editable')\n            .find('img')\n            .should('be.visible')\n            .then($img => {\n                const img = $img.get(0)\n                expect(img.src).to.eq(imgUrl)\n                expect(img.alt).to.eq(alt)\n                expect(img.dataset.href).to.eq(encodeURIComponent(clickUrl))\n            })\n    })",
+            "file": "integration/e2e/menus/insertImg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "键入enter插入网络图片",
+            "suites": [
+                "插入网络图片"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 21
+            },
+            "line": 61,
+            "code": "    it('键入enter插入网络图片', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n        cy.get('@imgMenu')\n            .find('.w-e-panel-container')\n            .find('input')\n            .as('allInput')\n            .eq(0)\n            .type(imgUrl)\n        cy.get('@allInput').eq(1).type(alt)\n        cy.get('@allInput')\n            .eq(2)\n            .type(clickUrl + '{enter}')\n\n        cy.get('@Editable').find('img').should('be.visible')\n    })",
+            "file": "integration/e2e/menus/insertImg.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单打开插入视频的面板",
+            "suites": [
+                "插入视频"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 21
+            },
+            "line": 15,
+            "code": "    it('点击菜单打开插入视频的面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('videoMenu').click()\n\n        cy.get('@videoMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入视频')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close')\n        cy.get('@Panel').find('.w-e-panel-tab-content input')\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button')\n    })",
+            "file": "integration/e2e/menus/insertVideo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击插入视频的面板的关闭按钮可以收起面板",
+            "suites": [
+                "插入视频"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 28
+            },
+            "line": 25,
+            "code": "    it('点击插入视频的面板的关闭按钮可以收起面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('videoMenu').click()\n\n        cy.get('@videoMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入视频')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close').click()\n        cy.get('@Panel').should('not.exist')\n    })",
+            "file": "integration/e2e/menus/insertVideo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "插入网络视频",
+            "suites": [
+                "插入视频"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 14
+            },
+            "line": 34,
+            "code": "    it('插入网络视频', () => {\n        cy.get('@Editable').find('video').should('not.exist')\n\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n        const videoEl = `<iframe src=\"${videoUrl}\" controls></iframe>`\n        cy.get('@imgMenu').find('.w-e-panel-container').as('Panel').find('input').type(videoEl)\n        cy.get('@Panel').find('.w-e-button-container button').click()\n\n        cy.get('.w-e-text-container iframe', { timeout: 10000 })\n            .should('be.visible')\n            .then($video => {\n                const video = $video.get(0) as HTMLVideoElement\n                expect(video.src).to.eq(videoUrl)\n            })\n    })",
+            "file": "integration/e2e/menus/insertVideo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "enter键入插入网络视频",
+            "suites": [
+                "插入视频"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 21
+            },
+            "line": 50,
+            "code": "    it('enter键入插入网络视频', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('imgMenu').click()\n        const videoEl = `<iframe src=\"${videoUrl}\" controls></iframe>`\n        cy.get('@imgMenu')\n            .find('.w-e-panel-container')\n            .as('Panel')\n            .find('input')\n            .type(videoEl + '{enter}')\n\n        cy.get('.w-e-text-container iframe', { timeout: 10000 }).should('be.visible')\n    })",
+            "file": "integration/e2e/menus/insertVideo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的斜体样式",
+            "suites": [
+                "斜体样式"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 24
+            },
+            "line": 15,
+            "code": "    it('能给选中的内容添加对应的斜体样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.get('@Editable').find('i').contains(text)\n    })",
+            "file": "integration/e2e/menus/italic.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以点击菜单打开设置行高的下拉菜单",
+            "suites": [
+                "行高"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 25
+            },
+            "line": 18,
+            "code": "    it('可以点击菜单打开设置行高的下拉菜单', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('lineHeightMenu').trigger('click')\n        cy.wait(200)\n\n        cy.get('@lineHeightMenu').find('.w-e-droplist').as('droplist').should('be.visible')\n        cy.get('@droplist').find('.w-e-dp-title').contains('设置行高')\n        cy.getEditor().then((editor: Editor) => {\n            const listLen = (editor.menus.menuList[pos] as any).dropList.conf.list.length\n            cy.get('@droplist').find('.w-e-list').children().should('have.length', listLen)\n        })\n    })",
+            "file": "integration/e2e/menus/lineHeight.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以选择指定的行高项给选中的文本添加对应的行高样式",
+            "suites": [
+                "行高"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 33
+            },
+            "line": 30,
+            "code": "    it('可以选择指定的行高项给选中的文本添加对应的行高样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('lineHeightMenu').trigger('click')\n        cy.wait(200)\n\n        cy.get('@lineHeightMenu')\n            .find('.w-e-droplist .w-e-list')\n            .children()\n            .eq(2)\n            .click()\n            .then($item => {\n                const text = $item.get(0).innerText\n                cy.get('@Editable')\n                    .find('p')\n                    .then($p => {\n                        expect($p.get(0).style.lineHeight).to.eq(text)\n                    })\n            })\n    })",
+            "file": "integration/e2e/menus/lineHeight.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入超链接",
+            "suites": [
+                "插入超链接"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 15
+            },
+            "line": 17,
+            "code": "    it('可以插入超链接', () => {\n        cy.get('@Editable').type(text)\n\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n\n        cy.getByClass('panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('链接')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content input').should('have.length', 2)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(0).type(linkText)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(1).type(link)\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container .right').eq(0).click()\n\n        cy.get('@Editable').find('a').should('have.text', linkText)\n        cy.get('@Editable').find('a').should('have.attr', 'href', link)\n        cy.get('@Editable').find('a').should('have.attr', 'target', '_blank')\n    })",
+            "file": "integration/e2e/menus/link.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以使用enter键入插入超链接",
+            "suites": [
+                "插入超链接"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 24
+            },
+            "line": 39,
+            "code": "    it('可以使用enter键入插入超链接', () => {\n        cy.get('@Editable').type(text)\n\n        cy.get('@Editable').contains(text)\n        cy.getByClass('toolbar').children().eq(pos).click()\n\n        cy.getByClass('panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('链接')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content input').should('have.length', 2)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(0).type(linkText)\n        cy.get('@Panel')\n            .find('.w-e-panel-tab-content input')\n            .eq(1)\n            .type(link + '{enter}')\n\n        cy.get('@Editable').find('a').should('have.text', linkText)\n        cy.get('@Editable').find('a').should('have.attr', 'href', link)\n        cy.get('@Editable').find('a').should('have.attr', 'target', '_blank')\n    })",
+            "file": "integration/e2e/menus/link.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "插入的超链接可以进行链接跳转",
+            "suites": [
+                "插入超链接"
+            ],
+            "updatePoint": {
+                "line": 62,
+                "column": 22
+            },
+            "line": 62,
+            "code": "    it('插入的超链接可以进行链接跳转', () => {\n        cy.get('@Editable').type(text)\n\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n\n        cy.getByClass('panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('链接')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content input').should('have.length', 2)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(0).type(linkText)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(1).type(link)\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container .right').eq(0).click()\n\n        cy.get('@Editable')\n            .find('a')\n            .then($a => {\n                const href = $a.prop('href')\n                // and now visit the href directly\n                cy.visit(href)\n                cy.url().should('eq', link)\n            })\n    })",
+            "file": "integration/e2e/menus/link.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击超链接弹窗tooptip，点击“取消链接”可以移除链接",
+            "suites": [
+                "插入超链接"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 37
+            },
+            "line": 89,
+            "code": "    it('点击超链接弹窗tooptip，点击“取消链接”可以移除链接', () => {\n        cy.get('@Editable').type(text)\n\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n\n        cy.getByClass('panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('链接')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content input').should('have.length', 2)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(0).type(linkText)\n        cy.get('@Panel').find('.w-e-panel-tab-content input').eq(1).type(link)\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container .right').eq(0).click()\n\n        cy.get('@Editable').find('a').click()\n\n        cy.getByClass('tooltip').should('be.visible')\n        cy.getByClass('tooltip').find('.w-e-tooltip-item-wrapper').eq(1).click()\n\n        cy.get('@Editable').find('a').should('not.exist')\n        cy.get('@Editable').contains(linkText)\n    })",
+            "file": "integration/e2e/menus/link.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入无序列表",
+            "suites": [
+                "插入序列"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 16
+            },
+            "line": 16,
+            "code": "    it('可以插入无序列表', () => {\n        cy.get('@Editable').type(text1)\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('序列')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 2)\n            .eq(0)\n            .contains('无序列表')\n\n        cy.get('@droplist').find('.w-e-list').children().eq(0).click()\n\n        cy.get('@Editable').find('ul').children().should('have.length', 1)\n        cy.get('@Editable').find('ul').children().eq(0).contains(text1)\n\n        cy.get('@Editable').focus().type('{movetoend}')\n        cy.get('@Editable').focus().type('{enter}')\n        cy.get('@Editable').type(text2)\n\n        cy.get('@Editable').find('ul').children().should('have.length', 2)\n        cy.get('@Editable').find('ul').children().eq(1).contains(text2)\n    })",
+            "file": "integration/e2e/menus/list.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入有序列表",
+            "suites": [
+                "插入序列"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 16
+            },
+            "line": 53,
+            "code": "    it('可以插入有序列表', () => {\n        cy.get('@Editable').type(text1)\n\n        cy.getByClass('toolbar').children().eq(pos).trigger('click')\n\n        cy.wait(200)\n\n        cy.getByClass('toolbar')\n            .children()\n            .eq(pos)\n            .find('.w-e-droplist')\n            .as('droplist')\n            .should('be.visible')\n            .and('have.css', 'display', 'block')\n\n        cy.get('@droplist').find('.w-e-dp-title').contains('序列')\n\n        cy.get('@droplist')\n            .find('.w-e-list')\n            .children()\n            .should('have.length', 2)\n            .eq(1)\n            .contains('有序列表')\n\n        cy.get('@droplist').find('.w-e-list').children().eq(1).click()\n\n        cy.get('@Editable').find('ol').children().should('have.length', 1)\n        cy.get('@Editable').find('ol').children().eq(0).contains(text1)\n\n        cy.get('@Editable').focus().type('{movetoend}')\n        cy.get('@Editable').focus().type('{enter}')\n        cy.get('@Editable').type(text2)\n\n        cy.get('@Editable').find('ol').children().should('have.length', 2)\n        cy.get('@Editable').find('ol').children().eq(1).contains(text2)\n    })",
+            "file": "integration/e2e/menus/list.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的删除线样式",
+            "suites": [
+                "删除线样式"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 25
+            },
+            "line": 15,
+            "code": "    it('能给选中的内容添加对应的删除线样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.get('@Editable').find('strike').contains(text)\n    })",
+            "file": "integration/e2e/menus/strike.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击菜单打开插入表格的面板",
+            "suites": [
+                "插入表格"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 21
+            },
+            "line": 13,
+            "code": "    it('点击菜单打开插入表格的面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('tableMenu').click()\n\n        cy.get('@tableMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入表格')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close')\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-table input').should('have.length', 2)\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button')\n    })",
+            "file": "integration/e2e/menus/table.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击插入表格的面板的关闭按钮可以收起面板",
+            "suites": [
+                "插入表格"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 28
+            },
+            "line": 23,
+            "code": "    it('点击插入表格的面板的关闭按钮可以收起面板', () => {\n        cy.getByClass('toolbar').children().eq(pos).as('tableMenu').click()\n\n        cy.get('@tableMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n        cy.get('@Panel').find('.w-e-panel-tab-title').contains('插入表格')\n        cy.get('@Panel').find('i').should('have.class', 'w-e-icon-close').click()\n        cy.get('@Panel').should('not.exist')\n    })",
+            "file": "integration/e2e/menus/table.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入表格，默认5行5列",
+            "suites": [
+                "插入表格"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 21
+            },
+            "line": 32,
+            "code": "    it('可以插入表格，默认5行5列', () => {\n        cy.get('@Editable').find('table').should('not.exist')\n\n        cy.getByClass('toolbar').children().eq(pos).as('tableMenu').click()\n\n        cy.get('@tableMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button').click()\n\n        cy.get('@Editable').find('table tr').should('have.length', 5)\n        cy.get('@Editable').find('table tr').eq(0).find('th').should('have.length', 5)\n    })",
+            "file": "integration/e2e/menus/table.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "可以插入表格，可以自定义插入的行和列",
+            "suites": [
+                "插入表格"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 26
+            },
+            "line": 45,
+            "code": "    it('可以插入表格，可以自定义插入的行和列', () => {\n        cy.get('@Editable').find('table').should('not.exist')\n\n        cy.getByClass('toolbar').children().eq(pos).as('tableMenu').click()\n\n        cy.get('@tableMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-table input').eq(0).clear().type('6')\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-table input').eq(1).clear().type('8')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-button-container button').click()\n\n        cy.get('@Editable').find('table tr').should('have.length', 6)\n        cy.get('@Editable').find('table tr').eq(0).find('th').should('have.length', 8)\n    })",
+            "file": "integration/e2e/menus/table.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "enter键入可以插入表格",
+            "suites": [
+                "插入表格"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 21
+            },
+            "line": 61,
+            "code": "    it('enter键入可以插入表格', () => {\n        cy.get('@Editable').find('table').should('not.exist')\n\n        cy.getByClass('toolbar').children().eq(pos).as('tableMenu').click()\n\n        cy.get('@tableMenu').find('.w-e-panel-container').as('Panel').should('be.visible')\n\n        cy.get('@Panel').find('.w-e-panel-tab-content .w-e-table input').eq(0).type('{enter}')\n        cy.get('@Editable').find('table').should('have.length', 1)\n    })",
+            "file": "integration/e2e/menus/table.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "点击todo菜单插入todo样式",
+            "suites": [
+                "添加todo"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 24
+            },
+            "line": 15,
+            "code": "    it('点击todo菜单插入todo样式', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.getByClass('toolbar').children().eq(pos).should('have.class', 'w-e-active')\n\n        cy.get('@Editable').find('ul').should('contain.text', text).find('input')\n    })",
+            "file": "integration/e2e/menus/todo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "再次点击todo菜单移除todo",
+            "suites": [
+                "添加todo"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 24
+            },
+            "line": 25,
+            "code": "    it('再次点击todo菜单移除todo', () => {\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains(text)\n\n        cy.getByClass('toolbar').children().eq(pos).as('todo').click()\n        cy.getByClass('toolbar').children().eq(pos).should('have.class', 'w-e-active')\n\n        cy.get('@Editable').find('ul').should('contain.text', text).find('input')\n\n        cy.get('@todo').click()\n        cy.get('@todo').should('not.have.class', 'w-e-active')\n\n        cy.get('@Editable').find('input').should('not.exist')\n        cy.get('@Editable').find('p').contains(text)\n    })",
+            "file": "integration/e2e/menus/todo.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "能给选中的内容添加对应的下划线样式",
+            "suites": [
+                "下划线"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 25
+            },
+            "line": 15,
+            "code": "    it('能给选中的内容添加对应的下划线样式', () => {\n        cy.get('@Editable').type(text)\n\n        cy.saveRange()\n\n        cy.getByClass('toolbar').children().eq(pos).click()\n        cy.get('@Editable').find('u').contains(text)\n    })",
+            "file": "integration/e2e/menus/underline.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "editor.txt.append()功能光标位置是否正常",
+            "suites": [
+                "test editor.txt.append()"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 37
+            },
+            "line": 10,
+            "code": "    it('editor.txt.append()功能光标位置是否正常', () => {\n        cy.get('#div1').contains('富文本编辑器')\n\n        cy.getEditor().then((editor: Editor) => {\n            const menusLen = editor.menus.menuList.length + 1\n            cy.getByClass('toolbar')\n                .children()\n                .should('have.length', menusLen + 1)\n        })\n\n        cy.get('#div1')\n            .find('.w-e-text-container')\n            .children()\n            .first()\n            .as('Editable')\n            .should('have.attr', 'contenteditable', 'true')\n        // 上面部分先确认编辑器是否生成\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains('123' + text)\n    })",
+            "file": "integration/e2e/txt/append.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        },
+        {
+            "name": "editor.txt.html()功能光标位置是否正常",
+            "suites": [
+                "test editor.txt.html()功能"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 35
+            },
+            "line": 10,
+            "code": "    it('editor.txt.html()功能光标位置是否正常', () => {\n        cy.get('#div1').contains('123456')\n\n        cy.getEditor().then((editor: Editor) => {\n            const menusLen = editor.menus.menuList.length + 1\n            cy.getByClass('toolbar')\n                .children()\n                .should('have.length', menusLen + 1)\n        })\n\n        cy.get('#div1')\n            .find('.w-e-text-container')\n            .children()\n            .first()\n            .as('Editable')\n            .should('have.attr', 'contenteditable', 'true')\n        // 上面部分先确认编辑器是否生成\n        cy.get('@Editable').type(text)\n        cy.get('@Editable').contains('456' + text)\n    })",
+            "file": "integration/e2e/txt/html.spec.ts",
+            "skipped": false,
+            "dir": "cypress"
+        }
+    ],
+    "badge": "wangeditor-team__wangEditor.svg"
+}

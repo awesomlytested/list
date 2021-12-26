@@ -1,0 +1,572 @@
+{
+    "repo": "usablica/intro.js",
+    "url": "https://github.com/usablica/intro.js",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "intro.js",
+            "lang": "js",
+            "dir": "tests",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should add floating element from options.steps to the list",
+            "suites": [
+                "fetchIntroSteps"
+            ],
+            "updatePoint": {
+                "line": 3,
+                "column": 66
+            },
+            "line": 3,
+            "code": "  test(\"should add floating element from options.steps to the list\", () => {\n    const targetElement = document.createElement(\"div\");\n    const steps = fetchIntroSteps.call({\n      _options: {\n        steps: [{\n          element: \"#element_does_not_exist\",\n          intro: \"hello world\"\n        }, {\n          intro: \"second\"\n        }]\n      }\n    }, targetElement);\n    expect(steps.length).toBe(2);\n    expect(steps[0].position).toBe(\"floating\");\n    expect(steps[0].intro).toBe(\"hello world\");\n    expect(steps[0].step).toBe(1);\n    expect(steps[1].position).toBe(\"floating\");\n    expect(steps[1].intro).toBe(\"second\");\n    expect(steps[1].step).toBe(2);\n  });",
+            "file": "core/fetchIntroSteps.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should find and add elements from options.steps to the list",
+            "suites": [
+                "fetchIntroSteps"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 67
+            },
+            "line": 23,
+            "code": "  test(\"should find and add elements from options.steps to the list\", () => {\n    const targetElement = document.createElement(\"div\");\n    const stepOne = document.createElement(\"div\");\n    stepOne.setAttribute(\"id\", \"first\");\n    const stepTwo = document.createElement(\"div\");\n    stepTwo.setAttribute(\"id\", \"second\");\n    document.body.appendChild(stepOne);\n    document.body.appendChild(stepTwo);\n    const steps = fetchIntroSteps.call({\n      _options: {\n        tooltipPosition: \"bottom\",\n        steps: [{\n          element: \"#first\",\n          intro: \"first\"\n        }, {\n          element: \"#second\",\n          intro: \"second\",\n          position: \"top\"\n        }, {\n          element: \"#not_found\",\n          intro: \"third\"\n        }]\n      }\n    }, targetElement);\n    expect(steps.length).toBe(3);\n    expect(steps[0].element).toBe(stepOne);\n    expect(steps[0].position).toBe(\"bottom\");\n    expect(steps[0].intro).toBe(\"first\");\n    expect(steps[0].step).toBe(1);\n    expect(steps[1].element).toBe(stepTwo);\n    expect(steps[1].position).toBe(\"top\");\n    expect(steps[1].intro).toBe(\"second\");\n    expect(steps[1].step).toBe(2);\n    expect(steps[2].position).toBe(\"floating\");\n    expect(steps[2].intro).toBe(\"third\");\n    expect(steps[2].step).toBe(3);\n  });",
+            "file": "core/fetchIntroSteps.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should find the data-* elements from the DOM",
+            "suites": [
+                "fetchIntroSteps"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 52
+            },
+            "line": 60,
+            "code": "  test(\"should find the data-* elements from the DOM\", () => {\n    const targetElement = document.createElement(\"div\");\n    const stepOne = document.createElement(\"div\");\n    stepOne.setAttribute(\"data-intro\", \"first\");\n    const stepTwo = document.createElement(\"div\");\n    stepTwo.setAttribute(\"data-intro\", \"second\");\n    stepTwo.setAttribute(\"data-position\", \"left\");\n    targetElement.appendChild(stepOne);\n    targetElement.appendChild(stepTwo);\n    const steps = fetchIntroSteps.call({\n      _options: {\n        tooltipPosition: \"bottom\"\n      }\n    }, targetElement);\n    expect(steps.length).toBe(2);\n    expect(steps[0].position).toBe(\"bottom\");\n    expect(steps[0].intro).toBe(\"first\");\n    expect(steps[0].step).toBe(1);\n    expect(steps[1].position).toBe(\"left\");\n    expect(steps[1].intro).toBe(\"second\");\n    expect(steps[1].step).toBe(2);\n  });",
+            "file": "core/fetchIntroSteps.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should respect the custom step attribute (DOM)",
+            "suites": [
+                "fetchIntroSteps"
+            ],
+            "updatePoint": {
+                "line": 82,
+                "column": 54
+            },
+            "line": 82,
+            "code": "  test(\"should respect the custom step attribute (DOM)\", () => {\n    const targetElement = document.createElement(\"div\");\n    const stepOne = document.createElement(\"div\");\n    stepOne.setAttribute(\"data-intro\", \"second\");\n    stepOne.setAttribute(\"data-step\", \"5\");\n    const stepTwo = document.createElement(\"div\");\n    stepTwo.setAttribute(\"data-intro\", \"first\");\n    targetElement.appendChild(stepOne);\n    targetElement.appendChild(stepTwo);\n    const steps = fetchIntroSteps.call({\n      _options: {\n        tooltipPosition: \"bottom\"\n      }\n    }, targetElement);\n    expect(steps.length).toBe(2);\n    expect(steps[0].intro).toBe(\"first\");\n    expect(steps[0].step).toBe(1);\n    expect(steps[1].intro).toBe(\"second\");\n    expect(steps[1].step).toBe(5);\n  });",
+            "file": "core/fetchIntroSteps.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should ignore DOM elements when options.steps is available",
+            "suites": [
+                "fetchIntroSteps"
+            ],
+            "updatePoint": {
+                "line": 102,
+                "column": 66
+            },
+            "line": 102,
+            "code": "  test(\"should ignore DOM elements when options.steps is available\", () => {\n    const targetElement = document.createElement(\"div\");\n    const stepOne = document.createElement(\"div\");\n    stepOne.setAttribute(\"data-intro\", \"first\");\n    const stepTwo = document.createElement(\"div\");\n    stepTwo.setAttribute(\"data-intro\", \"second\");\n    targetElement.appendChild(stepOne);\n    targetElement.appendChild(stepTwo);\n    const steps = fetchIntroSteps.call({\n      _options: {\n        steps: [{\n          intro: \"steps-first\"\n        }, {\n          intro: \"steps-second\"\n        }]\n      }\n    }, targetElement);\n    expect(steps.length).toBe(2);\n    expect(steps[0].intro).toBe(\"steps-first\");\n    expect(steps[1].intro).toBe(\"steps-second\");\n  });",
+            "file": "core/fetchIntroSteps.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should call the onstart callback",
+            "suites": [
+                "introForElement"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 40
+            },
+            "line": 6,
+            "code": "  test(\"should call the onstart callback\", () => {\n    jest.spyOn(fetchIntroSteps, \"default\").mockReturnValue(true);\n    jest.spyOn(addOverlayLayer, \"default\").mockReturnValue(true);\n    jest.spyOn(nextStep, \"nextStep\").mockReturnValue(true);\n    const onstartCallback = jest.fn();\n    const self = {\n      _options: {},\n      _introStartCallback: onstartCallback\n    };\n    introForElement.call(self, document.body);\n    expect(onstartCallback).toBeCalledTimes(1);\n    expect(onstartCallback).toBeCalledWith(document.body);\n  });",
+            "file": "core/introForElement.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should automatically place the tooltip position when there is enough space",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 5,
+                "column": 82
+            },
+            "line": 5,
+            "code": "  test(\"should automatically place the tooltip position when there is enough space\", () => {\n    jest.spyOn(getOffset, \"default\").mockReturnValue({\n      height: 100,\n      width: 100,\n      top: 0,\n      left: 0\n    });\n    jest.spyOn(getWindowSize, \"default\").mockReturnValue({\n      height: 1000,\n      width: 1000\n    });\n    jest.spyOn(Element.prototype, \"getBoundingClientRect\").mockReturnValue({\n      width: 100,\n      height: 100,\n      top: 200,\n      left: 200,\n      bottom: 300,\n      right: 300\n    });\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"top\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\", \"left\", \"right\"],\n        autoPosition: true\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip introjs-top-right-aligned\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should skip auto positioning when autoPosition is false",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 63
+            },
+            "line": 40,
+            "code": "  test(\"should skip auto positioning when autoPosition is false\", () => {\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"top\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\"],\n        autoPosition: false\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip introjs-top\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should use floating tooltips when height/width is limited",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 65
+            },
+            "line": 57,
+            "code": "  test(\"should use floating tooltips when height/width is limited\", () => {\n    jest.spyOn(getOffset, \"default\").mockReturnValue({\n      height: 100,\n      width: 100,\n      top: 0,\n      left: 0\n    });\n    jest.spyOn(getWindowSize, \"default\").mockReturnValue({\n      height: 100,\n      width: 100\n    });\n    jest.spyOn(Element.prototype, \"getBoundingClientRect\").mockReturnValue({\n      width: 100,\n      height: 100,\n      top: 0,\n      left: 0,\n      bottom: 0,\n      right: 0\n    });\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"left\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\", \"left\", \"right\"],\n        autoPosition: true\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip introjs-floating\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should use bottom middle aligned when there is enough vertical space",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 92,
+                "column": 76
+            },
+            "line": 92,
+            "code": "  test(\"should use bottom middle aligned when there is enough vertical space\", () => {\n    jest.spyOn(getOffset, \"default\").mockReturnValue({\n      height: 100,\n      width: 100,\n      top: 0,\n      left: 0\n    });\n    jest.spyOn(getWindowSize, \"default\").mockReturnValue({\n      height: 500,\n      width: 100\n    });\n    jest.spyOn(Element.prototype, \"getBoundingClientRect\").mockReturnValue({\n      width: 100,\n      height: 100,\n      top: 0,\n      left: 0,\n      bottom: 0,\n      right: 0\n    });\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"left\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\", \"left\", \"right\"],\n        autoPosition: true\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip introjs-bottom-middle-aligned\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should attach the global custom tooltip css class",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 127,
+                "column": 57
+            },
+            "line": 127,
+            "code": "  test(\"should attach the global custom tooltip css class\", () => {\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"left\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\", \"left\", \"right\"],\n        autoPosition: true,\n        tooltipClass: \"newclass\"\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip newclass introjs-bottom-middle-aligned\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should attach the step custom tooltip css class",
+            "suites": [
+                "placeTooltip"
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 55
+            },
+            "line": 145,
+            "code": "  test(\"should attach the step custom tooltip css class\", () => {\n    const targetElement = document.createElement(\"div\");\n    const tooltipLayer = document.createElement(\"div\");\n    const arrowLayer = document.createElement(\"div\");\n    placeTooltip.call({\n      _currentStep: 0,\n      _introItems: [{\n        tooltip: \"hello\",\n        position: \"left\",\n        tooltipClass: \"myclass\"\n      }],\n      _options: {\n        positionPrecedence: [\"top\", \"bottom\", \"left\", \"right\"],\n        autoPosition: true\n      }\n    }, targetElement, tooltipLayer, arrowLayer, false);\n    expect(tooltipLayer.className).toBe(\"introjs-tooltip myclass introjs-bottom-middle-aligned\");\n  });",
+            "file": "core/placeTooltip.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should refresh the cached intro steps",
+            "suites": [
+                "refresh"
+            ],
+            "updatePoint": {
+                "line": 4,
+                "column": 45
+            },
+            "line": 4,
+            "code": "  test(\"should refresh the cached intro steps\", () => {\n    jest.spyOn(placeTooltip, \"default\").mockReturnValue(true);\n    const targetElement = document.createElement(\"div\");\n    document.body.appendChild(targetElement);\n    const instance = introJs(targetElement).setOptions({\n      steps: [{\n        intro: \"first\"\n      }]\n    });\n    instance.start();\n    expect(instance._introItems.length).toBe(1);\n    expect(document.querySelectorAll(\".introjs-bullets ul li\").length).toBe(1);\n    instance.setOptions({\n      steps: [{\n        intro: \"first\"\n      }, {\n        intro: \"second\"\n      }]\n    }).refresh();\n    expect(instance._introItems.length).toBe(1);\n    expect(instance._introItems[0].intro).toBe(\"first\");\n    expect(document.querySelectorAll(\".introjs-bullets ul li\").length).toBe(1);\n    instance.setOptions({\n      steps: [{\n        intro: \"first\"\n      }, {\n        intro: \"second\"\n      }]\n    }).refresh(true);\n    expect(instance._introItems.length).toBe(2);\n    expect(instance._introItems[0].intro).toBe(\"first\");\n    expect(instance._introItems[1].intro).toBe(\"second\");\n    expect(document.querySelectorAll(\".introjs-bullets ul li\").length).toBe(2);\n  });",
+            "file": "core/refresh.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should start floating intro with one step",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 49
+            },
+            "line": 7,
+            "code": "  test(\"should start floating intro with one step\", () => {\n    introJs().setOptions({\n      steps: [{\n        intro: \"hello world\"\n      }]\n    }).start();\n    expect(content(tooltipText())).toBe(\"hello world\");\n    expect(content(doneButton())).toBe(\"Done\");\n    expect(prevButton()).toBeNull();\n    expect(className(\".introjs-showElement\")).toContain(\"introjsFloatingElement\");\n    expect(className(\".introjs-showElement\")).toContain(\"introjs-relativePosition\");\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should call onexit and oncomplete when there is one step",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 19,
+                "column": 64
+            },
+            "line": 19,
+            "code": "  test(\"should call onexit and oncomplete when there is one step\", () => {\n    const onexitMock = jest.fn();\n    const oncompleteMMock = jest.fn();\n    introJs().setOptions({\n      steps: [{\n        intro: \"hello world\"\n      }]\n    }).onexit(onexitMock).oncomplete(oncompleteMMock).start();\n    nextButton().click();\n    expect(onexitMock).toBeCalledTimes(1);\n    expect(oncompleteMMock).toBeCalledTimes(1);\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should call onexit when skip is clicked",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 47
+            },
+            "line": 31,
+            "code": "  test(\"should call onexit when skip is clicked\", () => {\n    const onexitMock = jest.fn();\n    const oncompleteMMock = jest.fn();\n    introJs().setOptions({\n      steps: [{\n        intro: \"hello world\"\n      }]\n    }).onexit(onexitMock).oncomplete(oncompleteMMock).start();\n    skipButton().click();\n    expect(onexitMock).toBeCalledTimes(1);\n    expect(oncompleteMMock).toBeCalledTimes(1);\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should call not oncomplete when skip is clicked and there are two steps",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 79
+            },
+            "line": 43,
+            "code": "  test(\"should call not oncomplete when skip is clicked and there are two steps\", () => {\n    const onexitMock = jest.fn();\n    const oncompleteMMock = jest.fn();\n    introJs().setOptions({\n      steps: [{\n        intro: \"first\"\n      }, {\n        intro: \"second\"\n      }]\n    }).onexit(onexitMock).oncomplete(oncompleteMMock).start();\n    skipButton().click();\n    expect(onexitMock).toBeCalledTimes(1);\n    expect(oncompleteMMock).toBeCalledTimes(0);\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should start floating intro with two steps",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 50
+            },
+            "line": 57,
+            "code": "  test(\"should start floating intro with two steps\", () => {\n    introJs().setOptions({\n      steps: [{\n        intro: \"step one\"\n      }, {\n        intro: \"step two\"\n      }]\n    }).start();\n    expect(content(tooltipText())).toBe(\"step one\");\n    expect(doneButton()).toBeNull();\n    expect(prevButton()).not.toBeNull();\n    expect(className(prevButton())).toContain(\"introjs-disabled\");\n    expect(nextButton()).not.toBeNull();\n    expect(className(nextButton())).not.toContain(\"introjs-disabled\");\n    expect(className(\".introjs-showElement\")).toContain(\"introjsFloatingElement\");\n    expect(className(\".introjs-showElement\")).toContain(\"introjs-relativePosition\");\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should highlight the target element",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 43
+            },
+            "line": 74,
+            "code": "  test(\"should highlight the target element\", () => {\n    const p = appendDummyElement();\n    introJs().setOptions({\n      steps: [{\n        intro: \"step one\",\n        element: document.querySelector(\"p\")\n      }]\n    }).start();\n    expect(p.className).toContain(\"introjs-showElement\");\n    expect(p.className).toContain(\"introjs-relativePosition\");\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not highlight the target element if queryString is incorrect",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 75
+            },
+            "line": 85,
+            "code": "  test(\"should not highlight the target element if queryString is incorrect\", () => {\n    const p = appendDummyElement();\n    introJs().setOptions({\n      steps: [{\n        intro: \"step one\",\n        element: document.querySelector(\"div\")\n      }]\n    }).start();\n    expect(p.className).not.toContain(\"introjs-showElement\");\n    expect(className(\".introjs-showElement\")).toContain(\"introjsFloatingElement\");\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not add relativePosition if target element is fixed or absolute",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 96,
+                "column": 78
+            },
+            "line": 96,
+            "code": "  test(\"should not add relativePosition if target element is fixed or absolute\", () => {\n    const absolute = appendDummyElement(\"h1\", \"hello world\", \"position: absolute\");\n    const fixed = appendDummyElement(\"h2\", \"hello world\", \"position: fixed\");\n    const intro = introJs();\n    intro.setOptions({\n      steps: [{\n        intro: \"step one\",\n        element: document.querySelector(\"h1\")\n      }, {\n        intro: \"step two\",\n        element: document.querySelector(\"h2\")\n      }]\n    }).start();\n    expect(absolute.className).toContain(\"introjs-showElement\");\n    expect(absolute.className).not.toContain(\"introjs-relativePosition\");\n    intro.nextStep();\n    expect(fixed.className).toContain(\"introjs-showElement\");\n    expect(fixed.className).not.toContain(\"introjs-relativePosition\");\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should set the onstart callback",
+            "suites": [
+                "intro"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 39
+            },
+            "line": 115,
+            "code": "  test(\"should set the onstart callback\", () => {\n    const fn = jest.fn();\n    const intro = introJs();\n    intro.setOptions({\n      steps: [{\n        intro: \"step one\",\n        element: document.querySelector(\"h1\")\n      }]\n    }).onstart(fn);\n    expect(intro._introStartCallback).toBe(fn);\n  });",
+            "file": "index.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should append when className is empty",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 3,
+                "column": 45
+            },
+            "line": 3,
+            "code": "  test(\"should append when className is empty\", () => {\n    const el = document.createElement(\"div\");\n    addClass(el, \"myClass\");\n    expect(el.className).toBe(\"myClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should append when className is NOT empty",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 49
+            },
+            "line": 8,
+            "code": "  test(\"should append when className is NOT empty\", () => {\n    const el = document.createElement(\"div\");\n    el.className = \"firstClass\";\n    addClass(el, \"secondClass\");\n    expect(el.className).toBe(\"firstClass secondClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should append when element is SVG",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 41
+            },
+            "line": 14,
+            "code": "  test(\"should append when element is SVG\", () => {\n    const el = document.createElementNS(\"http://www.w3.org/2000/svg\", \"svg\");\n    el.setAttribute(\"class\", \"firstClass\");\n    addClass(el, \"secondClass\");\n    expect(el.getAttribute(\"class\")).toBe(\"firstClass secondClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not append duplicate classNames to svg elements",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 62
+            },
+            "line": 20,
+            "code": "  test(\"should not append duplicate classNames to svg elements\", () => {\n    const el = document.createElementNS(\"http://www.w3.org/2000/svg\", \"svg\");\n    el.setAttribute(\"class\", \"firstClass\");\n    addClass(el, \"firstClass\");\n    expect(el.getAttribute(\"class\")).toBe(\"firstClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not append duplicate classNames to elements",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 58
+            },
+            "line": 26,
+            "code": "  test(\"should not append duplicate classNames to elements\", () => {\n    const el = document.createElement(\"div\");\n    el.className = \"firstClass\";\n    addClass(el, \"firstClass\");\n    expect(el.className).toBe(\"firstClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not append duplicate list of classNames to elements",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 66
+            },
+            "line": 32,
+            "code": "  test(\"should not append duplicate list of classNames to elements\", () => {\n    const el = document.createElement(\"div\");\n    el.className = \"firstClass firstClass\";\n    addClass(el, \"firstClass firstClass firstClass\");\n    expect(el.className).toBe(\"firstClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should not append duplicate list of classNames to an empty className",
+            "suites": [
+                "addClass"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 76
+            },
+            "line": 38,
+            "code": "  test(\"should not append duplicate list of classNames to an empty className\", () => {\n    const el = document.createElement(\"div\");\n    addClass(el, \"firstClass firstClass firstClass\");\n    expect(el.className).toBe(\"firstClass\");\n  });",
+            "file": "util/addClass.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should create an element",
+            "suites": [
+                "createElement"
+            ],
+            "updatePoint": {
+                "line": 3,
+                "column": 32
+            },
+            "line": 3,
+            "code": "  test(\"should create an element\", () => {\n    expect(createElement(\"div\").tagName).toBe(\"DIV\");\n    expect(createElement(\"b\").tagName).toBe(\"B\");\n  });",
+            "file": "util/createElement.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should create an element with properties",
+            "suites": [
+                "createElement"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 48
+            },
+            "line": 7,
+            "code": "  test(\"should create an element with properties\", () => {\n    const el = createElement(\"div\", {\n      className: \"myClass\"\n    });\n    expect(el.className).toBe(\"myClass\");\n  });",
+            "file": "util/createElement.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should create an element with onclick",
+            "suites": [
+                "createElement"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 45
+            },
+            "line": 13,
+            "code": "  test(\"should create an element with onclick\", () => {\n    const mock = jest.fn();\n    const el = createElement(\"div\", {\n      onclick: mock\n    });\n    el.click();\n    el.click();\n    expect(mock).toBeCalledTimes(2);\n  });",
+            "file": "util/createElement.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should set style when the list is empty",
+            "suites": [
+                "setStyle"
+            ],
+            "updatePoint": {
+                "line": 3,
+                "column": 47
+            },
+            "line": 3,
+            "code": "  test(\"should set style when the list is empty\", () => {\n    const el = document.createElement(\"div\");\n    setStyle(el, {\n      \"text-align\": \"center\"\n    });\n    expect(el.style.cssText).toBe(\"text-align: center;\");\n  });",
+            "file": "util/setStyle.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should set style using cssText",
+            "suites": [
+                "setStyle"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 38
+            },
+            "line": 10,
+            "code": "  test(\"should set style using cssText\", () => {\n    const el = document.createElement(\"div\");\n    setStyle(el, \"text-align: center\");\n    expect(el.style.cssText).toBe(\"text-align: center;\");\n  });",
+            "file": "util/setStyle.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should set when style is not empty",
+            "suites": [
+                "setStyle"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 42
+            },
+            "line": 15,
+            "code": "  test(\"should set when style is not empty\", () => {\n    const el = document.createElement(\"div\");\n    el.style.position = \"relative\";\n    setStyle(el, \"text-align: center\");\n    expect(el.style.cssText).toBe(\"position: relative; text-align: center;\");\n  });",
+            "file": "util/setStyle.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should set when style is not empty and given value is an object",
+            "suites": [
+                "setStyle"
+            ],
+            "updatePoint": {
+                "line": 21,
+                "column": 71
+            },
+            "line": 21,
+            "code": "  test(\"should set when style is not empty and given value is an object\", () => {\n    const el = document.createElement(\"div\");\n    el.style.position = \"relative\";\n    setStyle(el, {\n      \"text-align\": \"center\"\n    });\n    expect(el.style.cssText).toBe(\"position: relative; text-align: center;\");\n  });",
+            "file": "util/setStyle.test.js",
+            "skipped": false,
+            "dir": "tests"
+        },
+        {
+            "name": "should override the existing property",
+            "suites": [
+                "setStyle"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 45
+            },
+            "line": 29,
+            "code": "  test(\"should override the existing property\", () => {\n    const el = document.createElement(\"div\");\n    el.style.position = \"relative\";\n    setStyle(el, {\n      position: \"absolute\",\n      \"text-align\": \"center\"\n    });\n    expect(el.style.cssText).toBe(\"position: absolute; text-align: center;\");\n  });",
+            "file": "util/setStyle.test.js",
+            "skipped": false,
+            "dir": "tests"
+        }
+    ],
+    "badge": "usablica__intro_js.svg"
+}

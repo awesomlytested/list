@@ -1,0 +1,3009 @@
+{
+    "repo": "petkaantonov/bluebird",
+    "url": "https://github.com/petkaantonov/bluebird",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "bluebird",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should preserve async context when using fromNode",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 57
+            },
+            "line": 52,
+            "code": "    it('should preserve async context when using fromNode', function () {\n      hook.enable();\n      tree.add(currentId());\n      return new Promise(function (resolve) {\n        var globalResolve;\n        setImmediate(function () {\n          hook.enable();\n          tree.add(currentId());\n          resolve(new Promise(function (resolve) {\n            globalResolve = resolve;\n          }).then(function () {\n            assert.ok(tree.has(currentId()));\n          }));\n        });\n        setTimeout(function () {\n          globalResolve();\n        }, 10);\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve async context when using .map",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 53
+            },
+            "line": 71,
+            "code": "    it('should preserve async context when using .map', function () {\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(Promise.map([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n          return currentId();\n        }).then(function (asyncIds) {\n          for (var i = 0; i < asyncIds.length; ++i) {\n            assert.ok(tree.has(asyncIds[i]));\n          }\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve async context when using .filter",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 56
+            },
+            "line": 85,
+            "code": "    it('should preserve async context when using .filter', function () {\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(Promise.filter([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n          assert.ok(tree.has(currentId()));\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve async context when using .reduce",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 95,
+                "column": 56
+            },
+            "line": 95,
+            "code": "    it('should preserve async context when using .reduce', function () {\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(Promise.reduce([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n          assert.ok(tree.has(currentId()));\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve async context when using .join",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 54
+            },
+            "line": 105,
+            "code": "    it('should preserve async context when using .join', function () {\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(Promise.join(d1, Promise.delay(1), function () {\n          assert.ok(tree.has(currentId()));\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve async context when using .each",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 54
+            },
+            "line": 115,
+            "code": "    it('should preserve async context when using .each', function () {\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(Promise.each([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n          assert.ok(tree.has(currentId()));\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be able to disable AsyncResource usage",
+            "suites": [
+                "async_hooks"
+            ],
+            "updatePoint": {
+                "line": 125,
+                "column": 53
+            },
+            "line": 125,
+            "code": "    it('should be able to disable AsyncResource usage', function () {\n      Promise.config({\n        asyncHooks: false\n      });\n      hook.enable();\n      tree.add(currentId());\n      var d1 = getAsyncPromise();\n      return new Promise(function (resolve, reject) {\n        resolve(d1.then(function () {\n          assert.ok(!tree.has(currentId()));\n        }));\n      });\n    });",
+            "file": "mocha/async_hooks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw type error when called as function",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 53
+            },
+            "line": 85,
+            "code": "  it(\"should throw type error when called as function\", function () {\n    try {\n      Promise(function () {});\n    } catch (e) {\n      return;\n    }\n\n    assert.fail();\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw type error when passed non-function",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 94,
+                "column": 54
+            },
+            "line": 94,
+            "code": "  it(\"should throw type error when passed non-function\", function () {\n    try {\n      new Promise({});\n    } catch (e) {\n      return;\n    }\n\n    assert.fail();\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calls the resolver as a function",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 108,
+                "column": 38
+            },
+            "line": 108,
+            "code": "  it(\"calls the resolver as a function\", function () {\n    new Promise(function () {\n      assert(this === defaultThis);\n    });\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "passes arguments even if parameters are not defined",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 57
+            },
+            "line": 113,
+            "code": "  it(\"passes arguments even if parameters are not defined\", function () {\n    new Promise(function () {\n      assert(arguments.length === 2 || arguments.length === 3);\n    });\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with any thrown error",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 118,
+                "column": 41
+            },
+            "line": 118,
+            "code": "  it(\"should reject with any thrown error\", function () {\n    var e = new Error();\n    return new Promise(function () {\n      throw e;\n    }).then(assert.fail, function (err) {\n      assert(err === e);\n    });\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call the resolver function synchronously",
+            "suites": [
+                "Promise constructor"
+            ],
+            "updatePoint": {
+                "line": 126,
+                "column": 53
+            },
+            "line": 126,
+            "code": "  it(\"should call the resolver function synchronously\", function () {\n    var e = new Error();\n    var a = 0;\n    new Promise(function () {\n      a = 1;\n    });\n    assert(a === 1);\n  });",
+            "file": "mocha/constructor.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can return undefined",
+            "suites": [
+                "gh-627"
+            ],
+            "updatePoint": {
+                "line": 210,
+                "column": 26
+            },
+            "line": 210,
+            "code": "  it(\"can return undefined\", function () {\n    return Promise.bind(42).thenReturn(undefined).then(function (value) {\n      assert.strictEqual(value, undefined);\n    });\n  });",
+            "file": "mocha/direct_resolving.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can throw undefined",
+            "suites": [
+                "gh-627"
+            ],
+            "updatePoint": {
+                "line": 215,
+                "column": 25
+            },
+            "line": 215,
+            "code": "  it(\"can throw undefined\", function () {\n    return Promise.bind(42).thenThrow(undefined).then(assert.fail, function (reason) {\n      assert.strictEqual(reason, undefined);\n    });\n  });",
+            "file": "mocha/direct_resolving.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can catch return undefined",
+            "suites": [
+                "gh-627"
+            ],
+            "updatePoint": {
+                "line": 220,
+                "column": 32
+            },
+            "line": 220,
+            "code": "  it(\"can catch return undefined\", function () {\n    return Promise.bind(42).thenThrow(new Error()).catchReturn().then(function (value) {\n      assert.strictEqual(value, undefined);\n    });\n  });",
+            "file": "mocha/direct_resolving.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "can catch throw undefined",
+            "suites": [
+                "gh-627"
+            ],
+            "updatePoint": {
+                "line": 225,
+                "column": 31
+            },
+            "line": 225,
+            "code": "  it(\"can catch throw undefined\", function () {\n    return Promise.bind(42).thenThrow(new Error()).catchThrow().then(assert.fail, function (reason) {\n      assert.strictEqual(reason, undefined);\n    });\n  });",
+            "file": "mocha/direct_resolving.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve empty domain and this function",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 103,
+                "column": 54
+            },
+            "line": 103,
+            "code": "    it(\"should preserve empty domain and this function\", function (done) {\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.then(function shouldBeEmpty() {\n        assert.equal(false, !!process.domain);\n      }).bind({\n        ref: 'foo'\n      }).then(function shouldKeepThisAndEmptyDomain() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).caught(done);\n      deferred.resolve(\"ok\");\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve empty domain, nodeify",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 117,
+                "column": 45
+            },
+            "line": 117,
+            "code": "    it(\"should preserve empty domain, nodeify\", function (done) {\n      done = createGroupDone(3, done);\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.then(function shouldBeEmpty() {\n        assert.equal(false, !!process.domain);\n        done();\n      }).bind({\n        ref: 'foo'\n      }).then(function shouldKeepThisAndEmptyDomain() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).nodeify(function shouldKeepThisAndEmptyDomain() {\n        try {\n          assert.equal(false, !!process.domain);\n          assert.equal('foo', this.ref);\n          done();\n        } catch (err) {\n          done(err);\n        }\n      }).caught(done);\n      deferred.resolve(\"ok\");\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve corresponding state of domain",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 141,
+                "column": 53
+            },
+            "line": 141,
+            "code": "    it(\"should preserve corresponding state of domain\", function (done) {\n      done = createGroupDone(6, done);\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.then(function shouldBeEmpty() {\n        assert.equal(false, !!process.domain);\n        done();\n      }).bind({\n        ref: 'foo'\n      }).then(function shouldKeepThisAndEmptyDomain() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).nodeify(function shouldKeepThisAndEmptyDomain() {\n        try {\n          assert.equal(false, !!process.domain);\n          assert.equal('foo', this.ref);\n          done();\n        } catch (err) {\n          done(err);\n        }\n      }).caught(done);\n      var domain = Domain.create();\n      domain.run(function () {\n        p.then(function shouldNoBeEmpty() {\n          assert.equal(domain, process.domain);\n          done();\n        }).bind({\n          ref: 'bar'\n        }).then(function shouldKeepThisAndDomain() {\n          assert.equal(domain, process.domain);\n          assert.equal('bar', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain() {\n          try {\n            assert.equal(domain, process.domain);\n            assert.equal('bar', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        });\n      });\n      deferred.resolve(\"ok\");\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve corresponding state of domain, complex",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 186,
+                "column": 62
+            },
+            "line": 186,
+            "code": "    it('should preserve corresponding state of domain, complex', function (done) {\n      done = createGroupDone(9, done);\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.then(function shouldBeEmpty() {\n        assert.equal(false, !!process.domain);\n        done();\n      }).bind({\n        ref: 'foo'\n      }).then(function shouldKeepThisAndEmptyDomain() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).caught(done).nodeify(function shouldKeepThisAndEmptyDomain() {\n        try {\n          assert.equal(false, !!process.domain);\n          assert.equal('foo', this.ref);\n          done();\n        } catch (err) {\n          done(err);\n        }\n      }, done);\n      var domain1 = Domain.create();\n      domain1.run(function () {\n        p.then(function shouldNoBeEmpty() {\n          assert.equal(domain1, process.domain);\n          done();\n        }).bind({\n          ref: 'bar'\n        }).then(function shouldKeepThisAndDomain() {\n          assert.equal(domain1, process.domain);\n          assert.equal('bar', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain() {\n          try {\n            assert.equal(domain1, process.domain);\n            assert.equal('bar', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        }, done);\n      });\n      var domain2 = Domain.create();\n      domain2.run(function () {\n        p.then(function shouldNoBeEmpty() {\n          assert.equal(domain2, process.domain);\n          done();\n        }).bind({\n          ref: 'qaz'\n        }).then(function shouldKeepThisAndDomain() {\n          assert.equal(domain2, process.domain);\n          assert.equal('qaz', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain() {\n          try {\n            assert.equal(domain2, process.domain);\n            assert.equal('qaz', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        });\n      });\n      deferred.resolve(\"ok\");\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve corresponding state of domain in reject",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 252,
+                "column": 63
+            },
+            "line": 252,
+            "code": "    it('should preserve corresponding state of domain in reject', function (done) {\n      done = createGroupDone(4, done);\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.bind({\n        ref: 'foo'\n      }).caught(function shouldKeepThisAndEmptyDomain() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).caught(done).nodeify(function shouldKeepThisAndEmptyDomain() {\n        try {\n          assert.equal(false, !!process.domain);\n          assert.equal('foo', this.ref);\n          done();\n        } catch (err) {\n          done(err);\n        }\n      });\n      var domain = Domain.create();\n      domain.run(function () {\n        p.bind({\n          ref: 'bar'\n        }).caught(function shouldNoBeEmpty() {\n          assert.equal(true, !!process.domain);\n          assert.equal('bar', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain(err) {\n          try {\n            assert.equal(true, !!process.domain);\n            assert.equal('bar', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        }).caught(done);\n      });\n      deferred.reject('bad');\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve corresponding state of domain in reject, complex",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 291,
+                "column": 72
+            },
+            "line": 291,
+            "code": "    it('should preserve corresponding state of domain in reject, complex', function (done) {\n      done = createGroupDone(6, done);\n      var deferred = new Promise.defer();\n      var p = deferred.promise;\n      p.bind({\n        ref: 'foo'\n      }).caught(function shouldBeEmpty() {\n        assert.equal(false, !!process.domain);\n        assert.equal('foo', this.ref);\n        done();\n      }).caught(done).nodeify(function shouldKeepThisAndEmptyDomain() {\n        try {\n          assert.equal(false, !!process.domain);\n          assert.equal('foo', this.ref);\n          done();\n        } catch (err) {\n          done(err);\n        }\n      });\n      var domain1 = Domain.create();\n      domain1.run(function () {\n        p.bind({\n          ref: 'bar'\n        }).caught(function shouldNoBeEmpty() {\n          assert.equal(domain1, process.domain);\n          assert.equal('bar', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain() {\n          try {\n            assert.equal(domain1, process.domain);\n            assert.equal('bar', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        });\n      });\n      var domain2 = Domain.create();\n      domain2.run(function () {\n        p.bind({\n          ref: 'qaz'\n        }).caught(function shouldNoBeEmpty() {\n          assert.equal(domain2, process.domain);\n          assert.equal('qaz', this.ref);\n          done();\n        }).caught(done).nodeify(function shouldKeepThisAndDomain() {\n          try {\n            assert.equal(domain2, process.domain);\n            assert.equal('qaz', this.ref);\n            done();\n          } catch (err) {\n            done(err);\n          }\n        });\n      });\n      deferred.reject('bad');\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .join",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 348,
+                "column": 47
+            },
+            "line": 348,
+            "code": "    it('should preserve domain when using .join', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      var d2 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.join(d1, d2, function () {\n            assert.strictEqual(domain, process.domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .using",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 369,
+                "column": 48
+            },
+            "line": 369,
+            "code": "    it('should preserve domain when using .using', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      var d2 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.using(d1, d2, function () {\n            assert.strictEqual(domain, process.domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .map",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 390,
+                "column": 46
+            },
+            "line": 390,
+            "code": "    it('should preserve domain when using .map', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.map([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n            return process.domain;\n          }).then(function (domains) {\n            assert.deepEqual([domain, domain, domain, domain], domains);\n            assert.equal(process.domain, domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .filter",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 409,
+                "column": 49
+            },
+            "line": 409,
+            "code": "    it('should preserve domain when using .filter', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.filter([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n            assert.equal(process.domain, domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .reduce",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 425,
+                "column": 49
+            },
+            "line": 425,
+            "code": "    it('should preserve domain when using .reduce', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.reduce([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n            assert.equal(process.domain, domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve domain when using .each",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 441,
+                "column": 47
+            },
+            "line": 441,
+            "code": "    it('should preserve domain when using .each', function () {\n      var domain = Domain.create();\n      var d1 = new Promise(function (resolve, reject) {\n        Domain.create().run(function () {\n          setTimeout(resolve, 1);\n        });\n      });\n      return new Promise(function (resolve, reject) {\n        domain.on(\"error\", reject);\n        domain.run(function () {\n          resolve(Promise.each([d1, null, Promise.resolve(1), Promise.delay(1)], function () {\n            assert.equal(process.domain, domain);\n          }));\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not crash with already rejected promise",
+            "suites": [
+                "domain preservation"
+            ],
+            "updatePoint": {
+                "line": 457,
+                "column": 54
+            },
+            "line": 457,
+            "code": "    it(\"should not crash with already rejected promise\", function () {\n      return new Promise(function (resolve) {\n        Domain.create().run(function () {\n          Promise.resolve(1).timeout(200).then(function () {\n            resolve();\n          });\n        });\n      });\n    });",
+            "file": "mocha/domain.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call the callback and return nothing",
+            "suites": [
+                "done",
+                "when the promise is fulfilled",
+                "and the callback does not throw"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 53
+            },
+            "line": 35,
+            "code": "      it(\"should call the callback and return nothing\", function () {\n        var called = false;\n        var promise = Promise.resolve();\n        var returnValue = promise.done(function () {\n          called = true;\n        });\n        return promise.lastly(function () {\n          assert.equal(called, true);\n          assert.equal(returnValue, undefined);\n        });\n      });",
+            "file": "mocha/done.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rethrow that error in the next turn and return nothing",
+            "suites": [
+                "done",
+                "when the promise is fulfilled",
+                "and the callback throws"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 73
+            },
+            "line": 50,
+            "code": "        it(\"should rethrow that error in the next turn and return nothing\", function () {\n          var turn = 0;\n          process.nextTick(function () {\n            ++turn;\n          });\n          var returnValue = Promise.resolve().done(function () {\n            throw safeError;\n          });\n          return testUtils.awaitProcessExit(function (e) {\n            assert.equal(turn, 1);\n            assert.equal(returnValue, undefined);\n          });\n        });",
+            "file": "mocha/done.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call the errback and return nothing",
+            "suites": [
+                "done",
+                "when the promise is rejected",
+                "and the errback handles it"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 52
+            },
+            "line": 68,
+            "code": "      it(\"should call the errback and return nothing\", function () {\n        var called = false;\n        var promise = Promise.reject(\"unsafe_error\");\n        var returnValue = promise.done(function () {}, function () {\n          called = true;\n        });\n        return promise.caught(function () {}).lastly(function () {\n          assert.equal(called, true);\n          assert.equal(returnValue, undefined);\n        });\n      });",
+            "file": "mocha/done.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rethrow that error in the next turn and return nothing",
+            "suites": [
+                "done",
+                "when the promise is rejected",
+                "and the errback throws"
+            ],
+            "updatePoint": {
+                "line": 83,
+                "column": 73
+            },
+            "line": 83,
+            "code": "        it(\"should rethrow that error in the next turn and return nothing\", function () {\n          var turn = 0;\n          process.nextTick(function () {\n            ++turn;\n          });\n          var returnValue = Promise.reject(\"unsafe_error\").done(null, function () {\n            throw safeError;\n          });\n          return testUtils.awaitProcessExit(function (e) {\n            assert.equal(turn, 1);\n            assert.equal(returnValue, undefined);\n          });\n        });",
+            "file": "mocha/done.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw the original error in the next turn",
+            "suites": [
+                "done",
+                "when the promise is rejected",
+                "and there is no errback"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 60
+            },
+            "line": 98,
+            "code": "        it(\"should throw the original error in the next turn\", function () {\n          var turn = 0;\n          process.nextTick(function () {\n            ++turn;\n          });\n          var returnValue = Promise.reject(safeError).done();\n          return testUtils.awaitProcessExit(function (e) {\n            assert.equal(turn, 1);\n            assert.equal(returnValue, undefined);\n          });\n        });",
+            "file": "mocha/done.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the array's values mapped",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 27,
+                "column": 45
+            },
+            "line": 27,
+            "code": "  it(\"should return the array's values mapped\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).mapSeries(function (val) {\n      b.push(3 - val);\n      return val + 2;\n    }).then(function (ret) {\n      assert.deepEqual(ret, [3, 4, 5]);\n      assert.deepEqual(b, [2, 1, 0]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "takes value, index and length",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 35
+            },
+            "line": 38,
+            "code": "  it(\"takes value, index and length\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).each(function (value, index, length) {\n      b.push(value, index, length);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 0, 3, 2, 1, 3, 3, 2, 3]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "waits for returned promise before proceeding next",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 47,
+                "column": 55
+            },
+            "line": 47,
+            "code": "  it(\"waits for returned promise before proceeding next\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).each(function (value) {\n      b.push(value);\n      return Promise.delay(1).then(function () {\n        b.push(value * 2);\n      });\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2, 2, 4, 3, 6]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "waits for returned thenable before proceeding next",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 59,
+                "column": 56
+            },
+            "line": 59,
+            "code": "  it(\"waits for returned thenable before proceeding next\", function () {\n    var b = [1, 2, 3];\n    var a = [thenabled(1), thenabled(2), thenabled(3)];\n    return Promise.resolve(a).each(function (val) {\n      b.push(val * 50);\n      return thenabled(val * 500, b);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2, 3, 50, 500, 100, 1000, 150, 1500]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesnt iterate with an empty array",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 69,
+                "column": 40
+            },
+            "line": 69,
+            "code": "  it(\"doesnt iterate with an empty array\", function () {\n    return Promise.each([], function (val) {\n      throw new Error();\n    }).then(function (ret) {\n      assert.deepEqual(ret, []);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "iterates with an array of single item",
+            "suites": [
+                "Promise.each"
+            ],
+            "updatePoint": {
+                "line": 76,
+                "column": 43
+            },
+            "line": 76,
+            "code": "  it(\"iterates with an array of single item\", function () {\n    var b = [];\n    return Promise.each([promised(1)], function (val) {\n      b.push(val);\n      return thenabled(val * 2, b);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the array's values",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 87,
+                "column": 38
+            },
+            "line": 87,
+            "code": "  it(\"should return the array's values\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).each(function (val) {\n      b.push(3 - val);\n      return val;\n    }).then(function (ret) {\n      assert.deepEqual(ret, [1, 2, 3]);\n      assert.deepEqual(b, [2, 1, 0]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "takes value, index and length",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 35
+            },
+            "line": 98,
+            "code": "  it(\"takes value, index and length\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).each(function (value, index, length) {\n      b.push(value, index, length);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 0, 3, 2, 1, 3, 3, 2, 3]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "waits for returned promise before proceeding next",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 55
+            },
+            "line": 107,
+            "code": "  it(\"waits for returned promise before proceeding next\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var b = [];\n    return Promise.resolve(a).each(function (value) {\n      b.push(value);\n      return Promise.delay(1).then(function () {\n        b.push(value * 2);\n      });\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2, 2, 4, 3, 6]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "waits for returned thenable before proceeding next",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 119,
+                "column": 56
+            },
+            "line": 119,
+            "code": "  it(\"waits for returned thenable before proceeding next\", function () {\n    var b = [1, 2, 3];\n    var a = [thenabled(1), thenabled(2), thenabled(3)];\n    return Promise.resolve(a).each(function (val) {\n      b.push(val * 50);\n      return thenabled(val * 500, b);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2, 3, 50, 500, 100, 1000, 150, 1500]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "doesnt iterate with an empty array",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 129,
+                "column": 40
+            },
+            "line": 129,
+            "code": "  it(\"doesnt iterate with an empty array\", function () {\n    return Promise.resolve([]).each(function (val) {\n      throw new Error();\n    }).then(function (ret) {\n      assert.deepEqual(ret, []);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "iterates with an array of single item",
+            "suites": [
+                "Promise.prototype.each"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 43
+            },
+            "line": 136,
+            "code": "  it(\"iterates with an array of single item\", function () {\n    var b = [];\n    return Promise.resolve([promised(1)]).each(function (val) {\n      b.push(val);\n      return thenabled(val * 2, b);\n    }).then(function (ret) {\n      assert.deepEqual(b, [1, 2]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is mixed",
+            "suites": [
+                "mapSeries and each"
+            ],
+            "updatePoint": {
+                "line": 147,
+                "column": 14
+            },
+            "line": 147,
+            "code": "  it(\"is mixed\", function () {\n    return Promise.mapSeries([1, 2, 3], function (value) {\n      return value * 2;\n    }).then(function (result) {\n      assert.deepEqual(result, [2, 4, 6]);\n    }).then(function () {\n      return Promise.each([1, 2, 3], function (value) {\n        return value * 2;\n      }).then(function (result) {\n        assert.deepEqual(result, [1, 2, 3]);\n      });\n    }).thenReturn([1, 2, 3]).mapSeries(function (value) {\n      return value * 2;\n    }).then(function (result) {\n      assert.deepEqual(result, [2, 4, 6]);\n    }).thenReturn([1, 2, 3]).each(function (value) {\n      return value * 2;\n    }).then(function (result) {\n      assert.deepEqual(result, [1, 2, 3]);\n    });\n  });",
+            "file": "mocha/each.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work without new",
+            "suites": [
+                "Error constructors",
+                "OperationalError"
+            ],
+            "updatePoint": {
+                "line": 91,
+                "column": 31
+            },
+            "line": 91,
+            "code": "    it(\"should work without new\", function () {\n      var a = Promise.OperationalError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with new",
+            "suites": [
+                "Error constructors",
+                "OperationalError"
+            ],
+            "updatePoint": {
+                "line": 96,
+                "column": 28
+            },
+            "line": 96,
+            "code": "    it(\"should work with new\", function () {\n      var a = new Promise.OperationalError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should retain custom properties",
+            "suites": [
+                "Error constructors",
+                "OperationalError"
+            ],
+            "updatePoint": {
+                "line": 101,
+                "column": 39
+            },
+            "line": 101,
+            "code": "    it(\"should retain custom properties\", function () {\n      var message;\n      var name;\n\n      function f(cb) {\n        var err = new Error(\"custom message\");\n        message = err.message;\n        name = err.name;\n        err.code = \"ENOENT\";\n        err.path = \"C:\\\\\";\n        cb(err);\n      }\n\n      return Promise.promisify(f)().error(function (e) {\n        assert.strictEqual(e.message, message);\n        assert.strictEqual(e.name, name);\n        assert(e instanceof Promise.OperationalError);\n        assert.strictEqual(e.code, \"ENOENT\");\n        assert.strictEqual(e.path, \"C:\\\\\");\n      });\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work without new",
+            "suites": [
+                "Error constructors",
+                "CancellationError"
+            ],
+            "updatePoint": {
+                "line": 124,
+                "column": 31
+            },
+            "line": 124,
+            "code": "    it(\"should work without new\", function () {\n      var a = Promise.CancellationError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with new",
+            "suites": [
+                "Error constructors",
+                "CancellationError"
+            ],
+            "updatePoint": {
+                "line": 129,
+                "column": 28
+            },
+            "line": 129,
+            "code": "    it(\"should work with new\", function () {\n      var a = new Promise.CancellationError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work without new",
+            "suites": [
+                "Error constructors",
+                "TimeoutError"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 31
+            },
+            "line": 136,
+            "code": "    it(\"should work without new\", function () {\n      var a = Promise.TimeoutError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with new",
+            "suites": [
+                "Error constructors",
+                "TimeoutError"
+            ],
+            "updatePoint": {
+                "line": 141,
+                "column": 28
+            },
+            "line": 141,
+            "code": "    it(\"should work with new\", function () {\n      var a = new Promise.TimeoutError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work without new",
+            "suites": [
+                "Error constructors",
+                "AggregateError"
+            ],
+            "updatePoint": {
+                "line": 148,
+                "column": 31
+            },
+            "line": 148,
+            "code": "    it(\"should work without new\", function () {\n      var a = Promise.AggregateError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with new",
+            "suites": [
+                "Error constructors",
+                "AggregateError"
+            ],
+            "updatePoint": {
+                "line": 153,
+                "column": 28
+            },
+            "line": 153,
+            "code": "    it(\"should work with new\", function () {\n      var a = new Promise.AggregateError(\"msg\");\n      assert.strictEqual(a.message, \"msg\");\n      assert(a instanceof Error);\n    });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should stringify without circular errors",
+            "suites": [
+                "Error constructors",
+                "AggregateError"
+            ],
+            "updatePoint": {
+                "line": 160,
+                "column": 50
+            },
+            "line": 160,
+            "code": "      it(\"should stringify without circular errors\", function () {\n        var a = Promise.AggregateError();\n        a.push(new Error(\"1\"));\n        a.push(new Error(\"2\"));\n        a.push(new Error(\"3\"));\n        a = a.toString();\n        assert(a.indexOf(\"Error: 1\") >= 0);\n        assert(a.indexOf(\"Error: 2\") >= 0);\n        assert(a.indexOf(\"Error: 3\") >= 0);\n      });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should stringify with circular errors",
+            "suites": [
+                "Error constructors",
+                "AggregateError"
+            ],
+            "updatePoint": {
+                "line": 170,
+                "column": 47
+            },
+            "line": 170,
+            "code": "      it(\"should stringify with circular errors\", function () {\n        var a = Promise.AggregateError();\n        a.push(new Error(\"1\"));\n        a.push(a);\n        a.push(new Error(\"3\"));\n        a = a.toString();\n        assert(a.indexOf(\"Error: 1\") >= 0);\n        assert(a.indexOf(\"[Circular AggregateError]\") >= 0);\n        assert(a.indexOf(\"Error: 3\") >= 0);\n      });",
+            "file": "mocha/error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should do nothing",
+            "suites": [
+                "finally",
+                "when nothing is passed"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 25
+            },
+            "line": 33,
+            "code": "    it(\"should do nothing\", function () {\n      return Promise.resolve(\"foo\").lastly().lastly().lastly().lastly().then(function (val) {\n        assert(val === \"foo\");\n      });\n    });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call the callback",
+            "suites": [
+                "finally",
+                "when the promise is fulfilled"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 32
+            },
+            "line": 40,
+            "code": "    it(\"should call the callback\", function () {\n      var called = false;\n      return Promise.resolve(\"foo\").lastly(function () {\n        called = true;\n      }).then(function () {\n        assert.equal(called, true);\n      });\n    });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fulfill with the original value",
+            "suites": [
+                "finally",
+                "when the promise is fulfilled"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 46
+            },
+            "line": 48,
+            "code": "    it(\"should fulfill with the original value\", function () {\n      return Promise.resolve(\"foo\").lastly(function () {\n        return \"bar\";\n      }).then(function (result) {\n        assert.equal(result, \"foo\");\n      });\n    });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fulfill with the original reason after that promise resolves",
+            "suites": [
+                "finally",
+                "when the promise is fulfilled",
+                "when the callback returns a promise",
+                "that is fulfilled"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 79
+            },
+            "line": 57,
+            "code": "        it(\"should fulfill with the original reason after that promise resolves\", function () {\n          var promise = Promise.delay(1);\n          return Promise.resolve(\"foo\").lastly(function () {\n            return promise;\n          }).then(function (result) {\n            assert.equal(promise.isPending(), false);\n            assert.equal(result, \"foo\");\n          });\n        });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with this new rejection reason",
+            "suites": [
+                "finally",
+                "when the promise is fulfilled",
+                "when the callback returns a promise",
+                "that is rejected"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 56
+            },
+            "line": 68,
+            "code": "        it(\"should reject with this new rejection reason\", function () {\n          return Promise.resolve(\"foo\").lastly(function () {\n            return Promise.reject(exception1);\n          }).then(function () {\n            assert.equal(false, true);\n          }, function (exception) {\n            assert.equal(exception, exception1);\n          });\n        });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with this new exception",
+            "suites": [
+                "finally",
+                "when the promise is fulfilled",
+                "when the callback throws an exception"
+            ],
+            "updatePoint": {
+                "line": 80,
+                "column": 47
+            },
+            "line": 80,
+            "code": "      it(\"should reject with this new exception\", function () {\n        return Promise.resolve(\"foo\").lastly(function () {\n          throw exception1;\n        }).then(function () {\n          assert.equal(false, true);\n        }, function (exception) {\n          assert.equal(exception, exception1);\n        });\n      });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call the callback",
+            "suites": [
+                "finally",
+                "when the promise is rejected"
+            ],
+            "updatePoint": {
+                "line": 92,
+                "column": 32
+            },
+            "line": 92,
+            "code": "    it(\"should call the callback\", function () {\n      var called = false;\n      return Promise.reject(exception1).lastly(function () {\n        called = true;\n      }).then(function () {\n        assert.fail();\n      }, function () {\n        assert.equal(called, true);\n      });\n    });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the original reason",
+            "suites": [
+                "finally",
+                "when the promise is rejected"
+            ],
+            "updatePoint": {
+                "line": 102,
+                "column": 46
+            },
+            "line": 102,
+            "code": "    it(\"should reject with the original reason\", function () {\n      return Promise.reject(exception1).lastly(function () {\n        return \"bar\";\n      }).then(function () {\n        assert.equal(false, true);\n      }, function (exception) {\n        assert.equal(exception, exception1);\n      });\n    });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the original reason after that promise resolves",
+            "suites": [
+                "finally",
+                "when the promise is rejected",
+                "when the callback returns a promise",
+                "that is fulfilled"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 78
+            },
+            "line": 113,
+            "code": "        it(\"should reject with the original reason after that promise resolves\", function () {\n          var promise = Promise.delay(1);\n          return Promise.reject(exception1).lastly(function () {\n            return promise;\n          }).then(function () {\n            assert.equal(false, true);\n          }, function (exception) {\n            assert.equal(exception, exception1);\n            assert.equal(promise.isPending(), false);\n          });\n        });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the new reason",
+            "suites": [
+                "finally",
+                "when the promise is rejected",
+                "when the callback returns a promise",
+                "that is rejected"
+            ],
+            "updatePoint": {
+                "line": 126,
+                "column": 45
+            },
+            "line": 126,
+            "code": "        it(\"should reject with the new reason\", function () {\n          return Promise.reject(exception1).lastly(function () {\n            return Promise.reject(exception2);\n          }).then(function () {\n            assert.equal(false, true);\n          }, function (exception) {\n            assert.equal(exception, exception2);\n          });\n        });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with this new exception",
+            "suites": [
+                "finally",
+                "when the promise is rejected",
+                "when the callback throws an exception"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 47
+            },
+            "line": 138,
+            "code": "      it(\"should reject with this new exception\", function () {\n        return Promise.reject(exception1).lastly(function () {\n          throw exception2;\n        }).then(function () {\n          assert.equal(false, true);\n        }, function (exception) {\n          assert.equal(exception, exception2);\n        });\n      });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the original reason after that",
+            "suites": [
+                "finally",
+                "when the callback returns a thenable",
+                "that will fulfill"
+            ],
+            "updatePoint": {
+                "line": 151,
+                "column": 59
+            },
+            "line": 151,
+            "code": "      it(\"should reject with the original reason after that\", function () {\n        var promise = {\n          then: function (fn) {\n            setTimeout(function () {\n              fn(15);\n            }, 1);\n          }\n        };\n        return Promise.reject(exception1).lastly(function () {\n          return promise;\n        }).then(function () {\n          assert.equal(false, true);\n        }, function (exception) {\n          assert.equal(exception, exception1);\n        });\n      });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the new reason",
+            "suites": [
+                "finally",
+                "when the callback returns a thenable",
+                "that is rejected"
+            ],
+            "updatePoint": {
+                "line": 169,
+                "column": 43
+            },
+            "line": 169,
+            "code": "      it(\"should reject with the new reason\", function () {\n        var promise = {\n          then: function (f, fn) {\n            setTimeout(function () {\n              fn(exception2);\n            }, 1);\n          }\n        };\n        return Promise.reject(exception1).lastly(function () {\n          return promise;\n        }).then(function () {\n          assert.equal(false, true);\n        }, function (exception) {\n          assert.equal(exception, exception2);\n        });\n      });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with the new primitive reason",
+            "suites": [
+                "finally",
+                "when the callback returns a thenable",
+                "that is rejected"
+            ],
+            "updatePoint": {
+                "line": 185,
+                "column": 53
+            },
+            "line": 185,
+            "code": "      it(\"should reject with the new primitive reason\", function () {\n        var primitive = 3;\n        var promise = {\n          then: function (f, fn) {\n            setTimeout(function () {\n              fn(primitive);\n            }, 1);\n          }\n        };\n        return Promise.reject(exception1).lastly(function () {\n          return promise;\n        }).then(function () {\n          assert.equal(false, true);\n        }, function (exception) {\n          assert.strictEqual(exception, primitive);\n        });\n      });",
+            "file": "mocha/finally.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work",
+            "suites": [
+                "Spawn"
+            ],
+            "updatePoint": {
+                "line": 298,
+                "column": 17
+            },
+            "line": 298,
+            "code": "  it(\"should work\", function () {\n    return Promise.spawn(function* () {\n      return yield Promise.resolve(1);\n    }).then(function (value) {\n      assert.strictEqual(value, 1);\n    });\n  });",
+            "file": "mocha/generator.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return rejected promise when passed non function",
+            "suites": [
+                "Spawn"
+            ],
+            "updatePoint": {
+                "line": 305,
+                "column": 61
+            },
+            "line": 305,
+            "code": "  it(\"should return rejected promise when passed non function\", function () {\n    return Promise.spawn({}).then(assert.fail, function (err) {\n      assert(err instanceof Promise.TypeError);\n    });\n  });",
+            "file": "mocha/generator.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "1 level",
+            "suites": [
+                "Long stack traces with coroutines as context"
+            ],
+            "updatePoint": {
+                "line": 444,
+                "column": 15
+            },
+            "line": 444,
+            "code": "    it(\"1 level\", function () {\n      return Promise.coroutine(function* () {\n        yield Promise.delay(10);\n        throw new Error();\n      })().then(assert.fail, function (e) {\n        assertLongTrace(e, 1 + 1, [2]);\n      });\n    });",
+            "file": "mocha/generator.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "4 levels",
+            "suites": [
+                "Long stack traces with coroutines as context"
+            ],
+            "updatePoint": {
+                "line": 452,
+                "column": 16
+            },
+            "line": 452,
+            "code": "    it(\"4 levels\", function () {\n      var secondLevel = Promise.coroutine(function* () {\n        yield thirdLevel();\n      });\n      var thirdLevel = Promise.coroutine(function* () {\n        yield fourthLevel();\n      });\n      var fourthLevel = Promise.coroutine(function* () {\n        throw new Error();\n      });\n      return Promise.coroutine(function* () {\n        yield secondLevel();\n      })().then(assert.fail, function (e) {\n        assertLongTrace(e, 4 + 1, [2, 2, 2, 2]);\n      });\n    });",
+            "file": "mocha/generator.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return an independent copy of Bluebird library",
+            "suites": [
+                "Promise.getNewLibraryCopy"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 59
+            },
+            "line": 8,
+            "code": "  it(\"should return an independent copy of Bluebird library\", function () {\n    var Promise2 = Promise.getNewLibraryCopy();\n    Promise2.x = 123;\n    assert.equal(typeof Promise2.prototype.then, \"function\");\n    assert.notEqual(Promise2, Promise);\n    assert.equal(Promise2.x, 123);\n    assert.notEqual(Promise.x, 123);\n  });",
+            "file": "mocha/getNewLibraryCopy.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return copy of Bluebird library with its own getNewLibraryCopy method",
+            "suites": [
+                "Promise.getNewLibraryCopy"
+            ],
+            "updatePoint": {
+                "line": 16,
+                "column": 82
+            },
+            "line": 16,
+            "code": "  it(\"should return copy of Bluebird library with its own getNewLibraryCopy method\", function () {\n    var Promise2 = Promise.getNewLibraryCopy();\n    var Promise3 = Promise2.getNewLibraryCopy();\n    Promise3.x = 123;\n    assert.equal(typeof Promise3.prototype.then, \"function\");\n    assert.notEqual(Promise3, Promise);\n    assert.notEqual(Promise3, Promise2);\n    assert.equal(Promise3.x, 123);\n    assert.notEqual(Promise.x, 123);\n    assert.notEqual(Promise2.x, 123);\n  });",
+            "file": "mocha/getNewLibraryCopy.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return true for trusted promise",
+            "suites": [
+                "Promise.is"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 44
+            },
+            "line": 8,
+            "code": "  it(\"should return true for trusted promise\", function () {\n    assert.strictEqual(Promise.is(new Promise(function () {})), true);\n  });",
+            "file": "mocha/is.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return false for untrusted promise",
+            "suites": [
+                "Promise.is"
+            ],
+            "updatePoint": {
+                "line": 11,
+                "column": 47
+            },
+            "line": 11,
+            "code": "  it(\"should return false for untrusted promise\", function () {\n    assert.strictEqual(Promise.is({\n      then: function () {}\n    }), false);\n  });",
+            "file": "mocha/is.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseCreated",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "simple events API"
+            ],
+            "updatePoint": {
+                "line": 125,
+                "column": 22
+            },
+            "line": 125,
+            "code": "    it(\"promiseCreated\", function () {\n      return testCreated(function (promise) {\n        assert(Promise.is(promise));\n        numCreated++;\n      });\n    });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseChained",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "simple events API"
+            ],
+            "updatePoint": {
+                "line": 131,
+                "column": 22
+            },
+            "line": 131,
+            "code": "    it(\"promiseChained\", function () {\n      return testChained(function (promise, child) {\n        assert(Promise.is(promise));\n        assert(Promise.is(child));\n        numChained++;\n      });\n    });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseRejected",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "simple events API"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 23
+            },
+            "line": 138,
+            "code": "    it(\"promiseRejected\", function () {\n      return testRejected(function (promise) {\n        assert(Promise.is(promise));\n        numRejected++;\n      });\n    });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseFulfilled",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "simple events API"
+            ],
+            "updatePoint": {
+                "line": 144,
+                "column": 24
+            },
+            "line": 144,
+            "code": "    it(\"promiseFulfilled\", function () {\n      return testFulfilled(function (promise) {\n        assert(Promise.is(promise));\n        numFulfilled++;\n      });\n    });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseCreated",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "events API"
+            ],
+            "updatePoint": {
+                "line": 158,
+                "column": 24
+            },
+            "line": 158,
+            "code": "      it(\"promiseCreated\", function () {\n        return testCreated(function (event) {\n          assert(event.type === \"promisecreated\");\n          assert(Promise.is(event.detail.promise));\n          numCreated++;\n        });\n      });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseChained",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "events API"
+            ],
+            "updatePoint": {
+                "line": 165,
+                "column": 24
+            },
+            "line": 165,
+            "code": "      it(\"promiseChained\", function () {\n        return testChained(function (event) {\n          assert(event.type === \"promisechained\");\n          assert(Promise.is(event.detail.promise));\n          assert(Promise.is(event.detail.child));\n          numChained++;\n        });\n      });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseRejected",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "events API"
+            ],
+            "updatePoint": {
+                "line": 173,
+                "column": 25
+            },
+            "line": 173,
+            "code": "      it(\"promiseRejected\", function () {\n        return testRejected(function (event) {\n          numRejected++;\n          assert(event.type === \"promiserejected\");\n          assert(Promise.is(event.detail.promise));\n        });\n      });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "promiseFulfilled",
+            "suites": [
+                "monitoring: promise lifecycle events subscriptions",
+                "events API"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 26
+            },
+            "line": 180,
+            "code": "      it(\"promiseFulfilled\", function () {\n        return testFulfilled(function (event) {\n          numFulfilled++;\n          assert(event.type === \"promisefulfilled\");\n          assert(Promise.is(event.detail.promise));\n        });\n      });",
+            "file": "mocha/monitoring.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calls back with a resolution",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 34
+            },
+            "line": 34,
+            "code": "  it(\"calls back with a resolution\", function () {\n    var spy = sinon.spy();\n    Promise.resolve(10).nodeify(spy);\n    setTimeout(function () {\n      sinon.assert.calledOnce(spy);\n      sinon.assert.calledWith(spy, null, 10);\n    }, 1);\n  });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calls back with an undefined resolution",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 45
+            },
+            "line": 42,
+            "code": "  it(\"calls back with an undefined resolution\", function () {\n    var spy = sinon.spy();\n    Promise.resolve().nodeify(spy);\n    setTimeout(function () {\n      sinon.assert.calledOnce(spy);\n      sinon.assert.calledWithExactly(spy, null);\n    }, 1);\n  });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "calls back with an error",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 30
+            },
+            "line": 50,
+            "code": "  it(\"calls back with an error\", function () {\n    var spy = sinon.spy();\n    Promise.reject(10).nodeify(spy);\n    setTimeout(function () {\n      sinon.assert.calledOnce(spy);\n      sinon.assert.calledWith(spy, 10);\n    }, 1);\n  });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "forwards a promise",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 24
+            },
+            "line": 58,
+            "code": "  it(\"forwards a promise\", function () {\n    return Promise.resolve(10).nodeify().then(function (ten) {\n      assert(10 === ten);\n    });\n  });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "returns undefined when a callback is passed",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 49
+            },
+            "line": 63,
+            "code": "  it(\"returns undefined when a callback is passed\", function () {\n    return 'undefined' === typeof Promise.resolve(10).nodeify(function () {});\n  });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "throws normally in the node process if the function throws",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 78,
+                "column": 66
+            },
+            "line": 78,
+            "code": "    it(\"throws normally in the node process if the function throws\", function () {\n      var promise = Promise.resolve(10);\n      var turns = 0;\n      process.nextTick(function () {\n        turns++;\n      });\n      promise.nodeify(thrower);\n      return awaitGlobalException(function (err) {\n        assert(err === e);\n        assert(turns === 1);\n      });\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "always returns promise for now",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 90,
+                "column": 38
+            },
+            "line": 90,
+            "code": "    it(\"always returns promise for now\", function () {\n      return Promise.resolve(3).nodeify().then(function () {\n        var a = 0;\n        Promise.resolve(3).nodeify(function () {\n          a++;\n        }).then(function () {\n          assert(1 == 1);\n        });\n      });\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should spread arguments with spread option",
+            "suites": [
+                "nodeify"
+            ],
+            "updatePoint": {
+                "line": 100,
+                "column": 50
+            },
+            "line": 100,
+            "code": "    it(\"should spread arguments with spread option\", function () {\n      var spy = getSpy();\n      Promise.resolve([1, 2, 3]).nodeify(spy(function (err, a, b, c) {\n        assert(err === null);\n        assert(a === 1);\n        assert(b === 2);\n        assert(c === 3);\n      }), {\n        spread: true\n      });\n      return spy.promise;\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should wrap arguments with spread option",
+            "suites": [
+                "nodeify",
+                "promise rejected with falsy values"
+            ],
+            "updatePoint": {
+                "line": 158,
+                "column": 48
+            },
+            "line": 158,
+            "code": "    it(\"should wrap arguments with spread option\", function () {\n      var spy = getSpy();\n      Promise.resolve([1, 2, 3]).nodeify(spy(function (err, a, b, c) {\n        assert(err === null);\n        assert(a === 1);\n        assert(b === 2);\n        assert(c === 3);\n      }), {\n        spread: true\n      });\n      return spy.promise;\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work then result is not an array",
+            "suites": [
+                "nodeify",
+                "promise rejected with falsy values"
+            ],
+            "updatePoint": {
+                "line": 170,
+                "column": 47
+            },
+            "line": 170,
+            "code": "    it(\"should work then result is not an array\", function () {\n      var spy = getSpy();\n      Promise.resolve(3).nodeify(spy(function (err, a) {\n        assert(err === null);\n        assert(a === 3);\n      }), {\n        spread: true\n      });\n      return spy.promise;\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work if the callback throws when spread",
+            "suites": [
+                "nodeify",
+                "promise rejected with falsy values"
+            ],
+            "updatePoint": {
+                "line": 180,
+                "column": 54
+            },
+            "line": 180,
+            "code": "    it(\"should work if the callback throws when spread\", function () {\n      var err = new Error();\n      Promise.resolve([1, 2, 3]).nodeify(function (_, a) {\n        throw err;\n      }, {\n        spread: true\n      });\n      return awaitGlobalException(function (e) {\n        assert.strictEqual(err, e);\n      });\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work if the callback throws when rejected",
+            "suites": [
+                "nodeify",
+                "promise rejected with falsy values"
+            ],
+            "updatePoint": {
+                "line": 191,
+                "column": 56
+            },
+            "line": 191,
+            "code": "    it(\"should work if the callback throws when rejected\", function () {\n      var err = new Error();\n      Promise.reject(new Error()).nodeify(function (_, a) {\n        throw err;\n      });\n      return awaitGlobalException(function (e) {\n        assert.strictEqual(err, e);\n      });\n    });",
+            "file": "mocha/nodeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fulfills when passed an empty array",
+            "suites": [
+                "all"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 41
+            },
+            "line": 30,
+            "code": "  it(\"fulfills when passed an empty array\", function () {\n    return Promise.all([]);\n  });",
+            "file": "mocha/promise_array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "supports iterables",
+            "suites": [
+                "all"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 26
+            },
+            "line": 35,
+            "code": "    it(\"supports iterables\", function () {\n      return Promise.all(new Set([1, 2, 3])).then(function (v) {\n        assert.deepEqual([1, 2, 3].sort(), v.sort());\n      });\n    });",
+            "file": "mocha/promise_array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejects after any constituent promise is rejected",
+            "suites": [
+                "all"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 55
+            },
+            "line": 42,
+            "code": "  it(\"rejects after any constituent promise is rejected\", function () {\n    var toResolve = Promise.defer(); // never resolve\n\n    var toReject = Promise.defer();\n    var promises = [toResolve.promise, toReject.promise];\n    var promise = Promise.all(promises);\n    toReject.reject(new Error(\"Rejected\"));\n    promise.then(assert.fail, function (e) {//Unhandled rejection\n    });\n    return Promise.delay(1).then(function () {\n      assert.equal(promise.isRejected(), true);\n    }).timeout(1000);\n  });",
+            "file": "mocha/promise_array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolves foreign thenables",
+            "suites": [
+                "all"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 32
+            },
+            "line": 55,
+            "code": "  it(\"resolves foreign thenables\", function () {\n    var normal = Promise.resolve(1);\n    var foreign = {\n      then: function (f) {\n        f(2);\n      }\n    };\n    return Promise.all([normal, foreign]).then(function (result) {\n      assert.deepEqual(result, [1, 2]);\n    });\n  });",
+            "file": "mocha/promise_array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fulfills when passed an sparse array",
+            "suites": [
+                "all"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 42
+            },
+            "line": 66,
+            "code": "  it(\"fulfills when passed an sparse array\", function () {\n    var toResolve = Promise.defer();\n    var promises = [];\n    promises[0] = Promise.resolve(0);\n    promises[2] = toResolve.promise;\n    var promise = Promise.all(promises);\n    toResolve.resolve(2);\n    return promise.then(function (result) {\n      assert.deepEqual(result, [0, void 0, 2]);\n    });\n  });",
+            "file": "mocha/promise_array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should define methods with the custom suffix",
+            "suites": [
+                "Promisify with custom suffix"
+            ],
+            "updatePoint": {
+                "line": 423,
+                "column": 50
+            },
+            "line": 423,
+            "code": "  it(\"should define methods with the custom suffix\", function () {\n    function Test() {}\n\n    Test.prototype.method = function method() {};\n\n    Promise.promisifyAll(Test.prototype, {\n      suffix: \"$P\"\n    });\n    assert(typeof Test.prototype.method$P == \"function\");\n  });",
+            "file": "mocha/promisify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw on invalid suffix",
+            "suites": [
+                "Promisify with custom suffix"
+            ],
+            "updatePoint": {
+                "line": 433,
+                "column": 36
+            },
+            "line": 433,
+            "code": "  it(\"should throw on invalid suffix\", function () {\n    try {\n      Promise.promisifyAll({}, {\n        suffix: \"\"\n      });\n    } catch (e) {\n      return;\n    }\n\n    assert.fail();\n  });",
+            "file": "mocha/promisify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should promisify module with direct property classes",
+            "suites": [
+                "Module promisification"
+            ],
+            "updatePoint": {
+                "line": 446,
+                "column": 58
+            },
+            "line": 446,
+            "code": "  it(\"should promisify module with direct property classes\", function () {\n    function RedisClient() {}\n\n    RedisClient.prototype.query = function () {};\n\n    function Multi() {}\n\n    Multi.prototype.exec = function () {};\n\n    Multi.staticMethod = function () {};\n\n    var redis = {\n      RedisClient: RedisClient,\n      Multi: Multi,\n      moduleMethod: function () {}\n    };\n\n    redis.Multi.staticMethod.tooDeep = function () {};\n\n    Promise.promisifyAll(redis);\n    assert(typeof redis.moduleMethodAsync === \"function\");\n    assert(typeof redis.Multi.staticMethodAsync === \"function\");\n    assert(typeof redis.Multi.prototype.execAsync === \"function\");\n    assert(typeof redis.RedisClient.prototype.queryAsync === \"function\");\n    assert(typeof redis.Multi.staticMethod.tooDeepAsync === \"undefined\");\n  });",
+            "file": "mocha/promisify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should promisify module with inherited property classes",
+            "suites": [
+                "Module promisification"
+            ],
+            "updatePoint": {
+                "line": 472,
+                "column": 61
+            },
+            "line": 472,
+            "code": "  it(\"should promisify module with inherited property classes\", function () {\n    function Mongoose() {}\n\n    var Model = Mongoose.prototype.Model = function () {};\n\n    Model.prototype.find = function () {};\n\n    var Document = Mongoose.prototype.Document = function () {};\n\n    Document.prototype.create = function () {};\n\n    Document.staticMethod = function () {};\n\n    var mongoose = new Mongoose();\n    Promise.promisifyAll(mongoose);\n    assert(typeof mongoose.Model.prototype.findAsync === \"function\");\n    assert(typeof mongoose.Document.prototype.createAsync === \"function\");\n    assert(typeof mongoose.Document.staticMethodAsync === \"function\");\n  });",
+            "file": "mocha/promisify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should promisify classes that have static methods",
+            "suites": [
+                "Module promisification"
+            ],
+            "updatePoint": {
+                "line": 491,
+                "column": 55
+            },
+            "line": 491,
+            "code": "  it(\"should promisify classes that have static methods\", function () {\n    function MongoClient() {\n      this.connect = 3;\n    }\n\n    MongoClient.connect = function () {};\n\n    var module = {};\n    module.MongoClient = MongoClient;\n    Promise.promisifyAll(module);\n    assert(typeof MongoClient.connectAsync === \"function\");\n  });",
+            "file": "mocha/promisify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "remains forever pending when passed an empty array",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 56
+            },
+            "line": 8,
+            "code": "  it(\"remains forever pending when passed an empty array\", function () {\n    var p = Promise.race([]);\n    return Promise.delay(1).then(function () {\n      assert(p.isPending());\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "remains forever pending when passed an empty sparse array",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 63
+            },
+            "line": 14,
+            "code": "  it(\"remains forever pending when passed an empty sparse array\", function () {\n    var p = Promise.race([,,,,,]);\n    return Promise.delay(1).then(function () {\n      assert(p.isPending());\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fulfills when passed an immediate value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 45
+            },
+            "line": 20,
+            "code": "  it(\"fulfills when passed an immediate value\", function () {\n    return Promise.race([1, 2, 3]).then(function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fulfills when passed an immediately fulfilled value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 57
+            },
+            "line": 25,
+            "code": "  it(\"fulfills when passed an immediately fulfilled value\", function () {\n    var d1 = Promise.defer();\n    d1.fulfill(1);\n    var p1 = d1.promise;\n    var d2 = Promise.defer();\n    d2.fulfill(2);\n    var p2 = d2.promise;\n    var d3 = Promise.defer();\n    d3.fulfill(3);\n    var p3 = d3.promise;\n    return Promise.race([p1, p2, p3]).then(function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fulfills when passed an eventually fulfilled value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 56
+            },
+            "line": 39,
+            "code": "  it(\"fulfills when passed an eventually fulfilled value\", function () {\n    var d1 = Promise.defer();\n    var p1 = d1.promise;\n    var d2 = Promise.defer();\n    var p2 = d2.promise;\n    var d3 = Promise.defer();\n    var p3 = d3.promise;\n    setTimeout(function () {\n      d1.fulfill(1);\n      d2.fulfill(2);\n      d3.fulfill(3);\n    }, 1);\n    return Promise.race([p1, p2, p3]).then(function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejects when passed an immediate value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 44
+            },
+            "line": 55,
+            "code": "  it(\"rejects when passed an immediate value\", function () {\n    return Promise.race([Promise.reject(1), 2, 3]).then(assert.fail, function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejects when passed an immediately rejected value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 55
+            },
+            "line": 60,
+            "code": "  it(\"rejects when passed an immediately rejected value\", function () {\n    var d1 = Promise.defer();\n    d1.reject(1);\n    var p1 = d1.promise;\n    var d2 = Promise.defer();\n    d2.fulfill(2);\n    var p2 = d2.promise;\n    var d3 = Promise.defer();\n    d3.fulfill(3);\n    var p3 = d3.promise;\n    return Promise.race([, p1,, p2,,, p3]).then(assert.fail, function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejects when passed an eventually rejected value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 54
+            },
+            "line": 74,
+            "code": "  it(\"rejects when passed an eventually rejected value\", function () {\n    var d1 = Promise.defer();\n    var p1 = d1.promise;\n    var d2 = Promise.defer();\n    var p2 = d2.promise;\n    var d3 = Promise.defer();\n    var p3 = d3.promise;\n    setTimeout(function () {\n      d1.reject(1);\n      d2.fulfill(2);\n      d3.fulfill(3);\n    }, 1);\n    return Promise.race([p1, p2, p3]).then(assert.fail, function (v) {\n      assert.deepEqual(v, 1);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates bound value",
+            "suites": [
+                "Promise.race"
+            ],
+            "updatePoint": {
+                "line": 90,
+                "column": 28
+            },
+            "line": 90,
+            "code": "  it(\"propagates bound value\", function () {\n    var o = {};\n    return Promise.resolve([1]).bind(o).race().then(function (v) {\n      assert(v === 1);\n      assert(this === o);\n    });\n  });",
+            "file": "mocha/race.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works with no values",
+            "suites": [
+                "Promise.prototype.reduce"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 26
+            },
+            "line": 115,
+            "code": "  it(\"works with no values\", function () {\n    return Promise.resolve([]).reduce(function (total, value) {\n      return total + value + 5;\n    }).then(function (total) {\n      assert.strictEqual(total, undefined);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works with a single value",
+            "suites": [
+                "Promise.prototype.reduce"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 31
+            },
+            "line": 122,
+            "code": "  it(\"works with a single value\", function () {\n    return Promise.resolve([1]).reduce(function (total, value) {\n      return total + value + 5;\n    }).then(function (total) {\n      assert.strictEqual(total, 1);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a value",
+            "suites": [
+                "Promise.prototype.reduce"
+            ],
+            "updatePoint": {
+                "line": 129,
+                "column": 45
+            },
+            "line": 129,
+            "code": "  it(\"works when the iterator returns a value\", function () {\n    return Promise.resolve([1, 2, 3]).reduce(function (total, value) {\n      return total + value + 5;\n    }).then(function (total) {\n      assert.strictEqual(total, 1 + 2 + 5 + 3 + 5);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a Promise",
+            "suites": [
+                "Promise.prototype.reduce"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 47
+            },
+            "line": 136,
+            "code": "  it(\"works when the iterator returns a Promise\", function () {\n    return Promise.resolve([1, 2, 3]).reduce(function (total, value) {\n      return promised(5).then(function (bonus) {\n        return total + value + bonus;\n      });\n    }).then(function (total) {\n      assert.strictEqual(total, 1 + 2 + 5 + 3 + 5);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a thenable",
+            "suites": [
+                "Promise.prototype.reduce"
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 48
+            },
+            "line": 145,
+            "code": "  it(\"works when the iterator returns a thenable\", function () {\n    return Promise.resolve([1, 2, 3]).reduce(function (total, value) {\n      return thenabled(total + value + 5);\n    }).then(function (total) {\n      assert.strictEqual(total, 1 + 2 + 5 + 3 + 5);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow returning values",
+            "suites": [
+                "Promise.reduce"
+            ],
+            "updatePoint": {
+                "line": 154,
+                "column": 35
+            },
+            "line": 154,
+            "code": "  it(\"should allow returning values\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    return Promise.reduce(a, function (total, a) {\n      return total + a + 5;\n    }, 0).then(function (total) {\n      assert.equal(total, 1 + 5 + 2 + 5 + 3 + 5);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow returning promises",
+            "suites": [
+                "Promise.reduce"
+            ],
+            "updatePoint": {
+                "line": 162,
+                "column": 37
+            },
+            "line": 162,
+            "code": "  it(\"should allow returning promises\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    return Promise.reduce(a, function (total, a) {\n      return promised(5).then(function (b) {\n        return total + a + b;\n      });\n    }, 0).then(function (total) {\n      assert.equal(total, 1 + 5 + 2 + 5 + 3 + 5);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow returning thenables",
+            "suites": [
+                "Promise.reduce"
+            ],
+            "updatePoint": {
+                "line": 172,
+                "column": 38
+            },
+            "line": 172,
+            "code": "  it(\"should allow returning thenables\", function () {\n    var b = [1, 2, 3];\n    var a = [];\n    return Promise.reduce(b, function (total, cur) {\n      a.push(cur);\n      return thenabled(3);\n    }, 0).then(function (total) {\n      assert.equal(total, 3);\n      assert.deepEqual(a, b);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates error",
+            "suites": [
+                "Promise.reduce"
+            ],
+            "updatePoint": {
+                "line": 183,
+                "column": 22
+            },
+            "line": 183,
+            "code": "  it(\"propagates error\", function () {\n    var a = [promised(1), promised(2), promised(3)];\n    var e = new Error(\"asd\");\n    return Promise.reduce(a, function (total, a) {\n      if (a > 2) {\n        throw e;\n      }\n\n      return total + a + 5;\n    }, 0).then(assert.fail, function (err) {\n      assert.equal(err, e);\n    });\n  });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a value",
+            "suites": [
+                "Promise.reduce",
+                "with no initial accumulator or values"
+            ],
+            "updatePoint": {
+                "line": 197,
+                "column": 47
+            },
+            "line": 197,
+            "code": "    it(\"works when the iterator returns a value\", function () {\n      return Promise.reduce([], function (total, value) {\n        return total + value + 5;\n      }).then(function (total) {\n        assert.strictEqual(total, undefined);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a Promise",
+            "suites": [
+                "Promise.reduce",
+                "with no initial accumulator or values"
+            ],
+            "updatePoint": {
+                "line": 204,
+                "column": 49
+            },
+            "line": 204,
+            "code": "    it(\"works when the iterator returns a Promise\", function () {\n      return Promise.reduce([], function (total, value) {\n        return promised(5).then(function (bonus) {\n          return total + value + bonus;\n        });\n      }).then(function (total) {\n        assert.strictEqual(total, undefined);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a thenable",
+            "suites": [
+                "Promise.reduce",
+                "with no initial accumulator or values"
+            ],
+            "updatePoint": {
+                "line": 213,
+                "column": 50
+            },
+            "line": 213,
+            "code": "    it(\"works when the iterator returns a thenable\", function () {\n      return Promise.reduce([], function (total, value) {\n        return thenabled(total + value + 5);\n      }).then(function (total) {\n        assert.strictEqual(total, undefined);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a value",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 229,
+                "column": 55
+            },
+            "line": 229,
+            "code": "            it(\"works when the iterator returns a value\", function () {\n              return Promise.reduce(evaluate(values), function (total, value) {\n                return total + value + 5;\n              }, evaluate(initial)).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a Promise",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 236,
+                "column": 57
+            },
+            "line": 236,
+            "code": "            it(\"works when the iterator returns a Promise\", function () {\n              return Promise.reduce(evaluate(values), function (total, value) {\n                return promised(5).then(function (bonus) {\n                  return total + value + bonus;\n                });\n              }, evaluate(initial)).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a thenable",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 245,
+                "column": 58
+            },
+            "line": 245,
+            "code": "            it(\"works when the iterator returns a thenable\", function () {\n              return Promise.reduce(evaluate(values), function (total, value) {\n                return thenabled(total + value + 5);\n              }, evaluate(initial)).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates an initial Error",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 256,
+                "column": 35
+            },
+            "line": 256,
+            "code": "    it(\"propagates an initial Error\", function () {\n      var initial = Promise.reject(ERROR);\n      var values = [thenabling(1), promisingThen(2)(), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        return value;\n      }, initial).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates a value's Error",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 265,
+                "column": 34
+            },
+            "line": 265,
+            "code": "    it(\"propagates a value's Error\", function () {\n      var initial = 0;\n      var values = [thenabling(1), promisingThen(2)(), Promise.reject(ERROR), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        return value;\n      }, initial).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates an Error from the iterator",
+            "suites": [
+                "Promise.reduce",
+                "with an initial accumulator value"
+            ],
+            "updatePoint": {
+                "line": 274,
+                "column": 45
+            },
+            "line": 274,
+            "code": "    it(\"propagates an Error from the iterator\", function () {\n      var initial = 0;\n      var values = [thenabling(1), promisingThen(2)(), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        if (value === 2) {\n          throw ERROR;\n        }\n\n        return value;\n      }, initial).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "acts this way when an accumulator value is provided yet `undefined`",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 289,
+                "column": 75
+            },
+            "line": 289,
+            "code": "    it(\"acts this way when an accumulator value is provided yet `undefined`\", function () {\n      return Promise.reduce([1, 2, 3], function (total, value) {\n        return (total === void 0 ? 0 : total) + value + 5;\n      }, undefined).then(function (total) {\n        assert.strictEqual(total, 1 + 2 + 5 + 3 + 5);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "survives an `undefined` 0th value",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 296,
+                "column": 41
+            },
+            "line": 296,
+            "code": "    it(\"survives an `undefined` 0th value\", function () {\n      return Promise.reduce([undefined, 1, 2, 3], function (total, value) {\n        return (total === void 0 ? 0 : total) + value + 5;\n      }).then(function (total) {\n        assert.strictEqual(total, 1 + 5 + 2 + 5 + 3 + 5);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a value",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 311,
+                "column": 55
+            },
+            "line": 311,
+            "code": "            it(\"works when the iterator returns a value\", function () {\n              return Promise.reduce(evaluate(zerothAndValues), function (total, value) {\n                return total + value + 5;\n              }).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a Promise",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 318,
+                "column": 57
+            },
+            "line": 318,
+            "code": "            it(\"works when the iterator returns a Promise\", function () {\n              return Promise.reduce(evaluate(zerothAndValues), function (total, value) {\n                return promised(5).then(function (bonus) {\n                  return total + value + bonus;\n                });\n              }).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works when the iterator returns a thenable",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 327,
+                "column": 58
+            },
+            "line": 327,
+            "code": "            it(\"works when the iterator returns a thenable\", function () {\n              return Promise.reduce(evaluate(zerothAndValues), function (total, value) {\n                return thenabled(total + value + 5);\n              }).then(function (total) {\n                assert.strictEqual(total, valueTotal + values.length * 5);\n              });\n            });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates an initial Error",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 338,
+                "column": 35
+            },
+            "line": 338,
+            "code": "    it(\"propagates an initial Error\", function () {\n      var values = [Promise.reject(ERROR), thenabling(1), promisingThen(2)(), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        return value;\n      }).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates a value's Error",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 346,
+                "column": 34
+            },
+            "line": 346,
+            "code": "    it(\"propagates a value's Error\", function () {\n      var values = [0, thenabling(1), promisingThen(2)(), Promise.reject(ERROR), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        return value;\n      }).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagates an Error from the iterator",
+            "suites": [
+                "Promise.reduce",
+                "with a 0th value acting as an accumulator"
+            ],
+            "updatePoint": {
+                "line": 354,
+                "column": 45
+            },
+            "line": 354,
+            "code": "    it(\"propagates an Error from the iterator\", function () {\n      var values = [0, thenabling(1), promisingThen(2)(), promised(3), 4];\n      return Promise.reduce(values, function (total, value) {\n        if (value === 2) {\n          throw ERROR;\n        }\n\n        return value;\n      }).then(assert.fail, function (err) {\n        assert.equal(err, ERROR);\n      });\n    });",
+            "file": "mocha/reduce.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagate through then with no callback",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 47
+            },
+            "line": 120,
+            "code": "    it(\"propagate through then with no callback\", function () {\n        return Promise.resolve(10)\n        .then()\n        .then(function (ten) {\n            assert.equal(ten,10);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "propagate through then with modifying callback",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 128,
+                "column": 54
+            },
+            "line": 128,
+            "code": "    it(\"propagate through then with modifying callback\", function () {\n        return Promise.resolve(10)\n        .then(function (ten) {\n            return ten + 10;\n        })\n        .then(function (twen) {\n            assert.equal(twen,20);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "errback recovers from exception",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 39
+            },
+            "line": 138,
+            "code": "    it(\"errback recovers from exception\", function () {\n        var error = new Error(\"Bah!\");\n        return Promise.reject(error)\n        .then(null, function (_error) {\n            assert.equal(_error,error);\n            return 10;\n        })\n        .then(function (value) {\n            assert.equal(value,10);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejection propagates through then with no errback",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 150,
+                "column": 57
+            },
+            "line": 150,
+            "code": "    it(\"rejection propagates through then with no errback\", function () {\n        var error = new Error(\"Foolish mortals!\");\n        return Promise.reject(error)\n        .then()\n        .then(null, function (_error) {\n            assert.equal(_error,error);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "rejection intercepted and rethrown",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 159,
+                "column": 42
+            },
+            "line": 159,
+            "code": "    it(\"rejection intercepted and rethrown\", function () {\n        var error = new Error(\"Foolish mortals!\");\n        var nextError = new Error(\"Silly humans!\");\n        return Promise.reject(error)\n        .caught(function () {\n            throw nextError;\n        })\n        .then(null, function (_error) {\n            assert.equal(_error,nextError);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolution is forwarded through deferred promise",
+            "suites": [
+                "propagation"
+            ],
+            "updatePoint": {
+                "line": 171,
+                "column": 56
+            },
+            "line": 171,
+            "code": "    it(\"resolution is forwarded through deferred promise\", function () {\n        var a = Promise.defer();\n        var b = Promise.defer();\n        a.resolve(b.promise);\n        b.resolve(10);\n        return a.promise.then(function (eh) {\n            assert.equal(eh, 10);\n        });\n    });",
+            "file": "mocha/resolution.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should preserve the active domain",
+            "suites": [
+                "schedule",
+                "for Node.js"
+            ],
+            "updatePoint": {
+                "line": 13,
+                "column": 43
+            },
+            "line": 13,
+            "code": "      it(\"should preserve the active domain\", function () {\n        var domain = require(\"domain\");\n\n        var activeDomain = domain.create();\n        return new Promise(function (resolve) {\n          activeDomain.run(function () {\n            schedule(function () {\n              assert(domain.active);\n              assert.equal(domain.active, activeDomain);\n              resolve();\n            });\n          });\n        });\n      });",
+            "file": "mocha/schedule.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work with synchronous scheduler",
+            "suites": [
+                "schedule",
+                "Promise.setScheduler"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 48
+            },
+            "line": 29,
+            "code": "      it(\"should work with synchronous scheduler\", function () {\n        var prev = Promise.setScheduler(function (task) {\n          task();\n        });\n        var success = false;\n        Promise.resolve().then(function () {\n          success = true;\n        });\n        assert(success);\n        Promise.setScheduler(prev);\n      });",
+            "file": "mocha/schedule.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw for non function",
+            "suites": [
+                "schedule",
+                "Promise.setScheduler"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 39
+            },
+            "line": 40,
+            "code": "      it(\"should throw for non function\", function () {\n        try {\n          Promise.setScheduler({});\n        } catch (e) {\n          return Promise.resolve();\n        }\n\n        assert.fail();\n      });",
+            "file": "mocha/schedule.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "works on an empty array",
+            "suites": [
+                "allSettled"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 29
+            },
+            "line": 30,
+            "code": "  it(\"works on an empty array\", function () {\n    return Promise.settle([]).then(function (snapshots) {\n      assert.deepEqual(snapshots, []);\n    });\n  });",
+            "file": "mocha/settle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "deals with a mix of non-promises and promises",
+            "suites": [
+                "allSettled"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 51
+            },
+            "line": 35,
+            "code": "  it(\"deals with a mix of non-promises and promises\", function () {\n    return Promise.settle([1, Promise.resolve(2), Promise.reject(3)]).then(function (snapshots) {\n      assert.equal(snapshots[0].value(), 1);\n      assert.equal(snapshots[1].value(), 2);\n      assert.equal(snapshots[2].error(), 3);\n    });\n  });",
+            "file": "mocha/settle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "is settled after every constituent promise is settled",
+            "suites": [
+                "allSettled"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 59
+            },
+            "line": 42,
+            "code": "  it(\"is settled after every constituent promise is settled\", function () {\n    var toFulfill = Promise.defer();\n    var toReject = Promise.defer();\n    var promises = [toFulfill.promise, toReject.promise];\n    var fulfilled;\n    var rejected;\n    Promise.attempt(function () {\n      toReject.reject();\n      rejected = true;\n    }).delay(1).then(function () {\n      toFulfill.resolve();\n      fulfilled = true;\n    });\n    return Promise.settle(promises).then(function () {\n      assert.equal(fulfilled, true);\n      assert.equal(rejected, true);\n    });\n  });",
+            "file": "mocha/settle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "does not modify the input array",
+            "suites": [
+                "allSettled"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 37
+            },
+            "line": 60,
+            "code": "  it(\"does not modify the input array\", function () {\n    var input = [1, Promise.resolve(2), Promise.reject(3)];\n    return Promise.settle(input).then(function (snapshots) {\n      assert.notEqual(snapshots, input);\n      assert.equal(snapshots[0].value(), 1);\n      assert.equal(snapshots[1].value(), 2);\n      assert.equal(snapshots[2].error(), 3);\n    });\n  });",
+            "file": "mocha/settle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject on negative number",
+            "suites": [
+                "Promise.some"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 38
+            },
+            "line": 8,
+            "code": "  it(\"should reject on negative number\", function () {\n    return Promise.some([1, 2, 3], -1).then(assert.fail).caught(Promise.TypeError, function () {});\n  });",
+            "file": "mocha/some.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject on NaN",
+            "suites": [
+                "Promise.some"
+            ],
+            "updatePoint": {
+                "line": 11,
+                "column": 26
+            },
+            "line": 11,
+            "code": "  it(\"should reject on NaN\", function () {\n    return Promise.some([1, 2, 3], -0 / 0).then(assert.fail).caught(Promise.TypeError, function () {});\n  });",
+            "file": "mocha/some.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject on non-array",
+            "suites": [
+                "Promise.some"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 32
+            },
+            "line": 14,
+            "code": "  it(\"should reject on non-array\", function () {\n    return Promise.some({}, 2).then(assert.fail).caught(Promise.TypeError, function () {});\n  });",
+            "file": "mocha/some.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with rangeerror when impossible to fulfill",
+            "suites": [
+                "Promise.some"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 62
+            },
+            "line": 17,
+            "code": "  it(\"should reject with rangeerror when impossible to fulfill\", function () {\n    return Promise.some([1, 2, 3], 4).then(assert.fail).caught(Promise.RangeError, function (e) {});\n  });",
+            "file": "mocha/some.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fulfill with empty array with 0",
+            "suites": [
+                "Promise.some"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 44
+            },
+            "line": 20,
+            "code": "  it(\"should fulfill with empty array with 0\", function () {\n    return Promise.some([1, 2, 3], 0).then(function (result) {\n      assert.deepEqual(result, []);\n    });\n  });",
+            "file": "mocha/some.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "spreads values across arguments",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 37
+            },
+            "line": 30,
+            "code": "  it(\"spreads values across arguments\", function () {\n    return Promise.resolve([1, 2, 3]).spread(function (a, b) {\n      assert.equal(b, 2);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "spreads promises for arrays across arguments",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 50
+            },
+            "line": 35,
+            "code": "  it(\"spreads promises for arrays across arguments\", function () {\n    return Promise.resolve([Promise.resolve(10)]).all().spread(function (value) {\n      assert.equal(value, 10);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "spreads arrays of promises across arguments",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 49
+            },
+            "line": 40,
+            "code": "  it(\"spreads arrays of promises across arguments\", function () {\n    var deferredA = Promise.defer();\n    var deferredB = Promise.defer();\n    var promise = Promise.resolve([deferredA.promise, deferredB.promise]).all().spread(function (a, b) {\n      assert.equal(a, 10);\n      assert.equal(b, 20);\n    });\n    Promise.delay(1).then(function () {\n      deferredA.resolve(10);\n    });\n    Promise.delay(1).then(function () {\n      deferredB.resolve(20);\n    });\n    return promise;\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "spreads arrays of thenables across arguments",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 50
+            },
+            "line": 55,
+            "code": "  it(\"spreads arrays of thenables across arguments\", function () {\n    var p1 = {\n      then: function (v) {\n        v(10);\n      }\n    };\n    var p2 = {\n      then: function (v) {\n        v(20);\n      }\n    };\n    var promise = Promise.resolve([p1, p2]).all().spread(function (a, b) {\n      assert.equal(a, 10);\n      assert.equal(b, 20);\n    });\n    return promise;\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should wait for promises in the returned array even when not calling .all",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 79
+            },
+            "line": 72,
+            "code": "  it(\"should wait for promises in the returned array even when not calling .all\", function () {\n    var d1 = Promise.defer();\n    var d2 = Promise.defer();\n    var d3 = Promise.defer();\n    setTimeout(function () {\n      d1.resolve(1);\n      d2.resolve(2);\n      d3.resolve(3);\n    }, 1);\n    return Promise.resolve().then(function () {\n      return [d1.promise, d2.promise, d3.promise];\n    }).all().spread(function (a, b, c) {\n      assert(a === 1);\n      assert(b === 2);\n      assert(c === 3);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should wait for thenables in the returned array even when not calling .all",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 80
+            },
+            "line": 89,
+            "code": "  it(\"should wait for thenables in the returned array even when not calling .all\", function () {\n    var t1 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(1);\n        }, 1);\n      }\n    };\n    var t2 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(2);\n        }, 1);\n      }\n    };\n    var t3 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(3);\n        }, 1);\n      }\n    };\n    return Promise.resolve().then(function () {\n      return [t1, t2, t3];\n    }).all().spread(function (a, b, c) {\n      assert(a === 1);\n      assert(b === 2);\n      assert(c === 3);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should wait for promises in an array that a returned promise resolves to even when not calling .all",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 119,
+                "column": 105
+            },
+            "line": 119,
+            "code": "  it(\"should wait for promises in an array that a returned promise resolves to even when not calling .all\", function () {\n    var d1 = Promise.defer();\n    var d2 = Promise.defer();\n    var d3 = Promise.defer();\n    var defer = Promise.defer();\n    setTimeout(function () {\n      defer.resolve([d1.promise, d2.promise, d3.promise]);\n      setTimeout(function () {\n        d1.resolve(1);\n        d2.resolve(2);\n        d3.resolve(3);\n      }, 1);\n    }, 1);\n    return Promise.resolve().then(function () {\n      return defer.promise;\n    }).all().spread(function (a, b, c) {\n      assert(a === 1);\n      assert(b === 2);\n      assert(c === 3);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should wait for thenables in an array that a returned thenable resolves to even when not calling .all",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 140,
+                "column": 107
+            },
+            "line": 140,
+            "code": "  it(\"should wait for thenables in an array that a returned thenable resolves to even when not calling .all\", function () {\n    var t1 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(1);\n        }, 1);\n      }\n    };\n    var t2 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(2);\n        }, 1);\n      }\n    };\n    var t3 = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn(3);\n        }, 1);\n      }\n    };\n    var thenable = {\n      then: function (fn) {\n        setTimeout(function () {\n          fn([t1, t2, t3]);\n        }, 1);\n      }\n    };\n    return Promise.resolve().then(function () {\n      return thenable;\n    }).all().spread(function (a, b, c) {\n      assert(a === 1);\n      assert(b === 2);\n      assert(c === 3);\n    });\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with error when non array is the ultimate value to be spread",
+            "suites": [
+                "spread"
+            ],
+            "updatePoint": {
+                "line": 177,
+                "column": 80
+            },
+            "line": 177,
+            "code": "  it(\"should reject with error when non array is the ultimate value to be spread\", function () {\n    return Promise.resolve().then(function () {\n      return 3;\n    }).spread(function (a, b, c) {\n      assert.fail();\n    }).then(assert.fail, function (e) {});\n  });",
+            "file": "mocha/spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match pending state",
+            "suites": [
+                "Promise.prototype.toJSON"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 32
+            },
+            "line": 8,
+            "code": "  it(\"should match pending state\", function () {\n    var a = new Promise(function () {}).toJSON();\n    assert.strictEqual(a.isFulfilled, false);\n    assert.strictEqual(a.isRejected, false);\n    assert.strictEqual(a.rejectionReason, undefined);\n    assert.strictEqual(a.fulfillmentValue, undefined);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match rejected state",
+            "suites": [
+                "Promise.prototype.toJSON"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 33
+            },
+            "line": 15,
+            "code": "  it(\"should match rejected state\", function () {\n    var a = Promise.reject(3).toJSON();\n    assert.strictEqual(a.isFulfilled, false);\n    assert.strictEqual(a.isRejected, true);\n    assert.strictEqual(a.rejectionReason, 3);\n    assert.strictEqual(a.fulfillmentValue, undefined);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match fulfilled state",
+            "suites": [
+                "Promise.prototype.toJSON"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 34
+            },
+            "line": 22,
+            "code": "  it(\"should match fulfilled state\", function () {\n    var a = Promise.resolve(3).toJSON();\n    assert.strictEqual(a.isFulfilled, true);\n    assert.strictEqual(a.isRejected, false);\n    assert.strictEqual(a.rejectionReason, undefined);\n    assert.strictEqual(a.fulfillmentValue, 3);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a fulfilled promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 29
+            },
+            "line": 58,
+            "code": "  it(\"for a fulfilled promise\", function () {\n    var ret = Promise.resolve(10);\n    assert.equal(ret.value(), 10);\n    assert.equal(ret.isFulfilled(), true);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a rejected promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 28
+            },
+            "line": 63,
+            "code": "  it(\"for a rejected promise\", function () {\n    var e = new Error(\"In your face.\");\n    var ret = Promise.reject(e);\n    assert.equal(ret.reason(), e);\n    assert.equal(ret.isRejected(), true);\n    return ret.then(assert.fail, function () {});\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a pending, unresolved promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 70,
+                "column": 39
+            },
+            "line": 70,
+            "code": "  it(\"for a pending, unresolved promise\", function () {\n    var pending = Promise.defer().promise;\n    assert.equal(pending.isPending(), true);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a promise resolved to a rejected promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 50
+            },
+            "line": 74,
+            "code": "  it(\"for a promise resolved to a rejected promise\", function () {\n    var deferred = Promise.defer();\n    var error = new Error(\"Rejected!\");\n    var reject = Promise.reject(error);\n    deferred.resolve(reject);\n    assert.equal(deferred.promise.isRejected(), true);\n    assert.equal(deferred.promise.reason(), error);\n    return deferred.promise.then(assert.fail, function () {});\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a promise resolved to a fulfilled promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 83,
+                "column": 51
+            },
+            "line": 83,
+            "code": "  it(\"for a promise resolved to a fulfilled promise\", function () {\n    var deferred = Promise.defer();\n    var fulfilled = Promise.resolve(10);\n    deferred.resolve(fulfilled);\n    assert.equal(deferred.promise.isFulfilled(), true);\n    assert.equal(deferred.promise.value(), 10);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "for a promise resolved to a pending promise",
+            "suites": [
+                "inspect"
+            ],
+            "updatePoint": {
+                "line": 90,
+                "column": 49
+            },
+            "line": 90,
+            "code": "  it(\"for a promise resolved to a pending promise\", function () {\n    var a = Promise.defer();\n    var b = Promise.defer();\n    a.resolve(b.promise);\n    assert.equal(a.promise.isPending(), true);\n  });",
+            "file": "mocha/synchronous_inspection.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should do nothing if the promise fulfills quickly",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 55
+            },
+            "line": 34,
+            "code": "  it(\"should do nothing if the promise fulfills quickly\", function () {\n    Promise.delay(1).timeout(200).then(function () {});\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should do nothing if the promise rejects quickly",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 54
+            },
+            "line": 37,
+            "code": "  it(\"should do nothing if the promise rejects quickly\", function () {\n    var goodError = new Error(\"haha!\");\n    return Promise.delay(1).then(function () {\n      throw goodError;\n    }).timeout(200).then(undefined, function (error) {\n      assert(error === goodError);\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with a timeout error if the promise is too slow",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 67
+            },
+            "line": 45,
+            "code": "  it(\"should reject with a timeout error if the promise is too slow\", function () {\n    return Promise.delay(1).timeout(10).caught(Promise.TimeoutError, function () {});\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with a custom timeout error if the promise is too slow and msg was provided",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 48,
+                "column": 95
+            },
+            "line": 48,
+            "code": "  it(\"should reject with a custom timeout error if the promise is too slow and msg was provided\", function () {\n    return Promise.delay(1).timeout(10, \"custom\").caught(Promise.TimeoutError, function (e) {\n      assert(/custom/i.test(e.message));\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should cancel the parent promise once the timeout expires",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 53,
+                "column": 63
+            },
+            "line": 53,
+            "code": "  it(\"should cancel the parent promise once the timeout expires\", function () {\n    var didNotExecute = true;\n    var wasRejectedWithTimeout = false;\n    var p = Promise.delay(22).then(function () {\n      didNotExecute = false;\n    });\n    p.timeout(11).thenReturn(10).caught(Promise.TimeoutError, function (e) {\n      wasRejectedWithTimeout = true;\n    });\n    return Promise.delay(33).then(function () {\n      assert(didNotExecute, \"parent promise was not cancelled\");\n      assert(wasRejectedWithTimeout, \"promise was not rejected with timeout\");\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not cancel the parent promise if there are multiple consumers",
+            "suites": [
+                "timeout"
+            ],
+            "updatePoint": {
+                "line": 67,
+                "column": 74
+            },
+            "line": 67,
+            "code": "  it(\"should not cancel the parent promise if there are multiple consumers\", function () {\n    var derivedNotCancelled = false;\n    var p = Promise.delay(22);\n    var derived = p.then(function () {\n      derivedNotCancelled = true;\n    });\n    p.timeout(11).thenReturn(10);\n    return Promise.delay(33).then(function () {\n      assert(derivedNotCancelled, \"derived promise was cancelled\");\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should clear timeouts with proper handle type when fulfilled",
+            "suites": [
+                "timeout",
+                "timer handle clearouts"
+            ],
+            "updatePoint": {
+                "line": 106,
+                "column": 70
+            },
+            "line": 106,
+            "code": "      it(\"should clear timeouts with proper handle type when fulfilled\", function () {\n        var old = globalObject.clearTimeout;\n        var handleType = \"empty\";\n\n        globalObject.clearTimeout = function (handle) {\n          handleType = typeof handle;\n          globalObject.clearTimeout = old;\n        };\n\n        return Promise.delay(1).timeout(10000).then(function () {\n          assert.strictEqual(expectedHandleType, handleType);\n        });\n      });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should clear timeouts with proper handle type when rejected",
+            "suites": [
+                "timeout",
+                "timer handle clearouts"
+            ],
+            "updatePoint": {
+                "line": 119,
+                "column": 69
+            },
+            "line": 119,
+            "code": "      it(\"should clear timeouts with proper handle type when rejected\", function () {\n        var old = globalObject.clearTimeout;\n        var handleType = \"empty\";\n\n        globalObject.clearTimeout = function (handle) {\n          handleType = typeof handle;\n          globalObject.clearTimeout = old;\n        };\n\n        return new Promise(function (_, reject) {\n          setTimeout(reject, 10);\n        }).timeout(10000).then(null, function () {\n          assert.strictEqual(expectedHandleType, handleType);\n        });\n      });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not delay rejection",
+            "suites": [
+                "delay"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 32
+            },
+            "line": 138,
+            "code": "  it(\"should not delay rejection\", function () {\n    var promise = Promise.reject(5).delay(1);\n    promise.then(assert.fail, function () {});\n    return Promise.delay(1).then(function () {\n      assert(!promise.isPending());\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should delay after resolution",
+            "suites": [
+                "delay"
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 35
+            },
+            "line": 145,
+            "code": "  it(\"should delay after resolution\", function () {\n    var promise1 = Promise.delay(1, \"what\");\n    var promise2 = promise1.delay(1);\n    return promise2.then(function (value) {\n      assert(value === \"what\");\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve follower promise's value",
+            "suites": [
+                "delay"
+            ],
+            "updatePoint": {
+                "line": 152,
+                "column": 45
+            },
+            "line": 152,
+            "code": "  it(\"should resolve follower promise's value\", function () {\n    var resolveF;\n    var f = new Promise(function () {\n      resolveF = arguments[0];\n    });\n    var v = new Promise(function (f) {\n      setTimeout(function () {\n        f(3);\n      }, 1);\n    });\n    resolveF(v);\n    return Promise.delay(1, f).then(function (value) {\n      assert.equal(value, 3);\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject with a custom error if an error was provided as a parameter",
+            "suites": [
+                "delay"
+            ],
+            "updatePoint": {
+                "line": 167,
+                "column": 79
+            },
+            "line": 167,
+            "code": "  it(\"should reject with a custom error if an error was provided as a parameter\", function () {\n    var err = Error(\"Testing Errors\");\n    return Promise.delay(1).timeout(10, err).caught(function (e) {\n      assert(e === err);\n    });\n  });",
+            "file": "mocha/timers.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "petkaantonov__bluebird.svg"
+}

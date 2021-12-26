@@ -1,0 +1,2901 @@
+{
+    "repo": "deployd/deployd",
+    "url": "https://github.com/deployd/deployd",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "deployd",
+            "lang": "js",
+            "dir": "test",
+            "framework": "mocha",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "should start a new deployd server",
+            "suites": [
+                "attach",
+                "overall"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 41
+            },
+            "line": 60,
+            "code": "    it('should start a new deployd server', function () {\n      var server = attach(fakeHttpServer, opts);\n      server.listen();\n      expect(server.db instanceof Db).to.equal(true);\n      expect(server.options).to.eql(opts);\n    });",
+            "file": "attach.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": ".createStore(namespace): should create a store with the given name",
+            "suites": [
+                "attach",
+                "overall"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 74
+            },
+            "line": 66,
+            "code": "    it('.createStore(namespace): should create a store with the given name', function () {\n      var server = attach(fakeHttpServer, opts),\n          store = server.createStore('foo');\n      expect(store instanceof Store).to.equal(true);\n      expect(server.stores.foo).to.equal(store);\n    });",
+            "file": "attach.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": ".route(): should be on the prototype",
+            "suites": [
+                "attach",
+                "overall"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 44
+            },
+            "line": 72,
+            "code": "    it('.route(): should be on the prototype', function () {\n      var server = attach(fakeHttpServer, opts);\n      expect(typeof server.route).to.equal('function');\n      expect(server.route.toString()).to.contain('req, res');\n    });",
+            "file": "attach.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": ".route(): should call config.loadConfig",
+            "suites": [
+                "attach",
+                "overall"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 47
+            },
+            "line": 77,
+            "code": "    it('.route(): should call config.loadConfig', function () {\n      var server = attach(fakeHttpServer, opts);\n      var req = {\n        url: 'foo'\n      };\n      var res = {\n        body: 'bar'\n      };\n      configLoader.loadConfig = sinon.spy();\n      server.route(req, res);\n      expect(configLoader.loadConfig.callCount).to.equal(1);\n    });",
+            "file": "attach.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": ".handleRequest(): should set a resources array on the server",
+            "suites": [
+                "attach",
+                "overall"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 68
+            },
+            "line": 89,
+            "code": "    it('.handleRequest(): should set a resources array on the server', function () {\n      var server = attach(fakeHttpServer, opts);\n      var req = {\n        url: 'foo',\n        headers: {\n          accept: '*'\n        }\n      };\n      var res = {\n        body: 'bar',\n        on: function () {}\n      };\n\n      configLoader.loadConfig = function (path, server, callback) {\n        callback.call(server, null, ['foo']);\n      };\n\n      expect(Array.isArray(server.resources)).to.equal(false);\n      server.route(req, res);\n      expect(Array.isArray(server.resources)).to.equal(true);\n    });",
+            "file": "attach.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should validate the request",
+            "suites": [
+                "collection",
+                ".validate(req)"
+            ],
+            "updatePoint": {
+                "line": 14,
+                "column": 35
+            },
+            "line": 14,
+            "code": "    it('should validate the request', function() {\n      var r = createCollection({\n        title: {\n          type: 'string'\n        }\n      });\n\n      var errs = r.validate({title: 'foobar'});\n\n      expect(errs).to.not.exist;\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fail to validate the invalid request",
+            "suites": [
+                "collection",
+                ".validate(req)"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 51
+            },
+            "line": 26,
+            "code": "    it('should fail to validate the invalid request', function() {\n      var r = createCollection({\n        title: {\n          type: 'string'\n        }\n      });\n\n      var errs = r.validate({title: 7});\n\n      expect(errs).to.eql({'title': 'must be a string'});\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fail to validate the invalid request with multiple errors",
+            "suites": [
+                "collection",
+                ".validate(req)"
+            ],
+            "updatePoint": {
+                "line": 38,
+                "column": 72
+            },
+            "line": 38,
+            "code": "    it('should fail to validate the invalid request with multiple errors', function() {\n      var r = createCollection({\n        title: {\n          type: 'string',\n          required: true\n        },\n        age: {\n          type: 'number',\n          required: true\n        },\n        created: {\n          type: 'date'\n        }\n      });\n\n      var errs = r.validate({title: 7, created: 'foo'}, true);\n\n      expect(errs).to.eql({title: 'must be a string', age: 'is required', created: 'must be a date'});\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should remove properties outside the schema",
+            "suites": [
+                "collection",
+                ".sanitize(body)"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 51
+            },
+            "line": 60,
+            "code": "    it('should remove properties outside the schema', function() {\n      var r = createCollection({\n        title: {\n          type: 'string'\n        }\n      });\n\n      var sanitized = r.sanitize({foo: 7, bar: 8, title: 'foo'});\n\n      expect(sanitized.foo).to.not.exist;\n      expect(sanitized.bar).to.not.exist;\n      expect(sanitized.title).to.equal('foo');\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert int strings to numbers",
+            "suites": [
+                "collection",
+                ".sanitize(body)"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 45
+            },
+            "line": 74,
+            "code": "    it('should convert int strings to numbers', function() {\n      var r = createCollection({\n        age: {\n          type: 'number'\n        }\n      });\n\n      var sanitized = r.sanitize({age: '22'});\n      expect(sanitized.age).to.equal(22);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert number to strings",
+            "suites": [
+                "collection",
+                ".sanitize(body)"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 40
+            },
+            "line": 85,
+            "code": "    it('should convert number to strings', function() {\n      var r = createCollection({\n        token: {\n          type: 'string'\n        }\n      });\n\n      var sanitized = r.sanitize({token: 123456});\n      expect(sanitized.token).to.equal('123456');\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert date strings to dates",
+            "suites": [
+                "collection",
+                ".sanitize(body)"
+            ],
+            "updatePoint": {
+                "line": 96,
+                "column": 44
+            },
+            "line": 96,
+            "code": "    it('should convert date strings to dates', function() {\n      var r = createCollection({\n        date: {\n          type: 'date'\n        }\n      });\n\n      var sanitized = r.sanitize({date: '2016-09-09T09:09:09.09Z'});\n      expect(sanitized.date).to.eql(new Date('2016-09-09T09:09:09.09Z'));\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert numbers to dates",
+            "suites": [
+                "collection",
+                ".sanitize(body)"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 39
+            },
+            "line": 107,
+            "code": "    it('should convert numbers to dates', function() {\n      var r = createCollection({\n        date: {\n          type: 'date'\n        }\n      });\n\n      var sanitized = r.sanitize({date: 1473412149090});\n      expect(sanitized.date).to.eql(new Date('2016-09-09T09:09:09.09Z'));\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert number to strings",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 40
+            },
+            "line": 120,
+            "code": "    it('should convert number to strings', function() {\n      var r = createCollection({\n        token: {\n          type: 'string'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({token: 123456});\n      expect(sanitized.token).to.equal('123456');\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert string to boolean",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 131,
+                "column": 40
+            },
+            "line": 131,
+            "code": "    it('should convert string to boolean', function() {\n      var r = createCollection({\n        bool: {\n          type: 'boolean'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({bool: \"true\"});\n      expect(sanitized.bool).to.equal(true);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow object query on booleans",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 143,
+                "column": 45
+            },
+            "line": 143,
+            "code": "    it('should allow object query on booleans', function() {\n      var r = createCollection({\n        bool: {\n          type: 'boolean'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({bool: { $ne: true }});\n      expect(sanitized.bool).to.eql({$ne: true});\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert date strings to dates",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 154,
+                "column": 44
+            },
+            "line": 154,
+            "code": "    it('should convert date strings to dates', function() {\n      var r = createCollection({\n        date: {\n          type: 'date'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({date: '2016-09-09T09:09:09.09Z'});\n      expect(sanitized.date).to.eql(new Date('2016-09-09T09:09:09.09Z'));\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should convert numbers to dates",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 165,
+                "column": 39
+            },
+            "line": 165,
+            "code": "    it('should convert numbers to dates', function() {\n      var r = createCollection({\n        date: {\n          type: 'date'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({date: 1473412149090});\n      expect(sanitized.date).to.eql(new Date('2016-09-09T09:09:09.09Z'));\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow object query on dates",
+            "suites": [
+                "collection",
+                ".sanitizeQuery(query)"
+            ],
+            "updatePoint": {
+                "line": 176,
+                "column": 42
+            },
+            "line": 176,
+            "code": "    it('should allow object query on dates', function() {\n      var r = createCollection({\n        date: {\n          type: 'date'\n        }\n      });\n\n      var sanitized = r.sanitizeQuery({date: { $gte: new Date(2016, 01, 01) }});\n      expect(sanitized.date).to.eql({ $gte: new Date(2016, 01, 01) });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should have a store",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 189,
+                "column": 27
+            },
+            "line": 189,
+            "code": "    it('should have a store', function() {\n      var c = new Collection('foo', { db: db.create(TEST_DB) });\n      expect(c.store).to.exist;\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle POST",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 225,
+                "column": 26
+            },
+            "line": 225,
+            "code": "    it('should handle POST', function(done) {\n      example('POST', '/foo', {test: {type: 'boolean'}}, {test: true}, null,\n        function (err, res, body) {\n            expect(err).to.not.exist;\n            expect(res.body).to.include({test: true});\n            expect(res.statusCode).to.equal(200);\n        },\n        done\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle GET",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 236,
+                "column": 25
+            },
+            "line": 236,
+            "code": "    it('should handle GET', function(done) {\n      var testData = [{test: true}, {test: false}];\n      example('GET', '/foo', {test: {type: 'boolean'}}, null, null,\n        function (err, res, body) {\n          expect(err).to.not.exist;\n          expect(res.statusCode).to.equal(200);\n        },\n        done,\n        testData\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle GET without data",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 248,
+                "column": 38
+            },
+            "line": 248,
+            "code": "    it('should handle GET without data', function(done) {\n      var testData = [];\n      example('GET', '/foo', {test: {type: 'boolean'}}, null, null,\n        function (err, res, body) {\n          expect(res.statusCode).to.equal(200);\n        },\n        done,\n        testData\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle GET and not crash on invalid query",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 259,
+                "column": 56
+            },
+            "line": 259,
+            "code": "    it('should handle GET and not crash on invalid query', function (done) {\n      var testData = [];\n      example('GET', '/foo1', { test: { type: 'boolean' } }, null, { \"$fields\": \"test\" },\n      function (err, res, body) {\n        expect(res.statusCode).to.equal(200);\n      },\n        done,\n        testData\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle PUT",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 270,
+                "column": 25
+            },
+            "line": 270,
+            "code": "    it('should handle PUT', function(done) {\n      var testData = [{test: true}, {test: false}];\n      example('PUT', '/foo', {test: {type: 'boolean'}}, {test: false, id: \"7\"}, null,\n        function (err, res, body) {\n          expect(res.statusCode).to.equal(400);\n          expect(res.body.message).to.equal(\"No object exists that matches that query\");\n        },\n        done,\n        testData\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should handle DELETE",
+            "suites": [
+                "collection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 282,
+                "column": 28
+            },
+            "line": 282,
+            "code": "    it('should handle DELETE', function(done) {\n      example('DELETE', '/foo', {test: {type: 'boolean'}}, null, {id: \"7\"},\n        function (err, res, body) {\n          expect(err).to.not.exist;\n          expect(res.statusCode).to.equal(200);\n        },\n        done\n      );\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should save the provided data",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 294,
+                "column": 37
+            },
+            "line": 294,
+            "code": "    it('should save the provided data', function(done) {\n      var c = new Collection('counts', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n      c.save({session: {}, body: {count: 1}, query: {}, dpd: {}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        done();\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should save boolean value as the proper value",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 303,
+                "column": 53
+            },
+            "line": 303,
+            "code": "    it('should save boolean value as the proper value', function (done) {\n      var c = new Collection('truths', {db: db.create(TEST_DB), config: { properties: {on: {type: 'boolean'}}}});\n      c.save({session: {}, body: {on: true}, query: {}, dpd: {}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        expect(item.on).to.be.true;\n        done();\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass commands like $inc",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 313,
+                "column": 38
+            },
+            "line": 313,
+            "code": "    it('should pass commands like $inc', function(done) {\n      var c = new Collection('counts', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      c.save({body: {count: 1}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        c.save({body: {count: {$inc: 100}}, query: {id: item.id}}, function (err, updated) {\n          expect(err).to.not.exist;\n          expect(updated).to.exist;\n          expect(updated.count).to.equal(101);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass $addUnique command",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 328,
+                "column": 38
+            },
+            "line": 328,
+            "code": "    it('should pass $addUnique command', function(done) {\n      var c = new Collection('persons', {db: db.create(TEST_DB), config: { properties: {names: {type: 'array'}}}});\n\n      c.save({body: {names: ['jim','sam']}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        c.save({body: {names: {$addUnique: 'joe'}}, query: {id: item.id}}, function (err, updated) {\n          expect(err).to.not.exist;\n          expect(updated).to.exist;\n          expect(updated.names).to.eql(['jim', 'sam', 'joe']);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not add duplicate element on $addUnique",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 343,
+                "column": 54
+            },
+            "line": 343,
+            "code": "    it('should not add duplicate element on $addUnique', function(done) {\n      var c = new Collection('persons', {db: db.create(TEST_DB), config: { properties: {names: {type: 'array'}}}});\n\n      c.save({body: {names: ['jim','sam', 'joe']}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        c.save({body: {names: {$addUnique: 'joe'}}, query: {id: item.id}}, function (err, updated) {\n          expect(err).to.not.exist;\n          expect(updated).to.exist;\n          expect(updated.names).to.eql(['jim', 'sam', 'joe']);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not fail validation on $push with required array",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 358,
+                "column": 63
+            },
+            "line": 358,
+            "code": "    it('should not fail validation on $push with required array', function (done) {\n      var c = new Collection('persons', { db: db.create(TEST_DB), config: { properties: { names: { type: 'array', required: true } } } });\n\n      c.save({ body: { names: { $pushAll: ['jim','sam', 'joe'] } } }, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        expect(item.names).to.eql(['jim', 'sam', 'joe']);\n        done(err);\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not add duplicate elements and add unique elements on $addUnique",
+            "suites": [
+                "collection",
+                ".save()"
+            ],
+            "updatePoint": {
+                "line": 369,
+                "column": 79
+            },
+            "line": 369,
+            "code": "    it('should not add duplicate elements and add unique elements on $addUnique', function(done) {\n      var c = new Collection('persons', {db: db.create(TEST_DB), config: { properties: {names: {type: 'array'}}}});\n\n      c.save({body: {names: ['jim','sam', 'joe']}}, function (err, item) {\n        expect(item.id).to.exist;\n        expect(err).to.not.exist;\n        c.save({body: {names: {$addUnique: ['carmen', 'jim', 'keith', 'paulus', 'sam', 'joe']}}, query: {id: item.id}}, function (err, updated) {\n          expect(err).to.not.exist;\n          expect(updated).to.exist;\n          expect(updated.names).to.eql(['jim', 'sam', 'joe', 'carmen', 'keith', 'paulus']);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not crash on non existent id",
+            "suites": [
+                "collection",
+                ".remove()"
+            ],
+            "updatePoint": {
+                "line": 397,
+                "column": 43
+            },
+            "line": 397,
+            "code": "    it('should not crash on non existent id', function(done) {\n      var c = new Collection('foo_del', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      c.remove({query: {id: \"abc\"}}, function (err, item) {\n        c.find({}, function (err, items) {\n          expect(items.length).to.equal(0);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the provided data",
+            "suites": [
+                "collection",
+                ".get()"
+            ],
+            "updatePoint": {
+                "line": 410,
+                "column": 39
+            },
+            "line": 410,
+            "code": "    it('should return the provided data', function(done) {\n      var c = new Collection('foo', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      c.save({body: {count: 1}}, function (err, item) {\n        c.find({}, function (err, items) {\n          expect(items.length).to.equal(1);\n          done(err);\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return the provided data in sorted order",
+            "suites": [
+                "collection",
+                ".get()"
+            ],
+            "updatePoint": {
+                "line": 421,
+                "column": 55
+            },
+            "line": 421,
+            "code": "    it('should return the provided data in sorted order', function(done) {\n      var c = new Collection('sort', { db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      c.save({body: {count: 1}}, function (err, item) {\n        c.save({body: {count: 3}}, function (err, item) {\n          c.save({body: {count: 2}}, function (err, item) {\n            c.find({query: {$sort: {count: 1}}}, function (err, items) {\n              expect(items.length).to.equal(3);\n              for(var i = 0; i < 3; i++) {\n                delete items[i].id;\n              }\n              expect(items).to.eql([{count: 1}, {count: 2}, {count: 3}]);\n              done(err);\n            });\n          });\n        });\n      });\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$inc - should increment numbers",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 442,
+                "column": 39
+            },
+            "line": 442,
+            "code": "    it('$inc - should increment numbers', function() {\n      var c = new Collection()\n        , item = {count: 7};\n\n      c.execCommands('update', item, {count: {$inc: 7}});\n      expect(item.count).to.equal(14);\n      c.execCommands('update', item, {count: {$inc: -7}});\n      expect(item.count).to.equal(7);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$inc - should handle strings",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 452,
+                "column": 36
+            },
+            "line": 452,
+            "code": "    it('$inc - should handle strings', function() {\n      var c = new Collection()\n        , item = {count: 7};\n\n      c.execCommands('update', item, {count: {$inc: '8'}});\n      expect(item.count).to.equal(15);\n      c.execCommands('update', item, {count: {$inc: '-9'}});\n      expect(item.count).to.equal(6);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$push - should add an object to an array",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 462,
+                "column": 48
+            },
+            "line": 462,
+            "code": "    it('$push - should add an object to an array', function() {\n      var c = new Collection()\n        , item = {names: ['joe', 'bob']};\n\n      c.execCommands('update', item, {names: {$push: 'sam'}});\n      expect(item.names).to.eql(['joe', 'bob', 'sam']);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$pushAll - should add an array of objects to an array",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 470,
+                "column": 61
+            },
+            "line": 470,
+            "code": "    it('$pushAll - should add an array of objects to an array', function() {\n      var c = new Collection()\n        , item = {names: ['joe', 'bob']};\n\n      c.execCommands('update', item, {names: {$pushAll: ['jim', 'sam']}});\n      expect(item.names).to.eql(['joe', 'bob', 'jim', 'sam']);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$addUnique - should add an object to a set",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 478,
+                "column": 50
+            },
+            "line": 478,
+            "code": "    it('$addUnique - should add an object to a set', function () {\n      var c = new Collection()\n        , item = {names: ['joe', 'bob']};\n\n      c.execCommands('update', item, {names: {$addUnique: 'sam'}});\n      expect(item.names).to.eql(['joe', 'bob', 'sam']);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$addUnique - should add only an object that is unique to the set",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 486,
+                "column": 72
+            },
+            "line": 486,
+            "code": "    it('$addUnique - should add only an object that is unique to the set', function () {\n      var c = new Collection()\n        , item = {names: ['joe', 'bob']};\n\n      c.execCommands('update', item, {names: {$addUnique: 'joe'}});\n      expect(item.names).to.eql(['joe', 'bob']);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not throw",
+            "suites": [
+                "collection",
+                ".execCommands(type, obj)"
+            ],
+            "updatePoint": {
+                "line": 494,
+                "column": 24
+            },
+            "line": 494,
+            "code": "    it('should not throw', function() {\n      var c = new Collection()\n        , item = {names: 78};\n\n      c.execCommands('update', item, {names: {$pushAll: ['jim', 'sam']}});\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should make property non enumerable when calling hide() on domain",
+            "suites": [
+                "collection",
+                ".createDomain()"
+            ],
+            "updatePoint": {
+                "line": 503,
+                "column": 73
+            },
+            "line": 503,
+            "code": "    it('should make property non enumerable when calling hide() on domain', function() {\n      var col = new Collection('foodomain', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      var domain = col.createDomain({count: 1}, {});\n      domain.hide('count');\n\n      expect(domain.data.count).to.equal(1);\n      expect(Object.keys(domain.data).length).to.equal(0);\n\n      // test unhide\n      domain.hide('count', false);\n      expect(domain.data.count).to.equal(1);\n      expect(Object.keys(domain.data).length).to.equal(1);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should throw when modifying protect()ed property on domain",
+            "suites": [
+                "collection",
+                ".createDomain()"
+            ],
+            "updatePoint": {
+                "line": 518,
+                "column": 66
+            },
+            "line": 518,
+            "code": "    it('should throw when modifying protect()ed property on domain', function() {\n      var col = new Collection('foodomain', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      var domain = col.createDomain({count: 1}, {}, true);\n      var previousCount = 0;\n      domain.previous.count = previousCount;\n      \n      domain.protect('count');\n      expect(domain.data.count).to.equal(previousCount);\n\n      expect(function() { domain.data.count = 2; }).to.throw(/cannot modify protected property/i);\n\n      // test unprotect\n      domain.protect('count', false);\n      domain.data.count = 2;\n      expect(domain.data.count).to.equal(2);\n\n      domain.protect('count');\n      expect(function() { domain.data.count = 3; }).to.throw(/cannot modify protected property/i);\n      expect(domain.data.count).to.equal(previousCount);\n\n      domain.unprotect('count');\n      domain.data.count = 3;\n      expect(domain.data.count).to.equal(3);\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should properly report changed() properties on domain",
+            "suites": [
+                "collection",
+                ".createDomain()"
+            ],
+            "updatePoint": {
+                "line": 544,
+                "column": 61
+            },
+            "line": 544,
+            "code": "    it('should properly report changed() properties on domain', function() {\n      var col = new Collection('foodomain', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      var domain = col.createDomain({count: 1}, {}, true);\n      domain.previous.count = 2;\n      \n      expect(domain.changed('count')).to.be.true;\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should properly bind function to collection instance",
+            "suites": [
+                "collection",
+                "Collection.extendDomain"
+            ],
+            "updatePoint": {
+                "line": 555,
+                "column": 60
+            },
+            "line": 555,
+            "code": "    it('should properly bind function to collection instance', function() {\n      Collection.extendDomain(\"getName\", function(){\n        return { name: this.collection.name, data: this.domain.data };\n      });\n\n      var col = new Collection('foo', {db: db.create(TEST_DB), config: { properties: {count: {type: 'number'}}}});\n\n      var domain = col.createDomain({count: 1}, {});\n      expect(domain.getName()).to.eql({name: \"foo\", data: {count: 1}});\n    });",
+            "file": "collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should load resources",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 29
+            },
+            "line": 31,
+            "code": "    it('should load resources', function (done) {\n      this.timeout(10000);\n      sh.mkdir('-p', path.join(basepath, 'resources/foo'));\n      sh.mkdir('-p', path.join(basepath, 'resources/bar'));\n      JSON.stringify({\n        type: \"Collection\",\n        val: 1\n      }).to(path.join(basepath, 'resources/foo/config.json'));\n      JSON.stringify({\n        type: \"Collection\",\n        val: 2\n      }).to(path.join(basepath, 'resources/bar/config.json'));\n      configLoader.loadConfig(basepath, this.server, function (err, resources) {\n        if (err) return done(err);\n        expect(resources).to.have.length(4);\n        expect(resources.filter(function (r) {\n          return r.name == 'foo';\n        })).to.have.length(1);\n        expect(resources.filter(function (r) {\n          return r.name == 'bar';\n        })).to.have.length(1);\n        done();\n      });\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return a set of resource instances",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 49
+            },
+            "line": 55,
+            "code": "    it('should return a set of resource instances', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources/foo'));\n      JSON.stringify({\n        type: \"Collection\",\n        properties: {}\n      }).to(path.join(basepath, 'resources/foo/config.json'));\n      configLoader.loadConfig(basepath, {\n        db: db\n      }, function (err, resourceList) {\n        expect(resourceList).to.have.length(3);\n        expect(resourceList[0].config.properties).to.be.a('object');\n        expect(resourceList[0] instanceof Collection).to.equal(true);\n        done(err);\n      });\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should add internal resources",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 70,
+                "column": 37
+            },
+            "line": 70,
+            "code": "    it('should add internal resources', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources'));\n      configLoader.loadConfig(basepath, {}, function (err, resourceList) {\n        if (err) return done(err);\n        expect(resourceList).to.have.length(2);\n        expect(resourceList[0] instanceof Files).to.equal(true);\n        expect(resourceList[1] instanceof InternalResources).to.equal(true);\n        done(err);\n      });\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not attempt to load files",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 80,
+                "column": 40
+            },
+            "line": 80,
+            "code": "    it('should not attempt to load files', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources'));\n      ''.to(path.join(basepath, 'resources/.DS_STORE'));\n      configLoader.loadConfig(basepath, {}, function (err, resourceList) {\n        if (err) return done(err);\n        done();\n      });\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use public_dir option if available",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 88,
+                "column": 49
+            },
+            "line": 88,
+            "code": "    it('should use public_dir option if available', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources'));\n      configLoader.loadConfig(basepath, {}, function (err, resourceList) {\n        if (err) return done(err);\n        expect(resourceList[0].config.public).to.equal('./public');\n      });\n      var opts = {};\n      opts.options = {};\n      opts.options.public_dir = 'test';\n      configLoader.loadConfig(basepath, opts, function (err, resourceList) {\n        if (err) return done(err);\n        expect(resourceList[0].config.public).to.equal('test');\n      });\n      done();\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should use env options path if exists",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 103,
+                "column": 45
+            },
+            "line": 103,
+            "code": "    it('should use env options path if exists', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources'));\n      var public_dir = basepath + '/test';\n      var opts = {};\n      opts.options = {};\n      opts.options.public_dir = public_dir;\n      opts.options.env = 'dev';\n      sh.mkdir('-p', public_dir + '-dev');\n      configLoader.loadConfig(basepath, opts, function (err, resourceList) {\n        if (err) return done(err);\n        expect(resourceList[0].config.public).to.equal(public_dir + '-dev');\n        done();\n      });\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should read directories only once on multiple server.route requests",
+            "suites": [
+                "config-loader",
+                ".loadConfig()"
+            ],
+            "updatePoint": {
+                "line": 117,
+                "column": 75
+            },
+            "line": 117,
+            "code": "    it('should read directories only once on multiple server.route requests', function (done) {\n      sh.mkdir('-p', path.join(basepath, 'resources'));\n      var server = new Server({\n        server_dir: basepath\n      });\n      var callsLeft = 20;\n\n      function next() {\n        if (callsLeft == 0) {\n          expect(fs.readdir.callCount).to.equal(1);\n          return done();\n        }\n\n        callsLeft--;\n        server.route(req, res);\n      }\n\n      var originalLoadConfig = configLoader.loadConfig;\n      this.sinon.stub(configLoader, 'loadConfig').callsFake(function (basepath, server, fn) {\n        originalLoadConfig(basepath, server, function () {\n          // intercepting this call so that we can call this sequentially\n          next();\n          fn.apply(this, arguments);\n        });\n      });\n      var req = {\n        url: 'foo',\n        headers: {}\n      };\n      var res = {\n        body: 'bar'\n      };\n\n      var fs = require('fs');\n\n      sinon.spy(fs, 'readdir');\n      next();\n    });",
+            "file": "config-loader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not have the base url",
+            "suites": [
+                "Context",
+                ".url"
+            ],
+            "updatePoint": {
+                "line": 8,
+                "column": 36
+            },
+            "line": 8,
+            "code": "    it('should not have the base url', function (done) {\n      freq('/foo/bar', null, function (req, res) {\n        var r = new Resource('foo', {});\n        var ctx = new Context(r, req, res, {});\n        expect(ctx.url).to.equal('/bar');\n        done();\n      });\n    });",
+            "file": "context.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should provide default headers",
+            "suites": [
+                "Context",
+                ".done"
+            ],
+            "updatePoint": {
+                "line": 18,
+                "column": 38
+            },
+            "line": 18,
+            "code": "    it('should provide default headers', function (done) {\n      freq('/foo/bar', null, function (req, res) {\n        var r = new Resource('foo', {});\n        var ctx = new Context(r, req, res, {});\n        var response = 'callback(123)';\n        ctx.done(null, response);\n        expect(ctx.res.getHeader('Content-Type')).to.equal('text/html; charset=utf-8');\n        expect(ctx.res.getHeader('Cache-Control')).to.equal('no-cache, no-store, must-revalidate');\n        expect(ctx.res.getHeader('Pragma')).to.equal('no-cache');\n        expect(ctx.res.getHeader('Expires')).to.equal('0');\n        expect(ctx.res.getHeader('Content-Length')).to.equal(response.length);\n        done();\n      });\n    });",
+            "file": "context.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not overwrite headers",
+            "suites": [
+                "Context",
+                ".done"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 36
+            },
+            "line": 32,
+            "code": "    it('should not overwrite headers', function (done) {\n      freq('/foo/bar', null, function (req, res) {\n        var r = new Resource('foo', {});\n        var ctx = new Context(r, req, res, {});\n        ctx.res.setHeader('Content-Type', 'text/javascript');\n        ctx.done(null, 'callback(123)');\n        expect(ctx.res.getHeader('Content-Type')).to.equal('text/javascript');\n        done();\n      });\n    });",
+            "file": "context.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not send headers if they were already sent",
+            "suites": [
+                "Context",
+                ".done"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 57
+            },
+            "line": 42,
+            "code": "    it('should not send headers if they were already sent', function (done) {\n      freq('/foo/bar', null, function (req, res) {\n        var r = new Resource('foo', {});\n        var ctx = new Context(r, req, res, {});\n        ctx.res.writeHead(200);\n        expect(ctx.res.headersSent).to.be.true;\n        ctx.res.setHeader = sinon.spy();\n        ctx.done(null, 'callback(123)');\n        expect(ctx.res.setHeader.callCount).to.equal(0);\n        done();\n      });\n    });",
+            "file": "context.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not call res.end() if response already finished",
+            "suites": [
+                "Context",
+                ".done"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 62
+            },
+            "line": 54,
+            "code": "    it('should not call res.end() if response already finished', function (done) {\n      freq('/foo/bar', null, function (req, res) {\n        var r = new Resource('foo', {});\n        var ctx = new Context(r, req, res, {});\n        ctx.res.end(\"test\");\n        expect(ctx.res.headersSent).to.be.true;\n        expect(ctx.res.finished).to.be.true;\n        ctx.res.end = sinon.spy();\n        ctx.done(null, 'callback(123)');\n        expect(ctx.res.end.callCount).to.equal(0);\n        done();\n      });\n    });",
+            "file": "context.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should connect to a remote database",
+            "suites": [
+                "db",
+                ".create(options)"
+            ],
+            "updatePoint": {
+                "line": 40,
+                "column": 43
+            },
+            "line": 40,
+            "code": "    it('should connect to a remote database', function (done) {\n      store.find(function (err, empty) {\n        assert.equal(empty.length, 0);\n        done(err);\n      });\n    });",
+            "file": "db-remote.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not find anything when the store is empty",
+            "suites": [
+                "store",
+                ".find(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 56
+            },
+            "line": 50,
+            "code": "    it('should not find anything when the store is empty', function (done) {\n      store.find(function (err, empty) {\n        assert.equal(empty.length, 0);\n        done(err);\n      });\n    });",
+            "file": "db-remote.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass the query to the underlying database",
+            "suites": [
+                "store",
+                ".find(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 56,
+                "column": 56
+            },
+            "line": 56,
+            "code": "    it('should pass the query to the underlying database', function (done) {\n      store.insert([{\n        i: 1\n      }, {\n        i: 2\n      }, {\n        i: 3\n      }], function () {\n        store.find({\n          i: {\n            $lt: 3\n          }\n        }, function (err, result) {\n          assert.equal(result.length, 2);\n          result.forEach(function (obj) {\n            assert.equal(typeof obj.id, 'string');\n          });\n          done(err);\n        });\n      });\n    }); // TODO: convert the rest of the tests",
+            "file": "db-remote.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a database",
+            "suites": [
+                "db",
+                ".create(options)"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 32
+            },
+            "line": 22,
+            "code": "    it('should create a database', function () {\n      var tester = db.create(TEST_DB);\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not find anything when the store is empty",
+            "suites": [
+                "store",
+                ".find(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 56
+            },
+            "line": 29,
+            "code": "    it('should not find anything when the store is empty', function (done) {\n      store.find(function (err, empty) {\n        expect(empty).to.eql([]);\n        done(err);\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should pass the query to the underlying database",
+            "suites": [
+                "store",
+                ".find(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 56
+            },
+            "line": 35,
+            "code": "    it('should pass the query to the underlying database', function (done) {\n      store.insert([{\n        i: 1\n      }, {\n        i: 2\n      }, {\n        i: 3\n      }], function () {\n        store.find({\n          i: {\n            $lt: 3\n          }\n        }, function (err, result) {\n          expect(result).to.exist;\n          result.forEach(function (obj) {\n            expect(obj.id).to.be.a('string');\n          });\n          expect(result).to.have.length(2);\n          done(err);\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should limit the result",
+            "suites": [
+                "store",
+                ".find(query, fn)",
+                ".find({$limit: n}, fn)"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 33
+            },
+            "line": 58,
+            "code": "      it('should limit the result', function (done) {\n        store.insert([{\n          i: 1\n        }, {\n          i: 2\n        }, {\n          i: 3\n        }, {\n          i: 4\n        }, {\n          i: 5\n        }, {\n          i: 6\n        }, {\n          i: 7\n        }, {\n          i: 8\n        }, {\n          i: 9\n        }], function () {\n          store.find({\n            $limit: 2\n          }, function (err, result) {\n            expect(result).to.exist;\n            expect(result).to.have.length(2);\n            done(err);\n          });\n        });\n      });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should skip the n results",
+            "suites": [
+                "store",
+                ".find(query, fn)",
+                ".find({$skip: n}, fn)"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 35
+            },
+            "line": 89,
+            "code": "      it('should skip the n results', function (done) {\n        store.insert([{\n          i: 1\n        }, {\n          i: 2\n        }, {\n          i: 33333\n        }, {\n          i: 4\n        }, {\n          i: 5\n        }, {\n          i: 6\n        }, {\n          i: 7\n        }, {\n          i: 8\n        }, {\n          i: 9\n        }], function () {\n          store.find({\n            $skip: 2\n          }, function (err, result) {\n            expect(result).to.exist;\n            expect(result[0].i).to.equal(33333);\n            done(err);\n          });\n        });\n      });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should limit the result using integer value",
+            "suites": [
+                "store",
+                ".find(query, fn)",
+                ".find({$limit: \"n\"}, fn)"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 53
+            },
+            "line": 120,
+            "code": "      it('should limit the result using integer value', function (done) {\n        store.insert([{\n          i: 1\n        }, {\n          i: 2\n        }, {\n          i: 3\n        }, {\n          i: 4\n        }, {\n          i: 5\n        }, {\n          i: 6\n        }, {\n          i: 7\n        }, {\n          i: 8\n        }, {\n          i: 9\n        }], function () {\n          store.find({\n            $limit: \"2\"\n          }, function (err, result) {\n            expect(result).to.exist;\n            expect(result).to.have.length(2);\n            done(err);\n          });\n        });\n      });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should skip the result using integer value",
+            "suites": [
+                "store",
+                ".find(query, fn)",
+                ".find({$skip: n}, fn)"
+            ],
+            "updatePoint": {
+                "line": 151,
+                "column": 52
+            },
+            "line": 151,
+            "code": "      it('should skip the result using integer value', function (done) {\n        store.insert([{\n          i: 1\n        }, {\n          i: 2\n        }, {\n          i: 33333\n        }, {\n          i: 4\n        }, {\n          i: 5\n        }, {\n          i: 6\n        }, {\n          i: 7\n        }, {\n          i: 8\n        }, {\n          i: 9\n        }], function () {\n          store.find({\n            $skip: \"2\"\n          }, function (err, result) {\n            expect(result).to.exist;\n            expect(result[0].i).to.equal(33333);\n            done(err);\n          });\n        });\n      });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should count the results",
+            "suites": [
+                "store",
+                ".find(query, fn)",
+                ".count({}, fn)"
+            ],
+            "updatePoint": {
+                "line": 182,
+                "column": 34
+            },
+            "line": 182,
+            "code": "      it('should count the results', function (done) {\n        store.insert([{\n          i: 1\n        }, {\n          i: 2\n        }, {\n          i: 33333\n        }, {\n          i: 4\n        }, {\n          i: 5\n        }, {\n          i: 6\n        }, {\n          i: 7\n        }, {\n          i: 8\n        }, {\n          i: 9\n        }], function () {\n          store.count({}, function (err, result) {\n            expect(result).to.exist;\n            expect(result).to.equal(9);\n            done(err);\n          });\n        });\n      });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should add an _id to the object",
+            "suites": [
+                "store",
+                ".identify(object)"
+            ],
+            "updatePoint": {
+                "line": 212,
+                "column": 39
+            },
+            "line": 212,
+            "code": "    it('should add an _id to the object', function () {\n      var object = {};\n      store.identify(object);\n      expect(object._id.length).to.equal(16);\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should change _id to id",
+            "suites": [
+                "store",
+                ".identify(object)"
+            ],
+            "updatePoint": {
+                "line": 217,
+                "column": 31
+            },
+            "line": 217,
+            "code": "    it('should change _id to id', function () {\n      var object = {\n        _id: 'aaaaaaaabbbbbbbb'\n      };\n      store.identify(object);\n      expect(object.id.length).to.equal(16);\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should remove all the objects that match the query",
+            "suites": [
+                "store",
+                ".remove(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 226,
+                "column": 58
+            },
+            "line": 226,
+            "code": "    it('should remove all the objects that match the query', function (done) {\n      store.insert([{\n        i: 1\n      }, {\n        i: 2\n      }, {\n        i: 3\n      }], function () {\n        store.remove({\n          i: {\n            $lt: 3\n          }\n        }, function (err, result) {\n          expect(result.count).to.equal(2);\n          store.find(function (err, result) {\n            expect(result).to.have.length(1);\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should remove all the objects",
+            "suites": [
+                "store",
+                ".remove(query, fn)"
+            ],
+            "updatePoint": {
+                "line": 247,
+                "column": 37
+            },
+            "line": 247,
+            "code": "    it('should remove all the objects', function (done) {\n      store.insert([{\n        i: 1\n      }, {\n        i: 2\n      }, {\n        i: 3\n      }], function () {\n        store.remove(function (err, result) {\n          expect(result.count).to.equal(3);\n          store.find(function (err, result) {\n            expect(result).to.eql([]);\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should insert the given object into the namespace",
+            "suites": [
+                "store",
+                ".insert(namespace, object, fn)"
+            ],
+            "updatePoint": {
+                "line": 266,
+                "column": 57
+            },
+            "line": 266,
+            "code": "    it('should insert the given object into the namespace', function (done) {\n      store.insert({\n        testing: 123\n      }, function (err, result) {\n        expect(result.id).to.exist;\n        expect(result.testing).to.equal(123);\n        done();\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should insert the given array into the namespace",
+            "suites": [
+                "store",
+                ".insert(namespace, object, fn)"
+            ],
+            "updatePoint": {
+                "line": 275,
+                "column": 56
+            },
+            "line": 275,
+            "code": "    it('should insert the given array into the namespace', function (done) {\n      store.insert([{\n        a: 1\n      }, {\n        b: 2\n      }], function (err, result) {\n        expect(Array.isArray(result)).to.equal(true);\n        expect(result[0].id).to.exist;\n        expect(result[0].a).to.equal(1);\n        expect(result[1].id).to.exist;\n        expect(result[1].b).to.equal(2);\n        expect(result).to.have.length(2);\n        done(err);\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should update only the properties provided",
+            "suites": [
+                "store",
+                ".update(query, updates, fn)"
+            ],
+            "updatePoint": {
+                "line": 292,
+                "column": 50
+            },
+            "line": 292,
+            "code": "    it('should update only the properties provided', function (done) {\n      store.insert({\n        foo: 'bar'\n      }, function (err, result) {\n        expect(err).to.not.exist;\n        var query = {\n          id: result.id\n        };\n        store.update(query, {\n          foo: 'baz'\n        }, function (err, updated) {\n          expect(err).to.not.exist;\n          expect(updated.count).to.equal(1);\n          store.first(query, function (err, result) {\n            expect(result.foo).to.equal('baz');\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rename all objects",
+            "suites": [
+                "store",
+                ".update(query, updates, fn)"
+            ],
+            "updatePoint": {
+                "line": 312,
+                "column": 33
+            },
+            "line": 312,
+            "code": "    it('should rename all objects', function (done) {\n      store.insert([{\n        foo: 'bar'\n      }, {\n        foo: 'bat'\n      }, {\n        foo: 'baz'\n      }], function (err) {\n        if (err) throw err;\n        store.update({}, {\n          $rename: {\n            foo: 'RENAMED'\n          }\n        }, function (err, updated) {\n          if (err) throw err;\n          expect(updated.count).to.equal(3);\n          store.find(function (err, all) {\n            all.forEach(function (item) {\n              expect(item.RENAMED).to.exist;\n              expect(item.foo).to.not.exist;\n            });\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rename the underlying database representation of the store",
+            "suites": [
+                "store",
+                ".rename(namespace, fn)"
+            ],
+            "updatePoint": {
+                "line": 340,
+                "column": 73
+            },
+            "line": 340,
+            "code": "    it('should rename the underlying database representation of the store', function (done) {\n      store.insert([{\n        i: 1\n      }, {\n        i: 2\n      }, {\n        i: 3\n      }], function () {\n        store.rename('foo-store', function () {\n          store.find({\n            i: {\n              $lt: 3\n            }\n          }, function (err, result) {\n            expect(result).to.exist;\n            expect(result).to.have.length(2);\n            store.rename('test-store', function () {\n              store.find({\n                i: {\n                  $lt: 3\n                }\n              }, function (err, result) {\n                expect(result).to.exist;\n                expect(result).to.have.length(2);\n                done(err);\n              });\n            });\n          });\n        });\n      });\n    });",
+            "file": "db.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return a key if it exists",
+            "suites": [
+                "Keys",
+                ".get(key, callback)"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 40
+            },
+            "line": 15,
+            "code": "    it('should return a key if it exists', function (done) {\n      var keys = new Keys(KEY_FILE);\n      keys.get('abcdefghijklmnopqrstuvwxyz', function (err, exists) {\n        expect(exists).to.equal(true);\n        done(err);\n      });\n    });",
+            "file": "keys.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not throw if the file does not exist",
+            "suites": [
+                "Keys",
+                ".get(key, callback)"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 51
+            },
+            "line": 22,
+            "code": "    it('should not throw if the file does not exist', function (done) {\n      var keys = new Keys(__dirname + '/support/file-doesnt-exist.json');\n      keys.get('abcdefghijklmnopqrstuvwxyz', function (err, exists) {\n        expect(exists).to.equal(undefined);\n        done(err);\n      });\n    });",
+            "file": "keys.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a new key",
+            "suites": [
+                "Keys",
+                ".generate()"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 31
+            },
+            "line": 31,
+            "code": "    it('should create a new key', function () {\n      var keys = new Keys(),\n          key = keys.generate();\n      expect(key).to.exist;\n      expect(key.length).to.equal(512);\n    });",
+            "file": "keys.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "create a new key which should then exist",
+            "suites": [
+                "Keys",
+                ".create(callback)"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 48
+            },
+            "line": 39,
+            "code": "    it('create a new key which should then exist', function (done) {\n      var keys = new Keys(__dirname + '/support/keys.json');\n      keys.create(function (err, key) {\n        expect(err).to.not.exist;\n        keys.get(key, function (err, exists) {\n          expect(exists).to.equal(true);\n          done(err);\n        });\n      });\n    });",
+            "file": "keys.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should get the first local key",
+            "suites": [
+                "Keys",
+                ".getLocal(fn)"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 38
+            },
+            "line": 51,
+            "code": "    it('should get the first local key', function (done) {\n      var keys = new Keys(__dirname + '/support/keys.json');\n      keys.getLocal(function (err, key) {\n        expect(key).to.exist;\n        expect(key.length).to.equal(26);\n        done(err);\n      });\n    });",
+            "file": "keys.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should work like an EventEmitter",
+            "suites": [
+                "resource",
+                ".emit(ev, data)"
+            ],
+            "updatePoint": {
+                "line": 9,
+                "column": 40
+            },
+            "line": 9,
+            "code": "    it('should work like an EventEmitter', function (done) {\n      function Test() {\n        this.on('test', function (data) {\n          expect(data).to.equal('foo');\n          done();\n        });\n      }\n\n      util.inherits(Test, Resource);\n      var t = new Test();\n      t.emit('test', 'foo');\n    });",
+            "file": "resource.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return a parsed url",
+            "suites": [
+                "resource",
+                ".parse(url)"
+            ],
+            "updatePoint": {
+                "line": 32,
+                "column": 34
+            },
+            "line": 32,
+            "code": "    it('should return a parsed url', function () {\n      example('/foo/7?q=bar', 'foo', '7', ['foo', '7'], {\n        q: 'bar'\n      });\n      example('/foo/bat', 'foo', 'bat', ['foo', 'bat']);\n      example('/foo/bat/baz', 'foo', 'baz', ['foo', 'bat', 'baz']); // should also auto encode q={...}\n\n      example('/foo/boo/bar/baz?q=' + encodeURI(JSON.stringify({\n        \"a\": \"b\"\n      })), 'foo', 'baz', ['foo', 'boo', 'bar', 'baz'], {\n        'q': {\n          'a': 'b'\n        }\n      });\n    });",
+            "file": "resource.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should respond with 200 OK",
+            "suites": [
+                "resource",
+                ".handle(ctx, next)"
+            ],
+            "updatePoint": {
+                "line": 49,
+                "column": 34
+            },
+            "line": 49,
+            "code": "    it('should respond with 200 OK', function (done) {\n      var r = new Resource({\n        path: '/foo'\n      });\n      freq('/foo', null, function (req, res) {\n        r.handle(new Context(r, req, res, {}));\n      }, function (req, res) {\n        expect(res.statusCode).to.equal(200);\n        done();\n      });\n    });",
+            "file": "resource.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should require root access",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 36,
+                "column": 34
+            },
+            "line": 36,
+            "code": "    it('should require root access', function (done) {\n      var r = {\n        type: 'Bar'\n      },\n          created = false;\n      this.ir.handle({\n        req: {\n          method: 'POST',\n          url: '/__resources/foo'\n        },\n        body: r,\n        done: function (err, resource) {\n          expect(resource).to.not.exist;\n          expect(err).to.exist;\n          expect(err.statusCode).to.equal(401);\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not allow a generic POST",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 55,
+                "column": 39
+            },
+            "line": 55,
+            "code": "    it('should not allow a generic POST', function (done) {\n      var r = {\n        type: 'Bar'\n      },\n          created = false;\n      this.ir.handle({\n        req: {\n          method: 'POST',\n          url: '/__resources',\n          isRoot: true\n        },\n        body: r,\n        done: function (err, resource) {\n          expect(resource).to.not.exist;\n          expect(err).to.exist;\n          expect(err.statusCode).to.equal(400);\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a resource when handling a POST request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 75,
+                "column": 61
+            },
+            "line": 75,
+            "code": "    it('should create a resource when handling a POST request', function (done) {\n      var r = {\n        type: 'Bar'\n      },\n          created = false;\n      this.ir.handle({\n        req: {\n          method: 'POST',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        url: '/foo',\n        body: r,\n        done: function (err, resource) {\n          if (err) return done(err);\n          expect(resource.type).to.equal('Bar');\n          var file = path.join(configPath, '/resources/foo/config.json');\n          expect(sh.test('-f', file)).to.be.ok;\n          expect(JSON.parse(sh.cat(file)).type).to.equal('Bar');\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should save a file when handling a POST request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 55
+            },
+            "line": 98,
+            "code": "    it('should save a file when handling a POST request', function (done) {\n      var r = {\n        type: 'Bar'\n      },\n          created = false;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(r).to(path.join(configPath, 'resources/foo/config.json'));\n      this.ir.handle({\n        req: {\n          method: 'POST',\n          url: '/__resources/foo/get.js',\n          isRoot: true\n        },\n        url: '/foo/get.js',\n        body: {\n          value: \"this.foo = 'bar';\"\n        },\n        done: function (err, resource) {\n          if (err) return done(err);\n          var fileVal = sh.cat(path.join(configPath, 'resources/foo/get.js'));\n          expect(fileVal.toString()).to.exist.and.to.equal(\"this.foo = 'bar';\");\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should update a resource when handling a PUT request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 123,
+                "column": 60
+            },
+            "line": 123,
+            "code": "    it('should update a resource when handling a PUT request', function (done) {\n      var r = {\n        type: 'Bar',\n        val: 1\n      };\n      var test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(r).to(path.join(configPath, 'resources/foo/config.json'));\n      r.val = 2;\n      test.ir.handle({\n        req: {\n          method: 'PUT',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        url: '/foo',\n        body: r,\n        done: function () {\n          var file = path.join(configPath, '/resources/foo/config.json');\n          expect(JSON.parse(sh.cat(file)).val).to.equal(2);\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should partially update a resource when handing a PUT request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 149,
+                "column": 69
+            },
+            "line": 149,
+            "code": "    it('should partially update a resource when handing a PUT request', function (done) {\n      var r = {\n        type: 'Bar',\n        val: 1,\n        other: 'test'\n      };\n      var test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(r).to(path.join(configPath, 'resources/foo/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'PUT',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        url: '/foo',\n        body: {\n          val: 2\n        },\n        done: function () {\n          var file = path.join(configPath, '/resources/foo/config.json');\n          var json = JSON.parse(sh.cat(file));\n          expect(json.val).to.equal(2);\n          expect(json.other).to.equal('test');\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should update a resource when handing a PUT request with $setAll",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 179,
+                "column": 72
+            },
+            "line": 179,
+            "code": "    it('should update a resource when handing a PUT request with $setAll', function (done) {\n      var r = {\n        type: 'Bar',\n        val: 1,\n        other: 'test'\n      };\n      var test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(r).to(path.join(configPath, 'resources/foo/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'PUT',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        url: '/foo',\n        body: {\n          type: 'Bar',\n          val: 2,\n          $setAll: true\n        },\n        done: function () {\n          var file = path.join(configPath, '/resources/foo/config.json');\n          var json = JSON.parse(sh.cat(file));\n          expect(json.val).to.equal(2);\n          expect(json.other).to.not.exist;\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should find all resources when handling a GET request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 211,
+                "column": 61
+            },
+            "line": 211,
+            "code": "    it('should find all resources when handling a GET request', function (done) {\n      var q = {\n        type: 'Bar'\n      },\n          q2 = {\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      sh.mkdir('-p', path.join(configPath, 'resources/bar'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/config.json'));\n      JSON.stringify(q2).to(path.join(configPath, 'resources/bar/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'GET',\n          url: '/__resources',\n          isRoot: true\n        },\n        url: '/',\n        done: function (err, result) {\n          if (err) return done(err);\n          expect(result).to.have.length(2);\n          result.forEach(function (r) {\n            expect(r.id).to.exist;\n          });\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should find a single resource when handling a GET request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 242,
+                "column": 65
+            },
+            "line": 242,
+            "code": "    it('should find a single resource when handling a GET request', function (done) {\n      var q = {\n        type: 'Bar'\n      },\n          q2 = {\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      sh.mkdir('-p', path.join(configPath, 'resources/bar'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/config.json'));\n      JSON.stringify(q2).to(path.join(configPath, 'resources/bar/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'GET',\n          url: '/__resources/bar',\n          isRoot: true\n        },\n        url: '/bar',\n        done: function (err, result) {\n          if (err) return done(err);\n          expect(result).to.exist;\n          expect(result.id).to.equal('bar');\n          expect(result.type).to.equal('Bar');\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should delete a resource when handling a DELETE request",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 272,
+                "column": 63
+            },
+            "line": 272,
+            "code": "    it('should delete a resource when handling a DELETE request', function (done) {\n      var q = {\n        path: '/foo',\n        type: 'Bar'\n      },\n          q2 = {\n        path: '/bar',\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      sh.mkdir('-p', path.join(configPath, 'resources/bar'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/config.json'));\n      JSON.stringify(q2).to(path.join(configPath, 'resources/bar/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'DELETE',\n          url: '/__resources/bar',\n          isRoot: true\n        },\n        url: '/bar',\n        done: function () {\n          expect(sh.test('-d', path.join(configPath, 'resources/bar'))).to.not.be.ok;\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should delete a resource named \"foo/bar\" when handling a DELETE request, but leave \"foo\" alone",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 301,
+                "column": 102
+            },
+            "line": 301,
+            "code": "    it('should delete a resource named \"foo/bar\" when handling a DELETE request, but leave \"foo\" alone', function (done) {\n      var q = {\n        path: '/foo',\n        type: 'Bar'\n      },\n          q2 = {\n        path: '/bar',\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo/bar'));\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/bar/config.json'));\n      JSON.stringify(q2).to(path.join(configPath, 'resources/foo/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'DELETE',\n          url: '/__resources/foo/bar',\n          isRoot: true\n        },\n        url: '/foo/bar',\n        done: function () {\n          expect(sh.test('-d', path.join(configPath, 'resources/foo/bar'))).to.not.be.ok;\n          expect(sh.test('-d', path.join(configPath, 'resources/foo'))).to.be.ok;\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should delete a resource named \"foo\" when handling a DELETE request, but leave \"foo/bar\" alone",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 331,
+                "column": 102
+            },
+            "line": 331,
+            "code": "    it('should delete a resource named \"foo\" when handling a DELETE request, but leave \"foo/bar\" alone', function (done) {\n      var q = {\n        path: '/foo',\n        type: 'Bar'\n      },\n          q2 = {\n        path: '/bar',\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo/bar'));\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/bar/config.json'));\n      JSON.stringify(q2).to(path.join(configPath, 'resources/foo/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'DELETE',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        url: '/foo',\n        done: function () {\n          expect(sh.test('-f', path.join(configPath, 'resources/foo/config.json'))).to.not.be.ok;\n          expect(sh.test('-f', path.join(configPath, 'resources/foo/bar/config.json'))).to.be.ok;\n          expect(sh.test('-d', path.join(configPath, 'resources/foo/bar'))).to.be.ok;\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rename a resource named \"foo/bar/foo\" to \"bar/foo/bar\" properly",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 362,
+                "column": 78
+            },
+            "line": 362,
+            "code": "    it('should rename a resource named \"foo/bar/foo\" to \"bar/foo/bar\" properly', function (done) {\n      var q = {\n        path: '/foo',\n        type: 'Bar'\n      },\n          q2 = {\n        path: '/bar',\n        type: 'Bar'\n      },\n          test = this;\n      sh.mkdir('-p', path.join(configPath, 'resources/foo/bar/foo'));\n      JSON.stringify(q).to(path.join(configPath, 'resources/foo/bar/foo/config.json'));\n      test.ir.handle({\n        req: {\n          method: 'PUT',\n          url: '/__resources/foo/bar/foo',\n          isRoot: true\n        },\n        url: '/foo/bar/foo',\n        body: {\n          type: 'Bar',\n          id: '/bar/foo/bar'\n        },\n        done: function () {\n          expect(sh.test('-d', path.join(configPath, 'resources/foo/bar/foo'))).to.not.be.ok;\n          expect(sh.test('-d', path.join(configPath, 'resources/bar/foo/bar'))).to.be.ok;\n          done();\n        }\n      }, function () {\n        throw Error(\"next called\");\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call callbacks for config changes with errors",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 394,
+                "column": 60
+            },
+            "line": 394,
+            "code": "    it('should call callbacks for config changes with errors', function (done) {\n      var file = path.join(configPath, 'resources/foo/config.json');\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify({\n        type: 'Foo'\n      }).to(file);\n      this.ir.handle({\n        server: {\n          resources: [{\n            name: 'foo',\n            config: {},\n            configChanged: function (config, fn) {\n              return fn('ERROR');\n            }\n          }]\n        },\n        url: '/foo',\n        body: {\n          type: 'Foo',\n          value: {\n            something: 'new config'\n          }\n        },\n        req: {\n          method: 'PUT',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        done: function (err) {\n          expect(err).to.exist.and.to.equal('ERROR');\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call callbacks for resource deletion with errors",
+            "suites": [
+                "InternalResources",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 428,
+                "column": 63
+            },
+            "line": 428,
+            "code": "    it('should call callbacks for resource deletion with errors', function (done) {\n      var file = path.join(configPath, 'resources/foo/config.json');\n      sh.mkdir('-p', path.join(configPath, 'resources/foo'));\n      JSON.stringify({\n        type: 'Foo'\n      }).to(file);\n      this.ir.handle({\n        server: {\n          resources: [{\n            name: 'foo',\n            config: {},\n            configDeleted: function (config, fn) {\n              return fn('ERROR');\n            }\n          }]\n        },\n        url: '/foo',\n        body: {\n          type: 'Foo',\n          value: {\n            something: 'new config'\n          }\n        },\n        req: {\n          method: 'DELETE',\n          url: '/__resources/foo',\n          isRoot: true\n        },\n        done: function (err) {\n          expect(err).to.exist.and.to.equal('ERROR');\n          done();\n        }\n      });\n    });",
+            "file": "resources.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should route to a matching resource",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 43
+            },
+            "line": 37,
+            "code": "    it('should route to a matching resource', function (done) {\n      var resource = new Resource('foo', {}),\n          router = new Router([resource], {});\n      this.timeout(100);\n\n      resource.handle = function () {\n        done();\n      };\n\n      router.route({\n        url: '/foo/1234'\n      }, {});\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should route to an exactly matching resource",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 50,
+                "column": 52
+            },
+            "line": 50,
+            "code": "    it('should route to an exactly matching resource', function (done) {\n      var resource = new Resource('foo'),\n          other = new Resource(''),\n          router = new Router([resource, other], fauxServer());\n      this.timeout(100);\n\n      resource.handle = function () {\n        done();\n      };\n\n      other.handle = function () {\n        throw Error(\"This one shouldn't get called\");\n      };\n\n      router.route({\n        url: '/foo'\n      }, {});\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should route to resources in turn",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 41
+            },
+            "line": 68,
+            "code": "    it('should route to resources in turn', function (done) {\n      var foobar = new Resource('foo/bar'),\n          foo = new Resource('foo'),\n          router = new Router([foo, foobar], fauxServer()),\n          foobarCalled = false;\n      this.timeout(100);\n\n      foobar.handle = function (ctx, next) {\n        foobarCalled = true;\n        next();\n      };\n\n      foo.handle = function () {\n        expect(foobarCalled).to.be['true'];\n        done();\n      };\n\n      router.route({\n        url: '/foo/bar'\n      }, {});\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return 404 if no resources match",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 47
+            },
+            "line": 89,
+            "code": "    it('should return 404 if no resources match', function (done) {\n      var foo = new Resource('foo'),\n          router = new Router([foo], fauxServer());\n      this.timeout(100);\n      var req = fauxReq('/dont-match'),\n          res = fauxRes();\n\n      res.end = function () {\n        if (res.statusCode != 404) throw new Error('incorrect status for resource not found');\n        done();\n      };\n\n      foo.handle = function () {\n        throw \"/foo was handled\";\n      };\n\n      router.route(req, res);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return 404 if all resources call next",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 52
+            },
+            "line": 107,
+            "code": "    it('should return 404 if all resources call next', function (done) {\n      var foobar = new Resource('foo/bar'),\n          foo = new Resource('foo'),\n          router = new Router([foo, foobar], fauxServer());\n      this.timeout(100);\n\n      foobar.handle = function (ctx, next) {\n        next();\n      };\n\n      foo.handle = function (ctx, next) {\n        next();\n      };\n\n      var req = fauxReq('/dont-match'),\n          res = fauxRes();\n\n      res.end = function () {\n        if (res.statusCode != 404) throw new Error('incorrect status for resource not found');\n        done();\n      };\n\n      router.route(req, res);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should modify ctx.url to remove the base path",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 131,
+                "column": 53
+            },
+            "line": 131,
+            "code": "    it('should modify ctx.url to remove the base path', function (done) {\n      var foo = new Resource('foo'),\n          router = new Router([foo], fauxServer());\n      this.timeout(1000);\n\n      foo.handle = function (ctx, res) {\n        expect(ctx.url).to.equal('/1234');\n        done();\n      };\n\n      var req = fauxReq('/foo/1234'),\n          res = fauxRes();\n      router.route(req, res);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should still have a leading slash for root resources",
+            "suites": [
+                "Router",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 60
+            },
+            "line": 145,
+            "code": "    it('should still have a leading slash for root resources', function (done) {\n      var resource = new Resource(''),\n          router = new Router([resource], {});\n      this.timeout(1000);\n\n      resource.handle = function (ctx, res) {\n        expect(ctx.url).to.equal('/index.html');\n        done();\n      };\n\n      router.route({\n        url: '/index.html'\n      }, {});\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match /index.html to /",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 172,
+                "column": 37
+            },
+            "line": 172,
+            "code": "    it('should match /index.html to /', function () {\n      var result = this.router.matchResources('/index.html');\n      expect(paths(result)).to.include('/');\n      expect(result.length).to.equal(1);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match /foo/12345 to / and /foo",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 177,
+                "column": 45
+            },
+            "line": 177,
+            "code": "    it('should match /foo/12345 to / and /foo', function () {\n      var result = this.router.matchResources('/foo/12345');\n      expect(paths(result)).to.include('/').and.to.include('/foo');\n      expect(result.length).to.equal(2);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not match /food to /foo",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 182,
+                "column": 38
+            },
+            "line": 182,
+            "code": "    it('should not match /food to /foo', function () {\n      var result = this.router.matchResources('/food');\n      expect(paths(result)).to.not.include('/foo');\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match /foo?test=1 to / and /foo",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 186,
+                "column": 46
+            },
+            "line": 186,
+            "code": "    it('should match /foo?test=1 to / and /foo', function () {\n      var result = this.router.matchResources('/foo?test=1');\n      expect(paths(result)).to.include('/').and.to.include('/foo');\n      expect(result.length).to.equal(2);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match /foo/bar/12345 to /, /foo, and /foo/bar",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 191,
+                "column": 60
+            },
+            "line": 191,
+            "code": "    it('should match /foo/bar/12345 to /, /foo, and /foo/bar', function () {\n      var result = this.router.matchResources('/foo/bar/12345');\n      expect(paths(result)).to.include('/').and.include('/foo').and.include('/foo/bar');\n      expect(result.length).to.equal(3);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should order results by best match",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 196,
+                "column": 42
+            },
+            "line": 196,
+            "code": "    it('should order results by best match', function () {\n      var result = this.router.matchResources('/foo/bar/12345');\n      expect(paths(result)).to.eql(['/foo/bar', '/foo', '/']);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should match a route exactly",
+            "suites": [
+                "Router",
+                ".matchResources()"
+            ],
+            "updatePoint": {
+                "line": 200,
+                "column": 36
+            },
+            "line": 200,
+            "code": "    it('should match a route exactly', function () {\n      var result = this.router.matchResources('/foo');\n      expect(paths(result)).to.eql(['/foo', '/']);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should properly match the url",
+            "suites": [
+                "Router",
+                ".generateRegex()"
+            ],
+            "updatePoint": {
+                "line": 217,
+                "column": 37
+            },
+            "line": 217,
+            "code": "    it('should properly match the url', function () {\n      // should pass\n      example('/foo', '/foo', true);\n      example('/foo', '/foo/index.html', true);\n      example('/foo', '/foo/index.htm', true);\n      example('/foo', '/foo?blah', true);\n      example('/foo', '/foo?q={\"foo\":\"bar\"}', true);\n      example('/foo', '/foo/', true);\n      example('/foo', '/foo?', true);\n      example('/foo', '/foo?q', true);\n      example('/foo', '/foo?q=', true);\n      example('/foo', '/foo?q=a', true);\n      example('/foo', '/foo/some-id', true);\n      example('/foo', '/foo/some-id/', true);\n      example('/foo', '/foo/bar', true);\n      example('/foo', '/foo/bar/', true); // should fail\n\n      example('/foo', '/', false);\n      example('/foo', 'foo', false);\n      expect('/foo', '/food', false);\n      expect('/food', '/foo', false); // TODO: I think this one's OK\n      // example('/foo', '/foo/../bar', false);\n    });",
+            "file": "router.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should execute the script",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 33
+            },
+            "line": 6,
+            "code": "    it('should execute the script', function (done) {\n      var s = new Script('2 + 2');\n      s.run({}, done);\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should always have access to cancel()",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 10,
+                "column": 45
+            },
+            "line": 10,
+            "code": "    it('should always have access to cancel()', function (done) {\n      var s = new Script('cancel()');\n      s.run({}, function (e) {\n        expect(e).to.exist;\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should keep error intact when calling cancel(err)",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 17,
+                "column": 57
+            },
+            "line": 17,
+            "code": "    it('should keep error intact when calling cancel(err)', function (done) {\n      var s = new Script('cancel(new Error(\"test\"))');\n      s.run({}, function (e) {\n        expect(e).to.exist;\n        expect(e.message).to.equal('test');\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should keep object intact when calling cancel({message: , status: })",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 76
+            },
+            "line": 25,
+            "code": "    it('should keep object intact when calling cancel({message: , status: })', function (done) {\n      var s = new Script('cancel({message: \"test\", status: 404})');\n      s.run({}, function (e) {\n        expect(e).to.exist;\n        expect(e.message).to.equal('test');\n        expect(e.statusCode).to.equal(404); // status is turned into statusCode\n\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should have access to the current user if one exists",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 35,
+                "column": 60
+            },
+            "line": 35,
+            "code": "    it('should have access to the current user if one exists', function (done) {\n      var s = new Script('if(!me) throw \"no user\"');\n      var session = {\n        user: {\n          name: 'foo'\n        }\n      };\n      s.run({\n        session: session\n      }, done);\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should always have access to require()",
+            "suites": [
+                "script",
+                ".run(ctx, fn)"
+            ],
+            "updatePoint": {
+                "line": 46,
+                "column": 46
+            },
+            "line": 46,
+            "code": "    it('should always have access to require()', function (done) {\n      var s = new Script('if(typeof require !== \"function\") throw \"no access to require\"');\n      s.run({}, done);\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should expose the domain directly to the script",
+            "suites": [
+                "script",
+                ".run(ctx, domain, fn)"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 55
+            },
+            "line": 52,
+            "code": "    it('should expose the domain directly to the script', function (done) {\n      var s = new Script('if(!foo) throw \"foo not passed\"');\n      s.run({}, {\n        foo: 123\n      }, done);\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not change null to empty object",
+            "suites": [
+                "script",
+                ".run(ctx, domain, fn)"
+            ],
+            "updatePoint": {
+                "line": 58,
+                "column": 46
+            },
+            "line": 58,
+            "code": "    it('should not change null to empty object', function (done) {\n      var s = new Script('if(previous.foo !== null) throw \"foo was \" + JSON.stringify(previous.foo)');\n      s.run({}, {\n        previous: {\n          foo: null\n        }\n      }, done);\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not be slow and leak memory",
+            "suites": [
+                "script",
+                ".run(ctx, domain, fn)"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 42
+            },
+            "line": 66,
+            "code": "    it('should not be slow and leak memory', function (done) {\n      var s = new Script('if(!foo) throw \"foo not passed\"');\n      var time = Date.now();\n      var numDone = 0;\n\n      for (var i = 0; i < 15000; i++) {\n        s.run({}, {\n          foo: 123\n        }, function () {\n          numDone++;\n\n          if (numDone >= 15000) {\n            done();\n          }\n        });\n      }\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should callback with error on script syntax error",
+            "suites": [
+                "script",
+                ".run(ctx, domain, fn)"
+            ],
+            "updatePoint": {
+                "line": 83,
+                "column": 57
+            },
+            "line": 83,
+            "code": "    it('should callback with error on script syntax error', function (done) {\n      var s = new Script('if(!foo throw \"foo not passed\"');\n      s.run({}, {\n        foo: 123\n      }, function (err) {\n        expect(err.name).to.equal(\"SyntaxError\");\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow manual callback counting",
+            "suites": [
+                "script",
+                "async"
+            ],
+            "updatePoint": {
+                "line": 94,
+                "column": 45
+            },
+            "line": 94,
+            "code": "    it('should allow manual callback counting', function (done) {\n      this.timeout(200);\n      var s = new Script('$addCallback(); async(function() { setTimeout(function() { inc(); $finishCallback(); }, 20); }, 20)');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        async: function (fn) {\n          setTimeout(fn, 50);\n        },\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return after all callbacks are complete",
+            "suites": [
+                "script",
+                "async"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 54
+            },
+            "line": 113,
+            "code": "    it('should return after all callbacks are complete', function (done) {\n      this.timeout(200);\n      var s = new Script('setTimeout(function() { inc() }, 50)');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should callback even an error occurs asynchronously",
+            "suites": [
+                "script",
+                "async"
+            ],
+            "updatePoint": {
+                "line": 130,
+                "column": 59
+            },
+            "line": 130,
+            "code": "    it('should callback even an error occurs asynchronously', function (done) {\n      var s = new Script('setTimeout(function() { throw \"test err\" }, 22)');\n      s.run({}, {\n        setTimeout: setTimeout\n      }, function (e) {\n        expect(e).to.exist;\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should return errors even when nested in objects",
+            "suites": [
+                "script",
+                "async"
+            ],
+            "updatePoint": {
+                "line": 139,
+                "column": 56
+            },
+            "line": 139,
+            "code": "    it('should return errors even when nested in objects', function (done) {\n      var domain = {\n        foo: {\n          bar: {\n            baz: function (fn) {\n              setTimeout(function () {\n                fn();\n              }, 50);\n              throw 'test error baz';\n            }\n          }\n        }\n      };\n      var s = new Script('foo.bar.baz(function() {  })');\n      s.run({}, domain, function (e) {\n        expect(e).to.exist;\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve after promise is resolved",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 173,
+                "column": 48
+            },
+            "line": 173,
+            "code": "    it('should resolve after promise is resolved', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(); p.promise.then(inc); setTimeout(p.resolve, 10)');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject after promise is rejected",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 191,
+                "column": 47
+            },
+            "line": 191,
+            "code": "    it('should reject after promise is rejected', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(); p.promise.then(function() {}, inc); setTimeout(p.reject, 10)');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should resolve after nested promises is resolved and outer promise is resolved",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 209,
+                "column": 86
+            },
+            "line": 209,
+            "code": "    it('should resolve after nested promises is resolved and outer promise is resolved', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(), p2 = defer(); p.promise.then(function() { return p2.promise; }).then(inc); setTimeout(p.resolve, 22); setTimeout(p2.resolve, 44);');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject after nested promises is rejected and outer promise is resolved",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 227,
+                "column": 85
+            },
+            "line": 227,
+            "code": "    it('should reject after nested promises is rejected and outer promise is resolved', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(), p2 = defer(); p.promise.then(function() { return p2.promise; }).then(function() {}, inc); setTimeout(p.resolve, 22); setTimeout(p2.reject, 44);');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject after nested promises is resolved and outer promise is rejected",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 245,
+                "column": 85
+            },
+            "line": 245,
+            "code": "    it('should reject after nested promises is resolved and outer promise is rejected', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(), p2 = defer(); p.promise.then(function() { return p2.promise; }).then(function() {}, inc); setTimeout(p.reject, 22); setTimeout(p2.resolve, 44);');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should reject after nested promises is rejected and outer promise is rejected",
+            "suites": [
+                "script",
+                "promises"
+            ],
+            "updatePoint": {
+                "line": 263,
+                "column": 85
+            },
+            "line": 263,
+            "code": "    it('should reject after nested promises is rejected and outer promise is rejected', function (done) {\n      this.timeout(200);\n      var s = new Script('var p = defer(), p2 = defer(); p.promise.then(function() { return p2.promise; }).then(function() {}, inc); setTimeout(p.reject, 22); setTimeout(p2.reject, 44);');\n      var i = 0;\n\n      function inc() {\n        i++;\n      }\n\n      s.run({}, {\n        defer: defer,\n        setTimeout: setTimeout,\n        inc: inc\n      }, function () {\n        expect(i).to.equal(1);\n        done();\n      });\n    });",
+            "file": "script.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should start a new deployd server",
+            "suites": [
+                "Server",
+                ".listen()"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 41
+            },
+            "line": 26,
+            "code": "    it('should start a new deployd server', function () {\n      var PORT = genPort();\n      var opts = {\n        port: PORT,\n        db: {\n          name: 'deployd',\n          port: 27017,\n          host: '127.0.0.1'\n        }\n      };\n      var server = new Server(opts);\n      server.listen();\n      expect(server.db instanceof Db).to.equal(true);\n      expect(server.options).to.eql(opts);\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a store with the given name",
+            "suites": [
+                "Server",
+                ".createStore(namespace)"
+            ],
+            "updatePoint": {
+                "line": 46,
+                "column": 49
+            },
+            "line": 46,
+            "code": "    it('should create a store with the given name', function () {\n      var server = new Server(),\n          store = server.createStore('foo');\n      expect(store instanceof Store).to.equal(true);\n      expect(server.stores.foo).to.equal(store);\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be on the prototype",
+            "suites": [
+                "Server",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 34
+            },
+            "line": 54,
+            "code": "    it('should be on the prototype', function () {\n      var server = new Server();\n      expect(typeof server.route).to.equal('function');\n      expect(server.route.toString()).to.contain('req, res');\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should call config.loadConfig",
+            "suites": [
+                "Server",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 59,
+                "column": 37
+            },
+            "line": 59,
+            "code": "    it('should call config.loadConfig', function () {\n      var server = new Server();\n      var req = {\n        url: 'foo'\n      };\n      var res = {\n        body: 'bar'\n      };\n\n      var config = require('../lib/config-loader');\n\n      config.loadConfig = sinon.spy();\n      server.route(req, res);\n      expect(config.loadConfig.callCount).to.equal(1);\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set a resources array on the server",
+            "suites": [
+                "Server",
+                ".route()"
+            ],
+            "updatePoint": {
+                "line": 74,
+                "column": 50
+            },
+            "line": 74,
+            "code": "    it('should set a resources array on the server', function () {\n      var server = new Server();\n      var req = {\n        url: 'foo',\n        headers: {\n          accept: '*'\n        }\n      };\n      var res = {\n        body: 'bar',\n        on: function () {}\n      };\n\n      var configLoader = require('../lib/config-loader');\n\n      configLoader.loadConfig = function (path, server, callback) {\n        callback.call(server, null, ['foo']);\n      };\n\n      expect(Array.isArray(server.resources)).to.equal(false);\n      server.route(req, res);\n      expect(Array.isArray(server.resources)).to.equal(true);\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should be on the prototype",
+            "suites": [
+                "Server",
+                ".handleRequest()"
+            ],
+            "updatePoint": {
+                "line": 99,
+                "column": 34
+            },
+            "line": 99,
+            "code": "    it('should be on the prototype', function () {\n      var server = new Server();\n      expect(typeof server.handleRequest).to.equal('function');\n      expect(server.handleRequest.toString()).to.contain('req, res');\n    });",
+            "file": "server.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow binding multiple sockets to a single session",
+            "suites": [
+                "SessionStore"
+            ],
+            "updatePoint": {
+                "line": 7,
+                "column": 63
+            },
+            "line": 7,
+            "code": "  it('should allow binding multiple sockets to a single session', function(done) {\n    var store = new SessionStore('sessions', db.create(TEST_DB))\n      , sid = store.createUniqueIdentifier();\n\n    store.createSession(function (err, session) {\n      session.save(function(err, data){\n        var sockets = new EventEmitter()\n          ,  store = new SessionStore('sessions', db.create(TEST_DB), sockets);\n\n        for(var i = 1; i < 9; i++) {\n          fauxSocket = {\n                id: 'abcd' + i,\n                handshake: {headers: {cookie: 'name=value; name2=value2; sid=' + data.id}},\n                on: function() {},\n                emit: function() {}\n              };\n\n          sockets.emit('connection', fauxSocket);\n          expect(store.socketIndex[data.id]['abcd' + i]).to.equal(fauxSocket);\n        }\n        done();\n      });\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a session id",
+            "suites": [
+                "SessionStore",
+                ".createUniqueIdentifier()"
+            ],
+            "updatePoint": {
+                "line": 33,
+                "column": 34
+            },
+            "line": 33,
+            "code": "    it('should create a session id', function() {\n      var store = new SessionStore()\n        , sid = store.createUniqueIdentifier();\n\n      expect(sid.length).to.equal(128);\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should create a session",
+            "suites": [
+                "SessionStore",
+                ".createSession(fn)"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 31
+            },
+            "line": 42,
+            "code": "    it('should create a session', function(done) {\n      var store = new SessionStore('sessions', db.create(TEST_DB))\n        , sid = store.createUniqueIdentifier();\n\n      store.createSession(function (err, session) {\n        expect(session.isAnonymous()).to.be.true;\n        done(err);\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should get back the created session",
+            "suites": [
+                "SessionStore",
+                ".getSession(uid)"
+            ],
+            "updatePoint": {
+                "line": 54,
+                "column": 43
+            },
+            "line": 54,
+            "code": "    it('should get back the created session', function(done) {\n      var store = new SessionStore('sessions', db.create(TEST_DB));\n\n      store.createSession(function (err, session) {\n        // set the session uid\n        session.set({uid: 'my-uid'}).save(function(err, data){\n\n          // create again from store\n          store.createSession(session.sid, function (err, session2) {\n            // get back the session\n            var s = store.getSession('my-uid', session.sid);\n            expect(s.sid).to.equal(session.sid);\n\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should expire sessions after max age",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 44
+            },
+            "line": 105,
+            "code": "    it('should expire sessions after max age', function (done) {\n      var store = new SessionStore('sessions', db.create(TEST_DB), undefined, { maxAge: 100000 });\n      store.createSession(function (err, session) {\n        session.set({ foo: 'bar' }).save(function (err, data) {\n          expect(err).to.not.exist;\n          store.createSession(session.sid, function (err, session2) {\n            expect(session.sid).to.equal(session2.sid);\n\n            // check that the session is still valid 1 tick before expiration\n            clock.tick(99999);\n            process.nextTick(function () {\n              store.createSession(session.sid, function (err, session3) {\n                expect(session.sid).to.equal(session3.sid);\n                clock.tick(100001); // pass the threshold\n                process.nextTick(function () {\n                  store.createSession(session.sid, function (err, session4) {\n                    expect(session4.data.anonymous).to.be.true;\n                    // give the code in createSession some time to clean up inactive sessions\n                    clock.restore();\n                    setTimeout(function() {\n                      store.find({ id: session.sid }, function (err, s) {\n                        expect(s).to.not.exist;\n                        done();\n                      });\n                    }, 300);\n                  });\n                });\n              });\n            });\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should make sockets available even before they exist",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 204,
+                "column": 58
+            },
+            "line": 204,
+            "code": "  it('should make sockets available even before they exist', function(done) {\n    this.timeout(100);\n\n    var sockets = createMockSocketIo()\n      ,  fauxSocket = sockets.createClient()\n      ,  store = new SessionStore('sessions', db.create(TEST_DB), sockets);\n\n    store.createSession(function (err, session) {\n      session.save(function(err, data){\n\n        // generate faux headers\n        fauxSocket.id = 'test123';\n        fauxSocket.handshake = { headers: {cookie: 'name=value; name2=value2; sid=' + data.id} };\n\n        // bind to an event even before a connection has been made\n        session.socket.on('test', function (data) {\n          expect(data).to.equal(123);\n          done();\n        });\n\n        sockets.emit('connection', fauxSocket);\n\n        fauxSocket.emit('test', 123);\n      });\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should bind multiple sockets to the same session id",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 232,
+                "column": 57
+            },
+            "line": 232,
+            "code": "  it('should bind multiple sockets to the same session id', function(done) {\n    var sockets = createMockSocketIo()\n      , store = new SessionStore('sessions', db.create(TEST_DB), sockets)\n      , total = 5\n      , remainingTo = total\n      , remainingFrom = total;\n\n    store.createSession(function (err, session) {\n      session.save(function(err, data){\n        // bind to an event even before a connection has been made\n        session.socket.on('message TO server', function (data) {\n          expect(data).to.equal(\"message from \" + (total - remainingTo));\n          remainingTo--;\n          if (remainingTo === 0 && remainingFrom === 0) done();\n        });\n\n        for (var i = 0; i < total; i++){\n          var fauxSocket = sockets.createClient('testSocket' + i);\n          // generate faux headers\n          fauxSocket.handshake = { headers: {cookie: 'name=value; name2=value2; sid=' + data.id} };\n\n          sockets.emit('connection', fauxSocket);\n\n          fauxSocket.emit('message TO server', \"message from \" + i);\n\n          fauxSocket.on('message FROM server', function(data) {\n            // must receive all events\n            expect(data).to.equal(\"hello\");\n            remainingFrom--;\n            if (remainingTo === 0 && remainingFrom === 0) done();\n          });\n        }\n\n        session.socket.emit('message FROM server', \"hello\");\n      });\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not bind multiple sessions to the same socket",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 270,
+                "column": 58
+            },
+            "line": 270,
+            "code": "  it('should not bind multiple sessions to the same socket', function(done) {\n    var sockets = createMockSocketIo()\n      , store = new SessionStore('sessions', db.create(TEST_DB), sockets)\n      , calls = 0;\n\n    var sessions = [];\n\n    var createSession = function(fn) {\n      return store.createSession(function (err, session) {\n        session.save(function(err, data){\n          sessions.push(data);\n          fn(err, data, session);\n        });\n      });\n    };\n\n    createSession(function(err, data, session1){\n      var fauxSocket = sockets.createClient('testSocket1');\n      sockets.emit('connection', fauxSocket);\n      fauxSocket.emit('server:setSession', { sid: data.id });\n      fauxSocket.once('server:acksession', function() { \n        var handler = sinon.spy();\n\n        fauxSocket.on('hello', function(msg) {\n          expect(msg).to.equal('message from server to session2');\n          fauxSocket.removeAllListeners();\n          done();\n        });\n\n        createSession(function(err, data, session2){\n          fauxSocket.emit('server:setSession', { sid: data.id });\n          fauxSocket.once('server:acksession', function() {\n            // this message shouldn't be received:\n            session1.socket.emit('hello', 'message from server to session1');\n            // this message should be received:\n            session2.socket.emit('hello', 'message from server to session2');\n          })\n        });\n      });\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should rebind socket to rooms on reconnect",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 312,
+                "column": 48
+            },
+            "line": 312,
+            "code": "  it('should rebind socket to rooms on reconnect', function(done) {\n    var sockets = createMockSocketIo()\n      , store = new SessionStore('sessions', db.create(TEST_DB), sockets)\n      , calls = 0;\n\n    var sessions = [];\n\n    var createSession = function(fn) {\n      return store.createSession(function (err, session) {\n        session.save(function(err, data){\n          sessions.push(data);\n          fn(err, data, session);\n        });\n      });\n    };\n\n    createSession(function(err, data, session1){\n      var fauxSocket = sockets.createClient('socket1');\n      sockets.emit('connection', fauxSocket);\n      fauxSocket.emit('server:setSession', { sid: data.id });\n      session1.joinRoom('administrators');\n\n      var handler = sinon.spy();\n      fauxSocket.on('test', handler);\n      session1.emitToRoom('administrators', 'test', 'message 1');\n      expect(handler.calledWith('message 1')).to.be.true;\n\n      fauxSocket.emit('disconnect');\n\n      var fauxSocket2 = sockets.createClient('socket2');\n      sockets.emit('connection', fauxSocket2);\n\n      fauxSocket2.emit('server:setSession', { sid: data.id });\n\n      // this will be called asynchronously, tap into it\n      var originalJoin = fauxSocket2.join;\n      fauxSocket2.join = function(channel) {\n        originalJoin.apply(fauxSocket2, arguments);\n        // rejoins room\n        expect(channel).to.equal('administrators');\n\n        fauxSocket2.on('test', handler);\n        session1.emitToRoom('administrators', 'test', 'message 2');\n        expect(handler.calledWith('message 2')).to.be.true;\n        expect(handler.calledTwice).to.be.true;\n        done();\n        fauxSocket2.join = originalJoin;\n      };\n    });\n\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should allow joining multiple rooms at once",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 364,
+                "column": 49
+            },
+            "line": 364,
+            "code": "  it('should allow joining multiple rooms at once', function(done) {\n    var sockets = createMockSocketIo()\n      , store = new SessionStore('sessions', db.create(TEST_DB), sockets)\n      , calls = 0;\n\n    var sessions = [];\n\n    var createSession = function(fn) {\n      return store.createSession(function (err, session) {\n        session.save(function(err, data){\n          sessions.push(data);\n          fn(err, data, session);\n        });\n      });\n    };\n\n    createSession(function(err, data, session1){\n      var fauxSocket = sockets.createClient('socket1');\n      sockets.emit('connection', fauxSocket);\n      fauxSocket.emit('server:setSession', { sid: data.id });\n      session1.joinRoom(['administrators', 'users']);\n      var remaining = 2;\n\n      var handler = sinon.spy();\n\n      fauxSocket.on('test', handler);\n      session1.emitToRoom('administrators', 'test', 'for admins');\n      session1.emitToRoom('users', 'test', 'for users');\n      expect(handler.firstCall.calledWith('for admins')).to.be.true;\n      expect(handler.secondCall.calledWith('for users')).to.be.true;\n      expect(handler.calledTwice).to.be.true;\n      done();\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should bind multiple sessions to the same user id",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 400,
+                "column": 55
+            },
+            "line": 400,
+            "code": "  it('should bind multiple sessions to the same user id', function(done) {\n    var sockets = createMockSocketIo()\n      , store = new SessionStore('sessions', db.create(TEST_DB), sockets)\n      , totalSockets = 5\n      , remainingFrom = totalSockets * 3;\n\n    var fauxUsers = { get: function (q, fn) {\n      fn([{ id: \"abc123\" }]);\n    }};\n\n    var sessions = [];\n\n    var createSessionForUser = function(uid, fn) {\n      return store.createSession(function (err, session) {\n        session.set({uid: uid}).save(function(err, data){\n          sessions.push(data);\n          fn(err, data, session);\n        });\n      });\n    };\n\n    var bindSession = function(data, session){\n      // simulate totalSockets connections per user\n      for (var i = 0; i < totalSockets; i++){\n        var fauxSocket = sockets.createClient('testSocket' + i);\n        // generate faux headers\n        fauxSocket.handshake = { headers: {cookie: 'name=value; name2=value2; sid=' + data.id} };\n\n        sockets.emit('connection', fauxSocket);\n\n        // asserts here:\n        fauxSocket.on('hey', function(data) {\n          // must receive all events\n          expect(data).to.equal(\"test\");\n          remainingFrom--;\n          if (remainingFrom === 0) done();\n        });\n      }\n    };\n\n    // session #1\n    createSessionForUser(\"abc123\", function(err, data, session){\n      bindSession(data, session);\n      // session #2 (some other user id)\n      createSessionForUser(\"abc234\", function(err, data, session){\n        bindSession(data, session);\n        // session #3\n        createSessionForUser(\"abc123\", function(err, data, session){\n          bindSession(data, session);\n          // session #4\n          createSessionForUser(\"abc123\", function(err, data, session){\n            bindSession(data, session);\n            // emit\n            session.emitToUsers(fauxUsers, {}, \"hey\", \"test\");\n          });\n        });\n      });\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should join channels across nodes via pubsub",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 460,
+                "column": 50
+            },
+            "line": 460,
+            "code": "  it('should join channels across nodes via pubsub', function(done) {\n    var pubsub = createMockPubSub();\n    var database = db.create(TEST_DB);\n    var remaining = 3;\n\n    function createStore(sockets) {\n      return new SessionStore('sessions', database, sockets, {\n          pubClient: pubsub.pub,\n          subClient: pubsub.sub\n        });\n    }\n\n    var createSession = function(store, sid, fn) {\n      return store.createSession(sid, function (err, session) {\n        session.save(function(err, data){\n          fn(err, data, session);\n        });\n      });\n    };\n\n    // create two mock nodes\n    var sockets1 = createMockSocketIo();\n    var sockets2 = createMockSocketIo();\n\n    var store1 = createStore(sockets1);\n    var store2 = createStore(sockets2);\n\n    expect(store1.pubClient).to.equal(pubsub.pub);\n    expect(store1.subClient).to.equal(pubsub.sub);\n    expect(store2.pubClient).to.equal(pubsub.pub);\n    expect(store2.subClient).to.equal(pubsub.sub);\n\n    // create a session store\n    createSession(store1, null, function(err, data, session) {\n      // assume socket connects to the first node\n      var fauxSocket = sockets1.createClient('testSocket1');\n      sockets1.emit('connection', fauxSocket);\n      fauxSocket.emit('server:setsession', { sid: data.id });\n\n      // test that the uid room is joined\n      session.set({uid: 'user1'});\n\n      var originalRefresh = store1.refreshSessionRooms;\n      store1.refreshSessionRooms = function(sid, fn) {\n        // need to ensure this is called\n        expect(sid).to.equal(session.sid);\n        originalRefresh.apply(store1, arguments);\n        expect(fauxSocket.rooms).to.include('dpd_uid:user1'); // should not leave user channel\n        remaining-- || done();\n      };\n\n      // later on, second node receives a request for the session id to join a specific room\n      // this can happen with load balancing\n      createSession(store2, session.sid, function(err, data, session2) {\n        session2.joinRoom('administrators');\n\n        // the only connection between the two stores is via pubsub, otherwise they have separate\n        // socket instances, etc\n        var originalJoin = fauxSocket.join;\n        fauxSocket.join = function(channel) {\n          // ensure this is called\n          originalJoin.apply(fauxSocket, arguments);\n          expect(channel).to.equal('administrators');\n          session2.leaveRoom('administrators');\n\n          remaining-- || done();\n        };\n\n        var originalLeave = fauxSocket.leave;\n        fauxSocket.leave = function(channel) {\n          // ensure this is called\n          originalLeave.apply(fauxSocket, arguments);\n          expect(channel).to.equal('administrators');\n          remaining-- || done();\n        };\n      });\n\n    });\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not crash process when inserting the same session to the database",
+            "suites": [
+                "Session",
+                ".createSession()"
+            ],
+            "updatePoint": {
+                "line": 540,
+                "column": 78
+            },
+            "line": 540,
+            "code": "  it('should not crash process when inserting the same session to the database', function (done) {\n    var store = new SessionStore('sessions', db.create(TEST_DB));\n    var originalFind = store.find;\n    store.find = sinon.stub(store, \"find\").callsFake(function () {\n      var myArgs = arguments;\n      // simulate 10 ms latency for find function\n      setTimeout(function() { originalFind.apply(store, myArgs); }, 10);\n    });\n\n    var callsLeft = 5;\n    function callback(err) {\n      expect(err).to.not.exist;\n      callsLeft--;\n      if (callsLeft === 0) return done();\n    }\n\n    for (var i = 0; i< 5; i++) {\n      setTimeout(function() {\n        store.createSession(\"1c829fa9ed135d0301919aa70505cf36a39b35527b775e45e1523c354e0c5f2b0b1636f173a94e26082291ae9ad0e3e74cb5226bd0aa86ee9f7a3749d57cc74d\", callback);\n      }, 1);\n    }\n  });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should set the changes to a sessions data",
+            "suites": [
+                "Session",
+                ".set(changes)"
+            ],
+            "updatePoint": {
+                "line": 564,
+                "column": 49
+            },
+            "line": 564,
+            "code": "    it('should set the changes to a sessions data', function(done) {\n      createSession(function (err, session) {\n        session.set({ foo: 'bar' });\n        expect(session.data).to.contain({anonymous: true, foo: 'bar'});\n        done(err);\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should persist the session data in the store",
+            "suites": [
+                "Session",
+                ".save(fn)"
+            ],
+            "updatePoint": {
+                "line": 574,
+                "column": 52
+            },
+            "line": 574,
+            "code": "    it('should persist the session data in the store', function(done) {\n      createSession(function (err, session) {\n        session.set({foo: 'bar'}).save(function (err, data) {\n          session.store.first({id: session.sid}, function (err, sdata) {\n            expect(sdata.foo).to.equal('bar');\n            done(err);\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should remove the session data from the store",
+            "suites": [
+                "Session",
+                ".remove(fn)"
+            ],
+            "updatePoint": {
+                "line": 587,
+                "column": 53
+            },
+            "line": 587,
+            "code": "    it('should remove the session data from the store', function(done) {\n      createSession(function (err, session) {\n\n        session.set({foo: 'bar'}).save(function (err, data) {\n          session.store.first({id: session.sid}, function (err, sdata) {\n            expect(sdata.foo).to.equal('bar');\n            session.remove(function () {\n              session.store.first({id: session.sid}, function (err, sdata) {\n                expect(sdata).to.not.exist;\n                done(err);\n              });\n            });\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should unjoin all channels",
+            "suites": [
+                "Session",
+                ".remove(fn)"
+            ],
+            "updatePoint": {
+                "line": 604,
+                "column": 34
+            },
+            "line": 604,
+            "code": "    it('should unjoin all channels', function(done) {\n      var sockets = createMockSocketIo()\n        , store = new SessionStore('sessions', db.create(TEST_DB), sockets);\n\n      store.createSession(function (err, session) {\n        session.set({foo: 'bar'}).save(function (err, data) {\n          session.store.first({id: session.sid}, function (err, sdata) {\n            var fauxSocket = sockets.createClient('socket1');\n            sockets.emit('connection', fauxSocket);\n            fauxSocket.emit('server:setSession', { sid: session.sid });\n            session.joinRoom('administrators');\n            expect(fauxSocket.rooms).to.include('administrators');\n            expect(sdata.foo).to.equal('bar');\n            session.remove(function () {\n              expect(fauxSocket.rooms).to.not.include('administrators');\n              session.store.first({id: session.sid}, function (err, sdata) {\n                expect(sdata).to.not.exist;\n                done(err);\n              });\n            });\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should fetch the session data from the store",
+            "suites": [
+                "Session",
+                ".fetch(fn)"
+            ],
+            "updatePoint": {
+                "line": 631,
+                "column": 52
+            },
+            "line": 631,
+            "code": "    it('should fetch the session data from the store', function(done) {\n      createSession(function (err, session) {\n        session.set({foo: 'bar'}).save(function (err, data) {\n          session.store.first({id: session.sid}, function (err, sdata) {\n            session.data = {id: session.sid, foo: 'not-bar'};\n            session.fetch(function (err) {\n              expect(session.data).to.contain({id: session.sid, foo: 'bar'});\n              done(err);\n            });\n          });\n        });\n      });\n    });",
+            "file": "sessions.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should load the default resources",
+            "suites": [
+                "type-loader",
+                ".loadTypes(basepath, fn)"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 41
+            },
+            "line": 57,
+            "code": "    it('should load the default resources', function (done) {\n      TypeLoader(basepath, function (resources, customResources) {\n        expect(resources).to.not.be.empty;\n        expect(resources).to.include.keys('Collection');\n        expect(resources).to.include.keys('Files');\n        expect(resources).to.include.keys('InternalResources');\n        expect(resources).to.include.keys('UserCollection');\n        expect(customResources).to.be.empty;\n        done();\n      });\n    });",
+            "file": "typeloader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should load the default resources and the customResources based on package.json (w dpdIgnore)",
+            "suites": [
+                "type-loader",
+                ".loadTypes(basepath, fn)"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 101
+            },
+            "line": 68,
+            "code": "    it('should load the default resources and the customResources based on package.json (w dpdIgnore)', function (done) {\n      createPackageJson({\n        ignore: true\n      });\n      TypeLoader(basepath, function (resources, customResources) {\n        expect(customResources).to.not.be.empty;\n        expect(customResources).to.include.keys('Fileupload');\n        expect(customResources).to.not.include.keys('Count');\n        done();\n      });\n    });",
+            "file": "typeloader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should load the default resources and the customResources based on package.json (w dpdInclude)",
+            "suites": [
+                "type-loader",
+                ".loadTypes(basepath, fn)"
+            ],
+            "updatePoint": {
+                "line": 79,
+                "column": 102
+            },
+            "line": 79,
+            "code": "    it('should load the default resources and the customResources based on package.json (w dpdInclude)', function (done) {\n      createPackageJson({\n        include: true\n      });\n      TypeLoader(basepath, function (resources, customResources) {\n        expect(customResources).to.not.be.empty;\n        expect(customResources).to.not.include.keys('Fileupload');\n        expect(customResources).to.include.keys('Count');\n        done();\n      });\n    });",
+            "file": "typeloader.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not crash when the posted password is a number",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 30,
+                "column": 61
+            },
+            "line": 30,
+            "code": "    it('should not crash when the posted password is a number', function (done) {\n      var test = this;\n      this.ctx.url = '/users';\n      this.ctx.query = {\n        username: \"Foo\",\n        password: Math.random()\n      };\n      this.ctx.req.url = '/users';\n      this.ctx.req.method = 'POST';\n      this.ctx.req.body.username = 'foo@bar.com';\n      this.ctx.req.body.password = Math.random(); // hash the password so we can use it in our mocked loginFindUser function below\n\n      this.uc.setPassword(this.ctx.req.body);\n      var hashedPassword = this.ctx.req.body.password; // reset it as plain test\n\n      this.ctx.req.body.password = Math.random();\n\n      this.uc.loginFindUser = function (ctx, fn) {\n        expect(ctx.req.body).to.eql({\n          username: 'foo@bar.com',\n          password: 'abcd'\n        });\n        fn(null, {\n          id: '123',\n          username: 'foo@bar.com',\n          password: hashedPassword\n        });\n      };\n\n      this.complete = function (err, res) {\n        expect(err).to.equal(\"Missing request body\");\n        done();\n      };\n\n      this.uc.handle(this.ctx);\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should login a user when credentials are POSTed to \"/login\"",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 66,
+                "column": 67
+            },
+            "line": 66,
+            "code": "    it('should login a user when credentials are POSTed to \"/login\"', function (done) {\n      var test = this;\n      this.ctx.url = '/login';\n      this.ctx.query = {};\n      this.ctx.session = {\n        set: function (changes) {\n          expect(changes).to.contain({\n            uid: '123',\n            path: '/users'\n          });\n          return this;\n        },\n        save: function (fn) {\n          expect(fn).to.be.a('function');\n          fn(null, {\n            path: '/users',\n            uid: '123',\n            id: 'abc'\n          });\n        }\n      };\n      this.ctx.req.url = '/users/login';\n      this.ctx.req.method = 'POST';\n      this.ctx.req.body.username = 'foo@bar.com';\n      this.ctx.req.body.password = 'abcd'; // hash the password so we can use it in our mocked loginFindUser function below\n\n      this.uc.setPassword(this.ctx.req.body);\n      var hashedPassword = this.ctx.req.body.password; // reset it as plain test\n\n      this.ctx.req.body.password = 'abcd';\n\n      this.uc.loginFindUser = function (ctx, fn) {\n        expect(ctx.req.body).to.eql({\n          username: 'foo@bar.com',\n          password: 'abcd'\n        });\n        fn(null, {\n          id: '123',\n          username: 'foo@bar.com',\n          password: hashedPassword\n        });\n      };\n\n      this.complete = function (err, res) {\n        expect(err).to.not.exist;\n        expect(res).to.contain({\n          uid: '123',\n          path: '/users'\n        });\n        done();\n      };\n\n      this.uc.handle(this.ctx);\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should logout a user when \"/logout\" is requested",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 120,
+                "column": 56
+            },
+            "line": 120,
+            "code": "    it('should logout a user when \"/logout\" is requested', function (done) {\n      var test = this;\n      var removed = false;\n      this.ctx.url = '/logout';\n      this.ctx.session = {\n        remove: function (fn) {\n          removed = true;\n          expect(fn).to.be.a('function');\n          fn();\n        }\n      };\n      this.ctx.req.url = '/users/logout';\n      this.ctx.req.method = 'POST';\n      this.ctx.req.body.email = 'foo@bar.com';\n      this.ctx.req.body.password = 'abcd';\n\n      this.complete = function (err, res) {\n        expect(removed).to.equal(true);\n        done();\n      };\n\n      this.uc.handle(this.ctx);\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should perform GET with including $fields",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 143,
+                "column": 49
+            },
+            "line": 143,
+            "code": "    it('should perform GET with including $fields', function (done) {\n      this.ctx.url = '/';\n      this.ctx.query = {\n        $fields: {\n          username: 1,\n          email: 1\n        }\n      };\n      this.ctx.req.url = '/users';\n      this.ctx.req.method = 'GET';\n\n      function test(e, r) {\n        expect(e).to.not.exist;\n        this.uc.handle(this.ctx);\n      }\n\n      this.complete = function (err, res) {\n        expect(err).to.not.exist;\n        expect(res[0]).to.have.keys(['id', 'username', 'email']);\n        expect(res[0].username).to.eql('foo');\n        expect(res[0].email).to.eql('foo@bar.com');\n        this.uc.store.remove(function (err) {\n          done(err);\n        });\n      };\n\n      var testData = {\n        username: 'foo',\n        password: 'abcd',\n        email: 'foo@bar.com',\n        name: 'foo'\n      };\n      this.uc.store.insert(testData, test.bind(this));\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should perform GET with excluding $fields",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 177,
+                "column": 49
+            },
+            "line": 177,
+            "code": "    it('should perform GET with excluding $fields', function (done) {\n      this.ctx.url = '/';\n      this.ctx.query = {\n        $fields: {\n          username: 0,\n          email: 0\n        }\n      };\n      this.ctx.req.url = '/users';\n      this.ctx.req.method = 'GET';\n\n      function test(e, r) {\n        expect(e).to.not.exist;\n        this.uc.handle(this.ctx);\n      }\n\n      this.complete = function (err, res) {\n        expect(err).to.not.exist;\n        expect(res[0]).to.have.keys(['id', 'name']);\n        expect(res[0].name).to.eql('foo');\n        this.uc.store.remove(function (err) {\n          done(err);\n        });\n      };\n\n      var testData = {\n        username: 'foo',\n        password: 'abcd',\n        email: 'foo@bar.com',\n        name: 'foo'\n      };\n      this.uc.store.insert(testData, test.bind(this));\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should hide password when $fields{password: 1}",
+            "suites": [
+                "UserCollection",
+                ".handle(ctx)"
+            ],
+            "updatePoint": {
+                "line": 210,
+                "column": 54
+            },
+            "line": 210,
+            "code": "    it('should hide password when $fields{password: 1}', function (done) {\n      this.ctx.url = '/';\n      this.ctx.query = {\n        $fields: {\n          password: 1\n        }\n      };\n      this.ctx.req.url = '/users';\n      this.ctx.req.method = 'GET';\n\n      function test(e, r) {\n        expect(e).to.not.exist;\n        this.uc.handle(this.ctx);\n      }\n\n      this.complete = function (err, res) {\n        expect(err).to.not.exist;\n        expect(res[0]).to.have.keys(['id', 'name', 'email', 'username']);\n        this.uc.store.remove(function (err) {\n          done(err);\n        });\n      };\n\n      var testData = {\n        username: 'foo',\n        password: 'abcd',\n        email: 'foo@bar.com',\n        name: 'foo'\n      };\n      this.uc.store.insert(testData, test.bind(this));\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should attach the current user to the session",
+            "suites": [
+                "UserCollection",
+                ".handleSession(ctx)"
+            ],
+            "updatePoint": {
+                "line": 243,
+                "column": 53
+            },
+            "line": 243,
+            "code": "    it('should attach the current user to the session', function (done) {\n      var properties = {\n        name: {\n          type: 'string'\n        }\n      };\n      var uc = new UserCollection('users', {\n        db: db.create(TEST_DB),\n        config: {\n          properties: properties\n        }\n      });\n      var ctx = {\n        session: {\n          data: {\n            path: '/users',\n            uid: '123'\n          }\n        }\n      };\n      var found = false;\n\n      uc.store.find = function (query, fn) {\n        expect(query).to.eql({\n          id: '123'\n        });\n        found = true;\n        fn();\n      };\n\n      uc.handleSession(ctx, function () {\n        expect(found).to.equal(true);\n        done();\n      });\n    });",
+            "file": "user-collection.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse a query string",
+            "suites": [
+                "http",
+                ".parseQuery"
+            ],
+            "updatePoint": {
+                "line": 22,
+                "column": 35
+            },
+            "line": 22,
+            "code": "    it('should parse a query string', function () {\n      var q = http.parseQuery('/foo/bar?foo=bar');\n      expect(q).to.eql({\n        foo: 'bar'\n      });\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse a json query string",
+            "suites": [
+                "http",
+                ".parseQuery"
+            ],
+            "updatePoint": {
+                "line": 28,
+                "column": 40
+            },
+            "line": 28,
+            "code": "    it('should parse a json query string', function () {\n      var q = http.parseQuery('/foo/bar?{\"foo\":\"bar\"}');\n      expect(q).to.eql({\n        foo: 'bar'\n      });\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should not change a big number",
+            "suites": [
+                "http",
+                ".parseQuery"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 38
+            },
+            "line": 34,
+            "code": "    it('should not change a big number', function () {\n      var q = http.parseQuery('/foo/bar?id=9979174442646823'); // this number is expected to be changed by parseInt to 9979174442646824\n\n      expect(q).to.eql({\n        id: '9979174442646823'\n      });\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should get body from stream",
+            "suites": [
+                "http",
+                ".getBody"
+            ],
+            "updatePoint": {
+                "line": 43,
+                "column": 35
+            },
+            "line": 43,
+            "code": "    it('should get body from stream', function (done) {\n      var obj = JSON.stringify({\n        foo: 'bar'\n      }),\n          req = new Stream();\n      var res = this.res;\n      http.getBody(req, function (buffer) {\n        expect(buffer).to.exist;\n        expect(buffer).to.eql(obj);\n        done();\n      });\n      req.emit('data', obj);\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should get body from rawBody",
+            "suites": [
+                "http",
+                ".getBody"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 36
+            },
+            "line": 57,
+            "code": "    it('should get body from rawBody', function (done) {\n      var obj = JSON.stringify({\n        foo: 'bar'\n      }),\n          req = new Stream();\n      req.rawBody = '';\n      req.on('data', function (chunk) {\n        req.rawBody += chunk;\n      });\n      var res = this.res;\n      req.on('end', function () {\n        http.getBody(req, function (buffer) {\n          expect(buffer).to.exist;\n          expect(buffer).to.eql(obj);\n          done();\n        });\n      });\n      req.emit('data', obj);\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse json",
+            "suites": [
+                "http",
+                ".parseBody()"
+            ],
+            "updatePoint": {
+                "line": 84,
+                "column": 25
+            },
+            "line": 84,
+            "code": "    it('should parse json', function (done) {\n      var obj = {\n        foo: 'bar'\n      },\n          req = new Stream();\n      http.parseBody(req, this.res, 'application/json', function (err, result) {\n        expect(err).to.not.exist;\n        expect(req.body).to.eql(obj);\n        done();\n      });\n      req.emit('data', JSON.stringify(obj));\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse json in chunks",
+            "suites": [
+                "http",
+                ".parseBody()"
+            ],
+            "updatePoint": {
+                "line": 97,
+                "column": 35
+            },
+            "line": 97,
+            "code": "    it('should parse json in chunks', function (done) {\n      var req = new Stream(),\n          chunks = ['{\"fo', 'o\": \"bar\"', ', \"bar\"', ': \"baz\"', '}'];\n      http.parseBody(req, this.res, 'application/json', function (err) {\n        expect(err).to.not.exist;\n        expect(req.body).to.eql({\n          \"foo\": \"bar\",\n          \"bar\": \"baz\"\n        });\n        done();\n      });\n      chunks.forEach(function (c) {\n        req.emit('data', c);\n      });\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should parse a form url-encoded value",
+            "suites": [
+                "http",
+                ".parseBody()"
+            ],
+            "updatePoint": {
+                "line": 113,
+                "column": 45
+            },
+            "line": 113,
+            "code": "    it('should parse a form url-encoded value', function (done) {\n      var value = \"foo=bar&bar=baz\",\n          req = new Stream();\n      http.parseBody(req, this.res, 'application/x-www-form-urlencoded', function (err) {\n        expect(err).to.not.exist;\n        expect(req.body).to.eql({\n          \"foo\": \"bar\",\n          \"bar\": \"baz\"\n        });\n        done();\n      });\n      req.emit('data', value);\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should interpret an empty body as an empty object",
+            "suites": [
+                "http",
+                ".parseBody()"
+            ],
+            "updatePoint": {
+                "line": 127,
+                "column": 57
+            },
+            "line": 127,
+            "code": "    it('should interpret an empty body as an empty object', function (done) {\n      var req = new Stream();\n      http.parseBody(req, this.res, 'application/json', function (err) {\n        expect(err).to.not.exist;\n        expect(req.body).to.eql({});\n        done();\n      });\n      req.emit('end');\n    });",
+            "file": "util.unit.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "deployd__deployd.svg"
+}

@@ -1,0 +1,726 @@
+{
+    "repo": "react-grid-layout/react-grid-layout",
+    "url": "https://github.com/react-grid-layout/react-grid-layout",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "react-grid-layout",
+            "lang": "js",
+            "dir": "test",
+            "framework": "jest",
+            "pattern": "**/*[._-]{test,spec,unittest,unit}.{ts,js}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "Basic Render",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>"
+            ],
+            "updatePoint": {
+                "line": 29,
+                "column": 20
+            },
+            "line": 29,
+            "code": "    it(\"Basic Render\", async function () {\n      const wrapper = mount( /*#__PURE__*/React.createElement(BasicLayout, null));\n      expect(wrapper).toMatchSnapshot();\n    });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Creates layout based on properties",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "data-grid"
+            ],
+            "updatePoint": {
+                "line": 34,
+                "column": 44
+            },
+            "line": 34,
+            "code": "      it(\"Creates layout based on properties\", async function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(ReactGridLayout, {\n          className: \"layout\",\n          cols: 12,\n          rowHeight: 30,\n          width: 1200\n        }, /*#__PURE__*/React.createElement(\"div\", {\n          key: \"a\",\n          \"data-grid\": {\n            x: 0,\n            y: 0,\n            w: 1,\n            h: 2,\n            static: true\n          }\n        }, \"a\"), /*#__PURE__*/React.createElement(\"div\", {\n          key: \"b\",\n          \"data-grid\": {\n            x: 1,\n            y: 0,\n            w: 3,\n            h: 2,\n            minW: 2,\n            maxW: 4\n          }\n        }, \"b\"), /*#__PURE__*/React.createElement(\"div\", {\n          key: \"c\",\n          \"data-grid\": {\n            x: 4,\n            y: 0,\n            w: 1,\n            h: 2\n          }\n        }, \"c\")));\n        expect(wrapper).toMatchSnapshot();\n        expect(wrapper.state().layout).toMatchObject([{\n          h: 2,\n          i: \"a\",\n          static: true,\n          w: 1,\n          x: 0,\n          y: 0\n        }, {\n          h: 2,\n          i: \"b\",\n          static: false,\n          w: 3,\n          x: 1,\n          y: 0\n        }, {\n          h: 2,\n          i: \"c\",\n          static: false,\n          w: 1,\n          x: 4,\n          y: 0\n        }]);\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Null items in list",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "data-grid"
+            ],
+            "updatePoint": {
+                "line": 92,
+                "column": 28
+            },
+            "line": 92,
+            "code": "      it(\"Null items in list\", async function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(ReactGridLayout, {\n          className: \"layout\",\n          cols: 12,\n          rowHeight: 30,\n          width: 1200 // $FlowIgnore\n\n        }, /*#__PURE__*/React.createElement(\"div\", {\n          key: \"a\",\n          \"data-grid\": {\n            x: 0,\n            y: 0,\n            w: 1,\n            h: 2,\n            static: true\n          }\n        }, \"a\"), false, null, /*#__PURE__*/React.createElement(\"div\", {\n          key: \"c\",\n          \"data-grid\": {\n            x: 4,\n            y: 0,\n            w: 1,\n            h: 2\n          }\n        }, \"c\")));\n        expect(wrapper).toMatchSnapshot();\n        expect(wrapper.state().layout).toHaveLength(2); // Only two truthy items\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Renders with WidthProvider",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "WidthProvider"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 36
+            },
+            "line": 122,
+            "code": "      it(\"Renders with WidthProvider\", async function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(BasicLayout, {\n          measureBeforeMount: false\n        }));\n        expect(wrapper).toMatchSnapshot();\n        const widthProviderWrapper = wrapper.childAt(0);\n        expect(widthProviderWrapper.name()).toEqual(\"WidthProvider\");\n        expect(widthProviderWrapper.childAt(0).name()).toEqual(\"ReactGridLayout\");\n        expect(widthProviderWrapper.state().width).toEqual(1280); // default\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Renders with WidthProvider measureBeforeMount",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "WidthProvider"
+            ],
+            "updatePoint": {
+                "line": 132,
+                "column": 55
+            },
+            "line": 132,
+            "code": "      it(\"Renders with WidthProvider measureBeforeMount\", async function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(BasicLayout, {\n          measureBeforeMount: true\n        }));\n        expect(wrapper).toMatchSnapshot();\n        const widthProviderWrapper = wrapper.childAt(0);\n        expect(widthProviderWrapper.name()).toEqual(\"WidthProvider\"); // Renders a div first\n\n        expect(widthProviderWrapper.childAt(0).name()).toEqual(\"div\"); // Mock offsetWidth to return 500 and fire a resize\n\n        const node = wrapper.getDOMNode();\n        Object.defineProperty(node, \"offsetWidth\", {\n          get: jest.fn(() => 500)\n        });\n        global.dispatchEvent(new Event(\"resize\"));\n        wrapper.setProps({}); // force a rerender synchronously\n        // Should have removed the div, now has the RGL\n\n        expect(wrapper.childAt(0).childAt(0).name()).toEqual(\"ReactGridLayout\");\n        expect(wrapper.childAt(0).state().width).toEqual(500);\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "WidthProvider responds to window resize events",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "WidthProvider"
+            ],
+            "updatePoint": {
+                "line": 153,
+                "column": 56
+            },
+            "line": 153,
+            "code": "      it(\"WidthProvider responds to window resize events\", async function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(BasicLayout, null));\n        const widthProviderWrapper = wrapper.childAt(0); // Original width\n\n        expect(widthProviderWrapper.state().width).toEqual(1280); // Mock offsetWidth to return 500\n\n        const node = wrapper.getDOMNode();\n        Object.defineProperty(node, \"offsetWidth\", {\n          get: jest.fn(() => 500)\n        }); // Trigger the window resize event.\n\n        global.dispatchEvent(new Event(\"resize\")); // State should now be 500\n\n        expect(widthProviderWrapper.state().width).toEqual(500);\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Updates when an item is dropped in",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "Droppability"
+            ],
+            "updatePoint": {
+                "line": 182,
+                "column": 44
+            },
+            "line": 182,
+            "code": "      it(\"Updates when an item is dropped in\", function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(DroppableLayout, {\n          containerPadding: [0, 0]\n        }));\n        const gridLayout = wrapper.find(\"ReactGridLayout\");\n        expect(gridLayout).toHaveLength(1); // Start: no dropping node.\n\n        expect(gridLayout.state(\"droppingDOMNode\")).toEqual(null); // Drag the droppable over the grid layout.\n\n        dragDroppableTo(wrapper, 200, 150); // We should have the position in our state.\n\n        expect(gridLayout.state(\"droppingPosition\")).toHaveProperty(\"left\", 200);\n        expect(gridLayout.state(\"droppingPosition\")).toHaveProperty(\"top\", 150); // We should now have the placeholder element in our state.\n\n        expect(gridLayout.state(\"droppingDOMNode\")).toHaveProperty(\"type\", \"div\");\n        expect(gridLayout.state(\"droppingDOMNode\")).toHaveProperty(\"key\", \"__dropping-elem__\"); // It should also have a layout item assigned to it.\n\n        let layoutItem = gridLayout.state(\"layout\").find(item => item.i === \"__dropping-elem__\");\n        expect(layoutItem).toEqual({\n          i: \"__dropping-elem__\",\n          h: 1,\n          w: 1,\n          x: 2,\n          y: 4,\n          static: false,\n          isDraggable: true\n        }); // Let's move it some more.\n\n        dragDroppableTo(wrapper, 0, 300); // State should change.\n\n        expect(gridLayout.state(\"droppingPosition\")).toHaveProperty(\"left\", 0);\n        expect(gridLayout.state(\"droppingPosition\")).toHaveProperty(\"top\", 300);\n        layoutItem = gridLayout.state(\"layout\").find(item => item.i === \"__dropping-elem__\"); // Using toMatchObject() here as this will inherit some undefined properties from the cloning\n\n        expect(layoutItem).toMatchObject({\n          i: \"__dropping-elem__\",\n          h: 1,\n          w: 1,\n          x: 0,\n          y: 10,\n          static: false,\n          isDraggable: true\n        });\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Allows customizing the droppable placeholder",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "Droppability"
+            ],
+            "updatePoint": {
+                "line": 226,
+                "column": 54
+            },
+            "line": 226,
+            "code": "      it(\"Allows customizing the droppable placeholder\", function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(DroppableLayout, {\n          onDropDragOver: () => ({\n            w: 2,\n            h: 2\n          })\n        }));\n        const gridLayout = wrapper.find(\"ReactGridLayout\"); // Find the droppable element and drag it over the grid layout.\n\n        dragDroppableTo(wrapper, 200, 150); // It should also have a layout item assigned to it.\n\n        const layoutItem = gridLayout.state(\"layout\").find(item => item.i === \"__dropping-elem__\");\n        expect(layoutItem).toEqual({\n          i: \"__dropping-elem__\",\n          h: 2,\n          w: 2,\n          x: 2,\n          y: 4,\n          static: false,\n          isDraggable: true\n        });\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Allows short-circuiting the drag",
+            "suites": [
+                "Lifecycle tests",
+                "<ReactGridLayout>",
+                "Droppability"
+            ],
+            "updatePoint": {
+                "line": 248,
+                "column": 42
+            },
+            "line": 248,
+            "code": "      it(\"Allows short-circuiting the drag\", function () {\n        const wrapper = mount( /*#__PURE__*/React.createElement(DroppableLayout, {\n          onDropDragOver: () => false\n        }));\n        const gridLayout = wrapper.find(\"ReactGridLayout\"); // Find the droppable element and drag it over the grid layout.\n\n        dragDroppableTo(wrapper, 200, 150); // It should also have a layout item assigned to it.\n\n        const layoutItem = gridLayout.state(\"layout\").find(item => item.i === \"__dropping-elem__\");\n        expect(layoutItem).toBeUndefined();\n      });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Basic Render",
+            "suites": [
+                "Lifecycle tests",
+                "<ResponsiveReactGridLayout>"
+            ],
+            "updatePoint": {
+                "line": 262,
+                "column": 20
+            },
+            "line": 262,
+            "code": "    it(\"Basic Render\", async function () {\n      const wrapper = mount( /*#__PURE__*/React.createElement(ShowcaseLayout, null));\n      expect(wrapper).toMatchSnapshot();\n    });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Does not modify layout on movement",
+            "suites": [
+                "Lifecycle tests",
+                "<ResponsiveReactGridLayout>"
+            ],
+            "updatePoint": {
+                "line": 266,
+                "column": 42
+            },
+            "line": 266,
+            "code": "    it(\"Does not modify layout on movement\", async function () {\n      const layouts = {\n        lg: [..._.times(3, i => ({\n          i: String(i),\n          x: i,\n          y: 0,\n          w: 1,\n          h: 1\n        }))]\n      };\n      const frozenLayouts = deepFreeze(layouts, {\n        set: true,\n        get: false\n        /* don't crash on unknown gets */\n\n      }); // Render the basic Responsive layout.\n\n      const wrapper = mount( /*#__PURE__*/React.createElement(ResponsiveReactGridLayout, {\n        layouts: frozenLayouts,\n        width: 1280,\n        breakpoint: \"lg\"\n      }, _.times(3, i => /*#__PURE__*/React.createElement(\"div\", {\n        key: i\n      })))); // Set that layout as state and ensure it doesn't change.\n\n      wrapper.setState({\n        layouts: frozenLayouts\n      });\n      wrapper.setProps({\n        width: 800,\n        breakpoint: \"md\"\n      }); // will generate new layout\n\n      wrapper.render();\n      expect(frozenLayouts).not.toContain(\"md\");\n    });",
+            "file": "spec/lifecycle-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Handles an empty layout as input",
+            "suites": [
+                "bottom"
+            ],
+            "updatePoint": {
+                "line": 6,
+                "column": 38
+            },
+            "line": 6,
+            "code": "  it(\"Handles an empty layout as input\", () => {\n    expect(bottom([])).toEqual(0);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Returns the bottom coordinate of the layout",
+            "suites": [
+                "bottom"
+            ],
+            "updatePoint": {
+                "line": 9,
+                "column": 49
+            },
+            "line": 9,
+            "code": "  it(\"Returns the bottom coordinate of the layout\", () => {\n    expect(bottom([{\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 2,\n      w: 1,\n      h: 1\n    }])).toEqual(3);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should sort by top to bottom right",
+            "suites": [
+                "sortLayoutItemsByRowCol"
+            ],
+            "updatePoint": {
+                "line": 26,
+                "column": 40
+            },
+            "line": 26,
+            "code": "  it(\"should sort by top to bottom right\", () => {\n    const layout = [{\n      x: 1,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"2\"\n    }, {\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"1\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 2,\n      h: 2,\n      i: \"3\"\n    }];\n    expect(sortLayoutItemsByRowCol(layout)).toEqual([{\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"1\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 2,\n      h: 2,\n      i: \"3\"\n    }, {\n      x: 1,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"2\"\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Returns whether the layout items collide",
+            "suites": [
+                "collides"
+            ],
+            "updatePoint": {
+                "line": 68,
+                "column": 46
+            },
+            "line": 68,
+            "code": "  it(\"Returns whether the layout items collide\", () => {\n    expect(collides({\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 2,\n      w: 1,\n      h: 1\n    })).toEqual(false);\n    expect(collides({\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    }, {\n      i: \"2\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    })).toEqual(true);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Validates an empty layout",
+            "suites": [
+                "validateLayout"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 31
+            },
+            "line": 98,
+            "code": "  it(\"Validates an empty layout\", () => {\n    validateLayout([]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Validates a populated layout",
+            "suites": [
+                "validateLayout"
+            ],
+            "updatePoint": {
+                "line": 101,
+                "column": 34
+            },
+            "line": 101,
+            "code": "  it(\"Validates a populated layout\", () => {\n    validateLayout([{\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 2,\n      w: 1,\n      h: 1\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Throws errors on invalid input",
+            "suites": [
+                "validateLayout"
+            ],
+            "updatePoint": {
+                "line": 116,
+                "column": 36
+            },
+            "line": 116,
+            "code": "  it(\"Throws errors on invalid input\", () => {\n    expect(() => {\n      validateLayout([{\n        i: \"1\",\n        x: 0,\n        y: 1,\n        w: 1,\n        h: 1\n      }, // $FlowFixMe: dynamic check\n      {\n        i: \"2\",\n        x: 1,\n        y: 2,\n        w: 1\n      }]);\n    }).toThrowError(/layout\\[1]\\.h must be a number!/i);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Does not change layout when colliding on no rearrangement mode",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 139,
+                "column": 68
+            },
+            "line": 139,
+            "code": "  it(\"Does not change layout when colliding on no rearrangement mode\", () => {\n    const layout = [{\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      moved: false\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 2,\n      w: 1,\n      h: 1,\n      moved: false\n    }];\n    const layoutItem = layout[0];\n    expect(moveElement(layout, layoutItem, 1, 2, // x, y\n    true, // isUserAction\n    true, // preventCollision\n    null, 2 // compactType, cols\n    )).toEqual([{\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      moved: false\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 2,\n      w: 1,\n      h: 1,\n      moved: false\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Does change layout when colliding in rearrangement mode",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 176,
+                "column": 61
+            },
+            "line": 176,
+            "code": "  it(\"Does change layout when colliding in rearrangement mode\", () => {\n    const layout = [{\n      i: \"1\",\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 1,\n      moved: false\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      moved: false\n    }];\n    const layoutItem = layout[0];\n    expect(moveElement(layout, layoutItem, 1, 0, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 2 // compactType, cols\n    )).toEqual([{\n      i: \"1\",\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      moved: true\n    }, {\n      i: \"2\",\n      x: 1,\n      y: 1,\n      w: 1,\n      h: 1,\n      moved: true\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Moves elements out of the way without causing panel jumps when compaction is vertical",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 213,
+                "column": 91
+            },
+            "line": 213,
+            "code": "  it(\"Moves elements out of the way without causing panel jumps when compaction is vertical\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }]; // move A down slightly so it collides with C; can cause C to jump above B.\n    // We instead want B to jump above A (it has the room)\n\n    const itemA = layout[0];\n    expect(compactAndMove(layout, itemA, 0, 1, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 10 // compactType, cols\n    )).toEqual([expect.objectContaining({\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Calculates the correct collision when moving large object far",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 260,
+                "column": 67
+            },
+            "line": 260,
+            "code": "  it(\"Calculates the correct collision when moving large object far\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }]; // Move A down by 2. This should move B above, but since we don't compact in between,\n    // C should move below.\n\n    const itemA = layout[0];\n    expect(moveElement(layout, itemA, 0, 2, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 10 // compactType, cols\n    )).toEqual([expect.objectContaining({\n      x: 0,\n      y: 2,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 12,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Moves elements out of the way without causing panel jumps when compaction is vertical (example case 13)",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 307,
+                "column": 109
+            },
+            "line": 307,
+            "code": "  it(\"Moves elements out of the way without causing panel jumps when compaction is vertical (example case 13)\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"A\"\n    }, {\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 2,\n      h: 2,\n      i: \"C\"\n    }]; // move A over slightly so it collides with B; can cause C to jump above B\n    // this test will check that that does not happen\n\n    const itemA = layout[0];\n    expect(moveElement(layout, itemA, 1, 0, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 2 // compactType, cols\n    )).toEqual([{\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 1,\n      i: \"A\",\n      moved: true\n    }, {\n      x: 1,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"B\",\n      moved: true\n    }, {\n      x: 0,\n      y: 2,\n      w: 2,\n      h: 2,\n      i: \"C\",\n      moved: true\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Moves elements out of the way without causing panel jumps when compaction is horizontal",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 357,
+                "column": 93
+            },
+            "line": 357,
+            "code": "  it(\"Moves elements out of the way without causing panel jumps when compaction is horizontal\", () => {\n    const layout = [{\n      y: 0,\n      x: 0,\n      h: 1,\n      w: 10,\n      i: \"A\"\n    }, {\n      y: 0,\n      x: 11,\n      h: 1,\n      w: 1,\n      i: \"B\"\n    }, {\n      y: 0,\n      x: 12,\n      h: 1,\n      w: 1,\n      i: \"C\"\n    }]; // move A over slightly so it collides with C; can cause C to jump left of B\n    // this test will check that that does not happen\n\n    const itemA = layout[0];\n    expect(moveElement(layout, itemA, 2, 0, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"horizontal\", 10 // compactType, cols\n    )).toEqual([{\n      y: 0,\n      x: 2,\n      h: 1,\n      w: 10,\n      moved: true,\n      i: \"A\"\n    }, {\n      y: 0,\n      x: 1,\n      h: 1,\n      w: 1,\n      moved: true,\n      i: \"B\"\n    }, {\n      y: 0,\n      x: 12,\n      h: 1,\n      w: 1,\n      i: \"C\"\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Moves one element to another should cause moving down panels, vert compact, example 1",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 406,
+                "column": 91
+            },
+            "line": 406,
+            "code": "  it(\"Moves one element to another should cause moving down panels, vert compact, example 1\", () => {\n    // | A | B |\n    // |C|  D  |\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 2,\n      h: 1,\n      i: \"A\"\n    }, {\n      x: 2,\n      y: 0,\n      w: 2,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }, {\n      x: 1,\n      y: 1,\n      w: 3,\n      h: 1,\n      i: \"D\"\n    }]; // move B left slightly so it collides with A; can cause C to jump above A\n    // this test will check that that does not happen\n\n    const itemB = layout[1];\n    expect(compactAndMove(layout, itemB, 1, 0, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 4 // compactType, cols\n    )).toEqual([expect.objectContaining({\n      x: 0,\n      y: 1,\n      w: 2,\n      h: 1,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 1,\n      y: 0,\n      w: 2,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 2,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }), expect.objectContaining({\n      x: 1,\n      y: 2,\n      w: 3,\n      h: 1,\n      i: \"D\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Moves one element to another should cause moving down panels, vert compact, example 2",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 467,
+                "column": 91
+            },
+            "line": 467,
+            "code": "  it(\"Moves one element to another should cause moving down panels, vert compact, example 2\", () => {\n    // | A |\n    // |B|C|\n    //   | |\n    //\n    // Moving C above A should not move B above A\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 2,\n      h: 1,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 1,\n      y: 1,\n      w: 1,\n      h: 2,\n      i: \"C\"\n    }]; // Move C up.\n\n    const itemB = layout[2];\n    expect(compactAndMove(layout, itemB, 1, 0, // x, y\n    true, // isUserAction\n    false, //  preventCollision\n    \"vertical\", 4 // compactType, cols\n    )).toEqual([expect.objectContaining({\n      x: 0,\n      y: 2,\n      w: 2,\n      h: 1,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 3,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 1,\n      y: 0,\n      w: 1,\n      h: 2,\n      i: \"C\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Prevent collision",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 518,
+                "column": 23
+            },
+            "line": 518,
+            "code": "  it(\"Prevent collision\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }]; // Move A down by 2. This will collide with B and C so\n    // the layout should be unchanged\n\n    const itemA = layout[0];\n    const modifiedLayout = moveElement(layout, itemA, 0, // x\n    2, // y\n    true, // isUserAction\n    true, // preventCollision\n    null, // compactType\n    10 // cols\n    );\n    expect(Object.is(layout, modifiedLayout)).toBe(true);\n    expect(layout).toEqual([expect.objectContaining({\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Allow overlapping the grid items",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 569,
+                "column": 38
+            },
+            "line": 569,
+            "code": "  it(\"Allow overlapping the grid items\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }]; // Move A down by 2. Both B and C should remain in same position\n\n    const itemA = layout[0];\n    expect(moveElement(layout, itemA, 0, 2, // x, y\n    true, // isUserAction\n    false, // preventCollision\n    null, 10, // compactType, cols\n    true // allowOverlap\n    )).toEqual([expect.objectContaining({\n      x: 0,\n      y: 2,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }), expect.objectContaining({\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    })]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Layout is cloned when using allowOverlap (#1606)",
+            "suites": [
+                "moveElement"
+            ],
+            "updatePoint": {
+                "line": 616,
+                "column": 54
+            },
+            "line": 616,
+            "code": "  it(\"Layout is cloned when using allowOverlap (#1606)\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 10,\n      i: \"A\"\n    }, {\n      x: 0,\n      y: 10,\n      w: 1,\n      h: 1,\n      i: \"B\"\n    }, {\n      x: 0,\n      y: 11,\n      w: 1,\n      h: 1,\n      i: \"C\"\n    }]; // Move A down by 2. Both B and C should remain in same position\n\n    const itemA = layout[0];\n    const modifiedLayout = moveElement(layout, itemA, 0, 2, // x, y\n    true, // isUserAction\n    false, // preventCollision\n    null, 10, // compactType, cols\n    true // allowOverlap\n    );\n    expect(Object.is(layout, modifiedLayout)).toBe(false);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Removes empty vertical space above item",
+            "suites": [
+                "compact vertical"
+            ],
+            "updatePoint": {
+                "line": 648,
+                "column": 45
+            },
+            "line": 648,
+            "code": "  it(\"Removes empty vertical space above item\", () => {\n    const layout = [{\n      i: \"1\",\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1\n    }];\n    expect(compact(layout, \"vertical\", 10)).toEqual([{\n      i: \"1\",\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 1,\n      moved: false,\n      static: false\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Resolve collision by moving item further down in array",
+            "suites": [
+                "compact vertical"
+            ],
+            "updatePoint": {
+                "line": 666,
+                "column": 60
+            },
+            "line": 666,
+            "code": "  it(\"Resolve collision by moving item further down in array\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 5,\n      i: \"1\"\n    }, {\n      x: 0,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"2\"\n    }];\n    expect(compact(layout, \"vertical\", 10)).toEqual([{\n      x: 0,\n      y: 0,\n      w: 1,\n      h: 5,\n      i: \"1\",\n      moved: false,\n      static: false\n    }, {\n      x: 0,\n      y: 5,\n      w: 1,\n      h: 1,\n      i: \"2\",\n      moved: false,\n      static: false\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Handles recursive collision by moving new collisions out of the way before moving item down",
+            "suites": [
+                "compact vertical"
+            ],
+            "updatePoint": {
+                "line": 698,
+                "column": 97
+            },
+            "line": 698,
+            "code": "  it(\"Handles recursive collision by moving new collisions out of the way before moving item down\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 2,\n      h: 5,\n      i: \"1\"\n    }, {\n      x: 0,\n      y: 0,\n      w: 10,\n      h: 1,\n      i: \"2\"\n    }, {\n      x: 5,\n      y: 1,\n      w: 1,\n      h: 1,\n      i: \"3\"\n    }, {\n      x: 5,\n      y: 2,\n      w: 1,\n      h: 1,\n      i: \"4\"\n    }, {\n      x: 5,\n      y: 3,\n      w: 1,\n      h: 1,\n      i: \"5\",\n      static: true\n    }];\n    expect(compact(layout, \"vertical\", 10)).toEqual([{\n      x: 0,\n      y: 0,\n      w: 2,\n      h: 5,\n      i: \"1\",\n      moved: false,\n      static: false\n    }, {\n      x: 0,\n      y: 5,\n      w: 10,\n      h: 1,\n      i: \"2\",\n      moved: false,\n      static: false\n    }, {\n      x: 5,\n      y: 6,\n      w: 1,\n      h: 1,\n      i: \"3\",\n      moved: false,\n      static: false\n    }, {\n      x: 5,\n      y: 7,\n      w: 1,\n      h: 1,\n      i: \"4\",\n      moved: false,\n      static: false\n    }, {\n      x: 5,\n      y: 3,\n      w: 1,\n      h: 1,\n      i: \"5\",\n      moved: false,\n      static: true\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Clones layout items (does not modify input)",
+            "suites": [
+                "compact vertical"
+            ],
+            "updatePoint": {
+                "line": 773,
+                "column": 49
+            },
+            "line": 773,
+            "code": "  it(\"Clones layout items (does not modify input)\", () => {\n    const layout = [{\n      x: 0,\n      y: 0,\n      w: 2,\n      h: 5,\n      i: \"1\"\n    }, {\n      x: 0,\n      y: 0,\n      w: 10,\n      h: 1,\n      i: \"2\"\n    }];\n    const out = compact(layout, \"vertical\", 10);\n    layout.forEach(item => {\n      expect(out.includes(item)).toEqual(false);\n    });\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "compact horizontal should remove empty horizontal space to left of item",
+            "suites": [
+                "compact horizontal"
+            ],
+            "updatePoint": {
+                "line": 794,
+                "column": 77
+            },
+            "line": 794,
+            "code": "  it(\"compact horizontal should remove empty horizontal space to left of item\", () => {\n    const layout = [{\n      x: 5,\n      y: 5,\n      w: 1,\n      h: 1,\n      i: \"1\"\n    }];\n    expect(compact(layout, \"horizontal\", 10)).toEqual([{\n      x: 0,\n      y: 5,\n      w: 1,\n      h: 1,\n      i: \"1\",\n      moved: false,\n      static: false\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Resolve collision by moving item further to the right in array",
+            "suites": [
+                "compact horizontal"
+            ],
+            "updatePoint": {
+                "line": 812,
+                "column": 68
+            },
+            "line": 812,
+            "code": "  it(\"Resolve collision by moving item further to the right in array\", () => {\n    const layout = [{\n      y: 0,\n      x: 0,\n      h: 1,\n      w: 5,\n      i: \"1\"\n    }, {\n      y: 0,\n      x: 1,\n      h: 1,\n      w: 1,\n      i: \"2\"\n    }];\n    expect(compact(layout, \"horizontal\", 10)).toEqual([{\n      y: 0,\n      x: 0,\n      h: 1,\n      w: 5,\n      i: \"1\",\n      moved: false,\n      static: false\n    }, {\n      y: 0,\n      x: 5,\n      h: 1,\n      w: 1,\n      i: \"2\",\n      moved: false,\n      static: false\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Handles recursive collision by moving new collisions out of the way before moving item to the right",
+            "suites": [
+                "compact horizontal"
+            ],
+            "updatePoint": {
+                "line": 844,
+                "column": 105
+            },
+            "line": 844,
+            "code": "  it(\"Handles recursive collision by moving new collisions out of the way before moving item to the right\", () => {\n    const layout = [{\n      y: 0,\n      x: 0,\n      h: 2,\n      w: 5,\n      i: \"1\"\n    }, {\n      y: 1,\n      x: 0,\n      h: 10,\n      w: 1,\n      i: \"2\"\n    }, {\n      y: 5,\n      x: 1,\n      h: 1,\n      w: 1,\n      i: \"3\"\n    }, {\n      y: 5,\n      x: 2,\n      h: 1,\n      w: 1,\n      i: \"4\"\n    }, {\n      y: 5,\n      x: 2,\n      h: 1,\n      w: 1,\n      i: \"5\",\n      static: true\n    }];\n    expect(compact(layout, \"horizontal\", 10)).toEqual([{\n      y: 0,\n      x: 0,\n      h: 2,\n      w: 5,\n      i: \"1\",\n      moved: false,\n      static: false\n    }, {\n      y: 1,\n      x: 5,\n      h: 10,\n      w: 1,\n      i: \"2\",\n      moved: false,\n      static: false\n    }, {\n      y: 5,\n      x: 6,\n      h: 1,\n      w: 1,\n      i: \"3\",\n      moved: false,\n      static: false\n    }, {\n      y: 5,\n      x: 7,\n      h: 1,\n      w: 1,\n      i: \"4\",\n      moved: false,\n      static: false\n    }, {\n      y: 5,\n      x: 2,\n      h: 1,\n      w: 1,\n      i: \"5\",\n      moved: false,\n      static: true\n    }]);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should complete basic calculation",
+            "suites": [
+                "calcGridColWidth"
+            ],
+            "updatePoint": {
+                "line": 929,
+                "column": 39
+            },
+            "line": 929,
+            "code": "  it(\"should complete basic calculation\", () => {\n    expect(calcGridColWidth(basePositionParams)).toEqual(100);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should consider margin",
+            "suites": [
+                "calcGridColWidth"
+            ],
+            "updatePoint": {
+                "line": 932,
+                "column": 28
+            },
+            "line": 932,
+            "code": "  it(\"should consider margin\", () => {\n    const positionParams = { ...basePositionParams,\n      margin: [10, 10]\n    }; // 70 px of margin in total (one between each of 8 items)\n\n    expect(calcGridColWidth(positionParams)).toEqual(91.25);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should consider container padding",
+            "suites": [
+                "calcGridColWidth"
+            ],
+            "updatePoint": {
+                "line": 939,
+                "column": 39
+            },
+            "line": 939,
+            "code": "  it(\"should consider container padding\", () => {\n    const positionParams = { ...basePositionParams,\n      containerPadding: [100, 0]\n    }; // (800 - 100 - 100) / 8\n\n    expect(calcGridColWidth(positionParams)).toEqual(75);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should consider margin and padding",
+            "suites": [
+                "calcGridColWidth"
+            ],
+            "updatePoint": {
+                "line": 946,
+                "column": 40
+            },
+            "line": 946,
+            "code": "  it(\"should consider margin and padding\", () => {\n    const positionParams = { ...basePositionParams,\n      margin: [10, 0],\n      containerPadding: [100, 0]\n    }; // (800 - 100 - 100 - 70) / 8\n\n    expect(calcGridColWidth(positionParams)).toEqual(66.25);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should complete basic calculation",
+            "suites": [
+                "calcGridItemPosition"
+            ],
+            "updatePoint": {
+                "line": 956,
+                "column": 39
+            },
+            "line": 956,
+            "code": "  it(\"should complete basic calculation\", () => {\n    const x = 1;\n    const y = 1;\n    const w = 2;\n    const h = 2;\n    const resizing = null;\n    const dragging = null;\n    const positionParams = { ...basePositionParams,\n      margin: [10, 10],\n      containerPadding: [100, 100]\n    };\n    expect(calcGridItemPosition(positionParams, x, y, w, h, {\n      resizing,\n      dragging\n    })).toEqual({\n      height: 110,\n      // 50 * 2 + margin of 10\n      left: 176,\n      // 100 + colWidth (66.25) + margin. Rounded to complete pixel\n      top: 160,\n      // 100 + height + margin\n      width: 143 // 2x colWidth + margin, rounded\n\n    });\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "should tell us if props are equal, including arrays and objects",
+            "suites": [
+                "fastRGLPropsEqual"
+            ],
+            "updatePoint": {
+                "line": 983,
+                "column": 69
+            },
+            "line": 983,
+            "code": "  it(\"should tell us if props are equal, including arrays and objects\", () => {\n    const props1 = {\n      className: \"foo\",\n      margin: [10, 10],\n      style: {\n        background: \"red\"\n      }\n    };\n    const props2 = {\n      className: \"foo\",\n      margin: [10, 10],\n      style: {\n        background: \"red\"\n      }\n    };\n    expect(fastRGLPropsEqual(props1, props2, isEqual)).toEqual(true);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "catches changed arrays",
+            "suites": [
+                "fastRGLPropsEqual"
+            ],
+            "updatePoint": {
+                "line": 1000,
+                "column": 28
+            },
+            "line": 1000,
+            "code": "  it(\"catches changed arrays\", () => {\n    const props1 = {\n      margin: [10, 10]\n    };\n    const props2 = {\n      margin: [10, 11]\n    };\n    expect(fastRGLPropsEqual(props1, props2, isEqual)).toEqual(false);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignores children",
+            "suites": [
+                "fastRGLPropsEqual"
+            ],
+            "updatePoint": {
+                "line": 1009,
+                "column": 22
+            },
+            "line": 1009,
+            "code": "  it(\"ignores children\", () => {\n    const props1 = {\n      children: [\"foo\", \"bar\"]\n    };\n    const props2 = {\n      children: [\"biff\", \"bar\"]\n    };\n    expect(fastRGLPropsEqual(props1, props2, isEqual)).toEqual(true);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fails added props",
+            "suites": [
+                "fastRGLPropsEqual"
+            ],
+            "updatePoint": {
+                "line": 1018,
+                "column": 23
+            },
+            "line": 1018,
+            "code": "  it(\"fails added props\", () => {\n    const props1 = {};\n    const props2 = {\n      droppingItem: {\n        w: 1,\n        h: 2,\n        i: 3\n      }\n    };\n    expect(fastRGLPropsEqual(props1, props2, isEqual)).toEqual(false);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignores invalid props",
+            "suites": [
+                "fastRGLPropsEqual"
+            ],
+            "updatePoint": {
+                "line": 1029,
+                "column": 27
+            },
+            "line": 1029,
+            "code": "  it(\"ignores invalid props\", () => {\n    const props1 = {};\n    const props2 = {\n      somethingElse: {\n        w: 1,\n        h: 2,\n        i: 3\n      }\n    };\n    expect(fastRGLPropsEqual(props1, props2, isEqual)).toEqual(true);\n  });",
+            "file": "spec/utils-test.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "react-grid-layout__react-grid-layout.svg"
+}

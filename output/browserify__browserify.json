@@ -1,0 +1,2760 @@
+{
+    "repo": "browserify/browserify",
+    "url": "https://github.com/browserify/browserify",
+    "branch": "master",
+    "configs": [
+        {
+            "package": "browserify",
+            "lang": "js",
+            "dir": "test",
+            "framework": "jest",
+            "pattern": "**/*.{js,ts}"
+        }
+    ],
+    "tests": [
+        {
+            "name": "bundle from an arguments array",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 36
+            },
+            "line": 9,
+            "code": "test('bundle from an arguments array', function (t) {\n  t.plan(2);\n  var b = fromArgs([__dirname + '/entry/two.js', '-s', 'XYZ']);\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      window: {}\n    };\n    vm.runInNewContext(src, c);\n    t.equal(c.window.XYZ, 2);\n  });\n});",
+            "file": "args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "external flag for node modules",
+            "suites": [],
+            "updatePoint": {
+                "line": 21,
+                "column": 36
+            },
+            "line": 21,
+            "code": "test('external flag for node modules', function (t) {\n  t.plan(2);\n  var b = fromArgs([__dirname + '/external_args/main.js', '-x', 'backbone']);\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle from an arguments with --insert-global-vars",
+            "suites": [],
+            "updatePoint": {
+                "line": 31,
+                "column": 56
+            },
+            "line": 31,
+            "code": "test('bundle from an arguments with --insert-global-vars', function (t) {\n  t.plan(4);\n  var b = fromArgs([__dirname + '/global/filename.js', '--insert-global-vars=__filename,__dirname', '--basedir', __dirname]);\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err, 'b.bundle()');\n    var c = {},\n        x;\n    vm.runInNewContext(src, c);\n    t.doesNotThrow(function () {\n      x = c.require('x');\n    }, 'x = c.require(\\'x\\')');\n    t.equal(x && x.filename, '/global/filename.js', 'x.filename');\n    t.equal(x && x.dirname, '/global', 'x.dirname');\n  });\n});",
+            "file": "args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "numeric module names",
+            "suites": [],
+            "updatePoint": {
+                "line": 51,
+                "column": 26
+            },
+            "line": 51,
+            "code": "test('numeric module names', function (t) {\n  t.plan(1);\n  var b = fromArgs(['-x', '1337']);\n  b.bundle(function (err, src) {\n    t.ifError(err);\n  });\n});",
+            "file": "args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry expose",
+            "suites": [],
+            "updatePoint": {
+                "line": 58,
+                "column": 18
+            },
+            "line": 58,
+            "code": "test('entry expose', function (t) {\n  t.plan(3);\n  var b = fromArgs([path.join(__dirname, '/entry_expose/main.js'), '--require', path.join(__dirname, '/entry_expose/main.js') + ':x']);\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n\n    function log(msg) {\n      t.equal(msg, 'wow');\n    }\n\n    vm.runInNewContext(src, c);\n    t.equal(c.require('x'), 555);\n  });\n});",
+            "file": "args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "array add",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 15
+            },
+            "line": 7,
+            "code": "test('array add', function (t) {\n  var expected = ['ONE', 'TWO', 'THREE'];\n  t.plan(expected.length);\n  var b = browserify();\n  var files = [__dirname + '/array/one.js', __dirname + '/array/two.js', __dirname + '/array/three.js'];\n  b.add(files);\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  });\n});",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "array require",
+            "suites": [],
+            "updatePoint": {
+                "line": 25,
+                "column": 19
+            },
+            "line": 25,
+            "code": "test('array require', function (t) {\n  t.plan(3);\n  var b = browserify();\n  var files = ['defined', 'subarg'];\n\n  b.require(files);\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('defined')(undefined, true), true);\n    t.equal(c.require('defined')(undefined, false), false);\n    t.deepEqual(c.require('subarg')(['-x', '3']), {\n      x: 3,\n      _: []\n    });\n  });\n});",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "array require opts",
+            "suites": [],
+            "updatePoint": {
+                "line": 43,
+                "column": 24
+            },
+            "line": 43,
+            "code": "test('array require opts', function (t) {\n  t.plan(3);\n  var b = browserify();\n  var files = [{\n    file: require.resolve('defined'),\n    expose: 'abc'\n  }, {\n    file: require.resolve('subarg'),\n    expose: 'def'\n  }];\n\n  b.require(files);\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('abc')(undefined, true), true);\n    t.equal(c.require('abc')(undefined, false), false);\n    t.deepEqual(c.require('def')(['-x', '3']), {\n      x: 3,\n      _: []\n    });\n  });\n});",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "array external",
+            "suites": [],
+            "updatePoint": {
+                "line": 67,
+                "column": 20
+            },
+            "line": 67,
+            "code": "test('array external', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/external/main.js');\n  b.external(['util', 'freelist']);\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    vm.runInNewContext('function require (x) {' + 'if (x===\"freelist\") return function (n) { return n + 1000 }' + '}' + src, {\n      t: t\n    });\n  });\n});",
+            "file": "array.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "async/await",
+            "suites": [],
+            "updatePoint": {
+                "line": 18,
+                "column": 100
+            },
+            "line": 18,
+            "code": "if (!canAsync) console.error('# async/await unsupported in this environment');else test('async/await', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/async/src.js');\n  b.bundle(function (err, src) {\n    t.error(err);\n    var c = {\n      console: {\n        log: log\n      },\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    };\n    vm.runInNewContext(src, c);\n\n    function log(msg) {\n      t.equal(msg, 60);\n    }\n  });\n});",
+            "file": "async.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "backbone",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 14
+            },
+            "line": 9,
+            "code": "test('backbone', function (t) {\n  t.plan(3);\n  var b = browserify();\n\n  b.require('backbone');\n\n  b.bundle(function (err, buf) {\n    t.ok(Buffer.isBuffer(buf));\n    var src = buf.toString('utf8');\n    t.ok(src.length > 0);\n    var c = {\n      console: console\n    };\n    vm.runInNewContext(src, c);\n    t.deepEqual(Object.keys(backbone).sort(), Object.keys(c.require('backbone')).sort());\n    t.end();\n  });\n});",
+            "file": "backbone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare shebang",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 18
+            },
+            "line": 11,
+            "code": "test('bare shebang', function (t) {\n  t.plan(4);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-', '--bare']);\n  ps.stderr.pipe(process.stderr);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      Buffer: function (s) {\n        return s.toLowerCase();\n      },\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'woo');\n        }\n      }\n    });\n    vm.runInNewContext(body, {\n      Buffer: Buffer,\n      console: {\n        log: function (msg) {\n          t.ok(Buffer.isBuffer(msg));\n          t.equal(msg.toString('utf8'), 'WOO');\n        }\n      }\n    });\n  }));\n  ps.stdin.end('#!/usr/bin/env node\\nconsole.log(Buffer(\"WOO\"))');\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "bare_shebang.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 10
+            },
+            "line": 23,
+            "code": "test('bare', function (t) {\n  t.plan(4);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-', '--bare']);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      Buffer: function (s) {\n        return s.toLowerCase();\n      },\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'abc');\n        }\n      }\n    });\n    vm.runInNewContext(body, {\n      Buffer: Buffer,\n      console: {\n        log: function (msg) {\n          t.ok(Buffer.isBuffer(msg));\n          t.equal(msg.toString('utf8'), 'ABC');\n        }\n      }\n    });\n  }));\n  ps.stdin.end('console.log(Buffer(\"ABC\"))');\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "bare.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare api",
+            "suites": [],
+            "updatePoint": {
+                "line": 54,
+                "column": 14
+            },
+            "line": 54,
+            "code": "test('bare api', function (t) {\n  t.plan(3);\n  var input = through();\n  var b = browserify(input, {\n    bare: true\n  });\n  b.bundle().pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      Buffer: function (s) {\n        return s.toLowerCase();\n      },\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'abc');\n        }\n      }\n    });\n    vm.runInNewContext(body, {\n      Buffer: Buffer,\n      console: {\n        log: function (msg) {\n          t.ok(Buffer.isBuffer(msg));\n          t.equal(msg.toString('utf8'), 'ABC');\n        }\n      }\n    });\n  }));\n  input.end('console.log(Buffer(\"ABC\"))');\n});",
+            "file": "bare.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare inserts __filename,__dirname but not process,global,Buffer",
+            "suites": [],
+            "updatePoint": {
+                "line": 83,
+                "column": 69
+            },
+            "line": 83,
+            "code": "test('bare inserts __filename,__dirname but not process,global,Buffer', function (t) {\n  t.plan(2);\n  var file = path.resolve(__dirname, 'bare/main.js');\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), file, '--bare']);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      require: require,\n      __dirname: process.cwd(),\n      console: {\n        log: function (msg) {\n          t.same(msg, [path.join(__dirname, 'bare'), path.join(__dirname, 'bare/main.js'), 'undefined', 'undefined', 'undefined']);\n        }\n      }\n    });\n  }));\n  ps.stdin.end();\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "bare.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare inserts dynamic __filename,__dirname",
+            "suites": [],
+            "updatePoint": {
+                "line": 103,
+                "column": 47
+            },
+            "line": 103,
+            "code": "test('bare inserts dynamic __filename,__dirname', function (t) {\n  t.plan(2);\n  var file = path.join(tmpdir, 'dirname-filename.js');\n  fs.writeFileSync(file, fs.readFileSync(path.resolve(__dirname, 'bare/dirname-filename.js')));\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), file, '--bare']);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      require: require,\n      __dirname: process.cwd(),\n      console: {\n        log: function (msg) {\n          t.same(msg, [path.dirname(file), file]);\n        }\n      }\n    });\n  }));\n  ps.stdin.end();\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "bare.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bare inserts dynamic __filename,__dirname with basedir",
+            "suites": [],
+            "updatePoint": {
+                "line": 124,
+                "column": 60
+            },
+            "line": 124,
+            "code": "test('bare inserts dynamic __filename,__dirname with basedir', function (t) {\n  t.plan(2);\n  var file = 'dirname-filename.js';\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), file, '--bare', '--basedir=' + path.join(__dirname, 'bare')]);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body, {\n      require: require,\n      __dirname: process.cwd(),\n      console: {\n        log: function (msg) {\n          t.same(msg, [__dirname, path.join(__dirname, file)]);\n        }\n      }\n    });\n  }));\n  ps.stdin.end();\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "bare.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bin --entry",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 17
+            },
+            "line": 9,
+            "code": "test('bin --entry', function (t) {\n  t.plan(3);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '--entry', 'entry/main.js']);\n  var src = '';\n  var err = '';\n  ps.stdout.on('data', function (buf) {\n    src += buf;\n  });\n  ps.stderr.on('data', function (buf) {\n    err += buf;\n  });\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n    t.equal(err, '');\n    var allDone = false;\n    var c = {\n      done: function () {\n        allDone = true;\n      }\n    };\n    vm.runInNewContext(src, c);\n    t.ok(allDone);\n  });\n});",
+            "file": "bin_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "function transform",
+            "suites": [],
+            "updatePoint": {
+                "line": 13,
+                "column": 24
+            },
+            "line": 13,
+            "code": "test('function transform', {\n  skip: flaky\n}, function (t) {\n  t.plan(3);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-t', './tr.js', './main.js'], {\n    cwd: path.resolve(__dirname, 'bin_tr_error')\n  });\n  var src = '';\n  var err = '';\n  ps.stdout.on('data', function (buf) {\n    src += buf;\n  });\n  ps.stderr.on('data', function (buf) {\n    err += buf;\n  });\n  ps.on('exit', function (code) {\n    t.notEqual(code, 0);\n    var errorFile = path.resolve(__dirname, 'bin_tr_error', 'tr.js');\n    t.notEqual(err.indexOf('there was error'), -1, 'Error should contain error message');\n    t.notEqual(err.indexOf(errorFile), -1, 'Error should contain stack trace');\n  });\n});",
+            "file": "bin_tr_error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bin",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 9
+            },
+            "line": 9,
+            "code": "test('bin', function (t) {\n  t.plan(3);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), 'entry/main.js']);\n  var src = '';\n  var err = '';\n  ps.stdout.on('data', function (buf) {\n    src += buf;\n  });\n  ps.stderr.on('data', function (buf) {\n    err += buf;\n  });\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n    t.equal(err, '');\n    var allDone = false;\n    var c = {\n      done: function () {\n        allDone = true;\n      }\n    };\n    vm.runInNewContext(src, c);\n    t.ok(allDone);\n  });\n});",
+            "file": "bin.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "byte order marker",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 23
+            },
+            "line": 7,
+            "code": "test('byte order marker', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/bom/hello.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    var c = {\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'hello');\n        }\n      }\n    };\n    vm.runInNewContext(src, c);\n    t.notOk(/\\ufeff/.test(src.toString('utf8')));\n  });\n});",
+            "file": "bom.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field file no ext",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 31
+            },
+            "line": 7,
+            "code": "test('browser field file no ext', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_file/xyz');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 'cool beans');\n    }\n  });\n});",
+            "file": "browser_field_file.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (a)",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 31
+            },
+            "line": 7,
+            "code": "test('browser field resolve (a)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/a/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 555);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (b)",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 31
+            },
+            "line": 23,
+            "code": "test('browser field resolve (b)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/b/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 444);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (c)",
+            "suites": [],
+            "updatePoint": {
+                "line": 39,
+                "column": 31
+            },
+            "line": 39,
+            "code": "test('browser field resolve (c)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/c/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 333);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (d)",
+            "suites": [],
+            "updatePoint": {
+                "line": 55,
+                "column": 31
+            },
+            "line": 55,
+            "code": "test('browser field resolve (d)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/d/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 222);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (e)",
+            "suites": [],
+            "updatePoint": {
+                "line": 71,
+                "column": 31
+            },
+            "line": 71,
+            "code": "test('browser field resolve (e)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/e/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 111);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (f)",
+            "suites": [],
+            "updatePoint": {
+                "line": 87,
+                "column": 31
+            },
+            "line": 87,
+            "code": "test('browser field resolve (f)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/f/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.equal(x, 999);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (g)",
+            "suites": [],
+            "updatePoint": {
+                "line": 103,
+                "column": 31
+            },
+            "line": 103,
+            "code": "test('browser field resolve (g)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/g/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, {});\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (h)",
+            "suites": [],
+            "updatePoint": {
+                "line": 119,
+                "column": 31
+            },
+            "line": 119,
+            "code": "test('browser field resolve (h)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/h/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, {});\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (i)",
+            "suites": [],
+            "updatePoint": {
+                "line": 135,
+                "column": 31
+            },
+            "line": 135,
+            "code": "test('browser field resolve (i)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/i/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, 5000);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (j)",
+            "suites": [],
+            "updatePoint": {
+                "line": 151,
+                "column": 31
+            },
+            "line": 151,
+            "code": "test('browser field resolve (j)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/j/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, 5000);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (k)",
+            "suites": [],
+            "updatePoint": {
+                "line": 167,
+                "column": 31
+            },
+            "line": 167,
+            "code": "test('browser field resolve (k)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/k/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, 3000);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "browser field resolve (l)",
+            "suites": [],
+            "updatePoint": {
+                "line": 183,
+                "column": 31
+            },
+            "line": 183,
+            "code": "test('browser field resolve (l)', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/browser_field_resolve/l/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(x) {\n      t.deepEqual(x, 3000);\n    }\n  });\n});",
+            "file": "browser_field_resolve.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "utf8 buffer to base64",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 27
+            },
+            "line": 10,
+            "code": "test('utf8 buffer to base64', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"Ձאab\", \"utf8\").toString(\"base64\"), new Buffer(\"Ձאab\", \"utf8\").toString(\"base64\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "utf8 buffer to hex",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 24
+            },
+            "line": 23,
+            "code": "test('utf8 buffer to hex', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"Ձאab\", \"utf8\").toString(\"hex\"), new Buffer(\"Ձאab\", \"utf8\").toString(\"hex\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ascii buffer to base64",
+            "suites": [],
+            "updatePoint": {
+                "line": 35,
+                "column": 28
+            },
+            "line": 35,
+            "code": "test('ascii buffer to base64', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"123456!@#$%^\", \"ascii\").toString(\"base64\"), new Buffer(\"123456!@#$%^\", \"ascii\").toString(\"base64\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ascii buffer to hex",
+            "suites": [],
+            "updatePoint": {
+                "line": 47,
+                "column": 25
+            },
+            "line": 47,
+            "code": "test('ascii buffer to hex', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"123456!@#$%^\", \"ascii\").toString(\"hex\"), new Buffer(\"123456!@#$%^\", \"ascii\").toString(\"hex\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "base64 buffer to utf8",
+            "suites": [],
+            "updatePoint": {
+                "line": 59,
+                "column": 27
+            },
+            "line": 59,
+            "code": "test('base64 buffer to utf8', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"1YHXkGFi\", \"base64\").toString(\"utf8\"), new Buffer(\"1YHXkGFi\", \"base64\").toString(\"utf8\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "hex buffer to utf8",
+            "suites": [],
+            "updatePoint": {
+                "line": 71,
+                "column": 24
+            },
+            "line": 71,
+            "code": "test('hex buffer to utf8', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n\n    var B = c.require('buffer');\n\n    t.equal(new B.Buffer(\"d581d7906162\", \"hex\").toString(\"utf8\"), new Buffer(\"d581d7906162\", \"hex\").toString(\"utf8\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "base64 buffer to ascii",
+            "suites": [],
+            "updatePoint": {
+                "line": 86,
+                "column": 28
+            },
+            "line": 86,
+            "code": "test('base64 buffer to ascii', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"MTIzNDU2IUAjJCVe\", \"base64\").toString(\"ascii\"), new Buffer(\"MTIzNDU2IUAjJCVe\", \"base64\").toString(\"ascii\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "hex buffer to ascii",
+            "suites": [],
+            "updatePoint": {
+                "line": 98,
+                "column": 25
+            },
+            "line": 98,
+            "code": "test('hex buffer to ascii', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n    t.equal(new c.require('buffer').Buffer(\"31323334353621402324255e\", \"hex\").toString(\"ascii\"), new Buffer(\"31323334353621402324255e\", \"hex\").toString(\"ascii\"));\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "indexing a buffer",
+            "suites": [],
+            "updatePoint": {
+                "line": 110,
+                "column": 23
+            },
+            "line": 110,
+            "code": "test('indexing a buffer', function (t) {\n  t.plan(5);\n  var b = browserify();\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    var c = context();\n    vm.runInNewContext(src, c);\n\n    var buf = c.require('buffer').Buffer('abc');\n\n    t.equal(buf[0], 97);\n    t.equal(buf[1], 98);\n    t.equal(buf[2], 99);\n    t.equal(buf[3], undefined);\n    t.equal(buf.toString('utf8'), 'abc');\n  });\n});",
+            "file": "buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle external global",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 28
+            },
+            "line": 9,
+            "code": "test('bundle external global', function (t) {\n  t.plan(1);\n  var stream = through();\n  stream.push('console.log(process)');\n  stream.push(null);\n  var b = browserify({\n    bundleExternal: false\n  });\n  b.add(stream);\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      },\n      process: process\n    });\n\n    function log(msg) {\n      t.equal(msg, process);\n    }\n  });\n});",
+            "file": "bundle_external_global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle external",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 21
+            },
+            "line": 7,
+            "code": "test('bundle external', function (t) {\n  t.plan(3);\n  var expected = [{\n    name: 'beep',\n    value: 111\n  }, {\n    name: 't-rex',\n    value: 5\n  }];\n  var b = browserify({\n    bundleExternal: false\n  });\n  b.add(__dirname + '/bundle_external/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      t: t,\n      require: function (name) {\n        var r = expected.shift();\n        t.equal(name, r.name);\n        return r.value;\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "bundle_external.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle in debug mode",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 26
+            },
+            "line": 5,
+            "code": "test('bundle in debug mode', function (t) {\n  t.plan(3);\n  var b = browserify({\n    debug: true\n  });\n\n  b.require('seq');\n\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    var secondtolastLine = src.split('\\n').slice(-2);\n    t.ok(typeof src === 'string');\n    t.ok(src.length > 0);\n    t.ok(/^\\/\\/# sourceMappingURL=/.test(secondtolastLine), 'includes sourcemap');\n  });\n});",
+            "file": "bundle_sourcemap.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle in non debug mode",
+            "suites": [],
+            "updatePoint": {
+                "line": 21,
+                "column": 30
+            },
+            "line": 21,
+            "code": "test('bundle in non debug mode', function (t) {\n  t.plan(3);\n  var b = browserify();\n\n  b.require('seq');\n\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    var secondtolastLine = src.split('\\n').slice(-2);\n    t.ok(typeof src === 'string');\n    t.ok(src.length > 0);\n    t.notOk(/^\\/\\/# sourceMappingURL=/.test(secondtolastLine), 'includes no sourcemap');\n  });\n});",
+            "file": "bundle_sourcemap.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle bundle external",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 28
+            },
+            "line": 12,
+            "code": "test('bundle bundle external', function (t) {\n  t.plan(1);\n  var bundle1 = browserify(opt);\n  var name = dir + '/foo.js';\n\n  bundle1.require(name, {\n    entry: true,\n    expose: name,\n    basedir: pubdir\n  });\n\n  var bundle2 = browserify({\n    debug: true,\n    basedir: pubdir,\n    entries: [dir + '/baz.js']\n  }); // adding and removing this line causes failure //\n  //bundle2.external(bundle1);\n\n  bundle2.bundle(function (err, src) {\n    t.ifError(err);\n  });\n});",
+            "file": "bundle-bundle-external.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle is readable stream",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 31
+            },
+            "line": 9,
+            "code": "test('bundle is readable stream', function (t) {\n  t.plan(4);\n  var b = browserify(__dirname + '/entry/main.js');\n  b.on('bundle', function (bundle) {\n    t.ok(isReadable(bundle));\n    t.notok(isWritable(bundle));\n  });\n  var stream = b.bundle();\n  t.ok(isReadable(stream));\n  t.notok(isWritable(stream));\n});",
+            "file": "bundle-stream.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 12
+            },
+            "line": 7,
+            "code": "test('bundle', function (t) {\n  var b = browserify();\n\n  b.require('seq');\n\n  b.bundle(function (err, src) {\n    t.plan(3);\n    t.ifError(err);\n    t.ok(src.length > 0);\n    var c = {\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout,\n      console: console\n    };\n    vm.runInNewContext(src, c);\n\n    c.require('seq')([1, 2, 3]).parMap_(function (next, x) {\n      setTimeout(function () {\n        next.ok(x * 100);\n      }, 10);\n    }).seq(function (x, y, z) {\n      t.deepEqual([x, y, z], [100, 200, 300]);\n      t.end();\n    });\n  });\n});",
+            "file": "bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "catch pipeline errors with a callback",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 43
+            },
+            "line": 5,
+            "code": "test('catch pipeline errors with a callback', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/catch/main.js');\n  b.bundle(function (err, src) {\n    t.ok(err);\n    t.ok(/no_such_file/.test(err));\n  });\n});",
+            "file": "catch.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "catch pipeline errors with an event",
+            "suites": [],
+            "updatePoint": {
+                "line": 13,
+                "column": 41
+            },
+            "line": 13,
+            "code": "test('catch pipeline errors with an event', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/catch/main.js').bundle();\n  b.on('error', function (err) {\n    t.ok(err);\n    t.ok(/no_such_file/.test(err));\n  });\n});",
+            "file": "catch.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "circular",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 14
+            },
+            "line": 7,
+            "code": "test('circular', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/circular/main.js');\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "circular.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "circular expose",
+            "suites": [],
+            "updatePoint": {
+                "line": 16,
+                "column": 21
+            },
+            "line": 16,
+            "code": "test('circular expose', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/circular/main.js');\n\n  b.require(__dirname + '/circular/a.js', {\n    expose: './a.js'\n  });\n\n  b.require(__dirname + '/circular/b.js', {\n    expose: './b.js'\n  });\n\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "circular.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "circular require",
+            "suites": [],
+            "updatePoint": {
+                "line": 34,
+                "column": 22
+            },
+            "line": 34,
+            "code": "test('circular require', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/circular/main.js');\n\n  b.require(__dirname + '/circular/a.js');\n\n  b.require(__dirname + '/circular/b.js');\n\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "circular.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "compiling coffee with -c",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 30
+            },
+            "line": 9,
+            "code": "test('compiling coffee with -c', function (t) {\n  t.plan(4);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-c', '\"' + process.execPath + '\" \"' + __dirname + '/../node_modules/coffee-script/bin/coffee\" -sc', 'coffee_bin/main.coffee']);\n  var src = '';\n  var err = '';\n  ps.stdout.on('data', function (buf) {\n    src += buf;\n  });\n  ps.stderr.on('data', function (buf) {\n    err += buf;\n  });\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n    t.equal(err, '');\n    var msgs = ['hello world!', 'from x!'];\n    var c = {\n      console: {\n        log: function (msg) {\n          t.equal(msg, msgs.shift());\n        }\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "coffee_bin.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "coffeeify with an implicit global",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 39
+            },
+            "line": 7,
+            "code": "test('coffeeify with an implicit global', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/coffeeify/main.coffee');\n  b.transform('coffeeify');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      },\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    });\n\n    function log(msg) {\n      t.equal(msg, 'eyo');\n    }\n  });\n});",
+            "file": "coffeeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "trailing comment",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 22
+            },
+            "line": 7,
+            "code": "test('trailing comment', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/comment/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      ex: function (obj) {\n        t.same(obj, 1234);\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "comment.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "constants",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 15
+            },
+            "line": 9,
+            "code": "test('constants', function (t) {\n  t.plan(2);\n  var stream = through();\n  stream.push('console.log(require(\"constants\").ENOENT)');\n  stream.push(null);\n  var b = browserify(stream);\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 2);\n    }\n  });\n});",
+            "file": "constants.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "crypto --insertGlobals",
+            "suites": [],
+            "updatePoint": {
+                "line": 26,
+                "column": 28
+            },
+            "line": 26,
+            "code": "test('crypto --insertGlobals', {\n  skip: semver.lt(process.version, 'v4.0.0')\n}, function (t) {\n  t.plan(2);\n  var bin = __dirname + '/../bin/cmd.js';\n  var ps = spawn(process.execPath, [bin, 'main.js', '--ig'], {\n    cwd: tmpdir\n  });\n  ps.stderr.pipe(process.stderr, {\n    end: false\n  });\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n  ps.stdout.pipe(concat(function (src) {\n    var c = {\n      Int32Array: Int32Array,\n      ArrayBuffer: ArrayBuffer,\n      Uint8Array: Uint8Array,\n      DataView: DataView,\n      beep: function (c) {\n        t.equal(typeof c.createHash, 'function');\n      },\n      require: function () {}\n    };\n    vm.runInNewContext(src.toString('utf8'), c);\n  }));\n});",
+            "file": "crypto_ig.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "*-browserify libs from node_modules/",
+            "suites": [],
+            "updatePoint": {
+                "line": 26,
+                "column": 42
+            },
+            "line": 26,
+            "code": "test('*-browserify libs from node_modules/', {\n  skip: semver.lt(process.version, 'v4.0.0')\n}, function (t) {\n  t.plan(2);\n  var bin = __dirname + '/../bin/cmd.js';\n  var ps = spawn(process.execPath, [bin, 'main.js'], {\n    cwd: tmpdir\n  });\n  ps.stderr.pipe(process.stderr, {\n    end: false\n  });\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n  ps.stdout.pipe(concat(function (src) {\n    var c = {\n      Int32Array: Int32Array,\n      ArrayBuffer: ArrayBuffer,\n      Uint8Array: Uint8Array,\n      DataView: DataView,\n      beep: function (c) {\n        t.equal(typeof c.createHash, 'function');\n      },\n      require: function () {}\n    };\n    vm.runInNewContext(src.toString('utf8'), c);\n  }));\n});",
+            "file": "crypto.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cycle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 11
+            },
+            "line": 7,
+            "code": "test('cycle', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/cycle/entry.js');\n  b.bundle(function (err, body) {\n    t.ifError(err);\n    vm.runInNewContext(body);\n    t.ok(true);\n  });\n});",
+            "file": "cycle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ordinary debug",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 20
+            },
+            "line": 9,
+            "code": "test('ordinary debug', function (t) {\n  t.plan(1);\n  var stream = through();\n  stream.push('console.log(1+2)');\n  stream.push(null);\n  var b = browserify({\n    debug: true\n  });\n  b.add(stream);\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    var last = src.split('\\n').slice(-2)[0];\n    t.ok(/\\/\\/# sourceMappingURL=data:application\\/json;charset=utf-8;base64,[\\w+\\/=]+$/.test(last));\n  });\n});",
+            "file": "debug_standalone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "debug standalone",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 22
+            },
+            "line": 24,
+            "code": "test('debug standalone', function (t) {\n  t.plan(1);\n  var stream = through();\n  stream.push('console.log(1+2)');\n  stream.push(null);\n  var b = browserify({\n    debug: true,\n    standalone: 'xyz'\n  });\n  b.add(stream);\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    var last = src.split('\\n').slice(-2)[0];\n    t.ok(/\\/\\/# sourceMappingURL=data:application\\/json;charset=utf-8;base64,[\\w+\\/=]+$/.test(last));\n  });\n});",
+            "file": "debug_standalone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "debug standalone exposed",
+            "suites": [],
+            "updatePoint": {
+                "line": 40,
+                "column": 30
+            },
+            "line": 40,
+            "code": "test('debug standalone exposed', function (t) {\n  t.plan(2);\n  var stream = through();\n  stream.push('console.log(1+2)');\n  stream.push(null);\n  var b = browserify({\n    debug: true,\n    standalone: 'xyz'\n  });\n\n  b.require(__dirname + '/debug_standalone/x.js', {\n    expose: 'xxx'\n  });\n\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    var last = src.split('\\n').slice(-2)[0];\n    t.ok(/\\/\\/# sourceMappingURL=data:application\\/json;charset=utf-8;base64,[\\w+\\/=]+$/.test(last));\n    var c = {\n      window: {}\n    };\n    vm.runInNewContext(src, c);\n    t.equal(c.window.xyz, 555);\n  });\n});",
+            "file": "debug_standalone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical content gets deduped and the row gets an implicit dep on the original source",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 92
+            },
+            "line": 5,
+            "code": "test('identical content gets deduped and the row gets an implicit dep on the original source', function (t) {\n  t.plan(1);\n  var rows = [];\n\n  browserify().on('dep', [].push.bind(rows)).require(require.resolve('./dup'), {\n    entry: true\n  }).bundle(check);\n\n  function check(err, src) {\n    if (err) return t.fail(err);\n    var deduped = rows.filter(function (x) {\n      return x.dedupeIndex;\n    });\n    var d = deduped[0];\n    t.deepEqual(d.deps, {\n      'dup': d.dedupeIndex\n    }, \"adds implicit dep\");\n  }\n});",
+            "file": "dedupe-deps.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical content gets deduped with fullPaths",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 51
+            },
+            "line": 24,
+            "code": "test('identical content gets deduped with fullPaths', function (t) {\n  t.plan(1);\n  var rows = [];\n\n  browserify({\n    fullPaths: true\n  }).on('dep', [].push.bind(rows)).require(require.resolve('./dup'), {\n    entry: true\n  }).bundle(check);\n\n  function check(err, src) {\n    if (err) return t.fail(err);\n    var deduped = rows.filter(function (x) {\n      return x.dedupe;\n    });\n    var d = deduped[0];\n    t.deepEqual(d.source, 'arguments[4][' + JSON.stringify(d.dedupe) + '][0]' + '.apply(exports,arguments)', \"dedupes content\");\n  }\n});",
+            "file": "dedupe-deps.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical content does not get deduped with dedupe option false",
+            "suites": [],
+            "updatePoint": {
+                "line": 43,
+                "column": 69
+            },
+            "line": 43,
+            "code": "test('identical content does not get deduped with dedupe option false', function (t) {\n  t.plan(1);\n  var rows = [];\n\n  browserify({\n    fullPaths: true,\n    dedupe: false\n  }).on('dep', [].push.bind(rows)).require(require.resolve('./dup'), {\n    entry: true\n  }).bundle(check);\n\n  function check(err, src) {\n    if (err) return t.fail(err);\n    var deduped = rows.filter(function (x) {\n      return x.dedupe;\n    });\n    t.equal(deduped.length, 0, 'does not dedupe');\n  }\n});",
+            "file": "dedupe-deps.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical content gets deduped and the row gets a \"nomap\" flag set when sourcemaps are turned on",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 102
+            },
+            "line": 5,
+            "code": "test('identical content gets deduped and the row gets a \"nomap\" flag set when sourcemaps are turned on', function (t) {\n  t.plan(4);\n  var rows = [];\n\n  browserify({\n    debug: true\n  }).on('dep', [].push.bind(rows)).require(require.resolve('./dup'), {\n    entry: true\n  }).bundle(check);\n\n  function check(err, src) {\n    if (err) return t.fail(err);\n    var nomappeds = rows.filter(function (x) {\n      return x.nomap;\n    });\n    var nm = nomappeds[0];\n    t.equal(rows.length, 3, 'packs 3 rows');\n    t.equal(nomappeds.length, 1, 'one of has nomapped flag set');\n    t.equal(rows.filter(function (x) {\n      return x.id == nm.dedupeIndex;\n    }).length, 1, '2 rows with the same hash as the duplicate exist');\n    t.similar(nm.source, /arguments\\[4\\]\\[.+\\]\\[0\\]\\.apply\\(exports,arguments\\)$/, 'redirects duplicate to original via require call');\n  }\n});",
+            "file": "dedupe-nomap.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical content gets deduped and the row gets a \"nomap\" flag set when sourcemaps are turned off",
+            "suites": [],
+            "updatePoint": {
+                "line": 29,
+                "column": 103
+            },
+            "line": 29,
+            "code": "test('identical content gets deduped and the row gets a \"nomap\" flag set when sourcemaps are turned off', function (t) {\n  t.plan(4);\n  var rows = [];\n\n  browserify({\n    debug: false\n  }).on('dep', [].push.bind(rows)).require(require.resolve('./dup'), {\n    entry: true\n  }).bundle(check);\n\n  function check(err, src) {\n    if (err) return t.fail(err);\n    var nomappeds = rows.filter(function (x) {\n      return x.nomap;\n    });\n    var nm = nomappeds[0];\n    t.equal(rows.length, 3, 'packs 3 rows');\n    t.equal(nomappeds.length, 1, 'one of has nomapped flag set');\n    t.equal(rows.filter(function (x) {\n      return x.id == nm.dedupeIndex;\n    }).length, 1, '2 rows with the same hash as the duplicate exist');\n    t.similar(nm.source, /arguments\\[4\\]\\[.+\\]\\[0\\]\\.apply\\(exports,arguments\\)$/, 'redirects duplicate to original via require call');\n  }\n});",
+            "file": "dedupe-nomap.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "delay for pipelines",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 25
+            },
+            "line": 11,
+            "code": "test('delay for pipelines', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/delay/main.js');\n  b.pipeline.get('record').push(through.obj(function (row, enc, next) {\n    if (row.file) {\n      t.equal(row.file, path.join(__dirname, 'delay/main.js'));\n      row.file = path.join(__dirname, 'delay/diverted.js');\n    }\n\n    this.push(row);\n    next();\n  }));\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 900);\n    }\n  });\n});",
+            "file": "delay.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "dependency events",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 23
+            },
+            "line": 7,
+            "code": "test('dependency events', function (t) {\n  t.plan(4);\n  var b = browserify(__dirname + '/entry/main.js');\n  var deps = [];\n  b.on('dep', function (row) {\n    deps.push({\n      id: row.id,\n      deps: row.deps\n    });\n    t.equal(typeof row.source, 'string');\n  });\n  b.bundle(function (err, src) {\n    t.deepEqual(deps.sort(cmp), [{\n      id: 1,\n      deps: {\n        './one': 2,\n        './two': 3\n      }\n    }, {\n      id: 2,\n      deps: {}\n    }, {\n      id: 3,\n      deps: {}\n    }]);\n  });\n\n  function cmp(a, b) {\n    return a.id < b.id ? -1 : 1;\n  }\n});",
+            "file": "dep.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "dollar",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 12
+            },
+            "line": 7,
+            "code": "test('dollar', function (t) {\n  t.plan(2);\n  var b = browserify();\n\n  b.require(__dirname + '/dollar/dollar/index.js', {\n    expose: 'dollar'\n  });\n\n  b.bundle(function (err, src) {\n    t.ok(src.length > 0);\n    var c = {};\n    vm.runInNewContext(src, c);\n    var res = vm.runInNewContext('require(\"dollar\")(100)', c);\n    t.equal(res, 10000);\n  });\n});",
+            "file": "dollar.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double buffer",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 19
+            },
+            "line": 10,
+            "code": "test('double buffer', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/double_buffer/main.js');\n\n  b.require('buffer');\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    vm.runInNewContext(src, {\n      t: t,\n      Uint8Array: Uint8Array\n    });\n  });\n});",
+            "file": "double_buffer.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double bundle error",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 25
+            },
+            "line": 7,
+            "code": "test('double bundle error', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/double_bundle_error/main.js');\n  var x = b.bundle();\n  x.on('error', function (err) {\n    t.ok(err);\n    var y = b.bundle();\n    y.on('error', function (err) {\n      t.ok(err);\n    });\n  });\n});",
+            "file": "double_bundle_error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double bundle json",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 24
+            },
+            "line": 11,
+            "code": "test('double bundle json', function (t) {\n  t.plan(6);\n  var expected0 = ['a=500', 'b=500'];\n  var expected1 = ['a=500', 'b=500'];\n\n  function log0(msg) {\n    t.equal(msg, expected0.shift());\n  }\n\n  function log1(msg) {\n    t.equal(msg, expected1.shift());\n  }\n\n  var cache = {};\n  var b = browserify(__dirname + '/double_bundle_json/index.js', {\n    cache: cache\n  });\n  b.pipeline.get('deps').push(through.obj(function (row, enc, next) {\n    cache[row.file] = {\n      source: row.source,\n      deps: xtend(row.deps)\n    };\n    this.push(row);\n    next();\n  }));\n  b.bundle(function (err, src0) {\n    t.ifError(err);\n    vm.runInNewContext(src0, {\n      console: {\n        log: log0\n      }\n    });\n    delete cache[__dirname + '/double_bundle_json/index.js'];\n    b.bundle(function (err, src1) {\n      t.ifError(err);\n      vm.runInNewContext(src1, {\n        console: {\n          log: log1\n        }\n      });\n    });\n  });\n});",
+            "file": "double_bundle_json.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double bundle parallel cached",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 35
+            },
+            "line": 7,
+            "code": "test('double bundle parallel cached', function (t) {\n  t.plan(7);\n  var sources = [];\n  var b = browserify(__dirname + '/entry/main.js', {\n    cache: {}\n  });\n  var pending = 2;\n  b.bundle(check(0));\n  b.bundle(check(1));\n\n  function check(index) {\n    return function (err, src) {\n      t.ifError(err);\n      var c = {\n        done: function (one, two) {\n          t.equal(one, 1);\n          t.equal(two, 2);\n        }\n      };\n      vm.runInNewContext(src, c);\n      sources[index] = src.toString('utf8');\n      if (--pending === 0) done();\n    };\n  }\n\n  function done() {\n    t.equal(sources[0], sources[1]);\n  }\n});",
+            "file": "double_bundle_parallel_cache.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double bundle parallel",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 28
+            },
+            "line": 7,
+            "code": "test('double bundle parallel', function (t) {\n  t.plan(7);\n  var sources = [];\n  var b = browserify(__dirname + '/entry/main.js');\n  var pending = 2;\n  b.bundle(check(0));\n  b.bundle(check(1));\n\n  function check(index) {\n    return function (err, src) {\n      t.ifError(err);\n      var c = {\n        done: function (one, two) {\n          t.equal(one, 1);\n          t.equal(two, 2);\n        }\n      };\n      vm.runInNewContext(src, c);\n      sources[index] = src.toString('utf8');\n      if (--pending === 0) done();\n    };\n  }\n\n  function done() {\n    t.equal(sources[0], sources[1]);\n  }\n});",
+            "file": "double_bundle_parallel.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "double bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 19
+            },
+            "line": 7,
+            "code": "test('double bundle', function (t) {\n  t.plan(5);\n  var b = browserify(__dirname + '/entry/main.js');\n  b.bundle(function (err, src0) {\n    t.ifError(err);\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n      }\n    };\n    vm.runInNewContext(src0, c);\n    b.bundle(function (err, src1) {\n      t.ifError(err);\n      t.equal(src1.toString('utf8'), src0.toString('utf8'));\n    });\n  });\n});",
+            "file": "double_bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "only execute entry files",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 30
+            },
+            "line": 7,
+            "code": "test('only execute entry files', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/entry_exec/main.js');\n\n  b.require(__dirname + '/entry_exec/fail.js');\n\n  b.bundle(function (err, src) {\n    var c = {\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "entry_exec.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry expose",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 18
+            },
+            "line": 7,
+            "code": "test('entry expose', function (t) {\n  t.plan(3);\n  var b = browserify();\n  b.add(__dirname + '/entry_expose/main.js');\n\n  b.require(__dirname + '/entry_expose/main.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n\n    function log(msg) {\n      t.equal(msg, 'wow');\n    }\n\n    vm.runInNewContext(src, c);\n    t.equal(c.require('x'), 555);\n  });\n});",
+            "file": "entry_expose.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry - relative path",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 27
+            },
+            "line": 9,
+            "code": "test('entry - relative path', function (t) {\n  process.chdir(__dirname);\n  t.plan(3);\n  var b = browserify('entry/main.js');\n  b.on('dep', function (row) {\n    if (row.entry) t.equal(row.file, path.join(__dirname, 'entry/main.js'));\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "entry_relative.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry - relative path via add",
+            "suites": [],
+            "updatePoint": {
+                "line": 27,
+                "column": 35
+            },
+            "line": 27,
+            "code": "test('entry - relative path via add', function (t) {\n  t.plan(3);\n  var b = browserify({\n    basedir: __dirname\n  });\n  b.add('entry/main.js');\n  b.on('dep', function (row) {\n    if (row.entry) t.equal(row.file, path.join(__dirname, 'entry/main.js'));\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "entry_relative.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 11
+            },
+            "line": 9,
+            "code": "test('entry', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/entry/main.js');\n  b.on('dep', function (row) {\n    if (row.entry) t.equal(row.file, path.join(__dirname, 'entry/main.js'));\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entry via add",
+            "suites": [],
+            "updatePoint": {
+                "line": 26,
+                "column": 19
+            },
+            "line": 26,
+            "code": "test('entry via add', function (t) {\n  t.plan(3);\n  var b = browserify();\n  b.add(__dirname + '/entry/main.js');\n  b.on('dep', function (row) {\n    if (row.entry) t.equal(row.file, path.join(__dirname, 'entry/main.js'));\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "error code",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 16
+            },
+            "line": 11,
+            "code": "test('error code', {\n  skip: knownFailure\n}, function (t) {\n  t.plan(2);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), path.resolve(__dirname, 'error_code/src.js')]);\n  var err = '';\n  ps.stderr.on('data', function (buf) {\n    err += buf;\n  });\n  ps.stderr.on('end', function () {\n    t.ok(/^(Syntax|Parse)Error:/m.test(err));\n  });\n  ps.on('exit', function (code) {\n    t.notEqual(code, 0);\n  });\n});",
+            "file": "error_code.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exclude array",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 19
+            },
+            "line": 7,
+            "code": "test('exclude array', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/exclude/array.js');\n  b.exclude([__dirname + '/exclude/skip.js', __dirname + '/exclude/skip2.js']);\n  b.bundle(function (err, src) {\n    if (err) {\n      t.fail(err);\n    }\n\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "exclude.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "no exports when no files are loaded",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 41
+            },
+            "line": 7,
+            "code": "test('no exports when no files are loaded', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.same(Object.keys(c), []);\n  });\n});",
+            "file": "export.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "no exports when entries are defined",
+            "suites": [],
+            "updatePoint": {
+                "line": 16,
+                "column": 41
+            },
+            "line": 16,
+            "code": "test('no exports when entries are defined', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/export/entry.js');\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.same(c, {});\n  });\n});",
+            "file": "export.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "require export when files are required",
+            "suites": [],
+            "updatePoint": {
+                "line": 26,
+                "column": 44
+            },
+            "line": 26,
+            "code": "test('require export when files are required', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/export/entry.js');\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.same(Object.keys(c), ['require']);\n  });\n});",
+            "file": "export.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "requiring a shimmed module name from an external bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 61
+            },
+            "line": 7,
+            "code": "test('requiring a shimmed module name from an external bundle', function (t) {\n  t.plan(1);\n  var b1 = browserify();\n  var b2 = browserify();\n\n  b1.require(__dirname + '/external_shim/bundle1.js', {\n    expose: 'bundle1'\n  });\n\n  b2.external(b1);\n\n  b2.require(__dirname + '/external_shim/bundle2.js', {\n    expose: 'bundle2'\n  });\n\n  b1.bundle(function (err, src1) {\n    b2.bundle(function (err, src2) {\n      var c = {\n        console: console,\n        setTimeout: setTimeout,\n        clearTimeout: clearTimeout\n      };\n      vm.runInNewContext(src1 + src2, c);\n      t.ok(c.require('bundle1').shim === c.require('bundle2').shim);\n    });\n  });\n});",
+            "file": "external_shim.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "external",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 14
+            },
+            "line": 7,
+            "code": "test('external', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/external/main.js');\n  b.external('freelist');\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    vm.runInNewContext('function require (x) {' + 'if (x===\"freelist\") return function (n) { return n + 1000 }' + '}' + src, {\n      t: t\n    });\n  });\n});",
+            "file": "external.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "externalize bin",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 21
+            },
+            "line": 24,
+            "code": "test('externalize bin', function (t) {\n  t.plan(5);\n  var commands = [['-r', './robot.js', '-o', path.join(pubdir, 'common.js')], ['-x', './robot.js', 'beep.js', '-o', path.join(pubdir, 'beep.js')], ['-x', './robot.js', 'boop.js', '-o', path.join(pubdir, 'boop/bop.js')]];\n\n  (function next() {\n    if (commands.length === 0) {\n      var common = fs.readFileSync(path.join(pubdir, 'common.js'));\n      var beep = fs.readFileSync(path.join(pubdir, 'beep.js'));\n      var boop = fs.readFileSync(path.join(pubdir, 'boop/bop.js'));\n      vm.runInNewContext(common + beep, {\n        console: {\n          log: function (msg) {\n            t.equal(msg, 'BEEP!');\n          }\n        }\n      });\n      vm.runInNewContext(common + boop, {\n        console: {\n          log: function (msg) {\n            t.equal(msg, 'BOOP!');\n          }\n        }\n      });\n    } else {\n      var args = commands.shift();\n      args.unshift(path.join(__dirname, '../bin/cmd.js'));\n      var ps = spawn(process.execPath, args, {\n        cwd: tmpdir\n      });\n      ps.stderr.pipe(process.stderr);\n      ps.on('exit', function (code) {\n        t.equal(code, 0, 'exit code');\n        next();\n      });\n    }\n  })();\n});",
+            "file": "externalize.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fake",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 10
+            },
+            "line": 7,
+            "code": "test('fake', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/fake/fake_fs.js', {\n    expose: 'fs'\n  });\n\n  b.add(__dirname + '/fake/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "fake.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fieldString",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 17
+            },
+            "line": 9,
+            "code": "test('fieldString', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/field/string.js', {\n    expose: './string.js'\n  });\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('./string.js'), 'browser');\n  });\n});",
+            "file": "field.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fieldObject",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 17
+            },
+            "line": 24,
+            "code": "test('fieldObject', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/field/object.js', {\n    expose: './object.js'\n  });\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('./object.js'), '!browser');\n  });\n});",
+            "file": "field.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "missObject",
+            "suites": [],
+            "updatePoint": {
+                "line": 39,
+                "column": 16
+            },
+            "line": 39,
+            "code": "test('missObject', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/field/miss.js', {\n    expose: './miss.js'\n  });\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('./miss.js'), '!browser');\n  });\n});",
+            "file": "field.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fieldSub",
+            "suites": [],
+            "updatePoint": {
+                "line": 54,
+                "column": 14
+            },
+            "line": 54,
+            "code": "test('fieldSub', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/field/sub.js', {\n    expose: './sub.js'\n  });\n\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('./sub.js'), 'browser');\n  });\n});",
+            "file": "field.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "file event",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 16
+            },
+            "line": 9,
+            "code": "test('file event', function (t) {\n  t.plan(8);\n  var b = browserify(__dirname + '/entry/main.js');\n  var files = {\n    'main.js': path.join(__dirname, 'entry/main.js'),\n    'one.js': './one',\n    'two.js': './two'\n  };\n  b.on('file', function (file, id) {\n    var key = path.basename(file);\n    t.equal(file, path.join(__dirname, 'entry', key));\n    t.equal(id, files[key]);\n    delete files[key];\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "file_event.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "five bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 17
+            },
+            "line": 7,
+            "code": "test('five bundle', function (t) {\n  t.plan(3 + 4 * 2);\n  var b = browserify(__dirname + '/entry/main.js');\n  var source;\n  b.bundle(function (err, src0) {\n    t.ifError(err);\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n      }\n    };\n    vm.runInNewContext(src0, c);\n\n    (function next(count) {\n      if (count === 5) return;\n      b.bundle(function (err, src1) {\n        t.ifError(err);\n        t.equal(src1.toString('utf8'), src0.toString('utf8'));\n        next(count + 1);\n      });\n    })(1);\n  });\n});",
+            "file": "five_bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fullPaths enabled",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 23
+            },
+            "line": 12,
+            "code": "test('fullPaths enabled', function (t) {\n  t.plan(3);\n  var b = browserify({\n    entries: [deps[0]],\n    fullPaths: true\n  });\n  b.bundle(function (err, src) {\n    unpack(src).forEach(function (dep) {\n      t.notEqual(deps.indexOf(dep.id), -1, 'full path name for dep.id');\n    });\n  });\n});",
+            "file": "full_paths.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fullPaths disabled",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 24
+            },
+            "line": 24,
+            "code": "test('fullPaths disabled', function (t) {\n  t.plan(3);\n  var b = browserify({\n    entries: [deps[0]],\n    fullPaths: false\n  });\n  b.bundle(function (err, src) {\n    unpack(src).forEach(function (dep) {\n      t.equal(deps.indexOf(dep.id), -1, 'full path name no longer available');\n    });\n  });\n});",
+            "file": "full_paths.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "fullPaths enabled, with custom exposed dependency name",
+            "suites": [],
+            "updatePoint": {
+                "line": 36,
+                "column": 60
+            },
+            "line": 36,
+            "code": "test('fullPaths enabled, with custom exposed dependency name', function (t) {\n  t.plan(1);\n  var b = browserify({\n    entries: [__dirname + '/entry/needs_three.js'],\n    fullPaths: true\n  });\n\n  b.require(__dirname + '/entry/three.js', {\n    expose: 'three'\n  });\n\n  b.bundle(function (err, src) {\n    t.doesNotThrow(function () {\n      vm.runInNewContext(src, {\n        console: console,\n        t: t\n      });\n    });\n  });\n});",
+            "file": "full_paths.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "glob",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 10
+            },
+            "line": 11,
+            "code": "test('glob', function (t) {\n  var expected = ['a', '!x', 'z', 'b', '!y'];\n  t.plan(expected.length + 1);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), 'a.js', 'b.js', '-u', 'vendor/*.js'], {\n    cwd: __dirname + '/glob'\n  });\n  ps.stderr.pipe(process.stderr);\n  ps.stdout.pipe(concat(function (body) {\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(body.toString('utf8'), c);\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  }));\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "glob.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "coffeeify globally",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 24
+            },
+            "line": 7,
+            "code": "test('coffeeify globally', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/coffeeify/main.coffee');\n  b.transform('coffeeify', {\n    global: true\n  });\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      },\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    });\n\n    function log(msg) {\n      t.equal(msg, 'eyo');\n    }\n  });\n});",
+            "file": "global_coffeeify.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global noparse module",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 27
+            },
+            "line": 9,
+            "code": "test('global noparse module', function (t) {\n  t.plan(2);\n  var b = browserify({\n    noParse: 'aaa'\n  });\n\n  b.require(__dirname + '/global/node_modules/aaa', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      __filename: __filename,\n      __dirname: __dirname\n    };\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, __filename);\n    t.equal(x.dirname, __dirname);\n  });\n});",
+            "file": "global_noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global noparse module file",
+            "suites": [],
+            "updatePoint": {
+                "line": 32,
+                "column": 32
+            },
+            "line": 32,
+            "code": "test('global noparse module file', function (t) {\n  t.plan(2);\n  var b = browserify({\n    noParse: 'aaa/index.js'\n  });\n\n  b.require(__dirname + '/global/node_modules/aaa', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      __filename: __filename,\n      __dirname: __dirname\n    };\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, __filename);\n    t.equal(x.dirname, __dirname);\n  });\n});",
+            "file": "global_noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global noparse module deep file",
+            "suites": [],
+            "updatePoint": {
+                "line": 55,
+                "column": 37
+            },
+            "line": 55,
+            "code": "test('global noparse module deep file', function (t) {\n  t.plan(2);\n  var b = browserify({\n    noParse: 'robot/lib/beep.js'\n  });\n\n  b.require(__dirname + '/global/node_modules/robot', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      __filename: __filename,\n      __dirname: __dirname\n    };\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, __filename);\n    t.equal(x.dirname, __dirname);\n  });\n});",
+            "file": "global_noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global noparse basedir",
+            "suites": [],
+            "updatePoint": {
+                "line": 78,
+                "column": 28
+            },
+            "line": 78,
+            "code": "test('global noparse basedir', function (t) {\n  t.plan(2);\n  var b = browserify({\n    basedir: __dirname + '/global',\n    noParse: 'filename.js'\n  });\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      __filename: __filename,\n      __dirname: __dirname\n    };\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, __filename);\n    t.equal(x.dirname, __dirname);\n  });\n});",
+            "file": "global_noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global noparse function",
+            "suites": [],
+            "updatePoint": {
+                "line": 102,
+                "column": 29
+            },
+            "line": 102,
+            "code": "test('global noparse function', function (t) {\n  t.plan(2);\n  var b = browserify({\n    noParse: function (file) {\n      return file === path.join(__dirname, 'global/filename.js');\n    }\n  });\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      __filename: __filename,\n      __dirname: __dirname\n    };\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, __filename);\n    t.equal(x.dirname, __dirname);\n  });\n});",
+            "file": "global_noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "recorded global tr",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 24
+            },
+            "line": 7,
+            "code": "test('recorded global tr', function (t) {\n  t.plan(6);\n  var b = browserify(__dirname + '/global_recorder/main.js');\n  var context = {\n    console: {\n      log: function (msg) {\n        t.equal(msg, 'wow');\n      }\n    }\n  };\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, context);\n    t.equal(b._recorded.length, 2);\n    b.bundle(function (err, src) {\n      t.ifError(err);\n      vm.runInNewContext(src, context);\n      t.equal(b._recorded.length, 2);\n    });\n  });\n});",
+            "file": "global_recorder.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 12
+            },
+            "line": 10,
+            "code": "test('global', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/global/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      t: t,\n      a: 555\n    };\n    c.self = c;\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "__filename and __dirname with insertGlobals: true",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 55
+            },
+            "line": 23,
+            "code": "test('__filename and __dirname with insertGlobals: true', function (t) {\n  t.plan(2);\n  var b = browserify({\n    insertGlobals: true,\n    basedir: __dirname + '/global'\n  });\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {\n      Uint8Array: Uint8Array\n    };\n    c.self = c;\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, '/filename.js');\n    t.equal(x.dirname, '/');\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "__filename and __dirname",
+            "suites": [],
+            "updatePoint": {
+                "line": 47,
+                "column": 30
+            },
+            "line": 47,
+            "code": "test('__filename and __dirname', function (t) {\n  t.plan(2);\n  var b = browserify({\n    basedir: __dirname + '/global'\n  });\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, '/filename.js');\n    t.equal(x.dirname, '/');\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "__filename and __dirname with basedir",
+            "suites": [],
+            "updatePoint": {
+                "line": 67,
+                "column": 43
+            },
+            "line": 67,
+            "code": "test('__filename and __dirname with basedir', function (t) {\n  t.plan(2);\n  var b = browserify({\n    basedir: __dirname\n  });\n\n  b.require(__dirname + '/global/filename.js', {\n    expose: 'x'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n\n    var x = c.require('x');\n\n    t.equal(x.filename, '/global/filename.js');\n    t.equal(x.dirname, '/global');\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "process.nextTick",
+            "suites": [],
+            "updatePoint": {
+                "line": 87,
+                "column": 22
+            },
+            "line": 87,
+            "code": "test('process.nextTick', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/global/tick.js');\n  b.bundle(function (err, src) {\n    var c = {\n      t: t,\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "Buffer",
+            "suites": [],
+            "updatePoint": {
+                "line": 100,
+                "column": 12
+            },
+            "line": 100,
+            "code": "test('Buffer', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/global/buffer.js');\n  b.bundle(function (err, src) {\n    var c = {\n      t: t,\n      Uint8Array: Uint8Array,\n      ArrayBuffer: ArrayBuffer\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "hash instances with hashed contexts",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 41
+            },
+            "line": 7,
+            "code": "test('hash instances with hashed contexts', function (t) {\n  t.plan(17);\n  var b = browserify(__dirname + '/hash_instance_context/main.js');\n  b.bundle(function (err, buf) {\n    var c = {\n      t: t\n    };\n    var src = buf.toString('utf8');\n    t.equal(src.match(RegExp('// FILE F ONE', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE G ONE', 'g')).length, 2);\n    t.equal(src.match(RegExp('// FILE F TWO', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE G TWO', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE H TWO', 'g')).length, 2);\n    t.equal(src.match(RegExp('// FILE F THREE', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE G THREE', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE H THREE', 'g')).length, 1);\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "hash_instance_context.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "hash",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 10
+            },
+            "line": 7,
+            "code": "test('hash', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/hash/main.js');\n  b.bundle(function (err, buf) {\n    var c = {\n      t: t\n    };\n    var src = buf.toString('utf8');\n    t.equal(src.match(RegExp('// FILE CONTENTS', 'g')).length, 1);\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "hash.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 15
+            },
+            "line": 7,
+            "code": "test('identical', function (t) {\n  var expected = [1, 2, 10, 110];\n  t.plan(expected.length + 1);\n  var b = browserify(__dirname + '/identical_different/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src.toString('utf8'), {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  });\n});",
+            "file": "identical_different.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "identical",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 15
+            },
+            "line": 7,
+            "code": "test('identical', function (t) {\n  var expected = [0, 1, 0, 1];\n  t.plan(expected.length + 1);\n  var b = browserify(__dirname + '/identical/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src.toString('utf8'), {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  });\n});",
+            "file": "identical.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore browser field",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 26
+            },
+            "line": 11,
+            "code": "test('ignore browser field', function (t) {\n  t.plan(3);\n  var b = browserify(mainfile, {\n    browserField: false\n  });\n  var expected = ['A:NODE', 'B:X.JS'];\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  });\n});",
+            "file": "ignore_browser_field.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignoreMissing option",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 26
+            },
+            "line": 5,
+            "code": "test('ignoreMissing option', function (t) {\n  t.test('on browserify', function (t) {\n    t.plan(1);\n    var ignored = browserify({\n      entries: [__dirname + '/ignore_missing/main.js'],\n      ignoreMissing: true\n    });\n    ignored.bundle(function (err) {\n      t.ok(!err, \"bundle completed with missing file ignored\");\n    });\n  });\n  t.test('on .bundle', function (t) {\n    t.plan(1);\n    var ignored = browserify(__dirname + '/ignore_missing/main.js', {\n      ignoreMissing: true\n    });\n    ignored.bundle(function (err) {\n      t.ok(!err, \"bundle completed with missing file ignored\");\n    });\n  });\n  t.test('defaults to false', function (t) {\n    t.plan(1);\n    var expected = browserify(__dirname + '/ignore_missing/main.js');\n    expected.bundle(function (err) {\n      t.ok(err, 'ignoreMissing was false, an error was raised');\n    });\n  });\n  t.end();\n});",
+            "file": "ignore_missing.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore transform",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 22
+            },
+            "line": 7,
+            "code": "test('ignore transform', function (t) {\n  t.plan(1);\n  var b = browserify({\n    transformKey: false\n  });\n  b.add(__dirname + '/ignore_transform_key/main.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "ignore_transform_key.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 12
+            },
+            "line": 9,
+            "code": "test('ignore', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/ignore/main.js');\n  b.ignore(path.join(__dirname, 'ignore/skip.js'));\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "ignore.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore array",
+            "suites": [],
+            "updatePoint": {
+                "line": 21,
+                "column": 18
+            },
+            "line": 21,
+            "code": "test('ignore array', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/ignore/array.js');\n  b.ignore([path.join(__dirname, 'ignore/skip.js'), path.join(__dirname, 'ignore/skip2.js')]);\n  b.bundle(function (err, src) {\n    if (err) {\n      t.fail(err);\n    }\n\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "ignore.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore by package or id",
+            "suites": [],
+            "updatePoint": {
+                "line": 36,
+                "column": 29
+            },
+            "line": 36,
+            "code": "test('ignore by package or id', function (t) {\n  t.plan(3);\n  var b = browserify();\n  b.add(__dirname + '/ignore/by-id.js');\n  b.ignore('events');\n  b.ignore('beep');\n  b.ignore('bad id');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "ignore.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "ignore files referenced by relative path",
+            "suites": [],
+            "updatePoint": {
+                "line": 50,
+                "column": 46
+            },
+            "line": 50,
+            "code": "test('ignore files referenced by relative path', function (t) {\n  // Change the current working directory relative to this file\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/ignore/by-relative.js');\n  b.ignore('./ignore/ignored/skip.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  }); // Revert CWD\n\n  process.chdir(cwd);\n});",
+            "file": "ignore.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "do not ignore files with relative paths that do not resolve",
+            "suites": [],
+            "updatePoint": {
+                "line": 67,
+                "column": 65
+            },
+            "line": 67,
+            "code": "test('do not ignore files with relative paths that do not resolve', function (t) {\n  // Change the current working directory to the ignore folder\n  var cwd = process.cwd();\n  process.chdir(__dirname + '/ignore');\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/ignore/double-skip.js');\n  b.ignore('./skip.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  }); // Revert CWD\n\n  process.chdir(cwd);\n});",
+            "file": "ignore.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "json",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 10
+            },
+            "line": 11,
+            "code": "test('json', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/json/main.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    var c = {\n      ex: function (obj) {\n        t.same(obj, {\n          beep: 'boop',\n          x: 555\n        });\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n}); // This works in Node v10 and up thanks to the JSON superset proposal, which",
+            "file": "json.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "verify evil json",
+            "suites": [],
+            "updatePoint": {
+                "line": 31,
+                "column": 22
+            },
+            "line": 31,
+            "code": "test('verify evil json', {\n  skip: semver.gte(process.version, 'v10.0.0')\n}, function (t) {\n  t.plan(1);\n  fs.readFile(__dirname + '/json/evil-chars.json', function (err, data) {\n    if (err) t.fail(err);\n    t.throws(function () {\n      vm.runInNewContext('(' + data.toString() + ')');\n    });\n  });\n});",
+            "file": "json.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "evil json",
+            "suites": [],
+            "updatePoint": {
+                "line": 42,
+                "column": 15
+            },
+            "line": 42,
+            "code": "test('evil json', function (t) {\n  t.plan(2);\n  var b = browserify();\n  b.add(__dirname + '/json/evil.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    var c = {\n      ex: function (obj) {\n        t.same(obj, {\n          evil: '\\u2028\\u2029'\n        });\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "json.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "invalid json",
+            "suites": [],
+            "updatePoint": {
+                "line": 58,
+                "column": 18
+            },
+            "line": 58,
+            "code": "test('invalid json', function (t) {\n  var b = browserify();\n  t.plan(1);\n  b.add(__dirname + '/json/invalid.js');\n  b.bundle(function (err, src) {\n    t.ok(err);\n  });\n});",
+            "file": "json.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "leaking information about system paths (process)",
+            "suites": [],
+            "updatePoint": {
+                "line": 19,
+                "column": 54
+            },
+            "line": 19,
+            "code": "test('leaking information about system paths (process)', function (t) {\n  t.plan(4);\n  var b = browserify({\n    basedir: dir\n  });\n  var stream = through();\n  stream.push('process.nextTick(function () {' + 't.ok(true)' + '})');\n  stream.push(null);\n  b.add(stream);\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    t.equal(src.indexOf(dirstring), -1, 'temp directory visible');\n    t.equal(src.indexOf(process.cwd()), -1, 'cwd directory visible');\n    t.equal(src.indexOf('/home'), -1, 'home directory visible');\n    vm.runInNewContext(src, {\n      t: t,\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    });\n  });\n});",
+            "file": "leak.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "leaking information about system paths (Buffer)",
+            "suites": [],
+            "updatePoint": {
+                "line": 40,
+                "column": 53
+            },
+            "line": 40,
+            "code": "test('leaking information about system paths (Buffer)', function (t) {\n  t.plan(4);\n  var b = browserify({\n    basedir: dir\n  });\n  var stream = through();\n  stream.push('t.equal(Buffer(\"eHl6\", \"base64\").toString(), \"xyz\")');\n  stream.push(null);\n  b.add(stream);\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    t.equal(src.indexOf(dirstring), -1, 'temp directory visible');\n    t.equal(src.indexOf(process.cwd()), -1, 'cwd directory visible');\n    t.equal(src.indexOf('/home'), -1, 'home directory visible');\n    vm.runInNewContext(src, {\n      t: t,\n      setTimeout: setTimeout,\n      Uint8Array: Uint8Array,\n      ArrayBuffer: ArrayBuffer\n    });\n  });\n});",
+            "file": "leak.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "setMaxListener",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 20
+            },
+            "line": 7,
+            "code": "test('setMaxListener', function (t) {\n  t.plan(1);\n  var b = browserify();\n  b.add(__dirname + '/maxlisteners/main.js');\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src);\n    t.ok(true); // didn't crash\n  });\n});",
+            "file": "maxlisteners.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "unique require",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 20
+            },
+            "line": 12,
+            "code": "test('unique require', function (t) {\n  t.plan(6);\n  var core = browserify({\n    externalRequireName: 'unique_require',\n    prelude: prelude\n  });\n\n  core.require(__dirname + '/multi_bundle/b.js', {\n    expose: './b'\n  });\n\n  var app = browserify([__dirname + '/multi_bundle/a.js'], {\n    prelude: prelude\n  }); // inform this bundle that b exists in another bundle\n\n  app.external('./b');\n  core.bundle(function (err, src) {\n    var c = {\n      console: console,\n      t: t,\n      baton: {\n        times: 0\n      }\n    }; // loading core will cause no require to run\n\n    vm.runInNewContext(src, c);\n    t.equal(c.baton.times, 0); // loading the app will require\n\n    app.bundle(function (err, src) {\n      vm.runInNewContext(src, c); // b required for the first time\n\n      t.equal(c.baton.times, 1); // running the file again\n      // because it is using the same b, no reloading\n\n      vm.runInNewContext(src, c); // b should not have been required again\n      // because it was part of the core bundle\n\n      t.equal(c.baton.times, 1);\n      t.equal(c.unique_require('./b'), 'foo');\n    });\n  });\n});",
+            "file": "multi_bundle_unique.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 18
+            },
+            "line": 7,
+            "code": "test('multi bundle', function (t) {\n  t.plan(5);\n  var core = browserify();\n\n  core.require(__dirname + '/multi_bundle/b.js', {\n    expose: true\n  });\n\n  var app = browserify([__dirname + '/multi_bundle/a.js']); // inform this bundle that b exists in another bundle\n\n  app.external(__dirname + '/multi_bundle/b.js');\n  core.bundle(function (err, src) {\n    var c = {\n      console: console,\n      t: t,\n      baton: {\n        times: 0\n      }\n    }; // loading core will cause no require to run\n\n    vm.runInNewContext(src, c);\n    t.equal(c.baton.times, 0); // loading the app will require\n\n    app.bundle(function (err, src) {\n      vm.runInNewContext(src, c); // b required for the first time\n\n      t.equal(c.baton.times, 1); // running the file again\n      // because it is using the same b, no reloading\n\n      vm.runInNewContext(src, c); // b should not have been required again\n      // because it was part of the core bundle\n\n      t.equal(c.baton.times, 1);\n    });\n  });\n}); // re-enable this in future releases",
+            "file": "multi_bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 44,
+                "column": 18
+            },
+            "line": 44,
+            "code": "test('multi bundle', function (t) {\n  t.plan(8);\n  var core = browserify({\n    exposeAll: true\n  });\n\n  core.require(__dirname + '/multi_bundle/a.js', {\n    expose: true\n  });\n\n  var app = browserify([__dirname + '/multi_bundle/c.js']); // inform this bundle that b exists in another bundle\n\n  app.external(core);\n  core.bundle(function (err, src) {\n    var c = {\n      console: console,\n      t: t,\n      baton: {\n        times: 0\n      }\n    }; // loading core will cause no require to run\n\n    vm.runInNewContext(src, c);\n    t.equal(c.baton.times, 0); // loading the app will require\n\n    app.bundle(function (err, src) {\n      vm.runInNewContext(src, c); // b required for the first time\n\n      t.equal(c.baton.times, 1); // running the file again\n      // because it is using the same b, no reloading\n\n      vm.runInNewContext(src, c); // b should not have been required again\n      // because it was part of the core bundle\n\n      t.equal(c.baton.times, 1);\n    });\n  });\n});",
+            "file": "multi_bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry cross require",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 31
+            },
+            "line": 10,
+            "code": "test('multi entry cross require', function (t) {\n  t.plan(8);\n  var b = browserify([testFiles[0], testFiles[1]]);\n  b.add(testFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    if (err) throw err;\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry_cross_require.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry cross require - relative cwd",
+            "suites": [],
+            "updatePoint": {
+                "line": 28,
+                "column": 46
+            },
+            "line": 28,
+            "code": "test('multi entry cross require - relative cwd', function (t) {\n  t.plan(8);\n  var dsTestFiles = testFiles.map(function (x) {\n    return x.replace(__dirname + '/', './');\n  });\n  var b = browserify({\n    entries: [dsTestFiles[0], dsTestFiles[1]],\n    basedir: __dirname\n  });\n  b.add(dsTestFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    if (err) throw err;\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry_cross_require.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry cross require - relative",
+            "suites": [],
+            "updatePoint": {
+                "line": 52,
+                "column": 42
+            },
+            "line": 52,
+            "code": "test('multi entry cross require - relative', function (t) {\n  t.plan(8);\n  var rTestFiles = testFiles.map(function (x) {\n    return x.replace(__dirname + '/', '');\n  });\n  var b = browserify({\n    entries: [rTestFiles[0], rTestFiles[1]],\n    basedir: __dirname\n  });\n  b.add(rTestFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    if (err) throw err;\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry_cross_require.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 17
+            },
+            "line": 12,
+            "code": "test('multi entry', function (t) {\n  t.plan(6);\n  var b = browserify([testFiles[0], testFiles[1]]);\n  b.add(testFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry relative",
+            "suites": [],
+            "updatePoint": {
+                "line": 29,
+                "column": 26
+            },
+            "line": 29,
+            "code": "test('multi entry relative', function (t) {\n  t.plan(6);\n  var rTestFiles = testFiles.map(function (x) {\n    return x.replace(__dirname + '/', '');\n  });\n  var b = browserify({\n    entries: [rTestFiles[0], rTestFiles[1]],\n    basedir: __dirname\n  });\n  b.add(rTestFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multi entry relative cwd",
+            "suites": [],
+            "updatePoint": {
+                "line": 52,
+                "column": 30
+            },
+            "line": 52,
+            "code": "test('multi entry relative cwd', function (t) {\n  t.plan(6);\n  var rTestFiles = testFiles.map(function (x) {\n    return x.replace(__dirname + '/', './');\n  });\n  var b = browserify({\n    entries: [rTestFiles[0], rTestFiles[1]],\n    basedir: __dirname\n  });\n  b.add(rTestFiles[2]);\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.ok(testFiles.indexOf(row.file) > -1, 'should contain full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "entries as streams",
+            "suites": [],
+            "updatePoint": {
+                "line": 75,
+                "column": 24
+            },
+            "line": 75,
+            "code": "test('entries as streams', function (t) {\n  t.plan(6); // commondir blows up with streams and without basedir\n\n  var opts = {\n    basedir: __dirname + '/multi_entry'\n  };\n  var b = browserify([fs.createReadStream(testFiles[0]), fs.createReadStream(testFiles[1])], opts);\n  b.add(fs.createReadStream(testFiles[2]));\n  b.on('dep', function (row) {\n    if (row.entry) {\n      t.similar(row.file, RegExp(path.join(__dirname, 'multi_entry/_stream_').replace(/\\\\/g, '\\\\\\\\') + '[\\\\d].js'), 'should be full entry path');\n    }\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      times: 0,\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "require same file locally and globally",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 44
+            },
+            "line": 7,
+            "code": "test('require same file locally and globally', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/multi_require/main.js', {\n    basedir: __dirname\n  });\n\n  b.require('./multi_require/a.js', {\n    expose: 'a'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      t: t\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "multi_require.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "multiple symlink execution",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 32
+            },
+            "line": 7,
+            "code": "test('multiple symlink execution', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/multi_symlink/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(msg) {\n      t.equal(msg, 'X');\n    }\n  });\n});",
+            "file": "multi_symlink.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "builtins false",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 20
+            },
+            "line": 9,
+            "code": "test('builtins false', function (t) {\n  t.plan(1);\n  var file = __dirname + '/no_builtins/main.js';\n  var b = browserify({\n    entries: [file],\n    commondir: false,\n    builtins: false\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'beep boop\\n');\n        }\n      },\n      require: require,\n      __dirname: process.cwd()\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "no_builtins.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "builtins []",
+            "suites": [],
+            "updatePoint": {
+                "line": 30,
+                "column": 17
+            },
+            "line": 30,
+            "code": "test('builtins []', function (t) {\n  t.plan(1);\n  var b = browserify({\n    entries: [__dirname + '/no_builtins/main.js'],\n    commondir: false,\n    builtins: []\n  });\n  b.bundle(function (err, src) {\n    var c = {\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'beep boop\\n');\n        }\n      },\n      require: require\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "no_builtins.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "builtins object",
+            "suites": [],
+            "updatePoint": {
+                "line": 49,
+                "column": 21
+            },
+            "line": 49,
+            "code": "test('builtins object', function (t) {\n  t.plan(2);\n  var b = browserify({\n    entries: [__dirname + '/no_builtins/main.js'],\n    commondir: false,\n    builtins: {\n      fs: require.resolve('./no_builtins/extra/fs.js'),\n      tls: require.resolve('./no_builtins/extra/tls.js')\n    }\n  });\n  var expected = ['WRITE CODE EVERY DAY', 'WHATEVER'];\n  b.bundle(function (err, src) {\n    var c = {\n      console: {\n        log: log\n      },\n      require: require\n    };\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "no_builtins.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "noParse array",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 19
+            },
+            "line": 7,
+            "code": "test('noParse array', function (t) {\n  process.chdir(__dirname);\n  t.plan(2);\n  var actual = [];\n  var expected = ['noparse/a.js', 'noparse/b.js', 'noparse/dir1/1.js', 'noparse/node_modules/robot/main.js'].map(function (x) {\n    return path.resolve(x);\n  }).sort();\n  var b = browserify({\n    entries: [__dirname + '/noparse/a.js'],\n    noParse: [path.join(__dirname, 'noparse/dir1/1.js'), path.join(__dirname, 'noparse/node_modules/robot/main.js')]\n  });\n  b.on('dep', function (dep) {\n    actual.push(dep.file);\n  });\n  b.bundle(function (err, src) {\n    actual.sort();\n    t.ifError(err);\n    t.deepEqual(actual, expected);\n  });\n});",
+            "file": "noparse.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "custom packer",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 19
+            },
+            "line": 24,
+            "code": "test('custom packer', function (t) {\n  t.plan(7);\n  var b = browserify(__dirname + '/entry/main.js');\n  b.pipeline.get('pack').splice(0, 1, through.obj(function (row, enc, next) {\n    t.equal(sources[row.id], row.source);\n    t.deepEqual(deps[row.id], row.deps);\n    this.push(row.id + '\\n');\n    next();\n  }));\n  b.pipeline.get('wrap').splice(0);\n  b.bundle(function (err, src) {\n    t.equal(src.toString('utf8'), '1\\n2\\n3\\n');\n  });\n});",
+            "file": "pack.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "absolute paths with transform property",
+            "suites": [],
+            "updatePoint": {
+                "line": 15,
+                "column": 44
+            },
+            "line": 15,
+            "code": "test('absolute paths with transform property', function (t) {\n  t.plan(6);\n  var b = browserify({\n    transform: ['tr'],\n    basedir: __dirname,\n    paths: [__dirname + '/paths/x', __dirname + '/paths/y'],\n    entries: __dirname + '/paths/main.js'\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    ensureTransform(t, src);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths_transform.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "relative paths with transform property",
+            "suites": [],
+            "updatePoint": {
+                "line": 31,
+                "column": 44
+            },
+            "line": 31,
+            "code": "test('relative paths with transform property', function (t) {\n  t.plan(6);\n  var b = browserify({\n    transform: ['tr'],\n    basedir: __dirname,\n    paths: ['./paths/x', './paths/y'],\n    entries: __dirname + '/paths/main.js'\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    ensureTransform(t, src);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths_transform.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "absolute paths with transform method",
+            "suites": [],
+            "updatePoint": {
+                "line": 47,
+                "column": 42
+            },
+            "line": 47,
+            "code": "test('absolute paths with transform method', function (t) {\n  t.plan(6);\n  var b = browserify({\n    basedir: __dirname,\n    paths: [__dirname + '/paths/x', __dirname + '/paths/y'],\n    entries: __dirname + '/paths/main.js'\n  });\n  b.transform('tr');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    ensureTransform(t, src);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths_transform.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "relative paths with transform method",
+            "suites": [],
+            "updatePoint": {
+                "line": 63,
+                "column": 42
+            },
+            "line": 63,
+            "code": "test('relative paths with transform method', function (t) {\n  t.plan(6);\n  var b = browserify({\n    basedir: __dirname,\n    paths: ['./paths/x', './paths/y'],\n    entries: __dirname + '/paths/main.js'\n  });\n  b.transform('tr');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    ensureTransform(t, src);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths_transform.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "$NODE_PATHS",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 17
+            },
+            "line": 7,
+            "code": "test('$NODE_PATHS', function (t) {\n  t.plan(3);\n  var paths = [__dirname + '/paths/x', __dirname + '/paths/y'];\n  var sep = /^win/i.test(process.platform) ? ';' : ':';\n  process.env.NODE_PATH = (process.env.NODE_PATHS || '').split(sep).concat(paths).join(sep);\n  var b = browserify(__dirname + '/paths/main.js');\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "opts.paths",
+            "suites": [],
+            "updatePoint": {
+                "line": 20,
+                "column": 16
+            },
+            "line": 20,
+            "code": "test('opts.paths', function (t) {\n  t.plan(3);\n  var b = browserify({\n    paths: [__dirname + '/paths/x', __dirname + '/paths/y'],\n    entries: __dirname + '/paths/main.js'\n  });\n  b.bundle(function (err, src) {\n    if (err) t.fail(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "paths.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "deps pipeline",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 19
+            },
+            "line": 9,
+            "code": "test('deps pipeline', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/pipeline_deps/main.js');\n  b.pipeline.get('deps').push(through.obj(function (row, enc, next) {\n    row.source = row.source.replace(/111/g, '11111');\n    this.push(row);\n    next();\n  }));\n  b.bundle(function (err, src) {\n    Function(['console'], src)({\n      log: log\n    });\n\n    function log(msg) {\n      t.equal(msg, 'main: 56055');\n    }\n  });\n});",
+            "file": "pipeline_deps.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "package event",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 19
+            },
+            "line": 10,
+            "code": "test('package event', function (t) {\n  t.plan(2 + expected.length);\n  var b = browserify(__dirname + '/pkg_event/main.js');\n  b.on('package', function (pkg) {\n    t.deepEqual(pkg, expected.shift());\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 555);\n    }\n  });\n});",
+            "file": "pkg_event.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "package",
+            "suites": [],
+            "updatePoint": {
+                "line": 12,
+                "column": 13
+            },
+            "line": 12,
+            "code": "test('package', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/pkg/main.js');\n  b.on('package', function (pkg_) {\n    t.deepEqual(pkg_, pkg);\n  });\n  b.bundle(function (err) {\n    t.ifError(err);\n  });\n});",
+            "file": "pkg.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "plugin fn",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 15
+            },
+            "line": 7,
+            "code": "test('plugin fn', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/plugin/main.js', {\n    basedir: __dirname\n  });\n  b.plugin(function (b_) {\n    t.equal(b, b_);\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n  });\n});",
+            "file": "plugin.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "plugin module",
+            "suites": [],
+            "updatePoint": {
+                "line": 19,
+                "column": 19
+            },
+            "line": 19,
+            "code": "test('plugin module', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/plugin/main.js', {\n    basedir: __dirname\n  });\n  b.plugin('plugin-foo', {\n    msg: 'beep boop'\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    t.equal(src.toString('utf8'), 'beep boop');\n  });\n});",
+            "file": "plugin.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "optionally preserves symlinks",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 35
+            },
+            "line": 7,
+            "code": "test('optionally preserves symlinks', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/preserve_symlinks/a/index.js', {\n    preserveSymlinks: true\n  });\n  b.bundle(function (err, buf) {\n    t.ifError(err);\n    t.ok(buf);\n    var src = buf.toString('utf8');\n    vm.runInNewContext(src, {});\n  });\n});",
+            "file": "preserve-symlinks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "always resolve entry point symlink",
+            "suites": [],
+            "updatePoint": {
+                "line": 21,
+                "column": 40
+            },
+            "line": 21,
+            "code": "test('always resolve entry point symlink', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/preserve_symlinks/linked-entry.js', {\n    preserveSymlinks: true\n  });\n  b.bundle(function (err, buf) {\n    t.ifError(err);\n    t.ok(buf);\n    var src = buf.toString('utf8');\n    vm.runInNewContext(src, {});\n  });\n});",
+            "file": "preserve-symlinks.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "implicit process global",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 29
+            },
+            "line": 7,
+            "code": "test('implicit process global', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/process/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      },\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "process.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "quotes",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 12
+            },
+            "line": 9,
+            "code": "test('quotes', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/quotes/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (single, double) {\n        t.equal(single, 'success', 'single quotes');\n        t.equal(double, 'success', 'double quotes');\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "quotes.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "interpolation literals",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 28
+            },
+            "line": 23,
+            "code": "test('interpolation literals', {\n  skip: !hasTemplateLiterals\n}, function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/quotes/backtick.js');\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (single, double, backtick) {\n        t.equal(single, 'success', 'single quotes');\n        t.equal(double, 'success', 'double quotes');\n        t.equal(backtick, 'success', 'backtick quotes');\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "quotes.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "relative dedupe",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 21
+            },
+            "line": 7,
+            "code": "test('relative dedupe', function (t) {\n  var expected = ['a a', 'a b', 'b a', 'b b'];\n  t.plan(expected.length + 1);\n  var b = browserify(__dirname + '/relative_dedupe/main.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n\n  function log(msg) {\n    t.equal(msg, expected.shift());\n  }\n});",
+            "file": "relative_dedupe.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "cached require results",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 28
+            },
+            "line": 7,
+            "code": "test('cached require results', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('seq');\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n\n    var seq0 = c.require('seq');\n\n    var seq1 = c.require('seq');\n\n    t.ok(seq0 === seq1);\n  });\n});",
+            "file": "require_cache.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "require expose external module",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 36
+            },
+            "line": 7,
+            "code": "test('require expose external module', function (t) {\n  t.plan(2);\n  var b = browserify({\n    basedir: __dirname\n  });\n\n  b.require('beep', {\n    expose: 'bip'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('bip'), 'boop');\n  });\n});",
+            "file": "require_expose.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "renaming builtin",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 22
+            },
+            "line": 24,
+            "code": "test('renaming builtin', function (t) {\n  t.plan(2);\n  var b = browserify({\n    basedir: __dirname\n  });\n\n  b.require('os', {\n    expose: 'bone'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('bone').platform(), 'browser');\n  });\n});",
+            "file": "require_expose.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "exposed modules do not leak across bundles",
+            "suites": [],
+            "updatePoint": {
+                "line": 41,
+                "column": 48
+            },
+            "line": 41,
+            "code": "test('exposed modules do not leak across bundles', function (t) {\n  var bundle1, bundle2;\n  bundle1 = browserify();\n  bundle1.add(__dirname + '/require_expose/main.js');\n\n  bundle1.require(__dirname + '/require_expose/some_dep.js', {\n    expose: 'foo'\n  });\n\n  bundle1.bundle(function (err, src) {\n    if (err) t.fail(err);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.foo, 'some_dep');\n    bundle2 = browserify();\n    bundle2.add(__dirname + '/require_expose/main.js');\n    bundle2.bundle(function (err) {\n      t.ok(err && err.message.match(/Cannot find module 'foo'/), 'should fail with missing module');\n      t.end();\n    });\n  });\n});",
+            "file": "require_expose.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "reset",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 11
+            },
+            "line": 7,
+            "code": "test('reset', function (t) {\n  t.plan(4);\n  var b = browserify();\n\n  b.require('path');\n\n  b.bundle(function (err, src) {\n    check(err, src);\n    b.bundle(function (err, src) {\n      check(err, src);\n    });\n  });\n\n  function check(err, src) {\n    t.ifError(err);\n    var c = {\n      setTimeout: setTimeout,\n      clearTimeout: clearTimeout,\n      console: console\n    };\n    vm.runInNewContext(src, c);\n    t.equal(c.require('path').join('/a', 'b'), '/a/b');\n  }\n});",
+            "file": "reset.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolve exposed files",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 27
+            },
+            "line": 7,
+            "code": "test('resolve exposed files', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/resolve_exposed/main.js', {\n    basedir: __dirname + '/resolve_exposed'\n  });\n\n  b.require('./x.js', {\n    expose: 'xyz'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(x) {\n      t.equal(x, 333);\n    }\n  });\n});",
+            "file": "resolve_exposed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolve exposed files without extension",
+            "suites": [],
+            "updatePoint": {
+                "line": 31,
+                "column": 45
+            },
+            "line": 31,
+            "code": "test('resolve exposed files without extension', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/resolve_exposed/main.js', {\n    basedir: __dirname + '/resolve_exposed'\n  });\n\n  b.require('./x', {\n    expose: 'xyz'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(x) {\n      t.equal(x, 333);\n    }\n  });\n});",
+            "file": "resolve_exposed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolve exposed directories",
+            "suites": [],
+            "updatePoint": {
+                "line": 55,
+                "column": 33
+            },
+            "line": 55,
+            "code": "test('resolve exposed directories', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/resolve_exposed/main.js', {\n    basedir: __dirname + '/resolve_exposed'\n  });\n\n  b.require('./y', {\n    expose: 'xyz'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(x) {\n      t.equal(x, 555);\n    }\n  });\n});",
+            "file": "resolve_exposed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolve exposed index from directories",
+            "suites": [],
+            "updatePoint": {
+                "line": 79,
+                "column": 44
+            },
+            "line": 79,
+            "code": "test('resolve exposed index from directories', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/resolve_exposed/main.js', {\n    basedir: __dirname + '/resolve_exposed'\n  });\n\n  b.require('./y/index', {\n    expose: 'xyz'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(x) {\n      t.equal(x, 555);\n    }\n  });\n});",
+            "file": "resolve_exposed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "resolve exposed index.js from directories",
+            "suites": [],
+            "updatePoint": {
+                "line": 103,
+                "column": 47
+            },
+            "line": 103,
+            "code": "test('resolve exposed index.js from directories', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/resolve_exposed/main.js', {\n    basedir: __dirname + '/resolve_exposed'\n  });\n\n  b.require('./y/index.js', {\n    expose: 'xyz'\n  });\n\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(x) {\n      t.equal(x, 555);\n    }\n  });\n});",
+            "file": "resolve_exposed.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "retarget with -r",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 22
+            },
+            "line": 9,
+            "code": "test('retarget with -r', function (t) {\n  t.plan(2);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-r', 'beep'], {\n    cwd: __dirname\n  });\n  var src = '';\n  ps.stdout.on('data', function (buf) {\n    src += buf;\n  });\n  ps.stderr.pipe(process.stderr);\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('beep'), 'boop');\n  });\n  ps.stdin.end();\n});",
+            "file": "retarget.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "reverse multi bundle",
+            "suites": [],
+            "updatePoint": {
+                "line": 13,
+                "column": 26
+            },
+            "line": 13,
+            "code": "test('reverse multi bundle', function (t) {\n  t.plan(5); // Main app bundle has the main app code and the shared library code\n\n  var app = browserify([__dirname + '/reverse_multi_bundle/app.js']).external(__dirname + '/reverse_multi_bundle/lazy.js').require(__dirname + '/reverse_multi_bundle/shared.js', {\n    expose: true\n  }).require(__dirname + '/reverse_multi_bundle/arbitrary.js', {\n    expose: 'not/real'\n  }); // Lazily loaded bundle has only its own code even it uses code from the\n  // shared library.\n\n\n  var lazy = browserify({\n    filter: function (id) {\n      return id !== 'not/real';\n    }\n  }).require(__dirname + '/reverse_multi_bundle/lazy.js', {\n    expose: true\n  }).external(__dirname + '/reverse_multi_bundle/shared.js').external('not/real');\n\n  app.bundle(function (err, appSrc) {\n    if (err) throw err;\n    lazy.bundle(function (err, lazySrc) {\n      if (err) throw err;\n      var src = appSrc + ';' + lazySrc;\n      var c = {\n        setTimeout: setTimeout,\n        clearTimeout: clearTimeout,\n        t: t\n      };\n      vm.runInNewContext(src, c);\n    });\n  });\n});",
+            "file": "reverse_multi_bundle.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "shared symlink",
+            "suites": [],
+            "updatePoint": {
+                "line": 8,
+                "column": 20
+            },
+            "line": 8,
+            "code": "test('shared symlink', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/shared_symlink/main.js');\n  b.bundle(function (err, src) {\n    // does the same thing as node: crashes\n    t.equal(err.message, \"Can't walk dependency graph: Cannot find module 'foo' \" + \"from '\" + __dirname + \"/shared_symlink/shared/index.js'\\n\" + \"    required by \" + __dirname + \"/shared_symlink/shared/index.js\");\n  });\n});",
+            "file": "shared_symlink.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "files with shebangs",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 25
+            },
+            "line": 7,
+            "code": "test('files with shebangs', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/shebang/main.js');\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "shebang.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "yield",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 11
+            },
+            "line": 9,
+            "code": "test('yield', {\n  skip: !hasObjectSpread\n}, function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/spread/main.js');\n  b.bundle(function (err, src) {\n    t.error(err);\n    t.notEqual(src.indexOf('...b'), -1, 'passed through spread syntax');\n  });\n});",
+            "file": "spread.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "standalone bundle close event",
+            "suites": [],
+            "updatePoint": {
+                "line": 5,
+                "column": 35
+            },
+            "line": 5,
+            "code": "test('standalone bundle close event', {\n  timeout: 1000\n}, function (t) {\n  t.plan(1);\n  var ended = false;\n  var b = browserify(__dirname + '/standalone/main.js', {\n    standalone: 'stand-test'\n  });\n  var r = b.bundle();\n  r.resume();\n  r.on('end', function () {\n    t.ok(!ended);\n    ended = true;\n    t.end();\n  });\n});",
+            "file": "standalone_events.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "standalone in debug mode",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 30
+            },
+            "line": 9,
+            "code": "test('standalone in debug mode', function (t) {\n  t.plan(3);\n  var main = fs.readFileSync(__dirname + '/standalone/main.js');\n  var b = browserify(__dirname + '/standalone/main.js', {\n    standalone: 'stand-test',\n    debug: true\n  });\n  b.bundle(function (err, buf) {\n    var src = buf.toString('utf8');\n    t.test('window global', function (t) {\n      t.plan(2);\n      var c = {\n        window: {},\n        done: done(t)\n      };\n      vm.runInNewContext(src + '\\nwindow.standTest(done)', c);\n    });\n    t.test('CommonJS', function (t) {\n      t.plan(2);\n      var exp = {};\n      var c = {\n        module: {\n          exports: exp\n        },\n        exports: exp,\n        done: done(t)\n      };\n      vm.runInNewContext(src + '\\nmodule.exports(done)', c);\n    });\n    t.test('RequireJS', function (t) {\n      t.plan(2);\n      var c = {\n        define: function (dependencies, fn) {\n          fn()(done(t));\n        }\n      };\n      c.define.amd = true;\n      vm.runInNewContext(src, c);\n    });\n  });\n});",
+            "file": "standalone_sourcemap.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "standalone",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 16
+            },
+            "line": 7,
+            "code": "test('standalone', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/standalone/main.js', {\n    standalone: 'stand-test'\n  });\n  b.bundle(function (err, src) {\n    t.test('window global', function (t) {\n      t.plan(2);\n      var c = {\n        window: {},\n        done: done(t)\n      };\n      vm.runInNewContext(src + 'window.standTest(done)', c);\n    });\n    t.test('CommonJS', function (t) {\n      t.plan(2);\n      var exp = {};\n      var c = {\n        module: {\n          exports: exp\n        },\n        exports: exp,\n        done: done(t)\n      };\n      vm.runInNewContext(src + 'module.exports(done)', c);\n    });\n    t.test('RequireJS', function (t) {\n      t.plan(2);\n      var c = {\n        define: function (dependencies, fn) {\n          fn()(done(t));\n        }\n      };\n      c.define.amd = true;\n      vm.runInNewContext(src, c);\n    });\n  });\n});",
+            "file": "standalone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "A.B.C standalone",
+            "suites": [],
+            "updatePoint": {
+                "line": 45,
+                "column": 22
+            },
+            "line": 45,
+            "code": "test('A.B.C standalone', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/standalone/main.js', {\n    standalone: 'A.B.C'\n  });\n  b.bundle(function (err, src) {\n    t.test('window global', function (t) {\n      t.plan(2);\n      var c = {\n        window: {}\n      };\n      vm.runInNewContext(src, c);\n      c.window.A.B.C(done(t));\n    });\n    t.test('CommonJS', function (t) {\n      t.plan(2);\n      var exp = {};\n      var c = {\n        module: {\n          exports: exp\n        },\n        exports: exp\n      };\n      vm.runInNewContext(src, c);\n      c.module.exports(done(t));\n    });\n    t.test('RequireJS', function (t) {\n      t.plan(2);\n      var c = {\n        define: function (dependencies, fn) {\n          fn()(done(t));\n        }\n      };\n      c.define.amd = true;\n      vm.runInNewContext(src, c);\n    });\n  });\n});",
+            "file": "standalone.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "stdin",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 11
+            },
+            "line": 11,
+            "code": "test('stdin', function (t) {\n  t.plan(2);\n  var cwd = process.cwd();\n  process.chdir(__dirname);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), '-']);\n  ps.stdout.pipe(concat(function (body) {\n    var c = {\n      console: {\n        log: function (msg) {\n          t.equal(msg, 'hello');\n        }\n      }\n    };\n    vm.runInNewContext(body, c);\n  }));\n  ps.stderr.pipe(process.stderr);\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n  ps.stdin.write(\"console.log('hello')\");\n  ps.stdin.end();\n});",
+            "file": "stdin.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "stream file",
+            "suites": [],
+            "updatePoint": {
+                "line": 13,
+                "column": 17
+            },
+            "line": 13,
+            "code": "test('stream file', function (t) {\n  var expected = {};\n  expected[path.join(__dirname, 'stream/fake.js')] = true;\n  expected[path.join(__dirname, 'stream/bar.js')] = true;\n  expected[path.join(__dirname, 'stream/foo.js')] = true;\n  t.plan(5);\n  var stream = fs.createReadStream(__dirname + '/stream/main.js');\n  stream.file = path.join(__dirname, '/stream/fake.js');\n  var b = browserify(stream, {\n    basedir: __dirname + '/stream'\n  });\n  b.transform(function (file) {\n    t.ok(expected[file]);\n    delete expected[file];\n    return through();\n  });\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "stream_file.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "stream",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 12
+            },
+            "line": 9,
+            "code": "test('stream', function (t) {\n  t.plan(2);\n  var stream = fs.createReadStream(__dirname + '/stream/main.js');\n  var b = browserify(stream, {\n    basedir: __dirname + '/stream'\n  });\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "stream.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "subdep",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 12
+            },
+            "line": 7,
+            "code": "test('subdep', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require(__dirname + '/subdep/index.js', {\n    expose: 'subdep'\n  });\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('subdep'), 'zzz');\n  });\n});",
+            "file": "subdep.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "hash instances with hashed contexts",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 41
+            },
+            "line": 7,
+            "code": "test('hash instances with hashed contexts', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(5);\n  var b = browserify(__dirname + '/symlink_dedupe/main.js');\n  b.bundle(function (err, buf) {\n    var c = {\n      t: t\n    };\n    var src = buf.toString('utf8');\n    t.equal(src.match(RegExp('// FILE F ONE', 'g')).length, 1);\n    t.equal(src.match(RegExp('// FILE G ONE', 'g')).length, 1);\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "symlink_dedupe.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "syntax cache - valid",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 26
+            },
+            "line": 9,
+            "code": "test('syntax cache - valid', function (t) {\n  t.plan(2);\n  var expectedCache = {};\n  var cacheKey;\n  var b = browserify(__dirname + '/syntax_cache/valid.js');\n  b.once('dep', function (row) {\n    cacheKey = shasum(row.source);\n    expectedCache[cacheKey] = true;\n  });\n  Seq().seq(function () {\n    b.bundle(this);\n  }).seq(function () {\n    t.deepEqual(b._syntaxCache, expectedCache);\n    b._syntaxCache[cacheKey] = expectedCache[cacheKey] = 'beep';\n    b.bundle(function (err, src) {\n      // if the cache worked, the \"cacheKey\"\n      // should not be reset to \"true\"\n      t.deepEqual(b._syntaxCache, expectedCache);\n    });\n  });\n});",
+            "file": "syntax_cache.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "syntax cache - skip invalid",
+            "suites": [],
+            "updatePoint": {
+                "line": 30,
+                "column": 33
+            },
+            "line": 30,
+            "code": "test('syntax cache - skip invalid', function (t) {\n  t.plan(5);\n  var b = browserify(__dirname + '/syntax_cache/invalid.js');\n  Seq().seq(function () {\n    b.bundle(this);\n  }).catch(function (lastErr) {\n    t.deepEqual(b._syntaxCache, {});\n    t.similar(String(lastErr), /ParseError/);\n    b.bundle(function (err, src) {\n      t.deepEqual(b._syntaxCache, {});\n      t.similar(String(err), /ParseError/);\n      t.notEqual(lastErr, err, 'errors should be unique');\n    });\n  });\n});",
+            "file": "syntax_cache.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform arguments",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 25
+            },
+            "line": 11,
+            "code": "test('transform arguments', function (t) {\n  t.plan(2);\n  var ps = spawn(process.execPath, [path.resolve(__dirname, '../bin/cmd.js'), __dirname + '/tr_args/main.js', '-t', '[', __dirname + '/tr_args/tr.js', '-x', '1', ']']);\n  ps.stderr.pipe(process.stderr);\n  ps.stdout.pipe(concat(function (body) {\n    vm.runInNewContext(body.toString('utf8'), {\n      t: t\n    });\n  }));\n  ps.on('exit', function (code) {\n    t.equal(code, 0);\n  });\n});",
+            "file": "tr_args.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform errors errback",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 30
+            },
+            "line": 9,
+            "code": "test('transform errors errback', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/tr/main.js');\n  b.transform(function (file) {\n    return through(function (buf) {\n      this.emit('error', new Error('blah'));\n    });\n  });\n  b.bundle(function (err, src) {\n    t.ok(/^blah/.test(err.message));\n    t.equal(src, undefined);\n  });\n});",
+            "file": "tr_error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform errors propagate",
+            "suites": [],
+            "updatePoint": {
+                "line": 22,
+                "column": 32
+            },
+            "line": 22,
+            "code": "test('transform errors propagate', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/tr/main.js');\n  b.transform(function (file) {\n    return through(function (buf) {\n      this.emit('error', new Error('blah'));\n    });\n  });\n  b.bundle().on('error', function (err) {\n    t.ok(/^blah/.test(err.message));\n  });\n});",
+            "file": "tr_error.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "--debug passed to transforms",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 34
+            },
+            "line": 9,
+            "code": "test('--debug passed to transforms', function (t) {\n  var empty = require.resolve('../lib/_empty');\n\n  t.plan(3);\n  [true, false].forEach(function (debug) {\n    var b = browserify(empty, {\n      debug: debug\n    });\n    b.transform(function (file, opts) {\n      t.equal(opts._flags.debug, debug, 'debug: ' + debug);\n      return through();\n    });\n    b.bundle(function (err, src) {\n      if (err) return t.fail(err.message);\n    });\n  });\n  var b = browserify(empty, {\n    debug: true\n  });\n  b.transform({\n    _flags: Infinity\n  }, function (file, opts) {\n    t.equal(opts._flags, Infinity, 'transform arguents are preserved');\n    return through();\n  });\n  b.bundle(function (err, src) {\n    if (err) return t.fail(err.message);\n  });\n});",
+            "file": "tr_flags.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "global transform precedence",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 33
+            },
+            "line": 9,
+            "code": "test('global transform precedence', function (t) {\n  t.plan(1);\n  var b = browserify(__dirname + '/tr_global/main.js', {\n    basedir: __dirname + '/tr_global'\n  });\n  b.transform('tr', {\n    global: true\n  });\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 444);\n    }\n  });\n});",
+            "file": "tr_global.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform with no entry files",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 35
+            },
+            "line": 7,
+            "code": "test('transform with no entry files', function (t) {\n  process.chdir(__dirname);\n  t.plan(2);\n  var b = browserify();\n  b.transform('tr');\n\n  b.require(path.join(__dirname, 'tr_no_entry/main.js'), {\n    expose: 'yoyo'\n  });\n\n  b.bundle(function (err, body) {\n    t.ifError(err);\n    var src = body.toString('utf8') + 'require(\"yoyo\")';\n    var con = {\n      log: function (msg) {\n        t.equal(msg, 'ZZZ');\n      }\n    };\n    Function('console', src)(con);\n  });\n});",
+            "file": "tr_no_entry.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform exactly once",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 28
+            },
+            "line": 11,
+            "code": "test('transform exactly once', function (t) {\n  t.plan(3);\n  var b = browserify(__dirname + '/tr_once/main.js', {\n    transform: function (file) {\n      t.equal(file, path.join(__dirname, 'tr_once/main.js'));\n      return through();\n    }\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      console: {\n        log: log\n      }\n    });\n\n    function log(msg) {\n      t.equal(msg, 'wow');\n    }\n  });\n});",
+            "file": "tr_once.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "function transform",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 24
+            },
+            "line": 9,
+            "code": "test('function transform', function (t) {\n  debugger;\n  t.plan(8);\n  var b = browserify(__dirname + '/tr/main.js');\n  b.transform({\n    global: true\n  }, function (file) {\n    return through(function (buf, enc, next) {\n      this.push(String(buf).replace(/ZZZ/g, '1'));\n      next();\n    });\n  });\n  b.transform(__dirname + '/tr_order/replace_aaa');\n  b.transform(__dirname + '/tr_order/replace_bbb.js');\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "tr_order.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "transform symlink",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 23
+            },
+            "line": 11,
+            "code": "test('transform symlink', {\n  skip: process.platform === 'win32'\n}, function (t) {\n  t.plan(4);\n  var expected = [9, 555, 777];\n  var b = browserify(__dirname + '/tr_symlink/app/main.js', {\n    basedir: __dirname + '/tr_symlink/app'\n  });\n  b.transform(function (file) {\n    return through(function (buf, enc, next) {\n      this.push(String(buf).replace(/7/g, 9));\n      next();\n    });\n  });\n  b.bundle(function (err, src) {\n    t.ifError(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    vm.runInNewContext(src, c);\n\n    function log(msg) {\n      t.equal(msg, expected.shift());\n    }\n  });\n});",
+            "file": "tr_symlink.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "function transform",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 24
+            },
+            "line": 9,
+            "code": "test('function transform', function (t) {\n  t.plan(7);\n  var b = browserify(__dirname + '/tr/main.js');\n  b.transform({\n    global: true\n  }, function (file) {\n    return through(function (buf, enc, next) {\n      this.push(String(buf).replace(/ZZZ/g, '1'));\n      next();\n    });\n  });\n  b.transform(function (file) {\n    return through(function (buf, enc, next) {\n      this.push(String(buf).replace(/AAA/g, '5').replace(/BBB/g, '50'));\n      next();\n    });\n  });\n  b.bundle(function (err, src) {\n    vm.runInNewContext(src, {\n      t: t\n    });\n  });\n});",
+            "file": "tr.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "unicode entry",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 19
+            },
+            "line": 7,
+            "code": "test('unicode entry', function (t) {\n  t.plan(2);\n  var b = browserify(__dirname + '/unicode/main.js');\n  b.bundle(function (err, src) {\n    var c = {\n      done: function (one, two) {\n        t.equal(one, 1);\n        t.equal(two, 2);\n        t.end();\n      }\n    };\n    vm.runInNewContext(src, c);\n  });\n});",
+            "file": "unicode.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "util.inspect",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 18
+            },
+            "line": 11,
+            "code": "test('util.inspect', function (t) {\n  t.plan(1);\n  var b = browserify();\n\n  b.require('util');\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n    t.equal(c.require('util').inspect([1, 2, 3]), util.inspect([1, 2, 3]));\n  });\n});",
+            "file": "util.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "util.inherits",
+            "suites": [],
+            "updatePoint": {
+                "line": 23,
+                "column": 19
+            },
+            "line": 23,
+            "code": "test('util.inherits', function (t) {\n  t.plan(2);\n  var b = browserify();\n\n  b.require('util');\n\n  b.require('events');\n\n  b.bundle(function (err, src) {\n    var c = {};\n    vm.runInNewContext(src, c);\n\n    var EE = c.require('events').EventEmitter;\n\n    function Beep() {}\n\n    c.require('util').inherits(Beep, EE);\n\n    var beep = new Beep();\n    t.ok(beep instanceof Beep);\n    t.ok(beep instanceof EE);\n  });\n});",
+            "file": "util.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "util.inherits without Object.create",
+            "suites": [],
+            "updatePoint": {
+                "line": 46,
+                "column": 41
+            },
+            "line": 46,
+            "code": "test('util.inherits without Object.create', function (t) {\n  t.plan(2);\n  var b = browserify();\n\n  b.require('util');\n\n  b.require('events');\n\n  b.bundle(function (err, src) {\n    var c = xtend({}, Object);\n    delete c.create;\n    vm.runInNewContext(src, c);\n\n    var EE = c.require('events').EventEmitter;\n\n    function Beep() {}\n\n    Beep.prototype = {};\n\n    c.require('util').inherits(Beep, EE);\n\n    var beep = new Beep();\n    t.ok(beep instanceof Beep);\n    t.ok(beep instanceof EE);\n  });\n});",
+            "file": "util.js",
+            "skipped": false,
+            "dir": "test"
+        },
+        {
+            "name": "yield",
+            "suites": [],
+            "updatePoint": {
+                "line": 9,
+                "column": 11
+            },
+            "line": 9,
+            "code": "test('yield', {\n  skip: !generatorFunction\n}, function (t) {\n  t.plan(6);\n  var b = browserify(__dirname + '/yield/main.js');\n  b.bundle(function (err, src) {\n    t.error(err);\n    var c = {\n      console: {\n        log: log\n      }\n    };\n    var index = 0;\n    vm.runInNewContext(src, c);\n\n    function log(msg) {\n      t.equal(index++, msg);\n    }\n  });\n});",
+            "file": "yield.js",
+            "skipped": false,
+            "dir": "test"
+        }
+    ],
+    "badge": "browserify__browserify.svg"
+}
