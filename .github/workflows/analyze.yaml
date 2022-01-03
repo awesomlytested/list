@@ -1,0 +1,35 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Analyze
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache Repos
+      id: cache-repos
+      uses: actions/cache@v2
+      with:
+        path: repos
+        key: ${{ runner.os }}-repos
+
+    - name: Use Node.js 16
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+        cache: 'npm'
+    - run: node runok.js analyze:configs
+    - run: node runok.js update:list
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        branch: main
+        file_pattern: output/**.json

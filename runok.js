@@ -134,14 +134,14 @@ module.exports = {
 
 
         let hasTypeScript = false
-        if (glob.sync(path.join(rootDir, testDir, '**.ts'), { ignore: 'node_modules/**' }).length) {
+        if (glob.sync(path.join(rootDir, testDir, '*/**.ts'), { ignore: 'node_modules/**' }).length) {
           hasTypeScript = true
         }
 
 
         // no files found? Let's pick all js/ts files then!
         if (!glob.sync(path.join(rootDir, testDir, pattern), { ignore: 'node_modules/**' }).length) {
-          pattern = '**/*.{js,ts}'
+          pattern = '**/*.{js,ts,cjs,mjs}'
         }
 
         // avoid duplicate
@@ -234,7 +234,7 @@ module.exports = {
     }
     console.log(repo, `${data.tests.length} tests found`)
 
-    fs.writeFileSync(outputFile(repo), JSON.stringify(data, null, 4))
+    fs.writeFileSync(outputFile(repo), JSON.stringify(data))
   },
 
   async analyzeConfigs() {
@@ -334,9 +334,20 @@ module.exports = {
       }
     }
     fs.writeFileSync('output/list.json', JSON.stringify(success, null, 4))
+  },
+
+
+  syncList() {
+    for (let file of glob.sync('output/*.json', { ignore: 'list.json' })) {
+      if (existsSync(path.join('configs', path.basename(file)))) return;
+
+      const data = fs.readFileSync(file);
+      delete data.error;
+      delete data.tests;
+      fs.writeFileSync(path.join('configs', path.basename(file)));
+      console.log('Synchronized', path.basename(file));
+    }
   }
-
-
 }
 
 function repoFile(repo) {
@@ -361,7 +372,7 @@ async function ensureRepoDir(repo) {
   if (!fs.existsSync(dir)) {
     await exec(`git clone git@github.com:${repo}.git ${dir} --depth=1`, { output: true })
   } else {
-    // await exec(`git pull --depth=1 --no-tags`, { cwd: dir });
+    await exec(`git pull --depth=1 --no-tags`, { cwd: dir });
   }
   if (!fs.existsSync(dir)) {
     throw new Error('Dir cant be created')
