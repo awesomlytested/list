@@ -339,7 +339,7 @@ module.exports = {
 
   syncList() {
     for (let file of glob.sync('output/*.json', { ignore: 'list.json' })) {
-      if (existsSync(path.join('configs', path.basename(file)))) return;
+      if (fs.existsSync(path.join('configs', path.basename(file)))) return;
 
       const data = fs.readFileSync(file);
       delete data.error;
