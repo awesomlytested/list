@@ -370,7 +370,7 @@ async function ensureRepoDir(repo) {
   const dir = path.join(tmpDir, repo.replace('/', '__').replace('.', '_'))
 
   if (!fs.existsSync(dir)) {
-    await exec(`git clone git@github.com:${repo}.git ${dir} --depth=1`, { output: true })
+    await exec(`git clone https://github.com/${repo}.git ${dir} --depth=1`, { output: true })
   } else {
     await exec(`git pull --depth=1 --no-tags`, { cwd: dir });
   }
