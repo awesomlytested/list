@@ -372,7 +372,13 @@ async function ensureRepoDir(repo) {
   if (!fs.existsSync(dir)) {
     await exec(`git clone https://github.com/${repo}.git ${dir} --depth=1`, { output: true })
   } else {
-    await exec(`git pull --depth=1 --no-tags`, { cwd: dir });
+    try {
+      await exec(`git pull --depth=1 --no-tags`, { cwd: dir });
+    } catch (err) {
+      // history issues
+      await exec(`rm -rf ${dir}`)
+      await exec(`git clone https://github.com/${repo}.git ${dir} --depth=1`, { output: true })
+    }
   }
   if (!fs.existsSync(dir)) {
     throw new Error('Dir cant be created')
