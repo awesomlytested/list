@@ -5,6 +5,7 @@ const {
   runok,
   tasks: { git, exec },
   chdir,
+  stopOnFail,
 } = require('runok')
 const axios = require('axios');
 const Analyzer = require('check-tests/src/analyzer')
@@ -367,6 +368,7 @@ function outputFile(repo) {
 }
 
 async function ensureRepoDir(repo) {
+  stopOnFail(false);
   const dir = path.join(tmpDir, repo.replace('/', '__').replace('.', '_'))
 
   if (!fs.existsSync(dir)) {
