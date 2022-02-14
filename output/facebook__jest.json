@@ -8612,7 +8612,7 @@
                 "column": 37
             },
             "line": 1105,
-            "code": "  test('throws when preset is invalid', async () => {\n    jest.doMock('/node_modules/react-native/jest-preset.json', () =>\n      jest.requireActual('./jest-preset.json'),\n    );\n\n    await expect(\n      normalize(\n        {\n          preset: 'react-native',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowError(\n      /Unexpected token } in JSON at position 104[\\s\\S]* at /,\n    );\n  });",
+            "code": "  test('throws when preset is invalid', async () => {\n    jest.doMock('/node_modules/react-native/jest-preset.json', () =>\n      jest.requireActual('./jest-preset.json'),\n    );\n\n    await expect(\n      normalize(\n        {\n          preset: 'react-native',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowError(\n      /Unexpected token } in JSON at position (104|110)[\\s\\S]* at /,\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9255,7 +9255,7 @@
                 "column": 46
             },
             "line": 1845,
-            "code": "  it('should throw if watchman is not disabled', async () => {\n    await expect(\n      normalize({haste: {enableSymlinks: true}, rootDir: '/root/'}, {}),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    await expect(\n      normalize(\n        {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: true},\n        {},\n      ),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    const {options} = await normalize(\n      {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: false},\n      {},\n    );\n\n    expect(options.haste.enableSymlinks).toBe(true);\n    expect(options.watchman).toBe(false);\n  });",
+            "code": "  it('should throw if watchman is not disabled', async () => {\n    await expect(\n      normalize(\n        {haste: {enableSymlinks: true}, rootDir: '/root/'},\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    await expect(\n      normalize(\n        {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: true},\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    const {options} = await normalize(\n      {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: false},\n      {} as Config.Argv,\n    );\n\n    expect(options.haste.enableSymlinks).toBe(true);\n    expect(options.watchman).toBe(false);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9266,11 +9266,56 @@
                 "haste.forceNodeFilesystemAPI"
             ],
             "updatePoint": {
-                "line": 1868,
+                "line": 1871,
                 "column": 32
             },
-            "line": 1868,
-            "code": "  it('should pass option through', async () => {\n    const {options} = await normalize(\n      {haste: {forceNodeFilesystemAPI: true}, rootDir: '/root/'},\n      {},\n    );\n\n    expect(options.haste.forceNodeFilesystemAPI).toBe(true);\n    expect(console.warn).not.toHaveBeenCalled();\n  });",
+            "line": 1871,
+            "code": "  it('should pass option through', async () => {\n    const {options} = await normalize(\n      {haste: {forceNodeFilesystemAPI: true}, rootDir: '/root/'},\n      {} as Config.Argv,\n    );\n\n    expect(options.haste.forceNodeFilesystemAPI).toBe(true);\n    expect(console.warn).not.toHaveBeenCalled();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "should be all if updateSnapshot is true",
+            "suites": [
+                "updateSnapshot"
+            ],
+            "updatePoint": {
+                "line": 1883,
+                "column": 45
+            },
+            "line": 1883,
+            "code": "  it('should be all if updateSnapshot is true', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {\n      updateSnapshot: true,\n    } as Config.Argv);\n    expect(options.updateSnapshot).toBe('all');\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "should be new if updateSnapshot is falsy",
+            "suites": [
+                "updateSnapshot"
+            ],
+            "updatePoint": {
+                "line": 1889,
+                "column": 46
+            },
+            "line": 1889,
+            "code": "  it('should be new if updateSnapshot is falsy', async () => {\n    {\n      const {options} = await normalize(\n        {ci: false, rootDir: '/root/'},\n        {} as Config.Argv,\n      );\n      expect(options.updateSnapshot).toBe('new');\n    }\n    {\n      const {options} = await normalize({ci: false, rootDir: '/root/'}, {\n        updateSnapshot: false,\n      } as Config.Argv);\n      expect(options.updateSnapshot).toBe('new');\n    }\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "should be none if updateSnapshot is falsy and ci mode is true",
+            "suites": [
+                "updateSnapshot"
+            ],
+            "updatePoint": {
+                "line": 1904,
+                "column": 67
+            },
+            "line": 1904,
+            "code": "  it('should be none if updateSnapshot is falsy and ci mode is true', async () => {\n    const defaultCiConfig = Defaults.ci;\n    {\n      Defaults.ci = false;\n      const {options} = await normalize({rootDir: '/root/'}, {\n        ci: true,\n      } as Config.Argv);\n      expect(options.updateSnapshot).toBe('none');\n    }\n    {\n      Defaults.ci = true;\n      const {options} = await normalize({rootDir: '/root/'}, {} as Config.Argv);\n      expect(options.updateSnapshot).toBe('none');\n    }\n    Defaults.ci = defaultCiConfig;\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
