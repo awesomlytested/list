@@ -10574,6 +10574,54 @@
             "dir": "packages/plugins/typescript/operations/tests"
         },
         {
+            "name": "'combine' yields correct types",
+            "suites": [
+                "TypeScript Operations Plugin",
+                "inlineFragmentTypes option"
+            ],
+            "updatePoint": {
+                "line": 6034,
+                "column": 38
+            },
+            "line": 6034,
+            "code": "    it(\"'combine' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'combine' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: (\n            { __typename?: 'User' }\n            & UserFragmentFragment\n          ) | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string };\n      `);\n    });",
+            "file": "ts-documents.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/operations/tests"
+        },
+        {
+            "name": "'inline' yields correct types",
+            "suites": [
+                "TypeScript Operations Plugin",
+                "inlineFragmentTypes option"
+            ],
+            "updatePoint": {
+                "line": 6064,
+                "column": 37
+            },
+            "line": 6064,
+            "code": "    it(\"'inline' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'inline' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: { __typename?: 'User', id: string } | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string };\n      `);\n    });",
+            "file": "ts-documents.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/operations/tests"
+        },
+        {
+            "name": "'mask' yields correct types",
+            "suites": [
+                "TypeScript Operations Plugin",
+                "inlineFragmentTypes option"
+            ],
+            "updatePoint": {
+                "line": 6091,
+                "column": 35
+            },
+            "line": 6091,
+            "code": "    it(\"'mask' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'mask' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: (\n            { __typename?: 'User' }\n            & { ' $fragmentRefs': { 'UserFragmentFragment': UserFragmentFragment } }\n          ) | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string } & { ' $fragmentName': 'UserFragmentFragment' };\n      `);\n    });",
+            "file": "ts-documents.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/operations/tests"
+        },
+        {
             "name": "Should generate output correctly and backward compatible output",
             "suites": [
                 "React Apollo",
