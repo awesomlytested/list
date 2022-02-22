@@ -717,7 +717,7 @@
             "updatePoint": {
                 "line": 17,
                 "column": 41,
-                "index": 377
+                "index": 385
             },
             "line": 17,
             "code": "it('should aggregate docs from collection', async () => {\n  const files = db.collection('files');\n  await files.insertMany([{\n    type: 'Document'\n  }, {\n    type: 'Video'\n  }, {\n    type: 'Image'\n  }, {\n    type: 'Document'\n  }, {\n    type: 'Image'\n  }, {\n    type: 'Document'\n  }]);\n  const topFiles = await files.aggregate([{\n    $group: {\n      _id: '$type',\n      count: {\n        $sum: 1\n      }\n    }\n  }, {\n    $sort: {\n      count: -1\n    }\n  }]).toArray();\n  expect(topFiles).toEqual([{\n    _id: 'Document',\n    count: 3\n  }, {\n    _id: 'Image',\n    count: 2\n  }, {\n    _id: 'Video',\n    count: 1\n  }]);\n});",
@@ -888,7 +888,7 @@
                 "index": 141
             },
             "line": 5,
-            "code": "it('schedules a 10-second timer after 1 second', () => {\n  jest.spyOn(global, 'setTimeout');\n\n  const infiniteTimerGame = require('../infiniteTimerGame');\n\n  const callback = jest.fn();\n  infiniteTimerGame(callback); // At this point in time, there should have been a single call to\n  // setTimeout to schedule the end of the game in 1 second.\n\n  expect(setTimeout).toBeCalledTimes(1);\n  expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 1000); // Fast forward and exhaust only currently pending timers\n  // (but not any new timers that get created during that process)\n\n  jest.runOnlyPendingTimers(); // At this point, our 1-second timer should have fired its callback\n\n  expect(callback).toBeCalled(); // And it should have created a new timer to start the game over in\n  // 10 seconds\n\n  expect(setTimeout).toBeCalledTimes(2);\n  expect(setTimeout).toHaveBeenNthCalledWith(2, expect.any(Function), 10000);\n});",
+            "code": "it('schedules a 10-second timer after 1 second', () => {\n  jest.spyOn(globalThis, 'setTimeout');\n\n  const infiniteTimerGame = require('../infiniteTimerGame');\n\n  const callback = jest.fn();\n  infiniteTimerGame(callback); // At this point in time, there should have been a single call to\n  // setTimeout to schedule the end of the game in 1 second.\n\n  expect(setTimeout).toBeCalledTimes(1);\n  expect(setTimeout).toHaveBeenNthCalledWith(1, expect.any(Function), 1000); // Fast forward and exhaust only currently pending timers\n  // (but not any new timers that get created during that process)\n\n  jest.runOnlyPendingTimers(); // At this point, our 1-second timer should have fired its callback\n\n  expect(callback).toBeCalled(); // And it should have created a new timer to start the game over in\n  // 10 seconds\n\n  expect(setTimeout).toBeCalledTimes(2);\n  expect(setTimeout).toHaveBeenNthCalledWith(2, expect.any(Function), 10000);\n});",
             "file": "infinite_timer_game.test.js",
             "skipped": false,
             "dir": "examples/timer/__tests__"
@@ -901,7 +901,7 @@
             "updatePoint": {
                 "line": 9,
                 "column": 43,
-                "index": 233
+                "index": 237
             },
             "line": 9,
             "code": "  it('waits 1 second before ending the game', () => {\n    const timerGame = require('../timerGame');\n\n    timerGame();\n    expect(setTimeout).toBeCalledTimes(1);\n    expect(setTimeout).toBeCalledWith(expect.any(Function), 1000);\n  });",
@@ -917,7 +917,7 @@
             "updatePoint": {
                 "line": 16,
                 "column": 56,
-                "index": 481
+                "index": 485
             },
             "line": 16,
             "code": "  it('calls the callback after 1 second via runAllTimers', () => {\n    const timerGame = require('../timerGame');\n\n    const callback = jest.fn();\n    timerGame(callback); // At this point in time, the callback should not have been called yet\n\n    expect(callback).not.toBeCalled(); // Fast-forward until all timers have been executed\n\n    jest.runAllTimers(); // Now our callback should have been called!\n\n    expect(callback).toBeCalled();\n    expect(callback).toBeCalledTimes(1);\n  });",
@@ -933,7 +933,7 @@
             "updatePoint": {
                 "line": 29,
                 "column": 63,
-                "index": 977
+                "index": 981
             },
             "line": 29,
             "code": "  it('calls the callback after 1 second via advanceTimersByTime', () => {\n    const timerGame = require('../timerGame');\n\n    const callback = jest.fn();\n    timerGame(callback); // At this point in time, the callback should not have been called yet\n\n    expect(callback).not.toBeCalled(); // Fast-forward until all timers have been executed\n\n    jest.advanceTimersByTime(1000); // Now our callback should have been called!\n\n    expect(callback).toBeCalled();\n    expect(callback).toBeCalledTimes(1);\n  });",
@@ -10476,11 +10476,11 @@
                 "Common globals"
             ],
             "updatePoint": {
-                "line": 11,
+                "line": 9,
                 "column": 19
             },
-            "line": 11,
-            "code": "  it('check process', () => {\n    if (Symbol && Symbol.toStringTag) {\n      expect(Object.prototype.toString.call(global.process)).toBe(\n        '[object process]',\n      );\n    }\n  });",
+            "line": 9,
+            "code": "  it('check process', () => {\n    if (Symbol && Symbol.toStringTag) {\n      expect(Object.prototype.toString.call(process)).toBe('[object process]');\n    }\n  });",
             "file": "globals.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
