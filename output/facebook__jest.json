@@ -3060,6 +3060,19 @@
             "dir": "packages/expect/src/__tests__"
         },
         {
+            "name": "throws descriptive errors for invalid matchers",
+            "suites": [],
+            "updatePoint": {
+                "line": 188,
+                "column": 50
+            },
+            "line": 188,
+            "code": "it('throws descriptive errors for invalid matchers', () => {\n  expect(() =>\n    jestExpect.extend({\n      default: undefined,\n    }),\n  ).toThrow(\n    'expect.extend: `default` is not a valid matcher. Must be a function, is \"undefined\"',\n  );\n  expect(() =>\n    jestExpect.extend({\n      default: 42,\n    }),\n  ).toThrow(\n    'expect.extend: `default` is not a valid matcher. Must be a function, is \"number\"',\n  );\n  expect(() =>\n    jestExpect.extend({\n      default: 'foobar',\n    }),\n  ).toThrow(\n    'expect.extend: `default` is not a valid matcher. Must be a function, is \"string\"',\n  );\n});",
+            "file": "extend.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
             "name": "should always find the value when inside the array",
             "suites": [
                 "toContain"
@@ -7387,13 +7400,26 @@
             "dir": "packages/jest-circus/src/__tests__"
         },
         {
-            "name": "failures",
+            "name": "function descriptors",
             "suites": [],
             "updatePoint": {
                 "line": 23,
-                "column": 14
+                "column": 26
             },
             "line": 23,
+            "code": "test('function descriptors', () => {\n  const {stdout} = runTest(`\n    describe(function describer() {}, () => {\n      test(class One {}, () => {});\n    })\n  `);\n\n  expect(stdout).toMatchSnapshot();\n});",
+            "file": "baseTest.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "failures",
+            "suites": [],
+            "updatePoint": {
+                "line": 33,
+                "column": 14
+            },
+            "line": 33,
             "code": "test('failures', () => {\n  const {stdout} = runTest(`\n    describe('describe', () => {\n      beforeEach(() => {});\n      afterEach(() => { throw new Error('banana')});\n      test('one', () => { throw new Error('kentucky')});\n      test('two', () => {});\n    })\n  `);\n\n  expect(stdout).toMatchSnapshot();\n});",
             "file": "baseTest.test.ts",
             "skipped": false,
@@ -7430,16 +7456,16 @@
             "dir": "packages/jest-circus/src/__tests__"
         },
         {
-            "name": "it throws an error when first argument isn't a string",
+            "name": "it throws an error when first argument isn't valid",
             "suites": [
                 "test/it error throwing"
             ],
             "updatePoint": {
                 "line": 38,
-                "column": 59
+                "column": 56
             },
             "line": 38,
-            "code": "  it(\"it throws an error when first argument isn't a string\", () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusIt(() => {});\n    }).toThrowError('Invalid first argument, () => {}. It must be a string.');\n  });",
+            "code": "  it(\"it throws an error when first argument isn't valid\", () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusIt(() => {});\n    }).toThrowError(\n      'Invalid first argument, () => {}. It must be a named class, named function, number, or string.',\n    );\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
             "dir": "packages/jest-circus/src/__tests__"
@@ -7450,10 +7476,10 @@
                 "test/it error throwing"
             ],
             "updatePoint": {
-                "line": 44,
+                "line": 46,
                 "column": 65
             },
-            "line": 44,
+            "line": 46,
             "code": "  it('it throws an error when callback function is not a function', () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusIt('test4', 'test4b');\n    }).toThrowError(\n      'Invalid second argument, test4b. It must be a callback function.',\n    );\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
@@ -7465,10 +7491,10 @@
                 "test/it error throwing"
             ],
             "updatePoint": {
-                "line": 52,
+                "line": 54,
                 "column": 54
             },
-            "line": 52,
+            "line": 54,
             "code": "  it(\"test doesn't throw an error with valid arguments\", () => {\n    expect(() => {\n      circusTest('test5', () => {});\n    }).not.toThrowError();\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
@@ -7480,10 +7506,10 @@
                 "test/it error throwing"
             ],
             "updatePoint": {
-                "line": 57,
+                "line": 59,
                 "column": 54
             },
-            "line": 57,
+            "line": 59,
             "code": "  it('test throws error with missing callback function', () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusTest('test6');\n    }).toThrowError(\n      'Missing second argument. It must be a callback function. Perhaps you want to use `test.todo` for a test placeholder.',\n    );\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
@@ -7495,11 +7521,11 @@
                 "test/it error throwing"
             ],
             "updatePoint": {
-                "line": 65,
+                "line": 67,
                 "column": 61
             },
-            "line": 65,
-            "code": "  it(\"test throws an error when first argument isn't a string\", () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusTest(() => {});\n    }).toThrowError('Invalid first argument, () => {}. It must be a string.');\n  });",
+            "line": 67,
+            "code": "  it(\"test throws an error when first argument isn't a string\", () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusTest(() => {});\n    }).toThrowError(\n      'Invalid first argument, () => {}. It must be a named class, named function, number, or string.',\n    );\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
             "dir": "packages/jest-circus/src/__tests__"
@@ -7510,10 +7536,10 @@
                 "test/it error throwing"
             ],
             "updatePoint": {
-                "line": 71,
+                "line": 75,
                 "column": 67
             },
-            "line": 71,
+            "line": 75,
             "code": "  it('test throws an error when callback function is not a function', () => {\n    expect(() => {\n      // @ts-expect-error: Easy, we're testing runtime errors here\n      circusTest('test8', 'test8b');\n    }).toThrowError(\n      'Invalid second argument, test8b. It must be a callback function.',\n    );\n  });",
             "file": "circusItTestError.test.ts",
             "skipped": false,
@@ -9336,6 +9362,36 @@
             "dir": "packages/jest-config/src/__tests__"
         },
         {
+            "name": "logs a deprecation warning when `extraGlobals` is used",
+            "suites": [
+                "extraGlobals"
+            ],
+            "updatePoint": {
+                "line": 1945,
+                "column": 60
+            },
+            "line": 1945,
+            "code": "  it('logs a deprecation warning when `extraGlobals` is used', async () => {\n    await normalize(\n      {\n        extraGlobals: ['Math'],\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "logs a deprecation warning when `moduleLoader` is used",
+            "suites": [
+                "moduleLoader"
+            ],
+            "updatePoint": {
+                "line": 1963,
+                "column": 60
+            },
+            "line": 1963,
+            "code": "  it('logs a deprecation warning when `moduleLoader` is used', async () => {\n    await normalize(\n      {\n        moduleLoader: '<rootDir>/runtime.js',\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
             "name": "readConfig() throws when an object is passed without a file path",
             "suites": [],
             "updatePoint": {
@@ -10416,12 +10472,12 @@
                 "getNoTestsFoundMessage"
             ],
             "updatePoint": {
-                "line": 19,
+                "line": 26,
                 "column": 61
             },
-            "line": 19,
+            "line": 26,
             "code": "  test('returns correct message when monitoring only failures', () => {\n    const config = createGlobalConfig({onlyFailures: true});\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n  });",
-            "file": "getNoTestsFoundMessage.test.js",
+            "file": "getNoTestsFoundMessage.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
@@ -10431,12 +10487,12 @@
                 "getNoTestsFoundMessage"
             ],
             "updatePoint": {
-                "line": 24,
+                "line": 31,
                 "column": 60
             },
-            "line": 24,
+            "line": 31,
             "code": "  test('returns correct message when monitoring only changed', () => {\n    const config = createGlobalConfig({onlyChanged: true});\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n  });",
-            "file": "getNoTestsFoundMessage.test.js",
+            "file": "getNoTestsFoundMessage.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
@@ -10446,12 +10502,12 @@
                 "getNoTestsFoundMessage"
             ],
             "updatePoint": {
-                "line": 29,
+                "line": 36,
                 "column": 51
             },
-            "line": 29,
+            "line": 36,
             "code": "  test('returns correct message with verbose option', () => {\n    const config = createGlobalConfig({verbose: true});\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n  });",
-            "file": "getNoTestsFoundMessage.test.js",
+            "file": "getNoTestsFoundMessage.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
@@ -10461,12 +10517,12 @@
                 "getNoTestsFoundMessage"
             ],
             "updatePoint": {
-                "line": 34,
+                "line": 41,
                 "column": 47
             },
-            "line": 34,
+            "line": 41,
             "code": "  test('returns correct message without options', () => {\n    const config = createGlobalConfig();\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n  });",
-            "file": "getNoTestsFoundMessage.test.js",
+            "file": "getNoTestsFoundMessage.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
@@ -10476,12 +10532,27 @@
                 "getNoTestsFoundMessage"
             ],
             "updatePoint": {
-                "line": 39,
+                "line": 46,
                 "column": 52
             },
-            "line": 39,
+            "line": 46,
             "code": "  test('returns correct message with passWithNoTests', () => {\n    const config = createGlobalConfig({passWithNoTests: true});\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n  });",
-            "file": "getNoTestsFoundMessage.test.js",
+            "file": "getNoTestsFoundMessage.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "returns correct message with findRelatedTests",
+            "suites": [
+                "getNoTestsFoundMessage"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 53
+            },
+            "line": 51,
+            "code": "  test('returns correct message with findRelatedTests', () => {\n    const config = createGlobalConfig({findRelatedTests: true});\n    expect(getNoTestsFoundMessage([], config)).toMatchSnapshot();\n    expect(\n      getNoTestsFoundMessage([], {...config, passWithNoTests: true}),\n    ).toMatchSnapshot();\n  });",
+            "file": "getNoTestsFoundMessage.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
