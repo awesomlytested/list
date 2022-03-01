@@ -4466,7 +4466,7 @@
                 "column": 100
             },
             "line": 56,
-            "code": "    it('Should generate enum internal values resolvers when enum has enumValues set as external enum', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          v: MyEnum\n        }\n\n        enum MyEnum {\n          A\n          B\n          C\n        }\n      `);\n      const config = {\n        enumValues: {\n          MyEnum: 'MyCustomEnum',\n        },\n      };\n      const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n      expect(result.prepend).toContain(ENUM_RESOLVERS_SIGNATURE);\n      expect(result.content).toContain('EnumResolverSignature');\n      expect(result.content).toContain(\n        `export type MyEnumResolvers = EnumResolverSignature<{| A?: *, B?: *, C?: * |}, $ElementType<ResolversTypes, 'MyEnum'>>;`\n      );\n    });",
+            "code": "    it('Should generate enum internal values resolvers when enum has enumValues set as external enum', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          v: MyEnum\n        }\n\n        enum MyEnum {\n          A\n          B\n          C\n        }\n      `);\n      const config = {\n        enumValues: {\n          MyEnum: 'MyCustomEnum',\n        },\n      };\n      const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n      expect(result.prepend).toContain(ENUM_RESOLVERS_SIGNATURE);\n      expect(result.content).toContain('EnumResolverSignature');\n      expect(result.content).toContain(\n        `export type MyEnumResolvers = EnumResolverSignature<{| A?: *, B?: *, C?: * |}, $ElementType<ResolversTypes, 'MyEnum'>>;`\n      );\n      expect(result.content).toContain(`MyEnum?: MyEnumResolvers,`);\n    });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/flow/resolvers/tests"
@@ -4478,10 +4478,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 82,
+                "line": 83,
                 "column": 102
             },
-            "line": 82,
+            "line": 83,
             "code": "    it('Should generate enum internal values resolvers when enum has mappers pointing to external enum', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          v: MyEnum\n        }\n\n        enum MyEnum {\n          A\n          B\n          C\n        }\n      `);\n      const config = {\n        mappers: {\n          MyEnum: 'MyCustomEnum',\n        },\n      };\n      const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n      expect(result.prepend).toContain(ENUM_RESOLVERS_SIGNATURE);\n      expect(result.content).toContain('EnumResolverSignature');\n      expect(result.content).toContain(\n        `export type MyEnumResolvers = EnumResolverSignature<{| A?: *, B?: *, C?: * |}, $ElementType<ResolversTypes, 'MyEnum'>>;`\n      );\n    });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4494,10 +4494,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 108,
+                "line": 109,
                 "column": 114
             },
-            "line": 108,
+            "line": 109,
             "code": "    it('Should generate enum internal values resolvers when enum has enumValues set on a global level of all enums', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          v: MyEnum\n        }\n\n        enum MyEnum {\n          A\n          B\n          C\n        }\n      `);\n      const config = {\n        enumValues: './enums',\n      };\n      const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n      expect(result.prepend).toContain(ENUM_RESOLVERS_SIGNATURE);\n      expect(result.content).toContain('EnumResolverSignature');\n      expect(result.content).toContain(\n        `export type MyEnumResolvers = EnumResolverSignature<{| A?: *, B?: *, C?: * |}, $ElementType<ResolversTypes, 'MyEnum'>>;`\n      );\n    });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4510,10 +4510,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 133,
+                "line": 134,
                 "column": 42
             },
-            "line": 133,
+            "line": 134,
             "code": "  it('Should generate basic type resolvers', () => {\n    const result = plugin(schema, [], {}, { outputFile: '' });\n\n    expect(result).toMatchSnapshot();\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4526,10 +4526,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 139,
+                "line": 140,
                 "column": 63
             },
-            "line": 139,
+            "line": 140,
             "code": "  it('Default values of args and compatibility with flow plugin', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Query {\n        something(arg: String = \"default_value\"): String\n      }\n    `);\n\n    const config: any = { noSchemaStitching: true };\n    const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n    expect(result.prepend).toContain(\n      `export type $RequireFields<Origin, Keys> = $Diff<Origin, Keys> & $ObjMapi<Keys, <Key>(k: Key) => $NonMaybeType<$ElementType<Origin, Key>>>;`\n    );\n    expect(result.content).toContain(\n      `something?: Resolver<?$ElementType<ResolversTypes, 'String'>, ParentType, ContextType, $RequireFields<QuerySomethingArgs, { arg: * }>>,`\n    );\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4542,10 +4542,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 157,
+                "line": 158,
                 "column": 42
             },
-            "line": 157,
+            "line": 158,
             "code": "  it('Should generate ResolversParentTypes', () => {\n    const result = plugin(schema, [], {}, { outputFile: '' }) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n      /** Mapping between all available schema types and the resolvers parents */\n      export type ResolversParentTypes = {\n        MyType: $Diff<MyType, { unionChild: *  }> & { unionChild: ?$ElementType<ResolversParentTypes, 'ChildUnion'> },\n        String: $ElementType<Scalars, 'String'>,\n        Child: Child,\n        MyOtherType: MyOtherType,\n        ChildUnion: $ElementType<ResolversParentTypes, 'Child'> | $ElementType<ResolversParentTypes, 'MyOtherType'>,\n        Query: {},\n        Subscription: {},\n        Node: $ElementType<ResolversParentTypes, 'SomeNode'>,\n        ID: $ElementType<Scalars, 'ID'>,\n        SomeNode: SomeNode,\n        MyUnion: $ElementType<ResolversParentTypes, 'MyType'> | $ElementType<ResolversParentTypes, 'MyOtherType'>,\n        MyScalar: $ElementType<Scalars, 'MyScalar'>,\n        Int: $ElementType<Scalars, 'Int'>,\n        Boolean: $ElementType<Scalars, 'Boolean'>,\n      };\n    `);\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4558,11 +4558,11 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 181,
+                "line": 182,
                 "column": 65
             },
-            "line": 181,
-            "code": "  it('Should generate the correct imports when schema has scalars', () => {\n    const result = plugin(buildSchema(`scalar MyScalar`), [], {}, { outputFile: '' }) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { type GraphQLResolveInfo } from 'graphql';`);\n  });",
+            "line": 182,
+            "code": "  it('Should generate the correct imports when schema has scalars', () => {\n    const result = plugin(buildSchema(`scalar MyScalar`), [], {}, { outputFile: '' }) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(\n      `import { type GraphQLResolveInfo, type GraphQLScalarType, type GraphQLScalarTypeConfig } from 'graphql';`\n    );\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/flow/resolvers/tests"
@@ -4574,11 +4574,11 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 187,
+                "line": 190,
                 "column": 68
             },
-            "line": 187,
-            "code": "  it('Should generate the correct imports when schema has no scalars', () => {\n    const result = plugin(\n      buildSchema(`type MyType { f: String }`),\n      [],\n      {},\n      { outputFile: '' }\n    ) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).not.toContain(\n      `import { type GraphQLResolveInfo, type GraphQLScalarTypeConfig } from 'graphql';`\n    );\n  });",
+            "line": 190,
+            "code": "  it('Should generate the correct imports when schema has no scalars', () => {\n    const result = plugin(\n      buildSchema(`type MyType { f: String }`),\n      [],\n      {},\n      { outputFile: '' }\n    ) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { type GraphQLResolveInfo } from 'graphql';`);\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/flow/resolvers/tests"
@@ -4590,10 +4590,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 200,
+                "line": 201,
                 "column": 44
             },
-            "line": 200,
+            "line": 201,
             "code": "  it('Should generate valid output with args', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Query {\n        release: String\n      }\n      type Mutation {\n        random(byteLength: Int!): String!\n      }\n      schema {\n        query: Query\n        mutation: Mutation\n      }\n    `);\n    const config = {\n      contextType: 'GraphQLContext',\n      skipTypename: true,\n      addUnderscoreToArgsType: true,\n    };\n    const result = await plugin(testSchema, [], config, { outputFile: '' });\n    const o = mergeOutputs([result]);\n    expect(o).toContain(`$RequireFields<Mutation_RandomArgs, { byteLength: * }>>,`);\n    expect(o).toContain(\n      `export type $RequireFields<Origin, Keys> = $Diff<Origin, Keys> & $ObjMapi<Keys, <Key>(k: Key) => $NonMaybeType<$ElementType<Origin, Key>>>;`\n    );\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4606,10 +4606,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 226,
+                "line": 227,
                 "column": 88
             },
-            "line": 226,
+            "line": 227,
             "code": "  it('Should generate the correct resolver args type names when typesPrefix is specified', () => {\n    const result = plugin(\n      buildSchema(`type MyType { f(a: String): String }`),\n      [],\n      { typesPrefix: 'T' },\n      { outputFile: '' }\n    ) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(\n      `f?: Resolver<?$ElementType<TResolversTypes, 'String'>, ParentType, ContextType, TMyTypeFArgs>,`\n    );\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,
@@ -4622,10 +4622,10 @@
                 "Enums"
             ],
             "updatePoint": {
-                "line": 239,
+                "line": 240,
                 "column": 52
             },
-            "line": 239,
+            "line": 240,
             "code": "  it('should use MaybePromise in ResolverTypeWrapper', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type MyQuery {\n        posts: [Post]\n      }\n\n      type Post {\n        author: String\n        comment: String\n      }\n\n      schema {\n        query: MyQuery\n      }\n    `);\n    const content = (await plugin(\n      testSchema,\n      [],\n      {\n        rootValueType: 'MyRoot',\n        asyncResolverTypes: true,\n      } as any,\n      { outputFile: 'graphql.ts' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(content.content).toBeSimilarStringTo(`\n      export type ResolverTypeWrapper<T> = Promise<T> | T;\n    `);\n  });",
             "file": "flow-resolvers.spec.ts",
             "skipped": false,

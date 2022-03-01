@@ -8795,7 +8795,7 @@
                 "preset with globals"
             ],
             "line": 1357,
-            "code": "describe.each(['setupFiles', 'setupFilesAfterEnv'])(\n  'preset without %s',\n  configKey => {\n    let Resolver;\n    beforeEach(() => {\n      Resolver = require('jest-resolve').default;\n      Resolver.findNodeModule = jest.fn(\n        name => path.sep + 'node_modules' + path.sep + name,\n      );\n    });\n\n    beforeAll(() => {\n      jest.doMock(\n        '/node_modules/react-foo/jest-preset',\n        () => ({\n          moduleNameMapper: {b: 'b'},\n          modulePathIgnorePatterns: ['b'],\n        }),\n        {virtual: true},\n      );\n    });\n\n    afterAll(() => {\n      jest.dontMock('/node_modules/react-foo/jest-preset');\n    });\n\n    it(`should normalize ${configKey} correctly`, async () => {\n      const {options} = await normalize(\n        {\n          [configKey]: ['a'],\n          preset: 'react-foo',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      );\n\n      expect(options).toEqual(\n        expect.objectContaining({[configKey]: ['/node_modules/a']}),\n      );\n    });\n  },\n);",
+            "code": "describe.each(['setupFiles', 'setupFilesAfterEnv'])(\n  'preset without %s',\n  configKey => {\n    let Resolver;\n    beforeEach(() => {\n      Resolver = require('jest-resolve').default;\n      Resolver.findNodeModule = jest.fn(\n        name => `${path.sep}node_modules${path.sep}${name}`,\n      );\n    });\n\n    beforeAll(() => {\n      jest.doMock(\n        '/node_modules/react-foo/jest-preset',\n        () => ({\n          moduleNameMapper: {b: 'b'},\n          modulePathIgnorePatterns: ['b'],\n        }),\n        {virtual: true},\n      );\n    });\n\n    afterAll(() => {\n      jest.dontMock('/node_modules/react-foo/jest-preset');\n    });\n\n    it(`should normalize ${configKey} correctly`, async () => {\n      const {options} = await normalize(\n        {\n          [configKey]: ['a'],\n          preset: 'react-foo',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      );\n\n      expect(options).toEqual(\n        expect.objectContaining({[configKey]: ['/node_modules/a']}),\n      );\n    });\n  },\n);",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -8966,6 +8966,21 @@
             "dir": "packages/jest-config/src/__tests__"
         },
         {
+            "name": "uses  if set",
+            "suites": [
+                "testPathPattern"
+            ],
+            "updatePoint": {
+                "line": 1562,
+                "column": 33
+            },
+            "line": 1562,
+            "code": "      it(`uses ${opt.name} if set`, async () => {\n        const argv = {[opt.property]: ['a/b']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b');\n      });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
             "name": "ignores invalid regular expressions and logs a warning",
             "suites": [
                 "testPathPattern"
@@ -8976,6 +8991,21 @@
             },
             "line": 1569,
             "code": "      it('ignores invalid regular expressions and logs a warning', async () => {\n        const argv = {[opt.property]: ['a(']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('');\n        expect(\n          (console.log as unknown as jest.SpyInstance).mock.calls[0][0],\n        ).toMatchSnapshot();\n      });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "joins multiple  if set",
+            "suites": [
+                "testPathPattern"
+            ],
+            "updatePoint": {
+                "line": 1579,
+                "column": 43
+            },
+            "line": 1579,
+            "code": "      it(`joins multiple ${opt.name} if set`, async () => {\n        const argv = {testPathPattern: ['a/b', 'c/d']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b|c/d');\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9420,8 +9450,8 @@
         {
             "name": "Resolve config path %s",
             "suites": [],
-            "line": 32,
-            "code": "describe.each(JEST_CONFIG_EXT_ORDER.slice(0))(\n  'Resolve config path %s',\n  extension => {\n    test(`file path with \"${extension}\"`, () => {\n      const relativeConfigPath = `a/b/c/my_config${extension}`;\n      const absoluteConfigPath = path.resolve(DIR, relativeConfigPath);\n\n      writeFiles(DIR, {[relativeConfigPath]: ''});\n\n      // absolute\n      expect(resolveConfigPath(absoluteConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('/does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n\n      // relative\n      expect(resolveConfigPath(relativeConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n    });\n\n    test(`directory path with \"${extension}\"`, () => {\n      const mockedConsoleWarn = mockConsoleWarn();\n\n      const relativePackageJsonPath = 'a/b/c/package.json';\n      const absolutePackageJsonPath = path.resolve(\n        DIR,\n        relativePackageJsonPath,\n      );\n      const relativeJestConfigPath = `a/b/c/jest.config${extension}`;\n      const absoluteJestConfigPath = path.resolve(DIR, relativeJestConfigPath);\n\n      // no configs yet. should throw\n      writeFiles(DIR, {[`a/b/c/some_random_file${extension}`]: ''});\n\n      expect(() =>\n        // absolute\n        resolveConfigPath(path.dirname(absoluteJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      expect(() =>\n        // relative\n        resolveConfigPath(path.dirname(relativeJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      writeFiles(DIR, {[relativePackageJsonPath]: ''});\n\n      mockedConsoleWarn.mockClear();\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n      expect(mockedConsoleWarn).not.toBeCalled();\n\n      // jest.config.js takes precedence\n      writeFiles(DIR, {[relativeJestConfigPath]: ''});\n\n      mockedConsoleWarn.mockClear();\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).not.toBeCalled();\n\n      // jest.config.js and package.json with 'jest' cannot be used together\n      writeFiles(DIR, {[relativePackageJsonPath]: JSON.stringify({jest: {}})});\n\n      // absolute\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n\n      // relative\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n\n      expect(() => {\n        resolveConfigPath(\n          path.join(path.dirname(relativePackageJsonPath), 'j/x/b/m/'),\n          DIR,\n        );\n      }).toThrowError(NO_ROOT_DIR_ERROR_PATTERN);\n    });\n  },\n);",
+            "line": 22,
+            "code": "describe.each(JEST_CONFIG_EXT_ORDER.slice(0))(\n  'Resolve config path %s',\n  extension => {\n    test(`file path with \"${extension}\"`, () => {\n      const relativeConfigPath = `a/b/c/my_config${extension}`;\n      const absoluteConfigPath = path.resolve(DIR, relativeConfigPath);\n\n      writeFiles(DIR, {[relativeConfigPath]: ''});\n\n      // absolute\n      expect(resolveConfigPath(absoluteConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('/does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n\n      // relative\n      expect(resolveConfigPath(relativeConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n    });\n\n    test(`directory path with \"${extension}\"`, () => {\n      const relativePackageJsonPath = 'a/b/c/package.json';\n      const absolutePackageJsonPath = path.resolve(\n        DIR,\n        relativePackageJsonPath,\n      );\n      const relativeJestConfigPath = `a/b/c/jest.config${extension}`;\n      const absoluteJestConfigPath = path.resolve(DIR, relativeJestConfigPath);\n\n      // no configs yet. should throw\n      writeFiles(DIR, {[`a/b/c/some_random_file${extension}`]: ''});\n\n      expect(() =>\n        // absolute\n        resolveConfigPath(path.dirname(absoluteJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      expect(() =>\n        // relative\n        resolveConfigPath(path.dirname(relativeJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      writeFiles(DIR, {[relativePackageJsonPath]: ''});\n\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // jest.config.js takes precedence\n      writeFiles(DIR, {[relativeJestConfigPath]: ''});\n\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // jest.config.js and package.json with 'jest' cannot be used together\n      writeFiles(DIR, {[relativePackageJsonPath]: JSON.stringify({jest: {}})});\n\n      // absolute\n      expect(() =>\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n\n      // relative\n      expect(() =>\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n\n      expect(() => {\n        resolveConfigPath(\n          path.join(path.dirname(relativePackageJsonPath), 'j/x/b/m/'),\n          DIR,\n        );\n      }).toThrowError(NO_ROOT_DIR_ERROR_PATTERN);\n    });\n  },\n);",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9430,10 +9460,10 @@
             "name": "file path with \"\"",
             "suites": [],
             "updatePoint": {
-                "line": 35,
+                "line": 25,
                 "column": 39
             },
-            "line": 35,
+            "line": 25,
             "code": "    test(`file path with \"${extension}\"`, () => {\n      const relativeConfigPath = `a/b/c/my_config${extension}`;\n      const absoluteConfigPath = path.resolve(DIR, relativeConfigPath);\n\n      writeFiles(DIR, {[relativeConfigPath]: ''});\n\n      // absolute\n      expect(resolveConfigPath(absoluteConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('/does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n\n      // relative\n      expect(resolveConfigPath(relativeConfigPath, DIR)).toBe(\n        absoluteConfigPath,\n      );\n      expect(() => resolveConfigPath('does_not_exist', DIR)).toThrowError(\n        NO_ROOT_DIR_ERROR_PATTERN,\n      );\n    });",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
@@ -9443,11 +9473,11 @@
             "name": "directory path with \"\"",
             "suites": [],
             "updatePoint": {
-                "line": 58,
+                "line": 48,
                 "column": 44
             },
-            "line": 58,
-            "code": "    test(`directory path with \"${extension}\"`, () => {\n      const mockedConsoleWarn = mockConsoleWarn();\n\n      const relativePackageJsonPath = 'a/b/c/package.json';\n      const absolutePackageJsonPath = path.resolve(\n        DIR,\n        relativePackageJsonPath,\n      );\n      const relativeJestConfigPath = `a/b/c/jest.config${extension}`;\n      const absoluteJestConfigPath = path.resolve(DIR, relativeJestConfigPath);\n\n      // no configs yet. should throw\n      writeFiles(DIR, {[`a/b/c/some_random_file${extension}`]: ''});\n\n      expect(() =>\n        // absolute\n        resolveConfigPath(path.dirname(absoluteJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      expect(() =>\n        // relative\n        resolveConfigPath(path.dirname(relativeJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      writeFiles(DIR, {[relativePackageJsonPath]: ''});\n\n      mockedConsoleWarn.mockClear();\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n      expect(mockedConsoleWarn).not.toBeCalled();\n\n      // jest.config.js takes precedence\n      writeFiles(DIR, {[relativeJestConfigPath]: ''});\n\n      mockedConsoleWarn.mockClear();\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).not.toBeCalled();\n\n      // jest.config.js and package.json with 'jest' cannot be used together\n      writeFiles(DIR, {[relativePackageJsonPath]: JSON.stringify({jest: {}})});\n\n      // absolute\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n\n      // relative\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n\n      expect(() => {\n        resolveConfigPath(\n          path.join(path.dirname(relativePackageJsonPath), 'j/x/b/m/'),\n          DIR,\n        );\n      }).toThrowError(NO_ROOT_DIR_ERROR_PATTERN);\n    });",
+            "line": 48,
+            "code": "    test(`directory path with \"${extension}\"`, () => {\n      const relativePackageJsonPath = 'a/b/c/package.json';\n      const absolutePackageJsonPath = path.resolve(\n        DIR,\n        relativePackageJsonPath,\n      );\n      const relativeJestConfigPath = `a/b/c/jest.config${extension}`;\n      const absoluteJestConfigPath = path.resolve(DIR, relativeJestConfigPath);\n\n      // no configs yet. should throw\n      writeFiles(DIR, {[`a/b/c/some_random_file${extension}`]: ''});\n\n      expect(() =>\n        // absolute\n        resolveConfigPath(path.dirname(absoluteJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      expect(() =>\n        // relative\n        resolveConfigPath(path.dirname(relativeJestConfigPath), DIR),\n      ).toThrowError(ERROR_PATTERN);\n\n      writeFiles(DIR, {[relativePackageJsonPath]: ''});\n\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absolutePackageJsonPath);\n\n      // jest.config.js takes precedence\n      writeFiles(DIR, {[relativeJestConfigPath]: ''});\n\n      // absolute\n      expect(\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // relative\n      expect(\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toBe(absoluteJestConfigPath);\n\n      // jest.config.js and package.json with 'jest' cannot be used together\n      writeFiles(DIR, {[relativePackageJsonPath]: JSON.stringify({jest: {}})});\n\n      // absolute\n      expect(() =>\n        resolveConfigPath(path.dirname(absolutePackageJsonPath), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n\n      // relative\n      expect(() =>\n        resolveConfigPath(path.dirname(relativePackageJsonPath), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n\n      expect(() => {\n        resolveConfigPath(\n          path.join(path.dirname(relativePackageJsonPath), 'j/x/b/m/'),\n          DIR,\n        );\n      }).toThrowError(NO_ROOT_DIR_ERROR_PATTERN);\n    });",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9456,33 +9486,33 @@
             "name": "pickPairsWithSameOrder",
             "suites": [],
             "updatePoint": {
-                "line": 152,
+                "line": 125,
                 "column": 28
             },
-            "line": 152,
+            "line": 125,
             "code": "test('pickPairsWithSameOrder', () => {\n  expect(pickPairsWithSameOrder([1, 2, 3])).toStrictEqual([\n    [1, 2],\n    [1, 3],\n    [2, 3],\n  ]);\n});",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
         },
         {
-            "name": "Using multiple configs shows warning",
+            "name": "Using multiple configs shows error",
             "suites": [],
-            "line": 160,
-            "code": "describe.each(pickPairsWithSameOrder(JEST_CONFIG_EXT_ORDER))(\n  'Using multiple configs shows warning',\n  (extension1, extension2) => {\n    test(`Using jest.config${extension1} and jest.config${extension2} shows warning`, () => {\n      const mockedConsoleWarn = mockConsoleWarn();\n\n      const relativeJestConfigPaths = [\n        `a/b/c/jest.config${extension1}`,\n        `a/b/c/jest.config${extension2}`,\n      ];\n\n      writeFiles(DIR, {\n        [relativeJestConfigPaths[0]]: '',\n        [relativeJestConfigPaths[1]]: '',\n      });\n\n      // multiple configs here, should print warning\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(relativeJestConfigPaths[0]), DIR),\n      ).toBe(path.resolve(DIR, relativeJestConfigPaths[0]));\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n    });\n  },\n);",
+            "line": 133,
+            "code": "describe.each(pickPairsWithSameOrder(JEST_CONFIG_EXT_ORDER))(\n  'Using multiple configs shows error',\n  (extension1, extension2) => {\n    test(`Using jest.config${extension1} and jest.config${extension2} shows error`, () => {\n      const relativeJestConfigPaths = [\n        `a/b/c/jest.config${extension1}`,\n        `a/b/c/jest.config${extension2}`,\n      ];\n\n      writeFiles(DIR, {\n        [relativeJestConfigPaths[0]]: '',\n        [relativeJestConfigPaths[1]]: '',\n      });\n\n      expect(() =>\n        resolveConfigPath(path.dirname(relativeJestConfigPaths[0]), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n    });\n  },\n);",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
         },
         {
-            "name": "Using jest.config and jest.config shows warning",
+            "name": "Using jest.config and jest.config shows error",
             "suites": [],
             "updatePoint": {
-                "line": 163,
-                "column": 83
+                "line": 136,
+                "column": 81
             },
-            "line": 163,
-            "code": "    test(`Using jest.config${extension1} and jest.config${extension2} shows warning`, () => {\n      const mockedConsoleWarn = mockConsoleWarn();\n\n      const relativeJestConfigPaths = [\n        `a/b/c/jest.config${extension1}`,\n        `a/b/c/jest.config${extension2}`,\n      ];\n\n      writeFiles(DIR, {\n        [relativeJestConfigPaths[0]]: '',\n        [relativeJestConfigPaths[1]]: '',\n      });\n\n      // multiple configs here, should print warning\n      mockedConsoleWarn.mockClear();\n      expect(\n        resolveConfigPath(path.dirname(relativeJestConfigPaths[0]), DIR),\n      ).toBe(path.resolve(DIR, relativeJestConfigPaths[0]));\n      expect(mockedConsoleWarn).toBeCalledTimes(1);\n      expect(mockedConsoleWarn.mock.calls[0].join()).toMatch(\n        MULTIPLE_CONFIGS_ERROR_PATTERN,\n      );\n    });",
+            "line": 136,
+            "code": "    test(`Using jest.config${extension1} and jest.config${extension2} shows error`, () => {\n      const relativeJestConfigPaths = [\n        `a/b/c/jest.config${extension1}`,\n        `a/b/c/jest.config${extension2}`,\n      ];\n\n      writeFiles(DIR, {\n        [relativeJestConfigPaths[0]]: '',\n        [relativeJestConfigPaths[1]]: '',\n      });\n\n      expect(() =>\n        resolveConfigPath(path.dirname(relativeJestConfigPaths[0]), DIR),\n      ).toThrowError(MULTIPLE_CONFIGS_ERROR_PATTERN);\n    });",
             "file": "resolveConfigPath.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -10429,7 +10459,7 @@
                 "column": 60
             },
             "line": 16,
-            "code": "    it('renders usage information when all failures resolved', () => {\n      const mockWrite = jest.fn();\n\n      new FailedTestsInteractiveMode({write: mockWrite}).updateWithResults({\n        numFailedTests: 1,\n        snapshot: {},\n      });\n\n      expect(mockWrite).toHaveBeenCalledWith(\n        `${chalk.bold('Watch Usage')}\\n${chalk.dim(\n          ARROW + 'Press',\n        )} Enter ${chalk.dim('to return to watch mode.')}\\n`,\n      );\n    });",
+            "code": "    it('renders usage information when all failures resolved', () => {\n      const mockWrite = jest.fn();\n\n      new FailedTestsInteractiveMode({write: mockWrite}).updateWithResults({\n        numFailedTests: 1,\n        snapshot: {},\n      });\n\n      expect(mockWrite).toHaveBeenCalledWith(\n        `${chalk.bold('Watch Usage')}\\n${chalk.dim(\n          `${ARROW}Press`,\n        )} Enter ${chalk.dim('to return to watch mode.')}\\n`,\n      );\n    });",
             "file": "FailedTestsInteractiveMode.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -12878,7 +12908,7 @@
                 "column": 11
             },
             "line": 851,
-            "code": "    test('a', () => {\n      const aDisplay = 'MiXeD cAsE';\n      const bDisplay = 'Mixed case\\nUPPER CASE';\n      const aCompare = aDisplay.toLowerCase() + '\\nlower case';\n      const bCompare = bDisplay.toLowerCase();\n\n      const received = diffLinesUnified2(\n        aDisplay.split('\\n'),\n        bDisplay.split('\\n'),\n        aCompare.split('\\n'),\n        bCompare.split('\\n'),\n        optionsBe,\n      );\n      const expected = '- MiXeD cAsE\\n+ Mixed case\\n+ UPPER CASE';\n\n      expect(received).toBe(expected);\n    });",
+            "code": "    test('a', () => {\n      const aDisplay = 'MiXeD cAsE';\n      const bDisplay = 'Mixed case\\nUPPER CASE';\n      const aCompare = `${aDisplay.toLowerCase()}\\nlower case`;\n      const bCompare = bDisplay.toLowerCase();\n\n      const received = diffLinesUnified2(\n        aDisplay.split('\\n'),\n        bDisplay.split('\\n'),\n        aCompare.split('\\n'),\n        bCompare.split('\\n'),\n        optionsBe,\n      );\n      const expected = '- MiXeD cAsE\\n+ Mixed case\\n+ UPPER CASE';\n\n      expect(received).toBe(expected);\n    });",
             "file": "diff.test.ts",
             "skipped": false,
             "dir": "packages/jest-diff/src/__tests__"
@@ -13853,7 +13883,7 @@
                 "column": 47
             },
             "line": 12,
-            "code": "  it('extracts valid docblock with line comment', () => {\n    const code =\n      '/**' +\n      EOL +\n      ' * @team foo' +\n      EOL +\n      '* // TODO: test' +\n      EOL +\n      '*/' +\n      EOL +\n      'const x = foo;';\n    expect(docblock.extract(code)).toBe(\n      '/**' + EOL + ' * @team foo' + EOL + '* // TODO: test' + EOL + '*/',\n    );\n  });",
+            "code": "  it('extracts valid docblock with line comment', () => {\n    const code = `/**${EOL} * @team foo${EOL}* // TODO: test${EOL}*/${EOL}const x = foo;`;\n    expect(docblock.extract(code)).toBe(\n      `/**${EOL} * @team foo${EOL}* // TODO: test${EOL}*/`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13864,11 +13894,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 28,
+                "line": 19,
                 "column": 29
             },
-            "line": 28,
-            "code": "  it('extracts valid docblock', () => {\n    const code =\n      '/**' + EOL + ' * @team foo' + EOL + '*/' + EOL + 'const x = foo;';\n    expect(docblock.extract(code)).toBe(\n      '/**' + EOL + ' * @team foo' + EOL + '*/',\n    );\n  });",
+            "line": 19,
+            "code": "  it('extracts valid docblock', () => {\n    const code = `/**${EOL} * @team foo${EOL}*/${EOL}const x = foo;`;\n    expect(docblock.extract(code)).toBe(`/**${EOL} * @team foo${EOL}*/`);\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13879,11 +13909,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 36,
+                "line": 24,
                 "column": 48
             },
-            "line": 36,
-            "code": "  it('extracts valid docblock with more comments', () => {\n    const code =\n      '/**' +\n      EOL +\n      ' * @team foo' +\n      EOL +\n      '*/' +\n      EOL +\n      'const x = foo;' +\n      EOL +\n      '/**foo*/';\n    expect(docblock.extract(code)).toBe(\n      '/**' + EOL + ' * @team foo' + EOL + '*/',\n    );\n  });",
+            "line": 24,
+            "code": "  it('extracts valid docblock with more comments', () => {\n    const code = `/**${EOL} * @team foo${EOL}*/${EOL}const x = foo;${EOL}/**foo*/`;\n    expect(docblock.extract(code)).toBe(`/**${EOL} * @team foo${EOL}*/`);\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13894,11 +13924,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 52,
+                "line": 29,
                 "column": 36
             },
-            "line": 52,
-            "code": "  it('extracts from invalid docblock', () => {\n    const code =\n      '/*' + EOL + ' * @team foo' + EOL + '*/' + EOL + 'const x = foo;';\n    expect(docblock.extract(code)).toBe(\n      '/*' + EOL + ' * @team foo' + EOL + '*/',\n    );\n  });",
+            "line": 29,
+            "code": "  it('extracts from invalid docblock', () => {\n    const code = `/*${EOL} * @team foo${EOL}*/${EOL}const x = foo;`;\n    expect(docblock.extract(code)).toBe(`/*${EOL} * @team foo${EOL}*/`);\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13909,11 +13939,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 60,
+                "line": 34,
                 "column": 39
             },
-            "line": 60,
-            "code": "  it('returns extract and parsedocblock', () => {\n    const code =\n      '/** @provides module-name */' +\n      EOL +\n      '' +\n      '' +\n      EOL +\n      '' +\n      '.dummy {}' +\n      EOL +\n      '';\n\n    expect(docblock.parse(docblock.extract(code))).toEqual({\n      provides: 'module-name',\n    });\n  });",
+            "line": 34,
+            "code": "  it('returns extract and parsedocblock', () => {\n    const code = `/** @provides module-name */${EOL}${EOL}.dummy {}${EOL}`;\n\n    expect(docblock.parse(docblock.extract(code))).toEqual({\n      provides: 'module-name',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13924,11 +13954,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 77,
+                "line": 42,
                 "column": 41
             },
-            "line": 77,
-            "code": "  it('parses directives out of a docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * @team foo' +\n      EOL +\n      '' +\n      ' * @css a b' +\n      EOL +\n      '' +\n      ' * @preserve-whitespace' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      css: 'a b',\n      'preserve-whitespace': '',\n      team: 'foo',\n    });\n  });",
+            "line": 42,
+            "code": "  it('parses directives out of a docblock', () => {\n    const code =\n      `/**${EOL}` +\n      ` * @team foo${EOL}` +\n      ` * @css a b${EOL}` +\n      ` * @preserve-whitespace${EOL}` +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      css: 'a b',\n      'preserve-whitespace': '',\n      team: 'foo',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13939,11 +13969,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 99,
+                "line": 56,
                 "column": 62
             },
-            "line": 99,
-            "code": "  it('parses multiple of the same directives out of a docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * @x foo' +\n      EOL +\n      '' +\n      ' * @x bar' +\n      EOL +\n      '' +\n      ' * @y' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      x: ['foo', 'bar'],\n      y: '',\n    });\n  });",
+            "line": 56,
+            "code": "  it('parses multiple of the same directives out of a docblock', () => {\n    const code =\n      `/**${EOL}` +\n      ` * @x foo${EOL}` +\n      ` * @x bar${EOL}` +\n      ` * @y${EOL}` +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      x: ['foo', 'bar'],\n      y: '',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13954,11 +13984,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 120,
+                "line": 69,
                 "column": 57
             },
-            "line": 120,
-            "code": "  it('parses >=3 of the same directives out of a docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * @x foo' +\n      EOL +\n      '' +\n      ' * @x bar' +\n      EOL +\n      '' +\n      ' * @x baz' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      x: ['foo', 'bar', 'baz'],\n    });\n  });",
+            "line": 69,
+            "code": "  it('parses >=3 of the same directives out of a docblock', () => {\n    const code =\n      `/**${EOL}` +\n      ` * @x foo${EOL}` +\n      ` * @x bar${EOL}` +\n      ` * @x baz${EOL}` +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      x: ['foo', 'bar', 'baz'],\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13969,11 +13999,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 140,
+                "line": 81,
                 "column": 55
             },
-            "line": 140,
-            "code": "  it('parses directives out of a docblock with comments', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.' +\n      EOL +\n      '' +\n      ' * @team foo' +\n      EOL +\n      '' +\n      ' * @css a b' +\n      EOL +\n      '' +\n      ' *' +\n      EOL +\n      '' +\n      ' * And some license here' +\n      EOL +\n      '' +\n      ' * @preserve-whitespace' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      css: 'a b',\n      'preserve-whitespace': '',\n      team: 'foo',\n    });\n  });",
+            "line": 81,
+            "code": "  it('parses directives out of a docblock with comments', () => {\n    const code =\n      `/**${EOL}` +\n      ` * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.${EOL}` +\n      ` * @team foo${EOL}` +\n      ` * @css a b${EOL}` +\n      ` *${EOL}` +\n      ` * And some license here${EOL}` +\n      ` * @preserve-whitespace${EOL}` +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      css: 'a b',\n      'preserve-whitespace': '',\n      team: 'foo',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13984,11 +14014,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 98,
                 "column": 60
             },
-            "line": 171,
-            "code": "  it('parses directives out of a docblock with line comments', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * @team foo' +\n      EOL +\n      '' +\n      ' * // TODO: test' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '// TODO: test',\n      pragmas: {team: 'foo'},\n    });\n  });",
+            "line": 98,
+            "code": "  it('parses directives out of a docblock with line comments', () => {\n    const code = `/**${EOL} * @team foo${EOL} * // TODO: test${EOL} */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '// TODO: test',\n      pragmas: {team: 'foo'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -13999,11 +14029,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 189,
+                "line": 106,
                 "column": 33
             },
-            "line": 189,
-            "code": "  it('parses multiline directives', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.' +\n      EOL +\n      '' +\n      ' * @class A long declaration of a class' +\n      EOL +\n      '' +\n      ' *        goes here, so we can read it and enjoy' +\n      EOL +\n      '' +\n      ' *' +\n      EOL +\n      '' +\n      ' * And some license here' +\n      EOL +\n      '' +\n      ' * @preserve-whitespace' +\n      EOL +\n      '' +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      class:\n        'A long declaration of a class goes here, ' +\n        'so we can read it and enjoy',\n      'preserve-whitespace': '',\n    });\n  });",
+            "line": 106,
+            "code": "  it('parses multiline directives', () => {\n    const code =\n      `/**${EOL}` +\n      ` * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.${EOL}` +\n      ` * @class A long declaration of a class${EOL}` +\n      ` *        goes here, so we can read it and enjoy${EOL}` +\n      ` *${EOL}` +\n      ` * And some license here${EOL}` +\n      ` * @preserve-whitespace${EOL}` +\n      ' */';\n    expect(docblock.parse(code)).toEqual({\n      class:\n        'A long declaration of a class goes here, ' +\n        'so we can read it and enjoy',\n      'preserve-whitespace': '',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14014,11 +14044,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 221,
+                "line": 124,
                 "column": 84
             },
-            "line": 221,
-            "code": "  it('parses multiline directives even if there are linecomments within the docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      '' +\n      ' * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.' +\n      EOL +\n      '' +\n      ' * @class A long declaration of a class' +\n      EOL +\n      '' +\n      ' *        goes here, so we can read it and enjoy' +\n      EOL +\n      '' +\n      ' *' +\n      EOL +\n      '' +\n      ' * And some license here' +\n      EOL +\n      '' +\n      ' * @preserve-whitespace' +\n      EOL +\n      '' +\n      '// heres a comment' +\n      ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments:\n        'Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.' +\n        EOL +\n        EOL +\n        'And some license here' +\n        EOL +\n        '// heres a comment',\n      pragmas: {\n        class:\n          'A long declaration of a class goes here, ' +\n          'so we can read it and enjoy',\n        'preserve-whitespace': '',\n      },\n    });\n  });",
+            "line": 124,
+            "code": "  it('parses multiline directives even if there are linecomments within the docblock', () => {\n    const code =\n      `/**${EOL}` +\n      ` * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.${EOL}` +\n      ` * @class A long declaration of a class${EOL}` +\n      ` *        goes here, so we can read it and enjoy${EOL}` +\n      ` *${EOL}` +\n      ` * And some license here${EOL}` +\n      ` * @preserve-whitespace${EOL}` +\n      '// heres a comment' +\n      ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: `Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.${EOL}${EOL}And some license here${EOL}// heres a comment`,\n      pragmas: {\n        class:\n          'A long declaration of a class goes here, ' +\n          'so we can read it and enjoy',\n        'preserve-whitespace': '',\n      },\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14029,11 +14059,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 263,
+                "line": 146,
                 "column": 41
             },
-            "line": 263,
-            "code": "  it('supports slashes in @team directive', () => {\n    const code = '/**' + EOL + ' * @team apple/banana' + EOL + ' */';\n    expect(docblock.parse(code)).toEqual({\n      team: 'apple/banana',\n    });\n  });",
+            "line": 146,
+            "code": "  it('supports slashes in @team directive', () => {\n    const code = `/**${EOL} * @team apple/banana${EOL} */`;\n    expect(docblock.parse(code)).toEqual({\n      team: 'apple/banana',\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14044,11 +14074,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 270,
+                "line": 153,
                 "column": 37
             },
-            "line": 270,
-            "code": "  it('extracts comments from docblock', () => {\n    const code =\n      '/**' + EOL + ' * hello world' + EOL + ' * @flow yes' + EOL + ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'hello world',\n      pragmas: {flow: 'yes'},\n    });\n  });",
+            "line": 153,
+            "code": "  it('extracts comments from docblock', () => {\n    const code = `/**${EOL} * hello world${EOL} * @flow yes${EOL} */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'hello world',\n      pragmas: {flow: 'yes'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14059,11 +14089,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 279,
+                "line": 161,
                 "column": 47
             },
-            "line": 279,
-            "code": "  it('extracts multiline comments from docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      ' * hello' +\n      EOL +\n      ' * world' +\n      EOL +\n      ' * @flow yes' +\n      EOL +\n      ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'hello' + EOL + 'world',\n      pragmas: {flow: 'yes'},\n    });\n  });",
+            "line": 161,
+            "code": "  it('extracts multiline comments from docblock', () => {\n    const code = `/**${EOL} * hello${EOL} * world${EOL} * @flow yes${EOL} */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: `hello${EOL}world`,\n      pragmas: {flow: 'yes'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14074,11 +14104,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 296,
+                "line": 169,
                 "column": 70
             },
-            "line": 296,
-            "code": "  it('preserves leading whitespace in multiline comments from docblock', () => {\n    const code = '/**' + EOL + ' *  hello' + EOL + ' *   world' + EOL + ' */';\n\n    expect(docblock.parseWithComments(code).comments).toEqual(\n      ' hello' + EOL + '  world',\n    );\n  });",
+            "line": 169,
+            "code": "  it('preserves leading whitespace in multiline comments from docblock', () => {\n    const code = `/**${EOL} *  hello${EOL} *   world${EOL} */`;\n\n    expect(docblock.parseWithComments(code).comments).toEqual(\n      ` hello${EOL}  world`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14089,11 +14119,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 304,
+                "line": 177,
                 "column": 66
             },
-            "line": 304,
-            "code": "  it('removes leading newlines in multiline comments from docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      ' * @snailcode' +\n      EOL +\n      ' *' +\n      EOL +\n      ' *  hello world' +\n      EOL +\n      ' */';\n\n    expect(docblock.parseWithComments(code).comments).toEqual(' hello world');\n  });",
+            "line": 177,
+            "code": "  it('removes leading newlines in multiline comments from docblock', () => {\n    const code = `/**${EOL} * @snailcode${EOL} *${EOL} *  hello world${EOL} */`;\n\n    expect(docblock.parseWithComments(code).comments).toEqual(' hello world');\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14104,11 +14134,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 319,
+                "line": 183,
                 "column": 58
             },
-            "line": 319,
-            "code": "  it('extracts comments from beginning and end of docblock', () => {\n    const code =\n      '/**' +\n      EOL +\n      ' * hello' +\n      EOL +\n      ' * @flow yes' +\n      EOL +\n      ' * ' +\n      EOL +\n      ' * world' +\n      EOL +\n      ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'hello' + EOL + EOL + 'world',\n      pragmas: {flow: 'yes'},\n    });\n  });",
+            "line": 183,
+            "code": "  it('extracts comments from beginning and end of docblock', () => {\n    const code = `/**${EOL} * hello${EOL} * @flow yes${EOL} * ${EOL} * world${EOL} */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: `hello${EOL}${EOL}world`,\n      pragmas: {flow: 'yes'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14119,11 +14149,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 338,
+                "line": 191,
                 "column": 44
             },
-            "line": 338,
-            "code": "  it(\"preserve urls within a pragma's values\", () => {\n    const code = '/**' + EOL + ' * @see: https://example.com' + EOL + ' */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '',\n      pragmas: {'see:': 'https://example.com'},\n    });\n  });",
+            "line": 191,
+            "code": "  it(\"preserve urls within a pragma's values\", () => {\n    const code = `/**${EOL} * @see: https://example.com${EOL} */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '',\n      pragmas: {'see:': 'https://example.com'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14134,11 +14164,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 346,
+                "line": 199,
                 "column": 63
             },
-            "line": 346,
-            "code": "  it('strip linecomments from pragmas but preserve for comments', () => {\n    const code = '/**' + EOL + ' * @format: everything' + EOL + '// keep me */';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '// keep me',\n      pragmas: {'format:': 'everything'},\n    });\n  });",
+            "line": 199,
+            "code": "  it('strip linecomments from pragmas but preserve for comments', () => {\n    const code = `/**${EOL} * @format: everything${EOL}// keep me */`;\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: '// keep me',\n      pragmas: {'format:': 'everything'},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14149,10 +14179,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 354,
+                "line": 207,
                 "column": 68
             },
-            "line": 354,
+            "line": 207,
             "code": "  it('extracts docblock comments as CRLF when docblock contains CRLF', () => {\n    const code = '/**\\r\\n * foo\\r\\n * bar\\r\\n*/';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'foo\\r\\nbar',\n      pragmas: {},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14164,10 +14194,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 362,
+                "line": 215,
                 "column": 64
             },
-            "line": 362,
+            "line": 215,
             "code": "  it('extracts docblock comments as LF when docblock contains LF', () => {\n    const code = '/**\\n * foo\\n * bar\\n*/';\n    expect(docblock.parseWithComments(code)).toEqual({\n      comments: 'foo\\nbar',\n      pragmas: {},\n    });\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14179,10 +14209,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 370,
+                "line": 223,
                 "column": 68
             },
-            "line": 370,
+            "line": 223,
             "code": "  it('strips the docblock out of a file that contains a top docblock', () => {\n    const code = '/**\\n * foo\\n * bar\\n*/\\nthe rest';\n    expect(docblock.strip(code)).toEqual('\\nthe rest');\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14194,10 +14224,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 375,
+                "line": 228,
                 "column": 67
             },
-            "line": 375,
+            "line": 228,
             "code": "  it('returns a file unchanged if there is no top docblock to strip', () => {\n    const code = 'someCodeAtTheTop();\\n/** docblock */';\n    expect(docblock.strip(code)).toEqual(code);\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14209,10 +14239,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 380,
+                "line": 233,
                 "column": 54
             },
-            "line": 380,
+            "line": 233,
             "code": "  it('prints docblocks with no pragmas as empty string', () => {\n    const pragmas = {};\n    expect(docblock.print({pragmas})).toEqual('');\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14224,10 +14254,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 385,
+                "line": 238,
                 "column": 50
             },
-            "line": 385,
+            "line": 238,
             "code": "  it('prints docblocks with one pragma on one line', () => {\n    const pragmas = {flow: ''};\n    expect(docblock.print({pragmas})).toEqual('/** @flow */');\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14239,11 +14269,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 390,
+                "line": 243,
                 "column": 62
             },
-            "line": 390,
-            "code": "  it('prints docblocks with multiple pragmas on multiple lines', () => {\n    const pragmas = {\n      flow: '',\n      format: '',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      '/**' + EOL + ' * @flow' + EOL + ' * @format' + EOL + ' */',\n    );\n  });",
+            "line": 243,
+            "code": "  it('prints docblocks with multiple pragmas on multiple lines', () => {\n    const pragmas = {\n      flow: '',\n      format: '',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      `/**${EOL} * @flow${EOL} * @format${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14254,11 +14284,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 400,
+                "line": 253,
                 "column": 55
             },
-            "line": 400,
-            "code": "  it('prints docblocks with multiple of the same pragma', () => {\n    const pragmas = {\n      x: ['a', 'b'],\n      y: 'c',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      '/**' + EOL + ' * @x a' + EOL + ' * @x b' + EOL + ' * @y c' + EOL + ' */',\n    );\n  });",
+            "line": 253,
+            "code": "  it('prints docblocks with multiple of the same pragma', () => {\n    const pragmas = {\n      x: ['a', 'b'],\n      y: 'c',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      `/**${EOL} * @x a${EOL} * @x b${EOL} * @y c${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14269,11 +14299,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 409,
+                "line": 262,
                 "column": 35
             },
-            "line": 409,
-            "code": "  it('prints docblocks with pragmas', () => {\n    const pragmas = {\n      flow: 'foo',\n      team: 'x/y/z',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      '/**' + EOL + ' * @flow foo' + EOL + ' * @team x/y/z' + EOL + ' */',\n    );\n  });",
+            "line": 262,
+            "code": "  it('prints docblocks with pragmas', () => {\n    const pragmas = {\n      flow: 'foo',\n      team: 'x/y/z',\n    };\n    expect(docblock.print({pragmas})).toEqual(\n      `/**${EOL} * @flow foo${EOL} * @team x/y/z${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14284,11 +14314,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 419,
+                "line": 272,
                 "column": 36
             },
-            "line": 419,
-            "code": "  it('prints docblocks with comments', () => {\n    const pragmas = {flow: 'foo'};\n    const comments = 'hello';\n    expect(docblock.print({comments, pragmas})).toEqual(\n      '/**' +\n        EOL +\n        ' * hello' +\n        EOL +\n        ' *' +\n        EOL +\n        ' * @flow foo' +\n        EOL +\n        ' */',\n    );\n  });",
+            "line": 272,
+            "code": "  it('prints docblocks with comments', () => {\n    const pragmas = {flow: 'foo'};\n    const comments = 'hello';\n    expect(docblock.print({comments, pragmas})).toEqual(\n      `/**${EOL} * hello${EOL} *${EOL} * @flow foo${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14299,11 +14329,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 435,
+                "line": 280,
                 "column": 48
             },
-            "line": 435,
-            "code": "  it('prints docblocks with comments and no keys', () => {\n    const pragmas = {};\n    const comments =\n      'Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.';\n    expect(docblock.print({comments, pragmas})).toEqual(\n      '/**' + EOL + ' * ' + comments + EOL + ' */',\n    );\n  });",
+            "line": 280,
+            "code": "  it('prints docblocks with comments and no keys', () => {\n    const pragmas = {};\n    const comments =\n      'Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.';\n    expect(docblock.print({comments, pragmas})).toEqual(\n      `/**${EOL} * ${comments}${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14314,11 +14344,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 444,
+                "line": 289,
                 "column": 46
             },
-            "line": 444,
-            "code": "  it('prints docblocks with multiline comments', () => {\n    const pragmas = {};\n    const comments = 'hello' + EOL + 'world';\n    expect(docblock.print({comments, pragmas})).toEqual(\n      '/**' + EOL + ' * hello' + EOL + ' * world' + EOL + ' */',\n    );\n  });",
+            "line": 289,
+            "code": "  it('prints docblocks with multiline comments', () => {\n    const pragmas = {};\n    const comments = `hello${EOL}world`;\n    expect(docblock.print({comments, pragmas})).toEqual(\n      `/**${EOL} * hello${EOL} * world${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14329,10 +14359,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 452,
+                "line": 297,
                 "column": 41
             },
-            "line": 452,
+            "line": 297,
             "code": "  it('prints docblocks that are parseable', () => {\n    const pragmas = {a: 'b', c: ''};\n    const comments = 'hello world!';\n    const formatted = docblock.print({comments, pragmas});\n    const parsed = docblock.parse(formatted);\n    expect(parsed).toEqual(pragmas);\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14344,11 +14374,11 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 460,
+                "line": 305,
                 "column": 50
             },
-            "line": 460,
-            "code": "  it('can augment existing docblocks with comments', () => {\n    const before = '/**' + EOL + ' * Legalese' + EOL + ' * @flow' + EOL + ' */';\n    const {comments, pragmas} = docblock.parseWithComments(before);\n    pragmas.format = '';\n    const after = docblock.print({comments, pragmas});\n    expect(after).toEqual(\n      '/**' +\n        EOL +\n        ' * Legalese' +\n        EOL +\n        ' *' +\n        EOL +\n        ' * @flow' +\n        EOL +\n        ' * @format' +\n        EOL +\n        ' */',\n    );\n  });",
+            "line": 305,
+            "code": "  it('can augment existing docblocks with comments', () => {\n    const before = `/**${EOL} * Legalese${EOL} * @flow${EOL} */`;\n    const {comments, pragmas} = docblock.parseWithComments(before);\n    pragmas.format = '';\n    const after = docblock.print({comments, pragmas});\n    expect(after).toEqual(\n      `/**${EOL} * Legalese${EOL} *${EOL} * @flow${EOL} * @format${EOL} */`,\n    );\n  });",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-docblock/src/__tests__"
@@ -14359,10 +14389,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 480,
+                "line": 315,
                 "column": 59
             },
-            "line": 480,
+            "line": 315,
             "code": "  it('prints docblocks using CRLF if comments contains CRLF', () => {\n    const pragmas = {};\n    const comments = 'hello\\r\\nworld';\n    const formatted = docblock.print({comments, pragmas});\n    expect(formatted).toEqual('/**\\r\\n * hello\\r\\n * world\\r\\n */');\n  });",
             "file": "index.test.ts",
             "skipped": false,
@@ -14374,10 +14404,10 @@
                 "docblock"
             ],
             "updatePoint": {
-                "line": 487,
+                "line": 322,
                 "column": 55
             },
-            "line": 487,
+            "line": 322,
             "code": "  it('prints docblocks using LF if comments contains LF', () => {\n    const pragmas = {};\n    const comments = 'hello\\nworld';\n    const formatted = docblock.print({comments, pragmas});\n    expect(formatted).toEqual('/**\\n * hello\\n * world\\n */');\n  });",
             "file": "index.test.ts",
             "skipped": false,
