@@ -9005,7 +9005,22 @@
                 "column": 43
             },
             "line": 1579,
-            "code": "      it(`joins multiple ${opt.name} if set`, async () => {\n        const argv = {testPathPattern: ['a/b', 'c/d']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b|c/d');\n      });",
+            "code": "      it(`joins multiple ${opt.name} if set`, async () => {\n        const argv = {[opt.property]: ['a/b', 'c/d']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b|c/d');\n      });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "coerces all patterns to strings",
+            "suites": [
+                "testPathPattern"
+            ],
+            "updatePoint": {
+                "line": 1586,
+                "column": 41
+            },
+            "line": 1586,
+            "code": "      it('coerces all patterns to strings', async () => {\n        const argv = {[opt.property]: [1]} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('1');\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -9017,10 +9032,10 @@
                 "posix"
             ],
             "updatePoint": {
-                "line": 1587,
+                "line": 1594,
                 "column": 41
             },
-            "line": 1587,
+            "line": 1594,
             "code": "        it('should not escape the pattern', async () => {\n          const argv = {\n            [opt.property]: ['a\\\\/b', 'a/b', 'a\\\\b', 'a\\\\\\\\b'],\n          } as Config.Argv;\n          const {options} = await normalize(initialOptions, argv);\n\n          expect(options.testPathPattern).toBe('a\\\\/b|a/b|a\\\\b|a\\\\\\\\b');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9033,10 +9048,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1607,
+                "line": 1614,
                 "column": 37
             },
-            "line": 1607,
+            "line": 1614,
             "code": "        it('preserves any use of \"\\\\\"', async () => {\n          const argv = {[opt.property]: ['a\\\\b', 'c\\\\\\\\d']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\b|c\\\\\\\\d');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9049,10 +9064,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1617,
+                "line": 1624,
                 "column": 42
             },
-            "line": 1617,
+            "line": 1624,
             "code": "        it('replaces POSIX path separators', async () => {\n          const argv = {[opt.property]: ['a/b']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\\\\\b');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9065,27 +9080,11 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1627,
+                "line": 1634,
                 "column": 49
             },
-            "line": 1627,
+            "line": 1634,
             "code": "        it('replaces POSIX paths in multiple args', async () => {\n          const argv = {[opt.property]: ['a/b', 'c/d']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\\\\\b|c\\\\\\\\d');\n        });",
-            "file": "normalize.test.ts",
-            "skipped": false,
-            "dir": "packages/jest-config/src/__tests__"
-        },
-        {
-            "name": "coerces all patterns to strings",
-            "suites": [
-                "testPathPattern",
-                "win32"
-            ],
-            "updatePoint": {
-                "line": 1637,
-                "column": 43
-            },
-            "line": 1637,
-            "code": "        it('coerces all patterns to strings', async () => {\n          const argv = {[opt.property]: [1]} as Config.Argv;\n          const {options} = await normalize(initialOptions, argv);\n\n          expect(options.testPathPattern).toBe('1');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -10638,11 +10637,11 @@
                 "isTestFilePath"
             ],
             "updatePoint": {
-                "line": 69,
+                "line": 74,
                 "column": 60
             },
-            "line": 69,
-            "code": "    it('supports ../ paths and unix separators via testRegex', async () => {\n      if (process.platform !== 'win32') {\n        config = (\n          await normalize(\n            {\n              name,\n              rootDir: '.',\n              roots: [],\n              testMatch: undefined,\n              testRegex: '(/__tests__/.*|(\\\\.|/)(test|spec))\\\\.jsx?$',\n            },\n            {} as Config.Argv,\n          )\n        ).options;\n        return Runtime.createContext(config, {\n          maxWorkers,\n          watchman: false,\n        }).then(context => {\n          searchSource = new SearchSource(context);\n\n          const path = '/path/to/__tests__/foo/bar/baz/../../../test.js';\n          expect(searchSource.isTestFilePath(path)).toEqual(true);\n        });\n      } else {\n        return undefined;\n      }\n    });",
+            "line": 74,
+            "code": "    it('supports ../ paths and unix separators via testRegex', async () => {\n      if (process.platform === 'win32') {\n        return;\n      }\n      const searchSource = await initSearchSource({\n        name,\n        rootDir: '.',\n        roots: [],\n        testMatch: undefined,\n        testRegex: '(/__tests__/.*|(\\\\.|/)(test|spec))\\\\.jsx?$',\n      });\n\n      const path = '/path/to/__tests__/foo/bar/baz/../../../test.js';\n      expect(searchSource.isTestFilePath(path)).toEqual(true);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10654,10 +10653,10 @@
                 "isTestFilePath"
             ],
             "updatePoint": {
-                "line": 97,
+                "line": 90,
                 "column": 32
             },
-            "line": 97,
+            "line": 90,
             "code": "    it('supports unix separators', () => {\n      if (process.platform !== 'win32') {\n        const path = '/path/to/__tests__/test.js';\n        expect(searchSource.isTestFilePath(path)).toEqual(true);\n      }\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10670,10 +10669,10 @@
                 "isTestFilePath"
             ],
             "updatePoint": {
-                "line": 104,
+                "line": 97,
                 "column": 33
             },
-            "line": 104,
+            "line": 97,
             "code": "    it('supports win32 separators', () => {\n      if (process.platform === 'win32') {\n        const path = '\\\\path\\\\to\\\\__tests__\\\\test.js';\n        expect(searchSource.isTestFilePath(path)).toEqual(true);\n      }\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10683,14 +10682,14 @@
             "name": "finds tests matching a pattern via testRegex",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 121,
+                "line": 114,
                 "column": 52
             },
-            "line": 121,
-            "code": "    it('finds tests matching a pattern via testRegex', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx', 'txt'],\n          name,\n          rootDir,\n          testMatch: undefined,\n          testRegex: 'not-really-a-test',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests)\n          .map(absPath => path.relative(rootDir, absPath))\n          .sort();\n        expect(relPaths).toEqual(\n          [\n            path.normalize('.hiddenFolder/not-really-a-test.txt'),\n            path.normalize('__testtests__/not-really-a-test.txt'),\n          ].sort(),\n        );\n      });\n    });",
+            "line": 114,
+            "code": "    it('finds tests matching a pattern via testRegex', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx', 'txt'],\n        name,\n        rootDir,\n        testMatch: undefined,\n        testRegex: 'not-really-a-test',\n      });\n      expect(paths).toEqual([\n        path.normalize('.hiddenFolder/not-really-a-test.txt'),\n        path.normalize('__testtests__/not-really-a-test.txt'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10699,14 +10698,14 @@
             "name": "finds tests matching a pattern via testMatch",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 145,
+                "line": 128,
                 "column": 52
             },
-            "line": 145,
-            "code": "    it('finds tests matching a pattern via testMatch', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx', 'txt'],\n          name,\n          rootDir,\n          testMatch: ['**/not-really-a-test.txt', '!**/do-not-match-me.txt'],\n          testRegex: '',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests)\n          .map(absPath => path.relative(rootDir, absPath))\n          .sort();\n        expect(relPaths).toEqual(\n          [\n            path.normalize('.hiddenFolder/not-really-a-test.txt'),\n            path.normalize('__testtests__/not-really-a-test.txt'),\n          ].sort(),\n        );\n      });\n    });",
+            "line": 128,
+            "code": "    it('finds tests matching a pattern via testMatch', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx', 'txt'],\n        name,\n        rootDir,\n        testMatch: ['**/not-really-a-test.txt', '!**/do-not-match-me.txt'],\n        testRegex: '',\n      });\n      expect(paths).toEqual([\n        path.normalize('.hiddenFolder/not-really-a-test.txt'),\n        path.normalize('__testtests__/not-really-a-test.txt'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10715,14 +10714,14 @@
             "name": "finds tests matching a JS regex pattern",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 169,
+                "line": 142,
                 "column": 47
             },
-            "line": 169,
-            "code": "    it('finds tests matching a JS regex pattern', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx'],\n          name,\n          rootDir,\n          testMatch: undefined,\n          testRegex: 'test.jsx?',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 142,
+            "code": "    it('finds tests matching a JS regex pattern', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx'],\n        name,\n        rootDir,\n        testMatch: undefined,\n        testRegex: 'test.jsx?',\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10731,14 +10730,14 @@
             "name": "finds tests matching a JS glob pattern",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 191,
+                "line": 156,
                 "column": 46
             },
-            "line": 191,
-            "code": "    it('finds tests matching a JS glob pattern', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx'],\n          name,\n          rootDir,\n          testMatch: ['**/test.js?(x)'],\n          testRegex: '',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 156,
+            "code": "    it('finds tests matching a JS glob pattern', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx'],\n        name,\n        rootDir,\n        testMatch: ['**/test.js?(x)'],\n        testRegex: '',\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10747,14 +10746,14 @@
             "name": "finds tests matching a JS with overriding glob patterns",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 213,
+                "line": 170,
                 "column": 63
             },
-            "line": 213,
-            "code": "    it('finds tests matching a JS with overriding glob patterns', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx'],\n          name,\n          rootDir,\n          testMatch: [\n            '**/*.js?(x)',\n            '!**/test.js?(x)',\n            '**/test.js',\n            '!**/test.js',\n          ],\n          testRegex: '',\n        },\n        {} as Config.Argv,\n      );\n\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('module.jsx'),\n          path.normalize('noTests.js'),\n        ]);\n      });\n    });",
+            "line": 170,
+            "code": "    it('finds tests matching a JS with overriding glob patterns', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx'],\n        name,\n        rootDir,\n        testMatch: [\n          '**/*.js?(x)',\n          '!**/test.js?(x)',\n          '**/test.js',\n          '!**/test.js',\n        ],\n        testRegex: '',\n      });\n      expect(paths).toEqual([\n        path.normalize('module.jsx'),\n        path.normalize('noTests.js'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10763,14 +10762,14 @@
             "name": "finds tests with default file extensions using testRegex",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 241,
+                "line": 189,
                 "column": 64
             },
-            "line": 241,
-            "code": "    it('finds tests with default file extensions using testRegex', async () => {\n      const {options: config} = await normalize(\n        {\n          name,\n          rootDir,\n          testMatch: undefined,\n          testRegex,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 189,
+            "code": "    it('finds tests with default file extensions using testRegex', async () => {\n      const paths = await getTestPaths({\n        name,\n        rootDir,\n        testMatch: undefined,\n        testRegex,\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10779,14 +10778,14 @@
             "name": "finds tests with default file extensions using testMatch",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 262,
+                "line": 202,
                 "column": 64
             },
-            "line": 262,
-            "code": "    it('finds tests with default file extensions using testMatch', async () => {\n      const {options: config} = await normalize(\n        {\n          name,\n          rootDir,\n          testMatch,\n          testRegex: '',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 202,
+            "code": "    it('finds tests with default file extensions using testMatch', async () => {\n      const paths = await getTestPaths({\n        name,\n        rootDir,\n        testMatch,\n        testRegex: '',\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10795,14 +10794,14 @@
             "name": "finds tests with parentheses in their rootDir when using testMatch",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 283,
+                "line": 215,
                 "column": 74
             },
-            "line": 283,
-            "code": "    it('finds tests with parentheses in their rootDir when using testMatch', async () => {\n      const {options: config} = await normalize(\n        {\n          name,\n          rootDir: path.resolve(__dirname, 'test_root_with_(parentheses)'),\n          testMatch: ['<rootDir>**/__testtests__/**/*'],\n          testRegex: undefined,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          expect.stringContaining(path.normalize('__testtests__/test.js')),\n        ]);\n      });\n    });",
+            "line": 215,
+            "code": "    it('finds tests with parentheses in their rootDir when using testMatch', async () => {\n      const paths = await getTestPaths({\n        name,\n        rootDir: path.resolve(__dirname, 'test_root_with_(parentheses)'),\n        testMatch: ['<rootDir>**/__testtests__/**/*'],\n        testRegex: undefined,\n      });\n      expect(paths).toEqual([\n        expect.stringContaining(path.normalize('__testtests__/test.js')),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10811,14 +10810,14 @@
             "name": "finds tests with similar but custom file extensions",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 303,
+                "line": 227,
                 "column": 59
             },
-            "line": 303,
-            "code": "    it('finds tests with similar but custom file extensions', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx'],\n          name,\n          rootDir,\n          testMatch,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 227,
+            "code": "    it('finds tests with similar but custom file extensions', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx'],\n        name,\n        rootDir,\n        testMatch,\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10827,14 +10826,14 @@
             "name": "finds tests with totally custom foobar file extensions",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 324,
+                "line": 240,
                 "column": 62
             },
-            "line": 324,
-            "code": "    it('finds tests with totally custom foobar file extensions', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'foobar'],\n          name,\n          rootDir,\n          testMatch,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.foobar'),\n          path.normalize('__testtests__/test.js'),\n        ]);\n      });\n    });",
+            "line": 240,
+            "code": "    it('finds tests with totally custom foobar file extensions', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'foobar'],\n        name,\n        rootDir,\n        testMatch,\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.foobar'),\n        path.normalize('__testtests__/test.js'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10843,14 +10842,14 @@
             "name": "finds tests with many kinds of file extensions",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 345,
+                "line": 253,
                 "column": 54
             },
-            "line": 345,
-            "code": "    it('finds tests with many kinds of file extensions', async () => {\n      const {options: config} = await normalize(\n        {\n          moduleFileExtensions: ['js', 'jsx'],\n          name,\n          rootDir,\n          testMatch,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 253,
+            "code": "    it('finds tests with many kinds of file extensions', async () => {\n      const paths = await getTestPaths({\n        moduleFileExtensions: ['js', 'jsx'],\n        name,\n        rootDir,\n        testMatch,\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10859,14 +10858,14 @@
             "name": "finds tests using a regex only",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 366,
+                "line": 266,
                 "column": 38
             },
-            "line": 366,
-            "code": "    it('finds tests using a regex only', async () => {\n      const {options: config} = await normalize(\n        {\n          name,\n          rootDir,\n          testMatch: undefined,\n          testRegex,\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 266,
+            "code": "    it('finds tests using a regex only', async () => {\n      const paths = await getTestPaths({\n        name,\n        rootDir,\n        testMatch: undefined,\n        testRegex,\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10875,14 +10874,14 @@
             "name": "finds tests using a glob only",
             "suites": [
                 "SearchSource",
-                "testPathsMatching"
+                "getTestPaths"
             ],
             "updatePoint": {
-                "line": 387,
+                "line": 279,
                 "column": 37
             },
-            "line": 387,
-            "code": "    it('finds tests using a glob only', async () => {\n      const {options: config} = await normalize(\n        {\n          name,\n          rootDir,\n          testMatch,\n          testRegex: '',\n        },\n        {} as Config.Argv,\n      );\n      return findMatchingTests(config).then(data => {\n        const relPaths = toPaths(data.tests).map(absPath =>\n          path.relative(rootDir, absPath),\n        );\n        expect(relPaths.sort()).toEqual([\n          path.normalize('__testtests__/test.js'),\n          path.normalize('__testtests__/test.jsx'),\n        ]);\n      });\n    });",
+            "line": 279,
+            "code": "    it('finds tests using a glob only', async () => {\n      const paths = await getTestPaths({\n        name,\n        rootDir,\n        testMatch,\n        testRegex: '',\n      });\n      expect(paths).toEqual([\n        path.normalize('__testtests__/test.js'),\n        path.normalize('__testtests__/test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10894,10 +10893,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 436,
+                "line": 313,
                 "column": 35
             },
-            "line": 436,
+            "line": 313,
             "code": "    it('should allow a simple match', async () => {\n      const result = searchSource.filterPathsWin32(['packages/lib/my-lib.ts']);\n      expect(result).toEqual([path.resolve('packages/lib/my-lib.ts')]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10910,10 +10909,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 440,
+                "line": 317,
                 "column": 62
             },
-            "line": 440,
+            "line": 317,
             "code": "    it('should allow to match a file inside a hidden directory', async () => {\n      const result = searchSource.filterPathsWin32([\n        'packages/.hidden/my-app-hidden.ts',\n      ]);\n      expect(result).toEqual([\n        path.resolve('packages/.hidden/my-app-hidden.ts'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10926,10 +10925,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 448,
+                "line": 325,
                 "column": 75
             },
-            "line": 448,
+            "line": 325,
             "code": "    it('should allow to match a file inside a directory prefixed with a \"@\"', async () => {\n      const result = searchSource.filterPathsWin32([\n        'packages/@core/my-app.ts',\n      ]);\n      expect(result).toEqual([path.resolve('packages/@core/my-app.ts')]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10942,10 +10941,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 454,
+                "line": 331,
                 "column": 75
             },
-            "line": 454,
+            "line": 331,
             "code": "    it('should allow to match a file inside a directory prefixed with a \"+\"', async () => {\n      const result = searchSource.filterPathsWin32(['packages/+cli/my-cli.ts']);\n      expect(result).toEqual([path.resolve('packages/+cli/my-cli.ts')]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10958,10 +10957,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 458,
+                "line": 335,
                 "column": 34
             },
-            "line": 458,
+            "line": 335,
             "code": "    it('should allow an @(pattern)', () => {\n      const result = searchSource.filterPathsWin32([\n        'packages/@(@core)/my-app.ts',\n      ]);\n      expect(result).toEqual([path.resolve('packages/@core/my-app.ts')]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10974,10 +10973,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 464,
+                "line": 341,
                 "column": 33
             },
-            "line": 464,
+            "line": 341,
             "code": "    it('should allow a +(pattern)', () => {\n      const result = searchSource.filterPathsWin32([\n        'packages/+(@core)/my-app.ts',\n      ]);\n      expect(result).toEqual([path.resolve('packages/@core/my-app.ts')]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -10990,10 +10989,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 470,
+                "line": 347,
                 "column": 47
             },
-            "line": 470,
+            "line": 347,
             "code": "    it('should allow for (pattern) in file path', () => {\n      const result = searchSource.filterPathsWin32([\n        'packages/programs (x86)/my-program.ts',\n      ]);\n      expect(result).toEqual([\n        path.resolve('packages/programs (x86)/my-program.ts'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11006,10 +11005,10 @@
                 "filterPathsWin32"
             ],
             "updatePoint": {
-                "line": 478,
+                "line": 355,
                 "column": 37
             },
-            "line": 478,
+            "line": 355,
             "code": "    it('should allow no results found', () => {\n      const result = searchSource.filterPathsWin32(['not/exists']);\n      expect(result).toHaveLength(0);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11022,10 +11021,10 @@
                 "findRelatedTests"
             ],
             "updatePoint": {
-                "line": 524,
+                "line": 393,
                 "column": 46
             },
-            "line": 524,
+            "line": 393,
             "code": "    it('makes sure a file is related to itself', async () => {\n      const data = await searchSource.findRelatedTests(\n        new Set([rootPath]),\n        false,\n      );\n      expect(toPaths(data.tests)).toEqual([rootPath]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11038,10 +11037,10 @@
                 "findRelatedTests"
             ],
             "updatePoint": {
-                "line": 532,
+                "line": 401,
                 "column": 52
             },
-            "line": 532,
+            "line": 401,
             "code": "    it('finds tests that depend directly on the path', async () => {\n      const filePath = path.join(rootDir, 'RegularModule.js');\n      const file2Path = path.join(rootDir, 'RequireRegularModule.js');\n      const parentDep = path.join(rootDir, 'ModuleWithSideEffects.js');\n      const data = await searchSource.findRelatedTests(\n        new Set([filePath]),\n        false,\n      );\n      expect(toPaths(data.tests).sort()).toEqual([\n        parentDep,\n        filePath,\n        file2Path,\n        rootPath,\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11054,10 +11053,10 @@
                 "findRelatedTests"
             ],
             "updatePoint": {
-                "line": 548,
+                "line": 417,
                 "column": 45
             },
-            "line": 548,
+            "line": 417,
             "code": "    it('excludes untested files from coverage', async () => {\n      const unrelatedFile = path.join(rootDir, 'JSONFile.json');\n      const regular = path.join(rootDir, 'RegularModule.js');\n      const requireRegular = path.join(rootDir, 'RequireRegularMode.js');\n\n      const data = await searchSource.findRelatedTests(\n        new Set([regular, requireRegular, unrelatedFile]),\n        true,\n      );\n      expect(Array.from(data.collectCoverageFrom || [])).toEqual([\n        'RegularModule.js',\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11070,10 +11069,10 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 581,
+                "line": 442,
                 "column": 51
             },
-            "line": 581,
+            "line": 442,
             "code": "    it('returns empty search result for empty input', async () => {\n      const input: Array<string> = [];\n      const data = await searchSource.findRelatedTestsFromPattern(input, false);\n      expect(data.tests).toEqual([]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11086,10 +11085,10 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 587,
+                "line": 448,
                 "column": 53
             },
-            "line": 587,
+            "line": 448,
             "code": "    it('returns empty search result for invalid input', async () => {\n      const input = ['non-existend.js'];\n      const data = await searchSource.findRelatedTestsFromPattern(input, false);\n      expect(data.tests).toEqual([]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11102,10 +11101,10 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 593,
+                "line": 454,
                 "column": 66
             },
-            "line": 593,
+            "line": 454,
             "code": "    it('returns empty search result if no related tests were found', async () => {\n      const input = ['no_tests.js'];\n      const data = await searchSource.findRelatedTestsFromPattern(input, false);\n      expect(data.tests).toEqual([]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11118,10 +11117,10 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 599,
+                "line": 460,
                 "column": 37
             },
-            "line": 599,
+            "line": 460,
             "code": "    it('finds tests for a single file', async () => {\n      const input = ['packages/jest-core/src/__tests__/test_root/module.jsx'];\n      const data = await searchSource.findRelatedTestsFromPattern(input, false);\n      expect(toPaths(data.tests).sort()).toEqual([\n        path.join(rootDir, '__testtests__', 'test.js'),\n        path.join(rootDir, '__testtests__', 'test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11134,10 +11133,10 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 608,
+                "line": 469,
                 "column": 38
             },
-            "line": 608,
+            "line": 469,
             "code": "    it('finds tests for multiple files', async () => {\n      const input = [\n        'packages/jest-core/src/__tests__/test_root/module.jsx',\n        'packages/jest-core/src/__tests__/test_root/module.foobar',\n      ];\n      const data = await searchSource.findRelatedTestsFromPattern(input, false);\n      expect(toPaths(data.tests).sort()).toEqual([\n        path.join(rootDir, '__testtests__', 'test.foobar'),\n        path.join(rootDir, '__testtests__', 'test.js'),\n        path.join(rootDir, '__testtests__', 'test.jsx'),\n      ]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11150,11 +11149,11 @@
                 "findRelatedTestsFromPattern"
             ],
             "updatePoint": {
-                "line": 621,
+                "line": 482,
                 "column": 56
             },
-            "line": 621,
-            "code": "    it('does not mistake roots folders with prefix names', async () => {\n      if (process.platform !== 'win32') {\n        const config = (\n          await normalize(\n            {\n              name,\n              rootDir: '.',\n              roots: ['/foo/bar/prefix'],\n            },\n            {} as Config.Argv,\n          )\n        ).options;\n\n        searchSource = new SearchSource(\n          await Runtime.createContext(config, {maxWorkers, watchman: false}),\n        );\n\n        const input = ['/foo/bar/prefix-suffix/__tests__/my-test.test.js'];\n        const data = searchSource.findTestsByPaths(input);\n        expect(data.tests).toEqual([]);\n      }\n    });",
+            "line": 482,
+            "code": "    it('does not mistake roots folders with prefix names', async () => {\n      if (process.platform === 'win32') {\n        return;\n      }\n      searchSource = await initSearchSource({\n        name,\n        rootDir: '.',\n        roots: ['/foo/bar/prefix'],\n      });\n\n      const input = ['/foo/bar/prefix-suffix/__tests__/my-test.test.js'];\n      const data = searchSource.findTestsByPaths(input);\n      expect(data.tests).toEqual([]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11166,10 +11165,10 @@
                 "findRelatedSourcesFromTestsInChangedFiles"
             ],
             "updatePoint": {
-                "line": 672,
+                "line": 517,
                 "column": 34
             },
-            "line": 672,
+            "line": 517,
             "code": "    it('return empty set if no SCM', async () => {\n      const requireRegularModule = path.join(\n        rootDir,\n        'RequireRegularModule.js',\n      );\n      const sources =\n        await searchSource.findRelatedSourcesFromTestsInChangedFiles({\n          changedFiles: new Set([requireRegularModule]),\n          repos: {\n            git: new Set(),\n            hg: new Set(),\n          },\n        });\n      expect(sources).toEqual([]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
@@ -11182,10 +11181,10 @@
                 "findRelatedSourcesFromTestsInChangedFiles"
             ],
             "updatePoint": {
-                "line": 688,
+                "line": 533,
                 "column": 40
             },
-            "line": 688,
+            "line": 533,
             "code": "    it('return sources required by tests', async () => {\n      const regularModule = path.join(rootDir, 'RegularModule.js');\n      const requireRegularModule = path.join(\n        rootDir,\n        'RequireRegularModule.js',\n      );\n      const sources =\n        await searchSource.findRelatedSourcesFromTestsInChangedFiles({\n          changedFiles: new Set([requireRegularModule]),\n          repos: {\n            git: new Set('/path/to/git'),\n            hg: new Set(),\n          },\n        });\n      expect(sources).toEqual([regularModule]);\n    });",
             "file": "SearchSource.test.ts",
             "skipped": false,
