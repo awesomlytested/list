@@ -5398,16 +5398,32 @@
             "dir": "packages/plugins/java/kotlin/tests"
         },
         {
+            "name": "Should omit JvmStatic annotation if the option is set",
+            "suites": [
+                "Kotlin",
+                "Enums"
+            ],
+            "updatePoint": {
+                "line": 135,
+                "column": 61
+            },
+            "line": 135,
+            "code": "    it('Should omit JvmStatic annotation if the option is set', async () => {\n      const result = await plugin(schema, [], { omitJvmStatic: true }, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`    enum class UserRole(val label: String) {\n        Admin(\"ADMIN\"),\n        User(\"USER\"),\n        Editor(\"EDITOR\");\n        \n        companion object {\n          \n          fun valueOfLabel(label: String): UserRole? {\n            return values().find { it.label == label }\n          }\n        }\n      }`);\n    });",
+            "file": "kotlin.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/java/kotlin/tests"
+        },
+        {
             "name": "Should generate arguments correctly when using Array",
             "suites": [
                 "Kotlin",
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 137,
+                "line": 155,
                 "column": 60
             },
-            "line": 137,
+            "line": 155,
             "code": "    it('Should generate arguments correctly when using Array', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class InputWithArrayInput(\n        val f: Iterable<String>? = null,\n        val g: Iterable<SearchUserInput>? = null\n      ) {\n        @Suppress(\"UNCHECKED_CAST\")\n        constructor(args: Map<String, Any>) : this(\n          args[\"f\"] as Iterable<String>?,\n          args[\"g\"]?.let { g -> (g as List<Map<String, Any>>).map { SearchUserInput(it) } }\n        )\n      }`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5420,10 +5436,10 @@
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 153,
+                "line": 171,
                 "column": 70
             },
-            "line": 153,
+            "line": 171,
             "code": "    it('Should generate input class per each type with field arguments', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class UserFriendsArgs(\n        val skip: Int? = null,\n        val limit: Int? = null\n      ) {\n        constructor(args: Map<String, Any>) : this(\n          args[\"skip\"] as Int?,\n          args[\"limit\"] as Int?\n        )\n      }`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5436,10 +5452,10 @@
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 168,
+                "line": 186,
                 "column": 41
             },
-            "line": 168,
+            "line": 186,
             "code": "    it('Should generate argument defaults', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class UserHobbiesArgs(\n        val skip: Int? = 0,\n        val limit: Int = 10\n      ) {\n        constructor(args: Map<String, Any>) : this(\n          args[\"skip\"] as Int? ?: 0,\n          args[\"limit\"] as Int? ?: 10\n        )\n      }`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5452,10 +5468,10 @@
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 183,
+                "line": 201,
                 "column": 65
             },
-            "line": 183,
+            "line": 201,
             "code": "    it('Should generate input class per each query with arguments', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class QueryUserArgs(\n        val id: Any\n      ) {\n        constructor(args: Map<String, Any>) : this(\n          args[\"id\"] as Any\n        )\n      }`);\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class QuerySearchUserArgs(\n        val searchFields: SearchUserInput\n      ) {\n        @Suppress(\"UNCHECKED_CAST\")\n        constructor(args: Map<String, Any>) : this(\n            SearchUserInput(args[\"searchFields\"] as Map<String, Any>)\n        )\n      }`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5468,10 +5484,10 @@
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 206,
+                "line": 224,
                 "column": 80
             },
-            "line": 206,
+            "line": 224,
             "code": "    it('Should generate input class per each input, also with nested input types', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class MetadataSearchInput(\n          val something: Int? = null\n        ) {\n          constructor(args: Map<String, Any>) : this(\n              args[\"something\"] as Int?\n          )\n        }`);\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class SearchUserInput(\n          val username: String? = null,\n          val email: String? = null,\n          val name: String? = null,\n          val sort: ResultSort? = null,\n          val metadata: MetadataSearchInput? = null\n        ) {\n          @Suppress(\"UNCHECKED_CAST\")\n          constructor(args: Map<String, Any>) : this(\n              args[\"username\"] as String?,\n              args[\"email\"] as String?,\n              args[\"name\"] as String?,\n              args[\"sort\"] as ResultSort?,\n              args[\"metadata\"]?.let { MetadataSearchInput(it as Map<String, Any>) }\n          )\n        }`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5484,10 +5500,10 @@
                 "Input Types / Arguments"
             ],
             "updatePoint": {
-                "line": 237,
+                "line": 255,
                 "column": 72
             },
-            "line": 237,
+            "line": 255,
             "code": "    it('Should generate nested inputs with out duplicated `Input` suffix', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class UpdateUserMetadataInput(\n          val something: Int? = null\n        )`);\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class UpdateUserInput(\n          val id: Any,\n          val username: String? = null,\n          val metadata: UpdateUserMetadataInput? = null\n        )`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5500,10 +5516,10 @@
                 "Types"
             ],
             "updatePoint": {
-                "line": 255,
+                "line": 273,
                 "column": 82
             },
-            "line": 255,
+            "line": 273,
             "code": "    it('Should NOT generate type class per each type if withTypes is not specified', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).not.toBeSimilarStringTo(`data class User(\n        val skip: Int? = null,\n        val limit: Int? = null\n      )`);\n\n      // language=kotlin\n      expect(result).not.toBeSimilarStringTo(`data class Chat(\n        val skip: Int? = null,\n        val limit: Int? = null\n      )`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -5516,10 +5532,10 @@
                 "Types"
             ],
             "updatePoint": {
-                "line": 271,
+                "line": 289,
                 "column": 69
             },
-            "line": 271,
+            "line": 289,
             "code": "    it('Should generate type class per each type if withTypes is true', async () => {\n      const result = await plugin(schema, [], { withTypes: true }, { outputFile: OUTPUT_FILE });\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class User(\n        val id: Any,\n        val username: String,\n        val email: String,\n        val name: String?,\n        val friends: Iterable<User>,\n        val hobbies: Iterable<String>\n      )`);\n\n      // language=kotlin\n      expect(result).toBeSimilarStringTo(`data class Chat(\n        val id: Any,\n        val users: Iterable<User>,\n        val title: String?\n      )`);\n    });",
             "file": "kotlin.spec.ts",
             "skipped": false,
@@ -7856,7 +7872,7 @@
                 "column": 45
             },
             "line": 64,
-            "code": "    it('Should generate a correct wrap method', async () => {\n      const config = {};\n      const docs = [{ location: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n\n      const usage = `\nasync function test() {\n  const client = new GraphQLClient('');\n  const sdk = getSdk(client);\n\n  await sdk.feed();\n  await sdk.feed3();\n  await sdk.feed4();\n\n  const result = await sdk.feed2({ v: \"1\" });\n\n  if (result.feed) {\n    if (result.feed[0]) {\n      const id = result.feed[0].id\n    }\n  }\n}`;\n      const output = await validate(result, config, docs, schema, usage);\n\n      expect(result.content).toContain(\n        `(FeedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed');`\n      );\n      expect(output).toMatchSnapshot();\n    });",
+            "code": "    it('Should generate a correct wrap method', async () => {\n      const config = {};\n      const docs = [{ location: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n\n      const usage = `\nasync function test() {\n  const client = new GraphQLClient('');\n  const sdk = getSdk(client);\n\n  await sdk.feed();\n  await sdk.feed3();\n  await sdk.feed4();\n\n  const result = await sdk.feed2({ v: \"1\" });\n\n  if (result.feed) {\n    if (result.feed[0]) {\n      const id = result.feed[0].id\n    }\n  }\n}`;\n      const output = await validate(result, config, docs, schema, usage);\n\n      expect(result.content).toContain(\n        `(FeedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed', 'query');`\n      );\n      expect(output).toMatchSnapshot();\n    });",
             "file": "graphql-request.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/graphql-request/tests"
@@ -8000,7 +8016,7 @@
                 "column": 65
             },
             "line": 332,
-            "code": "    it('#4748 - integration with importDocumentNodeExternallyFrom', async () => {\n      const config = { importDocumentNodeExternallyFrom: './operations', documentMode: DocumentMode.external };\n      const docs = [{ location: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n      const output = await validate(result, config, docs, schema, '');\n\n      expect(output).toContain(`import * as Operations from './operations';`);\n      expect(output).toContain(\n        `(Operations.FeedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed');`\n      );\n      expect(output).toContain(\n        `(Operations.Feed2Document, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed2');`\n      );\n      expect(output).toContain(\n        `(Operations.Feed3Document, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed3');`\n      );\n    });",
+            "code": "    it('#4748 - integration with importDocumentNodeExternallyFrom', async () => {\n      const config = { importDocumentNodeExternallyFrom: './operations', documentMode: DocumentMode.external };\n      const docs = [{ location: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n      const output = await validate(result, config, docs, schema, '');\n\n      expect(output).toContain(`import * as Operations from './operations';`);\n      expect(output).toContain(\n        `(Operations.FeedDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed', 'query');`\n      );\n      expect(output).toContain(\n        `(Operations.Feed2Document, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed2', 'query');`\n      );\n      expect(output).toContain(\n        `(Operations.Feed3Document, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'feed3', 'query');`\n      );\n    });",
             "file": "graphql-request.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/graphql-request/tests"
