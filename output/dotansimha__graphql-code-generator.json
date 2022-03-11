@@ -7327,16 +7327,64 @@
             "dir": "packages/plugins/typescript/apollo-angular/tests"
         },
         {
-            "name": "should generate a SDK service with custom settings",
+            "name": "should include only the required SDK types for query operations",
             "suites": [
                 "Apollo Angular",
                 "SDK Service"
             ],
             "updatePoint": {
                 "line": 534,
-                "column": 58
+                "column": 71
             },
             "line": 534,
+            "code": "    it('should include only the required SDK types for query operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface WatchQueryOptionsAlone<V> extends Omit<ApolloCore.WatchQueryOptions<V>, 'query' | 'variables'> {}\n\n        interface QueryOptionsAlone<V> extends Omit<ApolloCore.QueryOptions<V>, 'query' | 'variables'> {}`);\n      expect(content.content).not.toContain('SubscriptionOptionsAlone');\n      expect(content.content).not.toContain('MutationOptionsAlone');\n    });",
+            "file": "apollo-angular.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/apollo-angular/tests"
+        },
+        {
+            "name": "should include only the required SDK types for mutation operations",
+            "suites": [
+                "Apollo Angular",
+                "SDK Service"
+            ],
+            "updatePoint": {
+                "line": 563,
+                "column": 74
+            },
+            "line": 563,
+            "code": "    it('should include only the required SDK types for mutation operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        mutation Update($arg: Int) {\n          update(arg: $arg) {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface MutationOptionsAlone<T, V> extends Omit<ApolloCore.MutationOptions<T, V>, 'mutation' | 'variables'> {}`);\n      expect(content.content).not.toContain('WatchOptionsAlone');\n      expect(content.content).not.toContain('QueryOptionsAlone');\n      expect(content.content).not.toContain('SubscriptionOptionsAlone');\n    });",
+            "file": "apollo-angular.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/apollo-angular/tests"
+        },
+        {
+            "name": "should include only the required SDK types for subscription operations",
+            "suites": [
+                "Apollo Angular",
+                "SDK Service"
+            ],
+            "updatePoint": {
+                "line": 591,
+                "column": 78
+            },
+            "line": 591,
+            "code": "    it('should include only the required SDK types for subscription operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        subscription MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface SubscriptionOptionsAlone<V> extends Omit<ApolloCore.SubscriptionOptions<V>, 'query' | 'variables'> {}`);\n      expect(content.content).not.toContain('WatchOptionsAlone');\n      expect(content.content).not.toContain('QueryOptionsAlone');\n      expect(content.content).not.toContain('MutationOptionsAlone');\n    });",
+            "file": "apollo-angular.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/apollo-angular/tests"
+        },
+        {
+            "name": "should generate a SDK service with custom settings",
+            "suites": [
+                "Apollo Angular",
+                "SDK Service"
+            ],
+            "updatePoint": {
+                "line": 619,
+                "column": 58
+            },
+            "line": 619,
             "code": "    it('should generate a SDK service with custom settings', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          serviceName: 'MySDK',\n          serviceProvidedInRoot: false,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule\n      expect(content.prepend).toContain(`import * as ApolloCore from '@apollo/client/core';`);\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable()\n        export class MySDK {\n        constructor(\n          private myFeedGql: MyFeedGQL\n        ) {}\n\n        myFeed(variables?: MyFeedQueryVariables, options?: QueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.fetch(variables, options)\n        }\n\n        myFeedWatch(variables?: MyFeedQueryVariables, options?: WatchQueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.watch(variables, options)\n        }\n        }\n      `);\n      // await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7349,10 +7397,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 578,
+                "line": 663,
                 "column": 70
             },
-            "line": 578,
+            "line": 663,
             "code": "    it('should generate a SDK service for Apollo Angular 1.0 on demand', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          apolloAngularVersion: 1,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.prepend).toContain(`import * as ApolloCore from 'apollo-client';`);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7365,10 +7413,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 603,
+                "line": 688,
                 "column": 71
             },
-            "line": 603,
+            "line": 688,
             "code": "    it('should generate a SDK service with a requested providedIn value', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          serviceProvidedIn: '../app.module#AppModule',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule import\n      expect(content.prepend).toContain(`import { AppModule } from '../app.module';`);\n      // NgModule in `providedIn`\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({ providedIn: AppModule })\n        export class ApolloAngularSDK {\n      `);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7381,10 +7429,10 @@
                 "near-operation-file"
             ],
             "updatePoint": {
-                "line": 636,
+                "line": 721,
                 "column": 64
             },
-            "line": 636,
+            "line": 721,
             "code": "    it('Should use Operations when preset is near-operation-file', async () => {\n      const docs = [{ location: '', document: basicDoc }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n          importDocumentNodeExternallyFrom: 'near-operation-file',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`@Injectable({\n        providedIn: 'root'\n      })\n      export class TestGQL extends Apollo.Query<TestQuery, TestQueryVariables> {\n        document = Operations.TestDocument;\n\n        constructor(apollo: Apollo.Apollo) {\n          super(apollo);\n        }\n      }`);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7397,10 +7445,10 @@
                 "others"
             ],
             "updatePoint": {
-                "line": 664,
+                "line": 749,
                 "column": 31
             },
-            "line": 664,
+            "line": 749,
             "code": "    it('should handle fragments', async () => {\n      const myFeed = gql`\n        query MyFeed {\n          feed {\n            ...MyEntry\n          }\n        }\n\n        fragment MyEntry on Entry {\n          id\n          commentCount\n        }\n      `;\n\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      await validateTypeScript(content, schema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
