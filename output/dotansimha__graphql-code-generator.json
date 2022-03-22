@@ -7119,16 +7119,32 @@
             "dir": "packages/plugins/typescript/apollo-angular/tests"
         },
         {
-            "name": "should add the correct angular imports with override",
+            "name": "should add explicit override to document and namedClient property",
             "suites": [
                 "Apollo Angular",
                 "Imports"
             ],
             "updatePoint": {
                 "line": 132,
-                "column": 60
+                "column": 73
             },
             "line": 132,
+            "code": "    it(`should add explicit override to document and namedClient property`, async () => {\n      const docs = [{ location: '', document: basicDoc }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {\n          addExplicitOverride: true,\n          namedClient: 'custom',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`override document = TestDocument;`);\n      expect(content.content).toBeSimilarStringTo(`override client = 'custom';`);\n      await validateTypeScript(content, schema, docs, {});\n    });",
+            "file": "apollo-angular.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/apollo-angular/tests"
+        },
+        {
+            "name": "should add the correct angular imports with override",
+            "suites": [
+                "Apollo Angular",
+                "Imports"
+            ],
+            "updatePoint": {
+                "line": 151,
+                "column": 60
+            },
+            "line": 151,
             "code": "    it(`should add the correct angular imports with override`, async () => {\n      const docs = [{ location: '', document: basicDoc }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {\n          apolloAngularPackage: 'my-custom-apollo-angular',\n        },\n        {\n          outputFile: 'graphql.tsx',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.prepend).toContain(`import * as Apollo from 'my-custom-apollo-angular';`);\n      expect(content.prepend).toContain(`import { Injectable } from '@angular/core';`);\n      await validateTypeScript(content, schema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7141,10 +7157,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 150,
+                "line": 169,
                 "column": 61
             },
-            "line": 150,
+            "line": 169,
             "code": "    it('Should import NgModules and remove NgModule directive', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      expect(modifiedSchema.getDirective('NgModule').name).toBe('NgModule');\n      const modulePath = '../my/lazy-module';\n      const moduleName = 'LazyModule';\n\n      const myFeed = gql(`\n        query MyFeed {\n          feed @client @NgModule(module: \"${modulePath}#${moduleName}\") {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.prepend).toContain(`import { ${moduleName} } from '${modulePath}';`);\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({\n          providedIn: ${moduleName}\n        })\n        export class MyFeedGQL\n      `);\n      expect(content.content).toBeSimilarStringTo(`document = MyFeedDocument;`);\n      expect(content.content).not.toContain('@NgModule');\n      expect(content.content).toContain('@client');\n      await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7157,10 +7173,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 186,
+                "line": 205,
                 "column": 66
             },
-            "line": 186,
+            "line": 205,
             "code": "    it('Should import namedClient and remove namedClient directive', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      expect(modifiedSchema.getDirective('namedClient').name).toBe('namedClient');\n\n      const myFeed = gql(`\n        query MyFeed {\n          feed @namedClient(name: \"custom\") {\n            id\n          }\n        }\n      `);\n\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`document = MyFeedDocument;`);\n\n      expect(content.content).toBeSimilarStringTo(`\n        client = 'custom';\n      `);\n      expect(content.content).not.toContain('@namedClient');\n      await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7173,10 +7189,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 217,
+                "line": 236,
                 "column": 104
             },
-            "line": 217,
+            "line": 236,
             "code": "    it('should output warning if documentMode = external and importDocumentNodeExternallyFrom is not set', async () => {\n      jest.spyOn(console, 'warn');\n      const docs = [{ location: '', document: basicDoc }];\n      await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      // eslint-disable-next-line no-console\n      expect(console.warn).toHaveBeenCalledWith(\n        'importDocumentNodeExternallyFrom must be provided if documentMode=external'\n      );\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7189,10 +7205,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 237,
+                "line": 256,
                 "column": 94
             },
-            "line": 237,
+            "line": 256,
             "code": "    it('output warning if importOperationTypesFrom is set to something other than \"Operations\"', async () => {\n      jest.spyOn(console, 'warn');\n      const docs = [{ location: '', document: basicDoc }];\n      await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n          importOperationTypesFrom: 'Whatever',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      // eslint-disable-next-line no-console\n      expect(console.warn).toHaveBeenCalledWith(\n        'importOperationTypesFrom only works correctly when left empty or set to \"Operations\"'\n      );\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7205,10 +7221,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 258,
+                "line": 277,
                 "column": 92
             },
-            "line": 258,
+            "line": 277,
             "code": "    it('output warning if importOperationTypesFrom is set and documentMode is not \"external\"', async () => {\n      jest.spyOn(console, 'warn');\n      const docs = [{ location: '', document: basicDoc }];\n      await plugin(\n        schema,\n        docs,\n        {\n          importOperationTypesFrom: 'Operations',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      // eslint-disable-next-line no-console\n      expect(console.warn).toHaveBeenCalledWith(\n        '\"importOperationTypesFrom\" should be used with \"documentMode=external\" and \"importDocumentNodeExternallyFrom\"'\n      );\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7221,10 +7237,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 297,
                 "column": 101
             },
-            "line": 278,
+            "line": 297,
             "code": "    it('output warning if importOperationTypesFrom is set and importDocumentNodeExternallyFrom is not', async () => {\n      jest.spyOn(console, 'warn');\n      const docs = [{ location: '', document: basicDoc }];\n      await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n          importOperationTypesFrom: 'Operations',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      // eslint-disable-next-line no-console\n      expect(console.warn).toHaveBeenCalledWith(\n        '\"importOperationTypesFrom\" should be used with \"documentMode=external\" and \"importDocumentNodeExternallyFrom\"'\n      );\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7237,10 +7253,10 @@
                 "Imports"
             ],
             "updatePoint": {
-                "line": 299,
+                "line": 318,
                 "column": 73
             },
-            "line": 299,
+            "line": 318,
             "code": "    it('should allow importing operations and documents from another file', async () => {\n      const docs = [{ location: '', document: basicDoc }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n          importOperationTypesFrom: 'Operations',\n          importDocumentNodeExternallyFrom: '@myproject/generated',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.prepend).toContain(`import * as Operations from '@myproject/generated';`);\n      expect(content.content).toContain('Operations.TestQuery');\n      expect(content.content).toContain('Operations.TestQueryVariables');\n      expect(content.content).toContain('Operations.TestDocument');\n      await validateTypeScript(content, schema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7253,10 +7269,10 @@
                 "Component"
             ],
             "updatePoint": {
-                "line": 323,
+                "line": 342,
                 "column": 48
             },
-            "line": 323,
+            "line": 342,
             "code": "    it('Should be able to use root schema object', async () => {\n      const rootSchema = buildSchema(`\n        type RootQuery { f: String }\n        schema { query: RootQuery }\n      `);\n      const query = gql`\n        query test {\n          f\n        }\n      `;\n      const docs = [{ location: '', document: query }];\n      const content = (await plugin(\n        rootSchema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({\n          providedIn: 'root'\n        })\n        export class TestGQL extends Apollo.Query\n      `);\n      await validateTypeScript(content, rootSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7269,10 +7285,10 @@
                 "Component"
             ],
             "updatePoint": {
-                "line": 352,
+                "line": 371,
                 "column": 29
             },
-            "line": 352,
+            "line": 371,
             "code": "    it('Should handle @client', async () => {\n      const myFeed = gql`\n        query MyFeed {\n          feed @client {\n            id\n          }\n        }\n      `;\n\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`document = MyFeedDocument;`);\n\n      await validateTypeScript(content, schema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7285,10 +7301,10 @@
                 "configuration"
             ],
             "updatePoint": {
-                "line": 378,
+                "line": 397,
                 "column": 68
             },
-            "line": 378,
+            "line": 397,
             "code": "    it('should be allow to define namedClient and NgModule in config', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const myExtraFeed = gql(`\n        query MyExtraFeed {\n          feed @NgModule(module: \"./extra#ExtraModule\") @namedClient(name: \"extra\") {\n            id\n          }\n        }\n      `);\n      const docs = [\n        { location: '', document: myFeed },\n        { location: 'a.ts', document: myExtraFeed },\n      ];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          ngModule: './path/to/file#AppModule',\n          namedClient: 'custom',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule\n      expect(content.prepend).toContain(`import { AppModule } from './path/to/file';`);\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({\n          providedIn: AppModule\n        })\n        export class MyFeedGQL\n      `);\n      expect(content.prepend).toContain(`import { ExtraModule } from './extra';`);\n\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({\n          providedIn: ExtraModule\n        })\n        export class MyExtraFeed\n      `);\n      expect(content.content).not.toContain('@NgModule');\n\n      // NamedClient\n      expect(content.content).toBeSimilarStringTo(`client = 'custom';`);\n      expect(content.content).toBeSimilarStringTo(`client = 'extra';`);\n      expect(content.content).not.toContain('@namedClient');\n\n      await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7301,10 +7317,10 @@
                 "configuration"
             ],
             "updatePoint": {
-                "line": 435,
+                "line": 454,
                 "column": 71
             },
-            "line": 435,
+            "line": 454,
             "code": "    it('should be allowed to define custom operation suffixes in config', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const vote = gql(`\n      mutation vote($repoFullName: String!, $type: VoteType!) {\n    vote(repoFullName: $repoFullName, type: $type) {\n      score\n      id\n      vote {\n        vote_value\n      }\n    }\n  }\n      `);\n      const commentAdded = gql(`\n        subscription onCommentAdded($repoFullName: String!) {\n        commentAdded(repoFullName: $repoFullName) {\n          id\n          postedBy {\n            login\n            html_url\n          }\n          createdAt\n          content\n        }\n      }\n      `);\n      const docs = [\n        { location: '', document: myFeed },\n        { location: '', document: commentAdded },\n        { location: '', document: vote },\n      ];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          querySuffix: 'QueryService',\n          mutationSuffix: 'MutationService',\n          subscriptionSuffix: 'SubscriptionService',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toContain(`export class MyFeedQueryService`);\n      expect(content.content).toContain(`export class OnCommentAddedSubscriptionService`);\n      expect(content.content).toContain(`export class VoteMutationService`);\n      await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7317,10 +7333,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 494,
+                "line": 513,
                 "column": 37
             },
-            "line": 494,
+            "line": 513,
             "code": "    it('should generate a SDK service', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule\n      expect(content.prepend).toContain(`import * as ApolloCore from '@apollo/client/core';`);\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({ providedIn: 'root' })\n        export class ApolloAngularSDK {\n        constructor(\n          private myFeedGql: MyFeedGQL\n        ) {}\n\n        myFeed(variables?: MyFeedQueryVariables, options?: QueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.fetch(variables, options)\n        }\n\n        myFeedWatch(variables?: MyFeedQueryVariables, options?: WatchQueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.watch(variables, options)\n        }\n        }\n      `);\n      // await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7333,10 +7349,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 534,
+                "line": 553,
                 "column": 71
             },
-            "line": 534,
+            "line": 553,
             "code": "    it('should include only the required SDK types for query operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface WatchQueryOptionsAlone<V> extends Omit<ApolloCore.WatchQueryOptions<V>, 'query' | 'variables'> {}\n\n        interface QueryOptionsAlone<V> extends Omit<ApolloCore.QueryOptions<V>, 'query' | 'variables'> {}`);\n      expect(content.content).not.toContain('SubscriptionOptionsAlone');\n      expect(content.content).not.toContain('MutationOptionsAlone');\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7349,10 +7365,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 563,
+                "line": 582,
                 "column": 74
             },
-            "line": 563,
+            "line": 582,
             "code": "    it('should include only the required SDK types for mutation operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        mutation Update($arg: Int) {\n          update(arg: $arg) {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface MutationOptionsAlone<T, V> extends Omit<ApolloCore.MutationOptions<T, V>, 'mutation' | 'variables'> {}`);\n      expect(content.content).not.toContain('WatchOptionsAlone');\n      expect(content.content).not.toContain('QueryOptionsAlone');\n      expect(content.content).not.toContain('SubscriptionOptionsAlone');\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7365,10 +7381,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 591,
+                "line": 610,
                 "column": 78
             },
-            "line": 591,
+            "line": 610,
             "code": "    it('should include only the required SDK types for subscription operations', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        subscription MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        { sdkClass: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`\n        type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;\n\n        interface SubscriptionOptionsAlone<V> extends Omit<ApolloCore.SubscriptionOptions<V>, 'query' | 'variables'> {}`);\n      expect(content.content).not.toContain('WatchOptionsAlone');\n      expect(content.content).not.toContain('QueryOptionsAlone');\n      expect(content.content).not.toContain('MutationOptionsAlone');\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7381,10 +7397,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 619,
+                "line": 638,
                 "column": 58
             },
-            "line": 619,
+            "line": 638,
             "code": "    it('should generate a SDK service with custom settings', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          serviceName: 'MySDK',\n          serviceProvidedInRoot: false,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule\n      expect(content.prepend).toContain(`import * as ApolloCore from '@apollo/client/core';`);\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable()\n        export class MySDK {\n        constructor(\n          private myFeedGql: MyFeedGQL\n        ) {}\n\n        myFeed(variables?: MyFeedQueryVariables, options?: QueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.fetch(variables, options)\n        }\n\n        myFeedWatch(variables?: MyFeedQueryVariables, options?: WatchQueryOptionsAlone<MyFeedQueryVariables>) {\n          return this.myFeedGql.watch(variables, options)\n        }\n        }\n      `);\n      // await validateTypeScript(content, modifiedSchema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7397,10 +7413,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 663,
+                "line": 682,
                 "column": 70
             },
-            "line": 663,
+            "line": 682,
             "code": "    it('should generate a SDK service for Apollo Angular 1.0 on demand', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          apolloAngularVersion: 1,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.prepend).toContain(`import * as ApolloCore from 'apollo-client';`);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7413,10 +7429,10 @@
                 "SDK Service"
             ],
             "updatePoint": {
-                "line": 688,
+                "line": 707,
                 "column": 71
             },
-            "line": 688,
+            "line": 707,
             "code": "    it('should generate a SDK service with a requested providedIn value', async () => {\n      const modifiedSchema = extendSchema(schema, addToSchema);\n      const myFeed = gql(`\n        query MyFeed {\n          feed {\n            id\n          }\n        }\n      `);\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        modifiedSchema,\n        docs,\n        {\n          sdkClass: true,\n          serviceProvidedIn: '../app.module#AppModule',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      // NgModule import\n      expect(content.prepend).toContain(`import { AppModule } from '../app.module';`);\n      // NgModule in `providedIn`\n      expect(content.content).toBeSimilarStringTo(`\n        @Injectable({ providedIn: AppModule })\n        export class ApolloAngularSDK {\n      `);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7429,10 +7445,10 @@
                 "near-operation-file"
             ],
             "updatePoint": {
-                "line": 721,
+                "line": 740,
                 "column": 64
             },
-            "line": 721,
+            "line": 740,
             "code": "    it('Should use Operations when preset is near-operation-file', async () => {\n      const docs = [{ location: '', document: basicDoc }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {\n          documentMode: DocumentMode.external,\n          importDocumentNodeExternallyFrom: 'near-operation-file',\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(content.content).toBeSimilarStringTo(`@Injectable({\n        providedIn: 'root'\n      })\n      export class TestGQL extends Apollo.Query<TestQuery, TestQueryVariables> {\n        document = Operations.TestDocument;\n\n        constructor(apollo: Apollo.Apollo) {\n          super(apollo);\n        }\n      }`);\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -7445,10 +7461,10 @@
                 "others"
             ],
             "updatePoint": {
-                "line": 749,
+                "line": 768,
                 "column": 31
             },
-            "line": 749,
+            "line": 768,
             "code": "    it('should handle fragments', async () => {\n      const myFeed = gql`\n        query MyFeed {\n          feed {\n            ...MyEntry\n          }\n        }\n\n        fragment MyEntry on Entry {\n          id\n          commentCount\n        }\n      `;\n\n      const docs = [{ location: '', document: myFeed }];\n      const content = (await plugin(\n        schema,\n        docs,\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      await validateTypeScript(content, schema, docs, {});\n    });",
             "file": "apollo-angular.spec.ts",
             "skipped": false,
@@ -12225,7 +12241,7 @@
                 "column": 60
             },
             "line": 138,
-            "code": "    it('Should generate query correctly with external mapper', async () => {\n      const config = {\n        fetcher: './my-file#myCustomFetcher',\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useInfiniteQuery, UseInfiniteQueryOptions, useMutation, UseMutationOptions, QueryFunctionContext } from 'react-query';`\n      );\n\n      expect(out.prepend).toContain(`import { myCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n    return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, {...variables, ...(metaData.pageParam ?? {})})(),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "code": "    it('Should generate query correctly with external mapper', async () => {\n      const config = {\n        fetcher: './my-file#myCustomFetcher',\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions, QueryFunctionContext } from 'react-query';`\n      );\n\n      expect(out.prepend).toContain(`import { myCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n    return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, {...variables, ...(metaData.pageParam ?? {})})(),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12241,7 +12257,7 @@
                 "column": 60
             },
             "line": 191,
-            "code": "    it('Should generate query correctly with internal mapper', async () => {\n      const config = {\n        fetcher: 'myCustomFetcher',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "code": "    it('Should generate query correctly with internal mapper', async () => {\n      const config = {\n        fetcher: 'myCustomFetcher',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12257,7 +12273,7 @@
                 "column": 62
             },
             "line": 229,
-            "code": "    it('Should generate mutation correctly with lazy variables', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useInfiniteQuery, UseInfiniteQueryOptions, useMutation, UseMutationOptions, QueryFunctionContext } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { useCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument).bind(null, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n      const query = useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument)\n      return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => query({...variables, ...(metaData.pageParam ?? {})}),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        useCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "code": "    it('Should generate mutation correctly with lazy variables', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions, QueryFunctionContext } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { useCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument).bind(null, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n      const query = useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument)\n      return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => query({...variables, ...(metaData.pageParam ?? {})}),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        useCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12387,7 +12403,7 @@
                 "column": 51
             },
             "line": 471,
-            "code": "    it('Should generate query correctly with client', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { GraphQLClient } from 'graphql-request';`);\n      expect(out.prepend).toContain(`import { RequestInit } from 'graphql-request/dist/types.dom';`);\n      expect(out.prepend[3])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(client: GraphQLClient, query: string, variables?: TVariables, headers?: RequestInit['headers']) {\n          return async (): Promise<TData> => client.request<TData, TVariables>(query, variables, headers);\n        }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      client: GraphQLClient,\n      variables?: TTestQueryVariables,\n      options?: UseQueryOptions<TTestQuery, TError, TData>,\n      headers?: RequestInit['headers']\n    ) =>\n    useQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test'] : ['test', variables],\n      fetcher<TTestQuery, TTestQueryVariables>(client, TestDocument, variables, headers),\n      options\n    );`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(\n      client: GraphQLClient,\n      options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>,\n      headers?: RequestInit['headers']\n    ) =>\n    useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n      ['test'],\n      (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(client, TestDocument, variables, headers)(),\n      options\n    );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "code": "    it('Should generate query correctly with client', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { GraphQLClient } from 'graphql-request';`);\n      expect(out.prepend).toContain(`import { RequestInit } from 'graphql-request/dist/types.dom';`);\n      expect(out.prepend[3])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(client: GraphQLClient, query: string, variables?: TVariables, headers?: RequestInit['headers']) {\n          return async (): Promise<TData> => client.request<TData, TVariables>(query, variables, headers);\n        }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      client: GraphQLClient,\n      variables?: TTestQueryVariables,\n      options?: UseQueryOptions<TTestQuery, TError, TData>,\n      headers?: RequestInit['headers']\n    ) =>\n    useQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test'] : ['test', variables],\n      fetcher<TTestQuery, TTestQueryVariables>(client, TestDocument, variables, headers),\n      options\n    );`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(\n      client: GraphQLClient,\n      options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>,\n      headers?: RequestInit['headers']\n    ) =>\n    useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n      ['test'],\n      (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(client, TestDocument, variables, headers)(),\n      options\n    );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12403,7 +12419,7 @@
                 "column": 37
             },
             "line": 519,
-            "code": "    it('Should support useTypeImports', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        useTypeImports: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(`import type { GraphQLClient } from 'graphql-request';`);\n    });",
+            "code": "    it('Should support useTypeImports', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        useTypeImports: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(`import type { GraphQLClient } from 'graphql-request';`);\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from 'react-query';`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12415,10 +12431,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 529,
+                "line": 532,
                 "column": 64
             },
-            "line": 529,
+            "line": 532,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (client: GraphQLClient, variables?: TestQueryVariables, headers?: RequestInit['headers']) => fetcher<TestQuery, TestQueryVariables>(client, TestDocument, variables, headers);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12431,10 +12447,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 540,
+                "line": 543,
                 "column": 39
             },
-            "line": 540,
+            "line": 543,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: 'graphql-request',\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12447,11 +12463,11 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 647,
+                "line": 650,
                 "column": 63
             },
-            "line": 647,
-            "code": "    it('Should generate query correctly with hardcoded endpoint', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(\"http://localhost:3000/graphql\", {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "line": 650,
+            "code": "    it('Should generate query correctly with hardcoded endpoint', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(\"http://localhost:3000/graphql\", {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12463,10 +12479,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 706,
+                "line": 709,
                 "column": 57
             },
-            "line": 706,
+            "line": 709,
             "code": "    it('Should generate query correctly with fetch config', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n          fetchParams: JSON.stringify({\n            headers: {\n              Authorization: 'Bearer XYZ',\n            },\n          }),\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1]).toMatchInlineSnapshot(`\n\"\nfunction fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n  return async (): Promise<TData> => {\n    const res = await fetch(\\\\\"http://localhost:3000/graphql\\\\\", {\n    method: \\\\\"POST\\\\\",\n    ...({\\\\\"headers\\\\\":{\\\\\"Authorization\\\\\":\\\\\"Bearer XYZ\\\\\"}}),\n      body: JSON.stringify({ query, variables }),\n    });\n\n    const json = await res.json();\n\n    if (json.errors) {\n      const { message } = json.errors[0];\n\n      throw new Error(message);\n    }\n\n    return json.data;\n  }\n}\"\n`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12479,10 +12495,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 748,
+                "line": 751,
                 "column": 80
             },
-            "line": 748,
+            "line": 751,
             "code": "    it('Should generate query correctly with fetch config and fetchParams object', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n          fetchParams: {\n            headers: {\n              Authorization: 'Bearer XYZ',\n            },\n          },\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1]).toMatchInlineSnapshot(`\n\"\nfunction fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n  return async (): Promise<TData> => {\n    const res = await fetch(\\\\\"http://localhost:3000/graphql\\\\\", {\n    method: \\\\\"POST\\\\\",\n    ...({\\\\\"headers\\\\\":{\\\\\"Authorization\\\\\":\\\\\"Bearer XYZ\\\\\"}}),\n      body: JSON.stringify({ query, variables }),\n    });\n\n    const json = await res.json();\n\n    if (json.errors) {\n      const { message } = json.errors[0];\n\n      throw new Error(message);\n    }\n\n    return json.data;\n  }\n}\"\n`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12495,10 +12511,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 790,
+                "line": 793,
                 "column": 76
             },
-            "line": 790,
+            "line": 793,
             "code": "    it('Should generate query correctly with hardcoded endpoint from env var', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'process.env.ENDPOINT_URL',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(process.env.ENDPOINT_URL as string, {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12511,10 +12527,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 824,
+                "line": 827,
                 "column": 84
             },
-            "line": 824,
+            "line": 827,
             "code": "    it('Should generate query correctly with hardcoded endpoint from just identifier', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'myEndpoint',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(myEndpoint as string, {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12527,10 +12543,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 858,
+                "line": 861,
                 "column": 64
             },
-            "line": 858,
+            "line": 861,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'myEndpoint',\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (variables?: TestQueryVariables) => fetcher<TestQuery, TestQueryVariables>(TestDocument, variables);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12543,10 +12559,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 872,
+                "line": 875,
                 "column": 39
             },
-            "line": 872,
+            "line": 875,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n        },\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12559,11 +12575,11 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 981,
+                "line": 984,
                 "column": 52
             },
-            "line": 981,
-            "code": "    it('Should generate query and mutation correctly', async () => {\n      const config = {\n        fetcher: 'fetch',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, UseQueryOptions, useMutation, UseMutationOptions } from 'react-query';`\n      );\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        dataSource: { endpoint: string, fetchParams?: RequestInit },\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n          TError = unknown,\n          TContext = unknown\n        >(\n          dataSource: { endpoint: string, fetchParams?: RequestInit },\n          options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>\n        ) =>\n        useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n          ['test'],\n          (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables)(),\n          options\n        );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "line": 984,
+            "code": "    it('Should generate query and mutation correctly', async () => {\n      const config = {\n        fetcher: 'fetch',\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        dataSource: { endpoint: string, fetchParams?: RequestInit },\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n          TError = unknown,\n          TContext = unknown\n        >(\n          dataSource: { endpoint: string, fetchParams?: RequestInit },\n          options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>\n        ) =>\n        useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n          ['test'],\n          (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables)(),\n          options\n        );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12575,10 +12591,10 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 1024,
+                "line": 1027,
                 "column": 64
             },
-            "line": 1024,
+            "line": 1027,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables?: TestQueryVariables) => fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12591,10 +12607,10 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 1035,
+                "line": 1038,
                 "column": 39
             },
-            "line": 1035,
+            "line": 1038,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: 'fetch',\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12607,10 +12623,10 @@
                 "exposeDocument: true"
             ],
             "updatePoint": {
-                "line": 1142,
+                "line": 1145,
                 "column": 53
             },
-            "line": 1142,
+            "line": 1145,
             "code": "    it('Should generate document field for each query', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeDocument: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(`useTestQuery.document = TestDocument;`);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12623,10 +12639,10 @@
                 "exposeQueryKeys: true"
             ],
             "updatePoint": {
-                "line": 1153,
+                "line": 1156,
                 "column": 45
             },
-            "line": 1153,
+            "line": 1156,
             "code": "    it('Should generate getKey for each query', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeQueryKeys: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test'] : ['test', variables];`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12639,10 +12655,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1166,
+                "line": 1169,
                 "column": 69
             },
-            "line": 1166,
+            "line": 1169,
             "code": "    it('Should generate getKey for each query - also infinite queries', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeQueryKeys: true,\n        addInfiniteQuery: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test'] : ['test', variables];`\n      );\n      expect(out.content).toBeSimilarStringTo(\n        `useInfiniteTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test.infinite'] : ['test.infinite', variables];`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12655,10 +12671,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1182,
+                "line": 1185,
                 "column": 60
             },
-            "line": 1182,
+            "line": 1185,
             "code": "  it('Should not generate fetcher if there are no operations', async () => {\n    const out = (await plugin(schema, notOperationDocs, {})) as Types.ComplexPluginOutput;\n    expect(out.prepend).not.toBeSimilarStringTo(`function fetcher<TData, TVariables>(`);\n\n    const config = {\n      fetcher: 'graphql-request',\n    };\n\n    const outGraphqlRequest = (await plugin(schema, notOperationDocs, config)) as Types.ComplexPluginOutput;\n    expect(outGraphqlRequest.prepend).not.toContain(`import { GraphQLClient } from 'graphql-request';`);\n  });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12671,10 +12687,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1194,
+                "line": 1197,
                 "column": 44
             },
-            "line": 1194,
+            "line": 1197,
             "code": "  it('Parses process.env variables correctly', async () => {\n    const outGraphqlRequest = (await plugin(schema, docs, {\n      fetcher: {\n        endpoint: 'process.env.ENDPOINT',\n        fetchParams: `\n          {\n            headers: {\n              apiKey: process.env.APIKEY as string,\n              somethingElse: process.env.SOMETHING as string\n            },\n          }`,\n      },\n    })) as Types.ComplexPluginOutput;\n\n    expect(outGraphqlRequest.prepend).toBeSimilarStringTo(`\n    const res = await fetch(process.env.ENDPOINT as string, {\n      method: \"POST\", ...(\n                {\n                  headers: {\n                    apiKey: process.env.APIKEY as string,\n                    somethingElse: process.env.SOMETHING as string\n                  },\n                }),\n            body: JSON.stringify({ query, variables }),\n          });\n    `);\n  });",
             "file": "react-query.spec.ts",
             "skipped": false,
