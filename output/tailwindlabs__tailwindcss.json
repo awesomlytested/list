@@ -431,7 +431,39 @@
                 "index": 8750
             },
             "line": 250,
-            "code": "  test('--full', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `); // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n  });",
+            "code": "  test('--full', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `); // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n    expect(await readOutputFile('../full.config.js')).not.toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "--types",
+            "suites": [
+                "Init command"
+            ],
+            "updatePoint": {
+                "line": 266,
+                "column": 15,
+                "index": 9450
+            },
+            "line": 266,
+            "code": "  test('--types', async () => {\n    cleanupFile('simple.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init simple.config.js --types`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: simple.config.js\n      \"\n    `);\n    expect(await readOutputFile('../simple.config.js')).toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "--full --types",
+            "suites": [
+                "Init command"
+            ],
+            "updatePoint": {
+                "line": 278,
+                "column": 22,
+                "index": 9867
+            },
+            "line": 278,
+            "code": "  test('--full --types', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full --types`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `); // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n    expect(await readOutputFile('../full.config.js')).toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
             "file": "cli.test.js",
             "skipped": false,
             "dir": "integrations/tailwindcss-cli/tests"
@@ -442,11 +474,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 265,
+                "line": 294,
                 "column": 17,
-                "index": 9330
+                "index": 10573
             },
-            "line": 265,
+            "line": 294,
             "code": "  test('--postcss', async () => {\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    await removeFile('postcss.config.js');\n    expect(await fileExists('postcss.config.js')).toBe(false);\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --postcss`);\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      tailwind.config.js already exists.\n      Created PostCSS config file: postcss.config.js\n      \"\n    `);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -458,12 +490,12 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 280,
+                "line": 309,
                 "column": 14,
-                "index": 9834
+                "index": 11077
             },
-            "line": 280,
-            "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.js\\` file\n           -p, --postcss            Initialize a \\`postcss.config.js\\` file\n           -h, --help               Display usage information\n      `));\n  });",
+            "line": 309,
+            "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.js\\` file\n           -p, --postcss            Initialize a \\`postcss.config.js\\` file\n               --types              Add TypeScript types for the \\`tailwind.config.js\\` file\n           -h, --help               Display usage information\n      `));\n  });",
             "file": "cli.test.js",
             "skipped": false,
             "dir": "integrations/tailwindcss-cli/tests"
