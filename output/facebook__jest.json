@@ -11675,7 +11675,7 @@
                 "column": 45
             },
             "line": 38,
-            "code": "test('config for reporters supports `default`', async () => {\n  const undefinedReportersScheduler = await createTestScheduler(\n    {\n      reporters: undefined,\n    },\n    {},\n  );\n  const numberOfReporters =\n    undefinedReportersScheduler._dispatcher._reporters.length;\n\n  const stringDefaultReportersScheduler = await createTestScheduler(\n    {\n      reporters: ['default'],\n    },\n    {},\n  );\n  expect(stringDefaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const defaultReportersScheduler = await createTestScheduler(\n    {\n      reporters: [['default', {}]],\n    },\n    {},\n  );\n  expect(defaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const emptyReportersScheduler = await createTestScheduler(\n    {\n      reporters: [],\n    },\n    {},\n  );\n  expect(emptyReportersScheduler._dispatcher._reporters.length).toBe(0);\n});",
+            "code": "test('config for reporters supports `default`', async () => {\n  const undefinedReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: undefined,\n    }),\n    {},\n    {},\n  );\n  const numberOfReporters =\n    undefinedReportersScheduler._dispatcher._reporters.length;\n\n  const stringDefaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: ['default'],\n    }),\n    {},\n    {},\n  );\n  expect(stringDefaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const defaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['default', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(defaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const emptyReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(emptyReportersScheduler._dispatcher._reporters.length).toBe(0);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11684,11 +11684,11 @@
             "name": ".addReporter() .removeReporter()",
             "suites": [],
             "updatePoint": {
-                "line": 77,
+                "line": 81,
                 "column": 38
             },
-            "line": 77,
-            "code": "test('.addReporter() .removeReporter()', async () => {\n  const scheduler = await createTestScheduler({}, {});\n  const reporter = new SummaryReporter();\n  scheduler.addReporter(reporter);\n  expect(scheduler._dispatcher._reporters).toContain(reporter);\n  scheduler.removeReporter(SummaryReporter);\n  expect(scheduler._dispatcher._reporters).not.toContain(reporter);\n});",
+            "line": 81,
+            "code": "test('.addReporter() .removeReporter()', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const reporter = new SummaryReporter();\n  scheduler.addReporter(reporter);\n  expect(scheduler._dispatcher._reporters).toContain(reporter);\n  scheduler.removeReporter(SummaryReporter);\n  expect(scheduler._dispatcher._reporters).not.toContain(reporter);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11697,11 +11697,11 @@
             "name": "schedule tests run in parallel per default",
             "suites": [],
             "updatePoint": {
-                "line": 86,
+                "line": 90,
                 "column": 48
             },
-            "line": 86,
-            "code": "test('schedule tests run in parallel per default', async () => {\n  const scheduler = await createTestScheduler({}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
+            "line": 90,
+            "code": "test('schedule tests run in parallel per default', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11710,11 +11710,11 @@
             "name": "schedule tests run in serial if the runner flags them",
             "suites": [],
             "updatePoint": {
-                "line": 109,
+                "line": 113,
                 "column": 59
             },
-            "line": 109,
-            "code": "test('schedule tests run in serial if the runner flags them', async () => {\n  const scheduler = await createTestScheduler({}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test, test];\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockSerialRunner.runTests).toHaveBeenCalled();\n  expect(mockSerialRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
+            "line": 113,
+            "code": "test('schedule tests run in serial if the runner flags them', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test, test];\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockSerialRunner.runTests).toHaveBeenCalled();\n  expect(mockSerialRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11723,11 +11723,11 @@
             "name": "should bail after `n` failures",
             "suites": [],
             "updatePoint": {
-                "line": 132,
+                "line": 136,
                 "column": 36
             },
-            "line": 132,
-            "code": "test('should bail after `n` failures', async () => {\n  const scheduler = await createTestScheduler({bail: 2}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 2,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).toBeCalledWith({interrupted: true});\n});",
+            "line": 136,
+            "code": "test('should bail after `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 2,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).toBeCalledWith({interrupted: true});\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11736,11 +11736,11 @@
             "name": "should not bail if less than `n` failures",
             "suites": [],
             "updatePoint": {
-                "line": 164,
+                "line": 172,
                 "column": 47
             },
-            "line": 164,
-            "code": "test('should not bail if less than `n` failures', async () => {\n  const scheduler = await createTestScheduler({bail: 2}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 1,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).not.toBeCalled();\n});",
+            "line": 172,
+            "code": "test('should not bail if less than `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 1,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).not.toBeCalled();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11749,11 +11749,11 @@
             "name": "should set runInBand to run in serial",
             "suites": [],
             "updatePoint": {
-                "line": 196,
+                "line": 208,
                 "column": 43
             },
-            "line": 196,
-            "code": "test('should set runInBand to run in serial', async () => {\n  const scheduler = await createTestScheduler({}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(true);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
+            "line": 208,
+            "code": "test('should set runInBand to run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(true);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11762,11 +11762,11 @@
             "name": "should set runInBand to not run in serial",
             "suites": [],
             "updatePoint": {
-                "line": 222,
+                "line": 234,
                 "column": 47
             },
-            "line": 222,
-            "code": "test('should set runInBand to not run in serial', async () => {\n  const scheduler = await createTestScheduler({}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(false);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
+            "line": 234,
+            "code": "test('should set runInBand to not run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(false);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
