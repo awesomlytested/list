@@ -8119,15 +8119,105 @@
             "dir": "packages/jest-config/src/__tests__"
         },
         {
+            "name": "allows empty list",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 319,
+                "column": 23
+            },
+            "line": 319,
+            "code": "  it('allows empty list', async () => {\n    const {options} = await normalize(\n      {\n        reporters: [],\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.reporters).toEqual([]);\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "normalizes the path and options object",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 331,
+                "column": 44
+            },
+            "line": 331,
+            "code": "  it('normalizes the path and options object', async () => {\n    const {options} = await normalize(\n      {\n        reporters: [\n          'default',\n          'github-actions',\n          '<rootDir>/custom-reporter.js',\n          ['<rootDir>/custom-reporter.js', {banana: 'yes', pineapple: 'no'}],\n          ['jest-junit', {outputName: 'report.xml'}],\n        ],\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.reporters).toEqual([\n      ['default', {}],\n      ['github-actions', {}],\n      ['/root/custom-reporter.js', {}],\n      ['/root/custom-reporter.js', {banana: 'yes', pineapple: 'no'}],\n      ['jest-junit', {outputName: 'report.xml'}],\n    ]);\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "throws an error if value is neither string nor array",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 355,
+                "column": 58
+            },
+            "line": 355,
+            "code": "  it('throws an error if value is neither string nor array', async () => {\n    expect.assertions(1);\n    await expect(\n      normalize(\n        {\n          reporters: [123],\n          rootDir: '/root/',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "throws an error if first value in the tuple is not a string",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 368,
+                "column": 65
+            },
+            "line": 368,
+            "code": "  it('throws an error if first value in the tuple is not a string', async () => {\n    expect.assertions(1);\n    await expect(\n      normalize(\n        {\n          reporters: [[123]],\n          rootDir: '/root/',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "throws an error if second value is missing in the tuple",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 381,
+                "column": 61
+            },
+            "line": 381,
+            "code": "  it('throws an error if second value is missing in the tuple', async () => {\n    expect.assertions(1);\n    await expect(\n      normalize(\n        {\n          reporters: [['some-reporter']],\n          rootDir: '/root/',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "throws an error if second value in the tuple is not an object",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 394,
+                "column": 67
+            },
+            "line": 394,
+            "code": "  it('throws an error if second value in the tuple is not an object', async () => {\n    expect.assertions(1);\n    await expect(\n      normalize(\n        {\n          reporters: [['some-reporter', true]],\n          rootDir: '/root/',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
             "name": "normalizes the path",
             "suites": [
                 "transform"
             ],
             "updatePoint": {
-                "line": 319,
+                "line": 415,
                 "column": 25
             },
-            "line": 319,
+            "line": 415,
             "code": "  it('normalizes the path', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        transform: {\n          [DEFAULT_CSS_PATTERN]: '<rootDir>/node_modules/jest-regex-util',\n          [DEFAULT_JS_PATTERN]: 'babel-jest',\n          'abs-path': '/qux/quux',\n        },\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.transform).toEqual([\n      [DEFAULT_CSS_PATTERN, '/root/node_modules/jest-regex-util', {}],\n      [DEFAULT_JS_PATTERN, require.resolve('babel-jest'), {}],\n      ['abs-path', '/qux/quux', {}],\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8139,10 +8229,10 @@
                 "transform"
             ],
             "updatePoint": {
-                "line": 338,
+                "line": 434,
                 "column": 78
             },
-            "line": 338,
+            "line": 434,
             "code": "  it(\"pulls in config if it's passed as an array, and defaults to empty object\", async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        transform: {\n          [DEFAULT_CSS_PATTERN]: '<rootDir>/node_modules/jest-regex-util',\n          [DEFAULT_JS_PATTERN]: ['babel-jest', {rootMode: 'upward'}],\n          'abs-path': '/qux/quux',\n        },\n      },\n      {} as Config.Argv,\n    );\n    expect(options.transform).toEqual([\n      [DEFAULT_CSS_PATTERN, '/root/node_modules/jest-regex-util', {}],\n      [DEFAULT_JS_PATTERN, require.resolve('babel-jest'), {rootMode: 'upward'}],\n      ['abs-path', '/qux/quux', {}],\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8154,10 +8244,10 @@
                 "haste"
             ],
             "updatePoint": {
-                "line": 365,
+                "line": 461,
                 "column": 49
             },
-            "line": 365,
+            "line": 461,
             "code": "  it('normalizes the path for hasteImplModulePath', async () => {\n    const {options} = await normalize(\n      {\n        haste: {\n          hasteImplModulePath: '<rootDir>/haste_impl.js',\n        },\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.haste).toEqual({\n      hasteImplModulePath: '/root/haste_impl.js',\n    });\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8169,10 +8259,10 @@
                 "setupFilesAfterEnv"
             ],
             "updatePoint": {
-                "line": 391,
+                "line": 487,
                 "column": 46
             },
-            "line": 391,
+            "line": 487,
             "code": "  it('normalizes the path according to rootDir', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        setupFilesAfterEnv: ['bar/baz'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.setupFilesAfterEnv).toEqual([expectedPathFooBar]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8184,10 +8274,10 @@
                 "setupFilesAfterEnv"
             ],
             "updatePoint": {
-                "line": 403,
+                "line": 499,
                 "column": 36
             },
-            "line": 403,
+            "line": 499,
             "code": "  it('does not change absolute paths', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        setupFilesAfterEnv: ['/an/abs/path'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.setupFilesAfterEnv).toEqual([expectedPathAbs]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8199,10 +8289,10 @@
                 "setupFilesAfterEnv"
             ],
             "updatePoint": {
-                "line": 415,
+                "line": 511,
                 "column": 34
             },
-            "line": 415,
+            "line": 511,
             "code": "  it('substitutes <rootDir> tokens', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        setupFilesAfterEnv: ['<rootDir>/bar/baz'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.setupFilesAfterEnv).toEqual([expectedPathFooBar]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8214,10 +8304,10 @@
                 "setupTestFrameworkScriptFile"
             ],
             "updatePoint": {
-                "line": 439,
+                "line": 535,
                 "column": 76
             },
-            "line": 439,
+            "line": 535,
             "code": "  it('logs a deprecation warning when `setupTestFrameworkScriptFile` is used', async () => {\n    await normalize(\n      {\n        rootDir: '/root/path/foo',\n        setupTestFrameworkScriptFile: 'bar/baz',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(\n      (console.warn as unknown as jest.SpyInstance).mock.calls[0][0],\n    ).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8229,10 +8319,10 @@
                 "setupTestFrameworkScriptFile"
             ],
             "updatePoint": {
-                "line": 453,
+                "line": 549,
                 "column": 89
             },
-            "line": 453,
+            "line": 549,
             "code": "  it('logs an error when `setupTestFrameworkScriptFile` and `setupFilesAfterEnv` are used', async () => {\n    await expect(\n      normalize(\n        {\n          rootDir: '/root/path/foo',\n          setupFilesAfterEnv: ['bar/baz'],\n          setupTestFrameworkScriptFile: 'bar/baz',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8244,10 +8334,10 @@
                 "coveragePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 468,
+                "line": 564,
                 "column": 50
             },
-            "line": 468,
+            "line": 564,
             "code": "  it('does not normalize paths relative to rootDir', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        coveragePathIgnorePatterns: ['bar/baz', 'qux/quux'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.coveragePathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8259,10 +8349,10 @@
                 "coveragePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 485,
+                "line": 581,
                 "column": 41
             },
-            "line": 485,
+            "line": 581,
             "code": "  it('does not normalize trailing slashes', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        coveragePathIgnorePatterns: ['bar/baz', 'qux/quux/'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.coveragePathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux', ''),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8274,10 +8364,10 @@
                 "coveragePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 502,
+                "line": 598,
                 "column": 34
             },
-            "line": 502,
+            "line": 598,
             "code": "  it('substitutes <rootDir> tokens', async () => {\n    const {options} = await normalize(\n      {\n        coveragePathIgnorePatterns: ['hasNoToken', '<rootDir>/hasAToken'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.coveragePathIgnorePatterns).toEqual([\n      'hasNoToken',\n      joinForPattern('', 'root', 'path', 'foo', 'hasAToken'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8289,10 +8379,10 @@
                 "watchPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 519,
+                "line": 615,
                 "column": 50
             },
-            "line": 519,
+            "line": 615,
             "code": "  it('does not normalize paths relative to rootDir', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        watchPathIgnorePatterns: ['bar/baz', 'qux/quux'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8304,10 +8394,10 @@
                 "watchPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 536,
+                "line": 632,
                 "column": 41
             },
-            "line": 536,
+            "line": 632,
             "code": "  it('does not normalize trailing slashes', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        watchPathIgnorePatterns: ['bar/baz', 'qux/quux/'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux', ''),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8319,10 +8409,10 @@
                 "watchPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 553,
+                "line": 649,
                 "column": 34
             },
-            "line": 553,
+            "line": 649,
             "code": "  it('substitutes <rootDir> tokens', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        watchPathIgnorePatterns: ['hasNoToken', '<rootDir>/hasAToken'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPathIgnorePatterns).toEqual([\n      'hasNoToken',\n      joinForPattern('', 'root', 'path', 'foo', 'hasAToken'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8334,10 +8424,10 @@
                 "testPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 570,
+                "line": 666,
                 "column": 50
             },
-            "line": 570,
+            "line": 666,
             "code": "  it('does not normalize paths relative to rootDir', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        testPathIgnorePatterns: ['bar/baz', 'qux/quux'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testPathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8349,10 +8439,10 @@
                 "testPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 587,
+                "line": 683,
                 "column": 41
             },
-            "line": 587,
+            "line": 683,
             "code": "  it('does not normalize trailing slashes', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        testPathIgnorePatterns: ['bar/baz', 'qux/quux/'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testPathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux', ''),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8364,10 +8454,10 @@
                 "testPathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 604,
+                "line": 700,
                 "column": 34
             },
-            "line": 604,
+            "line": 700,
             "code": "  it('substitutes <rootDir> tokens', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n        testPathIgnorePatterns: ['hasNoToken', '<rootDir>/hasAToken'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testPathIgnorePatterns).toEqual([\n      'hasNoToken',\n      joinForPattern('', 'root', 'path', 'foo', 'hasAToken'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8379,10 +8469,10 @@
                 "modulePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 621,
+                "line": 717,
                 "column": 50
             },
-            "line": 621,
+            "line": 717,
             "code": "  it('does not normalize paths relative to rootDir', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        modulePathIgnorePatterns: ['bar/baz', 'qux/quux'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.modulePathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8394,10 +8484,10 @@
                 "modulePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 638,
+                "line": 734,
                 "column": 41
             },
-            "line": 638,
+            "line": 734,
             "code": "  it('does not normalize trailing slashes', async () => {\n    // This is a list of patterns, so we can't assume any of them are\n    // directories\n    const {options} = await normalize(\n      {\n        modulePathIgnorePatterns: ['bar/baz', 'qux/quux/'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.modulePathIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux', ''),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8409,10 +8499,10 @@
                 "modulePathIgnorePatterns"
             ],
             "updatePoint": {
-                "line": 655,
+                "line": 751,
                 "column": 34
             },
-            "line": 655,
+            "line": 751,
             "code": "  it('substitutes <rootDir> tokens', async () => {\n    const {options} = await normalize(\n      {\n        modulePathIgnorePatterns: ['hasNoToken', '<rootDir>/hasAToken'],\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.modulePathIgnorePatterns).toEqual([\n      'hasNoToken',\n      joinForPattern('', 'root', 'path', 'foo', 'hasAToken'),\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8424,10 +8514,10 @@
                 "testRunner"
             ],
             "updatePoint": {
-                "line": 672,
+                "line": 768,
                 "column": 24
             },
-            "line": 672,
+            "line": 768,
             "code": "  it('defaults to Circus', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testRunner).toMatch('jest-circus');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8439,10 +8529,10 @@
                 "testRunner"
             ],
             "updatePoint": {
-                "line": 683,
+                "line": 779,
                 "column": 22
             },
-            "line": 683,
+            "line": 779,
             "code": "  it('resolves jasmine', async () => {\n    const Resolver = require('jest-resolve').default;\n    Resolver.findNodeModule = jest.fn(name => name);\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n      },\n      {\n        testRunner: 'jasmine2',\n      } as Config.Argv,\n    );\n\n    expect(options.testRunner).toMatch('jest-jasmine2');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8454,10 +8544,10 @@
                 "testRunner"
             ],
             "updatePoint": {
-                "line": 698,
+                "line": 794,
                 "column": 28
             },
-            "line": 698,
+            "line": 794,
             "code": "  it('is overwritten by argv', async () => {\n    const Resolver = require('jest-resolve').default;\n    Resolver.findNodeModule = jest.fn(name => name);\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n      },\n      {\n        testRunner: 'mocha',\n      } as Config.Argv,\n    );\n\n    expect(options.testRunner).toBe('mocha');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8469,10 +8559,10 @@
                 "coverageDirectory"
             ],
             "updatePoint": {
-                "line": 715,
+                "line": 811,
                 "column": 36
             },
-            "line": 715,
+            "line": 811,
             "code": "  it('defaults to <rootDir>/coverage', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.coverageDirectory).toBe('/root/path/foo/coverage');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8484,10 +8574,10 @@
                 "testEnvironment"
             ],
             "updatePoint": {
-                "line": 742,
+                "line": 838,
                 "column": 68
             },
-            "line": 742,
+            "line": 838,
             "code": "  it('resolves to an environment and prefers jest-environment-`name`', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testEnvironment: 'jsdom',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testEnvironment).toEqual(\n      'node_modules/jest-environment-jsdom',\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8499,10 +8589,10 @@
                 "testEnvironment"
             ],
             "updatePoint": {
-                "line": 756,
+                "line": 852,
                 "column": 45
             },
-            "line": 756,
+            "line": 852,
             "code": "  it('resolves to node environment by default', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testEnvironment).toEqual(\n      require.resolve('jest-environment-node'),\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8514,10 +8604,10 @@
                 "testEnvironment"
             ],
             "updatePoint": {
-                "line": 769,
+                "line": 865,
                 "column": 41
             },
-            "line": 769,
+            "line": 865,
             "code": "  it('throws on invalid environment names', async () => {\n    await expect(\n      normalize(\n        {\n          rootDir: '/root',\n          testEnvironment: 'phantom',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8529,10 +8619,10 @@
                 "testEnvironment"
             ],
             "updatePoint": {
-                "line": 781,
+                "line": 877,
                 "column": 24
             },
-            "line": 781,
+            "line": 877,
             "code": "  it('works with rootDir', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testEnvironment: '<rootDir>/testEnvironment.js',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testEnvironment).toEqual('/root/testEnvironment.js');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8544,10 +8634,10 @@
                 "babel-jest"
             ],
             "updatePoint": {
-                "line": 805,
+                "line": 901,
                 "column": 46
             },
-            "line": 805,
+            "line": 901,
             "code": "  it('correctly identifies and uses babel-jest', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.transform[0][0]).toBe(DEFAULT_JS_PATTERN);\n    expect(options.transform[0][1]).toEqual(require.resolve('babel-jest'));\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8559,10 +8649,10 @@
                 "babel-jest"
             ],
             "updatePoint": {
-                "line": 817,
+                "line": 913,
                 "column": 89
             },
-            "line": 817,
+            "line": 913,
             "code": "  it('uses babel-jest if babel-jest is explicitly specified in a custom transform options', async () => {\n    const customJSPattern = '\\\\.js$';\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        transform: {\n          [customJSPattern]: 'babel-jest',\n        },\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.transform[0][0]).toBe(customJSPattern);\n    expect(options.transform[0][1]).toEqual(require.resolve('babel-jest'));\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8574,10 +8664,10 @@
                 "Upgrade help"
             ],
             "updatePoint": {
-                "line": 847,
+                "line": 943,
                 "column": 91
             },
-            "line": 847,
+            "line": 943,
             "code": "  it('logs a warning when `scriptPreprocessor` and/or `preprocessorIgnorePatterns` are used', async () => {\n    const {options: options, hasDeprecationWarnings} = await normalize(\n      {\n        preprocessorIgnorePatterns: ['bar/baz', 'qux/quux'],\n        rootDir: '/root/path/foo',\n        scriptPreprocessor: 'bar/baz',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.transform).toEqual([['.*', '/node_modules/bar/baz', {}]]);\n    expect(options.transformIgnorePatterns).toEqual([\n      joinForPattern('bar', 'baz'),\n      joinForPattern('qux', 'quux'),\n    ]);\n\n    expect(options).not.toHaveProperty('scriptPreprocessor');\n    expect(options).not.toHaveProperty('preprocessorIgnorePatterns');\n    expect(hasDeprecationWarnings).toBeTruthy();\n\n    expect(\n      (console.warn as unknown as jest.SpyInstance).mock.calls[0][0],\n    ).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8589,10 +8679,10 @@
                 "testRegex"
             ],
             "updatePoint": {
-                "line": 874,
+                "line": 970,
                 "column": 53
             },
-            "line": 874,
+            "line": 970,
             "code": "  it('testRegex empty string is mapped to empty array', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testRegex: '',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testRegex).toEqual([]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8604,10 +8694,10 @@
                 "testRegex"
             ],
             "updatePoint": {
-                "line": 885,
+                "line": 981,
                 "column": 44
             },
-            "line": 885,
+            "line": 981,
             "code": "  it('testRegex string is mapped to an array', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testRegex: '.*',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testRegex).toEqual(['.*']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8619,10 +8709,10 @@
                 "testRegex"
             ],
             "updatePoint": {
-                "line": 896,
+                "line": 992,
                 "column": 34
             },
-            "line": 896,
+            "line": 992,
             "code": "  it('testRegex array is preserved', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testRegex: ['.*', 'foo\\\\.bar'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testRegex).toEqual(['.*', 'foo\\\\.bar']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8634,10 +8724,10 @@
                 "testMatch"
             ],
             "updatePoint": {
-                "line": 910,
+                "line": 1006,
                 "column": 55
             },
-            "line": 910,
+            "line": 1006,
             "code": "  it('testMatch default not applied if testRegex is set', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testRegex: '.*',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testMatch.length).toBe(0);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8649,10 +8739,10 @@
                 "testMatch"
             ],
             "updatePoint": {
-                "line": 922,
+                "line": 1018,
                 "column": 55
             },
-            "line": 922,
+            "line": 1018,
             "code": "  it('testRegex default not applied if testMatch is set', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testMatch: ['**/*.js'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testRegex).toEqual([]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8664,10 +8754,10 @@
                 "testMatch"
             ],
             "updatePoint": {
-                "line": 934,
+                "line": 1030,
                 "column": 58
             },
-            "line": 934,
+            "line": 1030,
             "code": "  it('throws if testRegex and testMatch are both specified', async () => {\n    await expect(\n      normalize(\n        {\n          rootDir: '/root',\n          testMatch: ['**/*.js'],\n          testRegex: '.*',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8679,10 +8769,10 @@
                 "testMatch"
             ],
             "updatePoint": {
-                "line": 947,
+                "line": 1043,
                 "column": 26
             },
-            "line": 947,
+            "line": 1043,
             "code": "  it('normalizes testMatch', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root',\n        testMatch: ['<rootDir>/**/*.js'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.testMatch).toEqual(['/root/**/*.js']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8694,10 +8784,10 @@
                 "moduleDirectories"
             ],
             "updatePoint": {
-                "line": 961,
+                "line": 1057,
                 "column": 30
             },
-            "line": 961,
+            "line": 1057,
             "code": "  it('defaults to node_modules', async () => {\n    const {options} = await normalize({rootDir: '/root'}, {} as Config.Argv);\n\n    expect(options.moduleDirectories).toEqual(['node_modules']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8709,10 +8799,10 @@
                 "moduleDirectories"
             ],
             "updatePoint": {
-                "line": 967,
+                "line": 1063,
                 "column": 34
             },
-            "line": 967,
+            "line": 1063,
             "code": "  it('normalizes moduleDirectories', async () => {\n    const {options} = await normalize(\n      {\n        moduleDirectories: ['<rootDir>/src', '<rootDir>/node_modules'],\n        rootDir: '/root',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.moduleDirectories).toEqual([\n      '/root/src',\n      '/root/node_modules',\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8724,10 +8814,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1056,
+                "line": 1152,
                 "column": 36
             },
-            "line": 1056,
+            "line": 1152,
             "code": "  test('throws when preset not found', async () => {\n    await expect(\n      normalize(\n        {\n          preset: 'doesnt-exist',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8739,10 +8829,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1068,
+                "line": 1164,
                 "column": 88
             },
-            "line": 1068,
+            "line": 1164,
             "code": "  test('throws when module was found but no \"jest-preset.js\" or \"jest-preset.json\" files', async () => {\n    await expect(\n      normalize(\n        {\n          preset: 'exist-but-no-jest-preset',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8754,10 +8844,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1080,
+                "line": 1176,
                 "column": 57
             },
-            "line": 1080,
+            "line": 1176,
             "code": "  test('throws when a dependency is missing in the preset', async () => {\n    jest.doMock(\n      '/node_modules/react-native-js-preset/jest-preset.js',\n      () => {\n        require('library-that-is-not-installed');\n        return {\n          transform: {} as Config.Argv,\n        };\n      },\n      {virtual: true},\n    );\n\n    await expect(\n      normalize(\n        {\n          preset: 'react-native-js-preset',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowError(\n      /Cannot find module 'library-that-is-not-installed'/,\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8769,10 +8859,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1105,
+                "line": 1201,
                 "column": 37
             },
-            "line": 1105,
+            "line": 1201,
             "code": "  test('throws when preset is invalid', async () => {\n    jest.doMock('/node_modules/react-native/jest-preset.json', () =>\n      jest.requireActual('./jest-preset.json'),\n    );\n\n    await expect(\n      normalize(\n        {\n          preset: 'react-native',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowError(\n      /Unexpected token } in JSON at position (104|110)[\\s\\S]* at /,\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8784,10 +8874,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1123,
+                "line": 1219,
                 "column": 55
             },
-            "line": 1123,
+            "line": 1219,
             "code": "  test('throws when preset evaluation throws type error', async () => {\n    jest.doMock(\n      '/node_modules/react-native-js-preset/jest-preset.js',\n      () => ({\n        transform: {}.nonExistingProp.call(),\n      }),\n      {virtual: true},\n    );\n\n    const errorMessage = semver.satisfies(process.versions.node, '>=16.9.1')\n      ? \"TypeError: Cannot read properties of undefined (reading 'call')\"\n      : /TypeError: Cannot read property 'call' of undefined[\\s\\S]* at /;\n\n    await expect(\n      normalize(\n        {\n          preset: 'react-native-js-preset',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowError(errorMessage);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8799,10 +8889,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1147,
+                "line": 1243,
                 "column": 33
             },
-            "line": 1147,
+            "line": 1243,
             "code": "  test('works with \"react-native\"', async () => {\n    await expect(\n      normalize(\n        {\n          preset: 'react-native',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).resolves.not.toThrow();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8813,7 +8903,7 @@
             "suites": [
                 "preset"
             ],
-            "line": 1159,
+            "line": 1255,
             "code": "  test.each(['react-native-js-preset', 'cjs-preset'])(\n    'works with cjs preset',\n    async presetName => {\n      await expect(\n        normalize(\n          {\n            preset: presetName,\n            rootDir: '/root/path/foo',\n          },\n          {} as Config.Argv,\n        ),\n      ).resolves.not.toThrow();\n    },\n  );",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8825,10 +8915,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1174,
+                "line": 1270,
                 "column": 29
             },
-            "line": 1174,
+            "line": 1270,
             "code": "  test('works with esm preset', async () => {\n    await expect(\n      normalize(\n        {\n          preset: 'mjs-preset',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      ),\n    ).resolves.not.toThrow();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8840,10 +8930,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1186,
+                "line": 1282,
                 "column": 56
             },
-            "line": 1186,
+            "line": 1282,
             "code": "  test('searches for .json, .js, .cjs, .mjs preset files', async () => {\n    const Resolver = require('jest-resolve').default;\n\n    await normalize(\n      {\n        preset: 'react-native',\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    const options = Resolver.findNodeModule.mock.calls[0][1];\n    expect(options.extensions).toEqual(['.json', '.js', '.cjs', '.mjs']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8855,10 +8945,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1201,
+                "line": 1297,
                 "column": 27
             },
-            "line": 1201,
+            "line": 1297,
             "code": "  test('merges with options', async () => {\n    const {options} = await normalize(\n      {\n        moduleNameMapper: {a: 'a'},\n        modulePathIgnorePatterns: ['a'],\n        preset: 'react-native',\n        rootDir: '/root/path/foo',\n        setupFiles: ['a'],\n        setupFilesAfterEnv: ['a'],\n        transform: {a: 'a'},\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.moduleNameMapper).toEqual([\n      ['a', 'a'],\n      ['b', 'b'],\n    ]);\n    expect(options.modulePathIgnorePatterns).toEqual(['b', 'a']);\n    expect(options.setupFiles.sort()).toEqual([\n      '/node_modules/a',\n      '/node_modules/b',\n    ]);\n    expect(options.setupFilesAfterEnv.sort()).toEqual([\n      '/node_modules/a',\n      '/node_modules/b',\n    ]);\n    expect(options.transform).toEqual([\n      ['a', '/node_modules/a', {}],\n      ['b', '/node_modules/b', {}],\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8870,10 +8960,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1234,
+                "line": 1330,
                 "column": 80
             },
-            "line": 1234,
+            "line": 1330,
             "code": "  test('merges with options and moduleNameMapper preset is overridden by options', async () => {\n    // Object initializer not used for properties as a workaround for\n    //  sort-keys eslint rule while specifying properties in\n    //  non-alphabetical order for a better test\n    const moduleNameMapper = {} as Record<string, string>;\n    moduleNameMapper.e = 'ee';\n    moduleNameMapper.b = 'bb';\n    moduleNameMapper.c = 'cc';\n    moduleNameMapper.a = 'aa';\n    const {options} = await normalize(\n      {\n        moduleNameMapper,\n        preset: 'react-native',\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.moduleNameMapper).toEqual([\n      ['e', 'ee'],\n      ['b', 'bb'],\n      ['c', 'cc'],\n      ['a', 'aa'],\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8885,10 +8975,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1260,
+                "line": 1356,
                 "column": 73
             },
-            "line": 1260,
+            "line": 1356,
             "code": "  test('merges with options and transform preset is overridden by options', async () => {\n    /* eslint-disable sort-keys */\n    const transform = {\n      e: 'ee',\n      b: 'bb',\n      c: 'cc',\n      a: 'aa',\n    };\n    /* eslint-enable */\n    const {options} = await normalize(\n      {\n        preset: 'react-native',\n        rootDir: '/root/path/foo',\n        transform,\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.transform).toEqual([\n      ['e', '/node_modules/ee', {}],\n      ['b', '/node_modules/bb', {}],\n      ['c', '/node_modules/cc', {}],\n      ['a', '/node_modules/aa', {}],\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8900,10 +8990,10 @@
                 "preset"
             ],
             "updatePoint": {
-                "line": 1286,
+                "line": 1382,
                 "column": 47
             },
-            "line": 1286,
+            "line": 1382,
             "code": "  test('extracts setupFilesAfterEnv from preset', async () => {\n    const {options} = await normalize(\n      {\n        preset: 'react-native',\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.setupFilesAfterEnv).toEqual(['/node_modules/b']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8915,10 +9005,10 @@
                 "preset with globals"
             ],
             "updatePoint": {
-                "line": 1328,
+                "line": 1424,
                 "column": 49
             },
-            "line": 1328,
+            "line": 1424,
             "code": "  test('should merge the globals preset correctly', async () => {\n    const {options} = await normalize(\n      {\n        globals: {\n          __DEV__: true,\n          config: {\n            sideBySide: 'This should also live another day',\n          },\n          myString: 'hello sunshine',\n          textValue: 'This is just text',\n        },\n        preset: 'global-foo',\n        rootDir: '/root/path/foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.globals).toEqual({\n      __DEV__: true,\n      config: {\n        hereToStay: 'This should stay here',\n        sideBySide: 'This should also live another day',\n      },\n      myString: 'hello sunshine',\n      textValue: 'This is just text',\n    });\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8929,7 +9019,7 @@
             "suites": [
                 "preset with globals"
             ],
-            "line": 1357,
+            "line": 1453,
             "code": "describe.each(['setupFiles', 'setupFilesAfterEnv'])(\n  'preset without %s',\n  configKey => {\n    let Resolver;\n    beforeEach(() => {\n      Resolver = require('jest-resolve').default;\n      Resolver.findNodeModule = jest.fn(\n        name => `${path.sep}node_modules${path.sep}${name}`,\n      );\n    });\n\n    beforeAll(() => {\n      jest.doMock(\n        '/node_modules/react-foo/jest-preset',\n        () => ({\n          moduleNameMapper: {b: 'b'},\n          modulePathIgnorePatterns: ['b'],\n        }),\n        {virtual: true},\n      );\n    });\n\n    afterAll(() => {\n      jest.dontMock('/node_modules/react-foo/jest-preset');\n    });\n\n    it(`should normalize ${configKey} correctly`, async () => {\n      const {options} = await normalize(\n        {\n          [configKey]: ['a'],\n          preset: 'react-foo',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      );\n\n      expect(options).toEqual(\n        expect.objectContaining({[configKey]: ['/node_modules/a']}),\n      );\n    });\n  },\n);",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8941,10 +9031,10 @@
                 "preset with globals"
             ],
             "updatePoint": {
-                "line": 1383,
+                "line": 1479,
                 "column": 47
             },
-            "line": 1383,
+            "line": 1479,
             "code": "    it(`should normalize ${configKey} correctly`, async () => {\n      const {options} = await normalize(\n        {\n          [configKey]: ['a'],\n          preset: 'react-foo',\n          rootDir: '/root/path/foo',\n        },\n        {} as Config.Argv,\n      );\n\n      expect(options).toEqual(\n        expect.objectContaining({[configKey]: ['/node_modules/a']}),\n      );\n    });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8956,10 +9046,10 @@
                 "runner"
             ],
             "updatePoint": {
-                "line": 1415,
+                "line": 1511,
                 "column": 31
             },
-            "line": 1415,
+            "line": 1511,
             "code": "  it('defaults to `jest-runner`', async () => {\n    const {options} = await normalize({rootDir: '/root'}, {} as Config.Argv);\n\n    expect(options.runner).toBe(require.resolve('jest-runner'));\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8971,10 +9061,10 @@
                 "runner"
             ],
             "updatePoint": {
-                "line": 1421,
+                "line": 1517,
                 "column": 53
             },
-            "line": 1421,
+            "line": 1517,
             "code": "  it('resolves to runners that do not have the prefix', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        runner: 'my-runner-foo',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.runner).toBe('node_modules/my-runner-foo');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -8986,10 +9076,10 @@
                 "runner"
             ],
             "updatePoint": {
-                "line": 1433,
+                "line": 1529,
                 "column": 56
             },
-            "line": 1433,
+            "line": 1529,
             "code": "  it('resolves to runners and prefers jest-runner-`name`', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        runner: 'eslint',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.runner).toBe('node_modules/jest-runner-eslint');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9001,10 +9091,10 @@
                 "runner"
             ],
             "updatePoint": {
-                "line": 1445,
+                "line": 1541,
                 "column": 44
             },
-            "line": 1445,
+            "line": 1541,
             "code": "  it('throw error when a runner is not found', async () => {\n    await expect(\n      normalize(\n        {\n          rootDir: '/root/',\n          runner: 'missing-runner',\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9016,10 +9106,10 @@
                 "watchPlugins"
             ],
             "updatePoint": {
-                "line": 1476,
+                "line": 1572,
                 "column": 27
             },
-            "line": 1476,
+            "line": 1572,
             "code": "  it('defaults to undefined', async () => {\n    const {options} = await normalize({rootDir: '/root'}, {} as Config.Argv);\n\n    expect(options.watchPlugins).toEqual(undefined);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9031,10 +9121,10 @@
                 "watchPlugins"
             ],
             "updatePoint": {
-                "line": 1482,
+                "line": 1578,
                 "column": 61
             },
-            "line": 1482,
+            "line": 1578,
             "code": "  it('resolves to watch plugins and prefers jest-watch-`name`', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        watchPlugins: ['typeahead'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPlugins).toEqual([\n      {config: {} as Config.Argv, path: 'node_modules/jest-watch-typeahead'},\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9046,10 +9136,10 @@
                 "watchPlugins"
             ],
             "updatePoint": {
-                "line": 1496,
+                "line": 1592,
                 "column": 56
             },
-            "line": 1496,
+            "line": 1592,
             "code": "  it('resolves watch plugins that do not have the prefix', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        watchPlugins: ['my-watch-plugin'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPlugins).toEqual([\n      {config: {} as Config.Argv, path: 'node_modules/my-watch-plugin'},\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9061,10 +9151,10 @@
                 "watchPlugins"
             ],
             "updatePoint": {
-                "line": 1510,
+                "line": 1606,
                 "column": 38
             },
-            "line": 1510,
+            "line": 1606,
             "code": "  it('normalizes multiple watchPlugins', async () => {\n    const {options} = await normalize(\n      {\n        rootDir: '/root/',\n        watchPlugins: ['jest-watch-typeahead', '<rootDir>/path/to/plugin'],\n      },\n      {} as Config.Argv,\n    );\n\n    expect(options.watchPlugins).toEqual([\n      {config: {} as Config.Argv, path: 'node_modules/jest-watch-typeahead'},\n      {config: {} as Config.Argv, path: '/root/path/to/plugin'},\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9076,10 +9166,10 @@
                 "watchPlugins"
             ],
             "updatePoint": {
-                "line": 1525,
+                "line": 1621,
                 "column": 50
             },
-            "line": 1525,
+            "line": 1621,
             "code": "  it('throw error when a watch plugin is not found', async () => {\n    await expect(\n      normalize(\n        {\n          rootDir: '/root/',\n          watchPlugins: ['missing-plugin'],\n        },\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9091,10 +9181,10 @@
                 "testPathPattern"
             ],
             "updatePoint": {
-                "line": 1550,
+                "line": 1646,
                 "column": 23
             },
-            "line": 1550,
+            "line": 1646,
             "code": "  it('defaults to empty', async () => {\n    const {options} = await normalize(initialOptions, {} as Config.Argv);\n\n    expect(options.testPathPattern).toBe('');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9106,10 +9196,10 @@
                 "testPathPattern"
             ],
             "updatePoint": {
-                "line": 1562,
+                "line": 1658,
                 "column": 33
             },
-            "line": 1562,
+            "line": 1658,
             "code": "      it(`uses ${opt.name} if set`, async () => {\n        const argv = {[opt.property]: ['a/b']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b');\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9121,10 +9211,10 @@
                 "testPathPattern"
             ],
             "updatePoint": {
-                "line": 1569,
+                "line": 1665,
                 "column": 64
             },
-            "line": 1569,
+            "line": 1665,
             "code": "      it('ignores invalid regular expressions and logs a warning', async () => {\n        const argv = {[opt.property]: ['a(']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('');\n        expect(\n          (console.log as unknown as jest.SpyInstance).mock.calls[0][0],\n        ).toMatchSnapshot();\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9136,10 +9226,10 @@
                 "testPathPattern"
             ],
             "updatePoint": {
-                "line": 1579,
+                "line": 1675,
                 "column": 43
             },
-            "line": 1579,
+            "line": 1675,
             "code": "      it(`joins multiple ${opt.name} if set`, async () => {\n        const argv = {[opt.property]: ['a/b', 'c/d']} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('a/b|c/d');\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9151,10 +9241,10 @@
                 "testPathPattern"
             ],
             "updatePoint": {
-                "line": 1586,
+                "line": 1682,
                 "column": 41
             },
-            "line": 1586,
+            "line": 1682,
             "code": "      it('coerces all patterns to strings', async () => {\n        const argv = {[opt.property]: [1]} as Config.Argv;\n        const {options} = await normalize(initialOptions, argv);\n\n        expect(options.testPathPattern).toBe('1');\n      });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9167,10 +9257,10 @@
                 "posix"
             ],
             "updatePoint": {
-                "line": 1594,
+                "line": 1690,
                 "column": 41
             },
-            "line": 1594,
+            "line": 1690,
             "code": "        it('should not escape the pattern', async () => {\n          const argv = {\n            [opt.property]: ['a\\\\/b', 'a/b', 'a\\\\b', 'a\\\\\\\\b'],\n          } as Config.Argv;\n          const {options} = await normalize(initialOptions, argv);\n\n          expect(options.testPathPattern).toBe('a\\\\/b|a/b|a\\\\b|a\\\\\\\\b');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9183,10 +9273,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1614,
+                "line": 1710,
                 "column": 37
             },
-            "line": 1614,
+            "line": 1710,
             "code": "        it('preserves any use of \"\\\\\"', async () => {\n          const argv = {[opt.property]: ['a\\\\b', 'c\\\\\\\\d']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\b|c\\\\\\\\d');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9199,10 +9289,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1624,
+                "line": 1720,
                 "column": 42
             },
-            "line": 1624,
+            "line": 1720,
             "code": "        it('replaces POSIX path separators', async () => {\n          const argv = {[opt.property]: ['a/b']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\\\\\b');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9215,10 +9305,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1634,
+                "line": 1730,
                 "column": 49
             },
-            "line": 1634,
+            "line": 1730,
             "code": "        it('replaces POSIX paths in multiple args', async () => {\n          const argv = {[opt.property]: ['a/b', 'c/d']};\n          const {options} = await require('../normalize').default(\n            initialOptions,\n            argv,\n          );\n\n          expect(options.testPathPattern).toBe('a\\\\\\\\b|c\\\\\\\\d');\n        });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9231,10 +9321,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1647,
+                "line": 1743,
                 "column": 63
             },
-            "line": 1647,
+            "line": 1743,
             "code": "  it('joins multiple --testPathPatterns and <regexForTestFiles>', async () => {\n    const {options} = await normalize(initialOptions, {\n      _: ['a', 'b'],\n      testPathPattern: ['c', 'd'],\n    } as Config.Argv);\n    expect(options.testPathPattern).toBe('a|b|c|d');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9247,10 +9337,10 @@
                 "win32"
             ],
             "updatePoint": {
-                "line": 1655,
+                "line": 1751,
                 "column": 31
             },
-            "line": 1655,
+            "line": 1751,
             "code": "  it('gives precedence to --all', async () => {\n    const {options} = await normalize(initialOptions, {\n      all: true,\n      onlyChanged: true,\n    } as Config.Argv);\n\n    expect(options.onlyChanged).toBe(false);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9262,10 +9352,10 @@
                 "moduleFileExtensions"
             ],
             "updatePoint": {
-                "line": 1666,
+                "line": 1762,
                 "column": 34
             },
-            "line": 1666,
+            "line": 1762,
             "code": "  it('defaults to something useful', async () => {\n    const {options} = await normalize({rootDir: '/root'}, {} as Config.Argv);\n\n    expect(options.moduleFileExtensions).toEqual([\n      'js',\n      'mjs',\n      'cjs',\n      'jsx',\n      'ts',\n      'tsx',\n      'json',\n      'node',\n    ]);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9276,7 +9366,7 @@
             "suites": [
                 "moduleFileExtensions"
             ],
-            "line": 1681,
+            "line": 1777,
             "code": "  it.each([undefined, 'jest-runner'])(\n    'throws if missing `js` but using jest-runner',\n    async runner => {\n      await expect(\n        normalize(\n          {\n            moduleFileExtensions: ['json', 'jsx'],\n            rootDir: '/root/',\n            runner,\n          },\n          {} as Config.Argv,\n        ),\n      ).rejects.toThrowError(\"moduleFileExtensions must include 'js'\");\n    },\n  );",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9288,10 +9378,10 @@
                 "moduleFileExtensions"
             ],
             "updatePoint": {
-                "line": 1697,
+                "line": 1793,
                 "column": 57
             },
-            "line": 1697,
+            "line": 1793,
             "code": "  it('does not throw if missing `js` with a custom runner', async () => {\n    await expect(\n      normalize(\n        {\n          moduleFileExtensions: ['json', 'jsx'],\n          rootDir: '/root/',\n          runner: './', // does not need to be a valid runner for this validation\n        },\n        {} as Config.Argv,\n      ),\n    ).resolves.not.toThrow();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9303,10 +9393,10 @@
                 "cwd"
             ],
             "updatePoint": {
-                "line": 1712,
+                "line": 1808,
                 "column": 27
             },
-            "line": 1712,
+            "line": 1808,
             "code": "  it('is set to process.cwd', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {} as Config.Argv);\n    expect(options.cwd).toBe(process.cwd());\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9318,10 +9408,10 @@
                 "cwd"
             ],
             "updatePoint": {
-                "line": 1717,
+                "line": 1813,
                 "column": 56
             },
-            "line": 1717,
+            "line": 1813,
             "code": "  it('is not lost if the config has its own cwd property', async () => {\n    (console.warn as unknown as jest.SpyInstance).mockImplementation(() => {});\n    const {options} = await normalize(\n      {\n        cwd: '/tmp/config-sets-cwd-itself',\n        rootDir: '/root/',\n      } as Config.InitialOptions,\n      {} as Config.Argv,\n    );\n    expect(options.cwd).toBe(process.cwd());\n    expect(console.warn).toHaveBeenCalled();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9333,10 +9423,10 @@
                 "Defaults"
             ],
             "updatePoint": {
-                "line": 1732,
+                "line": 1828,
                 "column": 37
             },
-            "line": 1732,
+            "line": 1828,
             "code": "  it('should be accepted by normalize', async () => {\n    await normalize({...Defaults, rootDir: '/root'}, {} as Config.Argv);\n\n    expect(console.warn).not.toHaveBeenCalled();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9347,7 +9437,7 @@
             "suites": [
                 "displayName"
             ],
-            "line": 1740,
+            "line": 1836,
             "code": "  test.each`\n    displayName             | description\n    ${{}}                   | ${'is an empty object'}\n    ${{name: 'hello'}}      | ${'missing color'}\n    ${{color: 'green'}}     | ${'missing name'}\n    ${{color: 2, name: []}} | ${'using invalid values'}\n  `(\n    'should throw an error when displayName is $description',\n    async ({displayName}) => {\n      await expect(\n        normalize(\n          {\n            displayName,\n            rootDir: '/root/',\n          },\n          {} as Config.Argv,\n        ),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    },\n  );",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9358,7 +9448,7 @@
             "suites": [
                 "displayName"
             ],
-            "line": 1761,
+            "line": 1857,
             "code": "  it.each([\n    undefined,\n    'jest-runner',\n    'jest-runner-eslint',\n    'jest-runner-tslint',\n    'jest-runner-tsc',\n  ])('generates a default color for the runner %s', async runner => {\n    virtualModuleRegexes.push(/jest-runner-.+/);\n    const {\n      options: {displayName},\n    } = await normalize(\n      {\n        displayName: 'project',\n        rootDir: '/root/',\n        runner,\n      },\n      {} as Config.Argv,\n    );\n    expect(displayName!.name).toBe('project');\n    expect(displayName!.color).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9370,10 +9460,10 @@
                 "testTimeout"
             ],
             "updatePoint": {
-                "line": 1785,
+                "line": 1881,
                 "column": 44
             },
-            "line": 1785,
+            "line": 1881,
             "code": "  it('should return timeout value if defined', async () => {\n    (console.warn as unknown as jest.SpyInstance).mockImplementation(() => {});\n    const {options} = await normalize(\n      {rootDir: '/root/', testTimeout: 1000},\n      {} as Config.Argv,\n    );\n\n    expect(options.testTimeout).toBe(1000);\n    expect(console.warn).not.toHaveBeenCalled();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9385,10 +9475,10 @@
                 "testTimeout"
             ],
             "updatePoint": {
-                "line": 1796,
+                "line": 1892,
                 "column": 59
             },
-            "line": 1796,
+            "line": 1892,
             "code": "  it('should throw an error if timeout is a negative number', async () => {\n    await expect(\n      normalize({rootDir: '/root/', testTimeout: -1}, {} as Config.Argv),\n    ).rejects.toThrowErrorMatchingSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9400,10 +9490,10 @@
                 "extensionsToTreatAsEsm"
             ],
             "updatePoint": {
-                "line": 1818,
+                "line": 1914,
                 "column": 38
             },
-            "line": 1818,
+            "line": 1914,
             "code": "  it('should pass valid config through', async () => {\n    const {options} = await normalize(\n      {extensionsToTreatAsEsm: ['.ts'], rootDir: '/root/'},\n      {} as Config.Argv,\n    );\n\n    expect(options.extensionsToTreatAsEsm).toEqual(['.ts']);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9415,10 +9505,10 @@
                 "extensionsToTreatAsEsm"
             ],
             "updatePoint": {
-                "line": 1827,
+                "line": 1923,
                 "column": 33
             },
-            "line": 1827,
+            "line": 1923,
             "code": "  it('should enforce leading dots', async () => {\n    await matchErrorSnapshot(async () =>\n      normalize(\n        {extensionsToTreatAsEsm: ['ts'], rootDir: '/root/'},\n        {} as Config.Argv,\n      ),\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9429,7 +9519,7 @@
             "suites": [
                 "extensionsToTreatAsEsm"
             ],
-            "line": 1836,
+            "line": 1932,
             "code": "  it.each(['.js', '.mjs', '.cjs'])('throws on %s', async ext => {\n    await matchErrorSnapshot(async () =>\n      normalize(\n        {extensionsToTreatAsEsm: [ext], rootDir: '/root/'},\n        {} as Config.Argv,\n      ),\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9441,10 +9531,10 @@
                 "haste.enableSymlinks"
             ],
             "updatePoint": {
-                "line": 1847,
+                "line": 1943,
                 "column": 46
             },
-            "line": 1847,
+            "line": 1943,
             "code": "  it('should throw if watchman is not disabled', async () => {\n    await expect(\n      normalize(\n        {haste: {enableSymlinks: true}, rootDir: '/root/'},\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    await expect(\n      normalize(\n        {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: true},\n        {} as Config.Argv,\n      ),\n    ).rejects.toThrow('haste.enableSymlinks is incompatible with watchman');\n\n    const {options} = await normalize(\n      {haste: {enableSymlinks: true}, rootDir: '/root/', watchman: false},\n      {} as Config.Argv,\n    );\n\n    expect(options.haste.enableSymlinks).toBe(true);\n    expect(options.watchman).toBe(false);\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9456,10 +9546,10 @@
                 "haste.forceNodeFilesystemAPI"
             ],
             "updatePoint": {
-                "line": 1873,
+                "line": 1969,
                 "column": 32
             },
-            "line": 1873,
+            "line": 1969,
             "code": "  it('should pass option through', async () => {\n    const {options} = await normalize(\n      {haste: {forceNodeFilesystemAPI: true}, rootDir: '/root/'},\n      {} as Config.Argv,\n    );\n\n    expect(options.haste.forceNodeFilesystemAPI).toBe(true);\n    expect(console.warn).not.toHaveBeenCalled();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9471,10 +9561,10 @@
                 "updateSnapshot"
             ],
             "updatePoint": {
-                "line": 1885,
+                "line": 1981,
                 "column": 45
             },
-            "line": 1885,
+            "line": 1981,
             "code": "  it('should be all if updateSnapshot is true', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {\n      updateSnapshot: true,\n    } as Config.Argv);\n    expect(options.updateSnapshot).toBe('all');\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9486,10 +9576,10 @@
                 "updateSnapshot"
             ],
             "updatePoint": {
-                "line": 1891,
+                "line": 1987,
                 "column": 46
             },
-            "line": 1891,
+            "line": 1987,
             "code": "  it('should be new if updateSnapshot is falsy', async () => {\n    {\n      const {options} = await normalize(\n        {ci: false, rootDir: '/root/'},\n        {} as Config.Argv,\n      );\n      expect(options.updateSnapshot).toBe('new');\n    }\n    {\n      const {options} = await normalize({ci: false, rootDir: '/root/'}, {\n        updateSnapshot: false,\n      } as Config.Argv);\n      expect(options.updateSnapshot).toBe('new');\n    }\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9501,10 +9591,10 @@
                 "updateSnapshot"
             ],
             "updatePoint": {
-                "line": 1906,
+                "line": 2002,
                 "column": 67
             },
-            "line": 1906,
+            "line": 2002,
             "code": "  it('should be none if updateSnapshot is falsy and ci mode is true', async () => {\n    const defaultCiConfig = Defaults.ci;\n    {\n      Defaults.ci = false;\n      const {options} = await normalize({rootDir: '/root/'}, {\n        ci: true,\n      } as Config.Argv);\n      expect(options.updateSnapshot).toBe('none');\n    }\n    {\n      Defaults.ci = true;\n      const {options} = await normalize({rootDir: '/root/'}, {} as Config.Argv);\n      expect(options.updateSnapshot).toBe('none');\n    }\n    Defaults.ci = defaultCiConfig;\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9516,10 +9606,10 @@
                 "testURL"
             ],
             "updatePoint": {
-                "line": 1929,
+                "line": 2025,
                 "column": 55
             },
-            "line": 1929,
+            "line": 2025,
             "code": "  it('logs a deprecation warning when `testURL` is used', async () => {\n    await normalize(\n      {\n        rootDir: '/root/',\n        testURL: 'https://jestjs.io/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9531,10 +9621,10 @@
                 "timers"
             ],
             "updatePoint": {
-                "line": 1947,
+                "line": 2043,
                 "column": 54
             },
-            "line": 1947,
+            "line": 2043,
             "code": "  it('logs a deprecation warning when `timers` is used', async () => {\n    await normalize(\n      {\n        rootDir: '/root/',\n        timers: 'real',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9546,10 +9636,10 @@
                 "extraGlobals"
             ],
             "updatePoint": {
-                "line": 1965,
+                "line": 2061,
                 "column": 60
             },
-            "line": 1965,
+            "line": 2061,
             "code": "  it('logs a deprecation warning when `extraGlobals` is used', async () => {\n    await normalize(\n      {\n        extraGlobals: ['Math'],\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9561,10 +9651,10 @@
                 "moduleLoader"
             ],
             "updatePoint": {
-                "line": 1983,
+                "line": 2079,
                 "column": 60
             },
-            "line": 1983,
+            "line": 2079,
             "code": "  it('logs a deprecation warning when `moduleLoader` is used', async () => {\n    await normalize(\n      {\n        moduleLoader: '<rootDir>/runtime.js',\n        rootDir: '/root/',\n      },\n      {} as Config.Argv,\n    );\n\n    expect(console.warn).toMatchSnapshot();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -9576,10 +9666,10 @@
                 "shards"
             ],
             "updatePoint": {
-                "line": 1997,
+                "line": 2093,
                 "column": 33
             },
-            "line": 1997,
+            "line": 2093,
             "code": "  it('should be object if defined', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {\n      shard: '1/2',\n    } as Config.Argv);\n\n    expect(options.shard).toEqual({shardCount: 2, shardIndex: 1});\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
@@ -11675,7 +11765,7 @@
                 "column": 45
             },
             "line": 41,
-            "code": "test('config for reporters supports `default`', async () => {\n  const undefinedReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: undefined,\n    }),\n    {},\n    {},\n  );\n  const numberOfReporters =\n    undefinedReportersScheduler._dispatcher._reporters.length;\n\n  const stringDefaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: ['default'],\n    }),\n    {},\n    {},\n  );\n  expect(stringDefaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const defaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['default', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(defaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const emptyReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(emptyReportersScheduler._dispatcher._reporters.length).toBe(0);\n});",
+            "code": "test('config for reporters supports `default`', async () => {\n  const undefinedReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: undefined,\n    }),\n    {},\n    {},\n  );\n  const numberOfReporters =\n    undefinedReportersScheduler._dispatcher._reporters.length;\n\n  const defaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['default', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(defaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const emptyReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(emptyReportersScheduler._dispatcher._reporters.length).toBe(0);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11684,11 +11774,11 @@
             "name": "config for reporters supports `github-actions`",
             "suites": [],
             "updatePoint": {
-                "line": 84,
+                "line": 73,
                 "column": 52
             },
-            "line": 84,
-            "code": "test('config for reporters supports `github-actions`', async () => {\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(0);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: ['github-actions'],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(1);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: ['default', 'github-actions'],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(2);\n});",
+            "line": 73,
+            "code": "test('config for reporters supports `github-actions`', async () => {\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(0);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['github-actions', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(1);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [\n        ['default', {}],\n        ['github-actions', {}],\n      ],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(2);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -11697,10 +11787,10 @@
             "name": ".addReporter() .removeReporter()",
             "suites": [],
             "updatePoint": {
-                "line": 113,
+                "line": 105,
                 "column": 38
             },
-            "line": 113,
+            "line": 105,
             "code": "test('.addReporter() .removeReporter()', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const reporter = new SummaryReporter();\n  scheduler.addReporter(reporter);\n  expect(scheduler._dispatcher._reporters).toContain(reporter);\n  scheduler.removeReporter(SummaryReporter);\n  expect(scheduler._dispatcher._reporters).not.toContain(reporter);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11710,10 +11800,10 @@
             "name": "schedule tests run in parallel per default",
             "suites": [],
             "updatePoint": {
-                "line": 122,
+                "line": 114,
                 "column": 48
             },
-            "line": 122,
+            "line": 114,
             "code": "test('schedule tests run in parallel per default', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11723,10 +11813,10 @@
             "name": "schedule tests run in serial if the runner flags them",
             "suites": [],
             "updatePoint": {
-                "line": 145,
+                "line": 137,
                 "column": 59
             },
-            "line": 145,
+            "line": 137,
             "code": "test('schedule tests run in serial if the runner flags them', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test, test];\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockSerialRunner.runTests).toHaveBeenCalled();\n  expect(mockSerialRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11736,10 +11826,10 @@
             "name": "should bail after `n` failures",
             "suites": [],
             "updatePoint": {
-                "line": 168,
+                "line": 160,
                 "column": 36
             },
-            "line": 168,
+            "line": 160,
             "code": "test('should bail after `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 2,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).toBeCalledWith({interrupted: true});\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11749,10 +11839,10 @@
             "name": "should not bail if less than `n` failures",
             "suites": [],
             "updatePoint": {
-                "line": 204,
+                "line": 196,
                 "column": 47
             },
-            "line": 204,
+            "line": 196,
             "code": "test('should not bail if less than `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 1,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).not.toBeCalled();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11762,10 +11852,10 @@
             "name": "should set runInBand to run in serial",
             "suites": [],
             "updatePoint": {
-                "line": 240,
+                "line": 232,
                 "column": 43
             },
-            "line": 240,
+            "line": 232,
             "code": "test('should set runInBand to run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(true);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11775,10 +11865,10 @@
             "name": "should set runInBand to not run in serial",
             "suites": [],
             "updatePoint": {
-                "line": 266,
+                "line": 258,
                 "column": 47
             },
-            "line": 266,
+            "line": 258,
             "code": "test('should set runInBand to not run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(false);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
