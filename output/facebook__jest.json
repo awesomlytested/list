@@ -11758,39 +11758,150 @@
             "dir": "packages/jest-core/src/__tests__"
         },
         {
-            "name": "config for reporters supports `default`",
-            "suites": [],
+            "name": "works with default value",
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 41,
-                "column": 45
+                "line": 63,
+                "column": 32
             },
-            "line": 41,
-            "code": "test('config for reporters supports `default`', async () => {\n  const undefinedReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: undefined,\n    }),\n    {},\n    {},\n  );\n  const numberOfReporters =\n    undefinedReportersScheduler._dispatcher._reporters.length;\n\n  const defaultReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['default', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(defaultReportersScheduler._dispatcher._reporters.length).toBe(\n    numberOfReporters,\n  );\n\n  const emptyReportersScheduler = await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(emptyReportersScheduler._dispatcher._reporters.length).toBe(0);\n});",
+            "line": 63,
+            "code": "  test('works with default value', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: undefined,\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
         {
-            "name": "config for reporters supports `github-actions`",
-            "suites": [],
+            "name": "does not enable any reporters, if empty list is passed",
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 73,
-                "column": 52
+                "line": 80,
+                "column": 62
             },
-            "line": 73,
-            "code": "test('config for reporters supports `github-actions`', async () => {\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(0);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [['github-actions', {}]],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(1);\n\n  await createTestScheduler(\n    makeGlobalConfig({\n      reporters: [\n        ['default', {}],\n        ['github-actions', {}],\n      ],\n    }),\n    {},\n    {},\n  );\n  expect(GitHubActionsReporter).toHaveBeenCalledTimes(2);\n});",
+            "line": 80,
+            "code": "  test('does not enable any reporters, if empty list is passed', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(0);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(0);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up default reporters",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 97,
+                "column": 33
+            },
+            "line": 97,
+            "code": "  test('sets up default reporters', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [['default', {}]],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up verbose reporter",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 114,
+                "column": 32
+            },
+            "line": 114,
+            "code": "  test('sets up verbose reporter', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [['default', {}]],\n        verbose: true,\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(0);\n    expect(VerboseReporter).toBeCalledTimes(1);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up github actions reporter",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 132,
+                "column": 39
+            },
+            "line": 132,
+            "code": "  test('sets up github actions reporter', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [\n          ['default', {}],\n          ['github-actions', {}],\n        ],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(1);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up notify reporter",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 152,
+                "column": 31
+            },
+            "line": 152,
+            "code": "  test('sets up notify reporter', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        notify: true,\n        reporters: [['default', {}]],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(1);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up coverage reporter",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 170,
+                "column": 33
+            },
+            "line": 170,
+            "code": "  test('sets up coverage reporter', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        collectCoverage: true,\n        reporters: [['default', {}]],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(1);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "allows enabling summary reporter separately",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 188,
+                "column": 51
+            },
+            "line": 188,
+            "code": "  test('allows enabling summary reporter separately', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [['summary', {}]],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(0);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n  });",
+            "file": "TestScheduler.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "sets up custom reporter",
+            "suites": [
+                "reporters"
+            ],
+            "updatePoint": {
+                "line": 205,
+                "column": 31
+            },
+            "line": 205,
+            "code": "  test('sets up custom reporter', async () => {\n    await createTestScheduler(\n      makeGlobalConfig({\n        reporters: [\n          ['default', {}],\n          ['/custom-reporter.js', {}],\n        ],\n      }),\n      {},\n      {},\n    );\n\n    expect(DefaultReporter).toBeCalledTimes(1);\n    expect(VerboseReporter).toBeCalledTimes(0);\n    expect(GitHubActionsReporter).toBeCalledTimes(0);\n    expect(NotifyReporter).toBeCalledTimes(0);\n    expect(CoverageReporter).toBeCalledTimes(0);\n    expect(SummaryReporter).toBeCalledTimes(1);\n    expect(CustomReporter).toBeCalledTimes(1);\n  });",
             "file": "TestScheduler.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
         },
         {
             "name": ".addReporter() .removeReporter()",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 105,
+                "line": 227,
                 "column": 38
             },
-            "line": 105,
+            "line": 227,
             "code": "test('.addReporter() .removeReporter()', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const reporter = new SummaryReporter();\n  scheduler.addReporter(reporter);\n  expect(scheduler._dispatcher._reporters).toContain(reporter);\n  scheduler.removeReporter(SummaryReporter);\n  expect(scheduler._dispatcher._reporters).not.toContain(reporter);\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11798,12 +11909,14 @@
         },
         {
             "name": "schedule tests run in parallel per default",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 114,
+                "line": 236,
                 "column": 48
             },
-            "line": 114,
+            "line": 236,
             "code": "test('schedule tests run in parallel per default', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11811,12 +11924,14 @@
         },
         {
             "name": "schedule tests run in serial if the runner flags them",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 137,
+                "line": 259,
                 "column": 59
             },
-            "line": 137,
+            "line": 259,
             "code": "test('schedule tests run in serial if the runner flags them', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test, test];\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(mockSerialRunner.runTests).toHaveBeenCalled();\n  expect(mockSerialRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11824,12 +11939,14 @@
         },
         {
             "name": "should bail after `n` failures",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 160,
+                "line": 282,
                 "column": 36
             },
-            "line": 160,
+            "line": 282,
             "code": "test('should bail after `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 2,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).toBeCalledWith({interrupted: true});\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11837,12 +11954,14 @@
         },
         {
             "name": "should not bail if less than `n` failures",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 196,
+                "line": 318,
                 "column": 47
             },
-            "line": 196,
+            "line": 318,
             "code": "test('should not bail if less than `n` failures', async () => {\n  const scheduler = await createTestScheduler(\n    makeGlobalConfig({bail: 2}),\n    {},\n    {},\n  );\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        rootDir: './',\n        runner: 'jest-runner-serial',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n\n  const tests = [test];\n  const setState = jest.fn();\n  await scheduler.scheduleTests(tests, {\n    isInterrupted: jest.fn(),\n    isWatchMode: () => true,\n    setState,\n  });\n  await mockSerialRunner.runTests.mock.calls[0][3](test, {\n    numFailingTests: 1,\n    snapshot: {},\n    testResults: [{}],\n  });\n  expect(setState).not.toBeCalled();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11850,12 +11969,14 @@
         },
         {
             "name": "should set runInBand to run in serial",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 232,
+                "line": 354,
                 "column": 43
             },
-            "line": 232,
+            "line": 354,
             "code": "test('should set runInBand to run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(true);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeTruthy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
@@ -11863,12 +11984,14 @@
         },
         {
             "name": "should set runInBand to not run in serial",
-            "suites": [],
+            "suites": [
+                "reporters"
+            ],
             "updatePoint": {
-                "line": 258,
+                "line": 380,
                 "column": 47
             },
-            "line": 258,
+            "line": 380,
             "code": "test('should set runInBand to not run in serial', async () => {\n  const scheduler = await createTestScheduler(makeGlobalConfig(), {}, {});\n  const test = {\n    context: {\n      config: makeProjectConfig({\n        moduleFileExtensions: ['.js'],\n        runner: 'jest-runner-parallel',\n        transform: [],\n      }),\n      hasteFS: {\n        matchFiles: jest.fn(() => []),\n      },\n    },\n    path: './test/path.js',\n  };\n  const tests = [test, test];\n\n  spyShouldRunInBand.mockReturnValue(false);\n\n  await scheduler.scheduleTests(tests, {isInterrupted: jest.fn()});\n\n  expect(spyShouldRunInBand).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests).toHaveBeenCalled();\n  expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();\n});",
             "file": "TestScheduler.test.js",
             "skipped": false,
