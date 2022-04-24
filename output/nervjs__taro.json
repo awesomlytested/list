@@ -572,16 +572,32 @@
             "dir": "packages/babel-plugin-transform-react-jsx-to-rn-stylesheet/__tests__"
         },
         {
-            "name": "merge stylesheet when css module disable",
+            "name": "Processing module style through call expression When css module enable",
             "suites": [
                 "jsx style plugin"
             ],
             "updatePoint": {
                 "line": 591,
-                "column": 46,
-                "index": 16495
+                "column": 76,
+                "index": 16525
             },
             "line": 591,
+            "code": "  it('Processing module style through call expression When css module enable', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport styleSheet from './app.module.scss';\n\nclass App extends Component {\n  render() {\n    const a = Object.assign({}, styleSheet.red);\n    const b = Object.assign({}, a);\n    return <div className={a}><span className={b} /></div>;\n  }\n}`, false, {\n      enableCSSModule: true\n    })).toBe(`import { createElement, Component } from 'rax';\nimport styleSheet from './app.module.scss';\nvar _styleSheet = {};\n\nclass App extends Component {\n  render() {\n    const a = Object.assign({}, styleSheet.red);\n    const b = Object.assign({}, a);\n    return <div style={a}><span style={b} /></div>;\n  }\\n\n}`);\n  });",
+            "file": "index.spec.js",
+            "skipped": false,
+            "dir": "packages/babel-plugin-transform-react-jsx-to-rn-stylesheet/__tests__"
+        },
+        {
+            "name": "merge stylesheet when css module disable",
+            "suites": [
+                "jsx style plugin"
+            ],
+            "updatePoint": {
+                "line": 616,
+                "column": 46,
+                "index": 17264
+            },
+            "line": 616,
             "code": "  it('merge stylesheet when css module disable', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport './app.scss';\nimport styleSheet from './app.module.scss';\n\nclass App extends Component {\n  render() {\n    return <div className=\"header\" style={styleSheet.red} />;\n  }\n}`)).toBe(`import { createElement, Component } from 'rax';\nimport appScssStyleSheet from \"./app.scss\";\nimport styleSheet from \"./app.module.scss\";\n\n${mergeEleStylesFunctionTemplate}\n\n${mergeStylesFunctionTemplate}\n\nvar _styleSheet = _mergeStyles(appScssStyleSheet, styleSheet);\n\nclass App extends Component {\n  render() {\n    return <div style={_mergeEleStyles(_styleSheet[\"header\"], styleSheet.red)} />;\n  }\\n\n}`);\n  });",
             "file": "index.spec.js",
             "skipped": false,
@@ -593,11 +609,11 @@
                 "jsx style plugin"
             ],
             "updatePoint": {
-                "line": 617,
+                "line": 642,
                 "column": 81,
-                "index": 17262
+                "index": 18031
             },
-            "line": 617,
+            "line": 642,
             "code": "  it('disableMultipleClassName and transform multiple className to multiple style', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport './app.css';\n\nclass App extends Component {\n  render() {\n    return <div className=\"container\" headerClassName=\"header\" />;\n  }\n}`, false, {\n      enableMultipleClassName: false\n    })).toBe(`import { createElement, Component } from 'rax';\nimport appCssStyleSheet from \"./app.css\";\nvar _styleSheet = appCssStyleSheet;\n\nclass App extends Component {\n  render() {\n    return <div headerClassName=\"header\" style={_styleSheet[\"container\"]} />;\n  }\n\n}`);\n  });",
             "file": "index.spec.js",
             "skipped": false,
@@ -609,11 +625,11 @@
                 "jsx style plugin"
             ],
             "updatePoint": {
-                "line": 639,
+                "line": 664,
                 "column": 80,
-                "index": 17894
+                "index": 18663
             },
-            "line": 639,
+            "line": 664,
             "code": "  it('enableMultipleClassName and transform multiple className to multiple style', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport './app.css';\n\nclass App extends Component {\n  render() {\n    return <div className=\"container\" headerClassName=\"header\" />;\n  }\n}`, false, {\n      enableMultipleClassName: true\n    })).toBe(`import { createElement, Component } from 'rax';\nimport appCssStyleSheet from \"./app.css\";\nvar _styleSheet = appCssStyleSheet;\n\nclass App extends Component {\n  render() {\n    return <div style={_styleSheet[\"container\"]} headerStyle={_styleSheet[\"header\"]} />;\n  }\n\n}`);\n  });",
             "file": "index.spec.js",
             "skipped": false,
@@ -625,11 +641,11 @@
                 "jsx style plugin"
             ],
             "updatePoint": {
-                "line": 661,
+                "line": 686,
                 "column": 89,
-                "index": 18545
+                "index": 19314
             },
-            "line": 661,
+            "line": 686,
             "code": "  it('enableMultipleClassName and transform multiple className to multiple style as array', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport './app.css';\n\nclass App extends Component {\n  render() {\n    return <div className=\"container\" headerClassName=\"header\" style={{ color: \"red\" }} headerStyle={{ color: \"green\" }} />;\n  }\n}`, false, {\n      enableMultipleClassName: true\n    })).toBe(`import { createElement, Component } from 'rax';\nimport appCssStyleSheet from \"./app.css\";\n\n${mergeEleStylesFunctionTemplate}\n\nvar _styleSheet = appCssStyleSheet;\n\nclass App extends Component {\n  render() {\n    return <div style={_mergeEleStyles(_styleSheet[\"container\"], {\n      color: \"red\"\n    })} headerStyle={_mergeEleStyles(_styleSheet[\"header\"], {\n      color: \"green\"\n    })} />;\n  }\n\n}`);\n  });",
             "file": "index.spec.js",
             "skipped": false,
@@ -641,11 +657,11 @@
                 "jsx style plugin"
             ],
             "updatePoint": {
-                "line": 690,
+                "line": 715,
                 "column": 59,
-                "index": 19352
+                "index": 20121
             },
-            "line": 690,
+            "line": 715,
             "code": "  it('enableMultipleClassName and transform error css value', () => {\n    expect(getTransfromCode(`\nimport { createElement, Component } from 'rax';\nimport './app.css';\n\nclass App extends Component {\n  render() {\n    return <StatusBar barStyle=\"dark-content\" />;\n  }\n}`, false, {\n      enableMultipleClassName: true\n    })).toBe(`import { createElement, Component } from 'rax';\nimport appCssStyleSheet from \"./app.css\";\nvar _styleSheet = appCssStyleSheet;\n\nclass App extends Component {\n  render() {\n    return <StatusBar barStyle={\"dark-content\"} />;\n  }\n\n}`);\n  });",
             "file": "index.spec.js",
             "skipped": false,
