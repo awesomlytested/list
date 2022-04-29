@@ -405,16 +405,48 @@
             "dir": "integrations/tailwindcss-cli/tests"
         },
         {
-            "name": "--help",
+            "name": "--postcss supports process options",
             "suites": [
                 "Build command"
             ],
             "updatePoint": {
                 "line": 225,
-                "column": 14,
-                "index": 7793
+                "column": 42,
+                "index": 7821
             },
             "line": 225,
+            "code": "  test('--postcss supports process options', async () => {\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    let customConfig = javascript`\n      let path = require('path')\n      let postcss = require('postcss')\n\n      module.exports = {\n        map: { inline: true },\n        plugins: [\n          function tailwindcss() {\n            return require(path.resolve('..', '..'))\n          },\n        ],\n      }\n    `;\n    await writeInputFile('../postcss.config.js', customConfig);\n    await $(`${EXECUTABLE} --output ./dist/main.css --postcss`);\n    let contents = await readOutputFile('main.css');\n    expect(contents).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    expect(contents).toContain(`/*# sourceMappingURL`);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "--postcss supports process options with custom config",
+            "suites": [
+                "Build command"
+            ],
+            "updatePoint": {
+                "line": 250,
+                "column": 61,
+                "index": 8638
+            },
+            "line": 250,
+            "code": "  test('--postcss supports process options with custom config', async () => {\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    let customConfig = javascript`\n      let path = require('path')\n      let postcss = require('postcss')\n\n      module.exports = {\n        map: { inline: true },\n        plugins: [\n          function tailwindcss() {\n            return require(path.resolve('..', '..'))\n          },\n        ],\n      }\n    `;\n    await writeInputFile('../custom.postcss.config.js', customConfig);\n    await $(`${EXECUTABLE} --output ./dist/main.css --postcss ./custom.postcss.config.js`);\n    let contents = await readOutputFile('main.css');\n    expect(contents).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    expect(contents).toContain(`/*# sourceMappingURL`);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "--help",
+            "suites": [
+                "Build command"
+            ],
+            "updatePoint": {
+                "line": 275,
+                "column": 14,
+                "index": 9442
+            },
+            "line": 275,
             "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss build [options]\n\n        Options:\n           -i, --input              Input file\n           -o, --output             Output file\n           -w, --watch              Watch for changes and rebuild as needed\n           -p, --poll               Use polling instead of filesystem events when watching\n               --content            Content paths to use for removing unused classes\n               --postcss            Load custom PostCSS configuration\n           -m, --minify             Minify the output\n           -c, --config             Path to a custom config file\n               --no-autoprefixer    Disable autoprefixer\n           -h, --help               Display usage information\n      `));\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -426,11 +458,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 250,
+                "line": 300,
                 "column": 14,
-                "index": 8750
+                "index": 10399
             },
-            "line": 250,
+            "line": 300,
             "code": "  test('--full', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `); // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n    expect(await readOutputFile('../full.config.js')).not.toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -442,11 +474,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 266,
+                "line": 316,
                 "column": 15,
-                "index": 9450
+                "index": 11099
             },
-            "line": 266,
+            "line": 316,
             "code": "  test('--types', async () => {\n    cleanupFile('simple.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init simple.config.js --types`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: simple.config.js\n      \"\n    `);\n    expect(await readOutputFile('../simple.config.js')).toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -458,11 +490,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 328,
                 "column": 22,
-                "index": 9867
+                "index": 11516
             },
-            "line": 278,
+            "line": 328,
             "code": "  test('--full --types', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full --types`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `); // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n    expect(await readOutputFile('../full.config.js')).toContain(`/** @type {import('tailwindcss/types').Config} */`);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -474,11 +506,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 294,
+                "line": 344,
                 "column": 17,
-                "index": 10573
+                "index": 12222
             },
-            "line": 294,
+            "line": 344,
             "code": "  test('--postcss', async () => {\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    await removeFile('postcss.config.js');\n    expect(await fileExists('postcss.config.js')).toBe(false);\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --postcss`);\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      tailwind.config.js already exists.\n      Created PostCSS config file: postcss.config.js\n      \"\n    `);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -490,11 +522,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 309,
+                "line": 359,
                 "column": 14,
-                "index": 11077
+                "index": 12726
             },
-            "line": 309,
+            "line": 359,
             "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.js\\` file\n           -p, --postcss            Initialize a \\`postcss.config.js\\` file\n               --types              Add TypeScript types for the \\`tailwind.config.js\\` file\n           -h, --help               Display usage information\n      `));\n  });",
             "file": "cli.test.js",
             "skipped": false,
