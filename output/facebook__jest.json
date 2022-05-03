@@ -10765,10 +10765,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 16,
+                "line": 17,
                 "column": 28
             },
-            "line": 16,
+            "line": 17,
             "code": "  it('should collect Timeout', async () => {\n    const handleCollector = collectHandles();\n\n    const interval = setInterval(() => {}, 100);\n\n    const openHandles = await handleCollector();\n\n    expect(openHandles).toContainEqual(\n      expect.objectContaining({message: 'Timeout'}),\n    );\n\n    clearInterval(interval);\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
@@ -10780,10 +10780,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 30,
+                "line": 31,
                 "column": 60
             },
-            "line": 30,
+            "line": 31,
             "code": "  it('should not collect the PerformanceObserver open handle', async () => {\n    const handleCollector = collectHandles();\n    const obs = new PerformanceObserver((list, observer) => {});\n    obs.observe({entryTypes: ['mark']});\n\n    const openHandles = await handleCollector();\n\n    expect(openHandles).not.toContainEqual(\n      expect.objectContaining({message: 'PerformanceObserver'}),\n    );\n    obs.disconnect();\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
@@ -10795,10 +10795,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 43,
+                "line": 44,
                 "column": 51
             },
-            "line": 43,
+            "line": 44,
             "code": "  it('should not collect the DNSCHANNEL open handle', async () => {\n    const handleCollector = collectHandles();\n\n    const resolver = new dns.Resolver();\n    resolver.getServers();\n\n    const openHandles = await handleCollector();\n\n    expect(openHandles).not.toContainEqual(\n      expect.objectContaining({message: 'DNSCHANNEL'}),\n    );\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
@@ -10810,11 +10810,26 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 56,
+                "line": 57,
                 "column": 45
             },
-            "line": 56,
+            "line": 57,
             "code": "  it('should not collect the ZLIB open handle', async () => {\n    const handleCollector = collectHandles();\n\n    const decompressed = zlib.inflateRawSync(\n      Buffer.from('cb2a2d2e5128492d2ec9cc4b0700', 'hex'),\n    );\n\n    const openHandles = await handleCollector();\n\n    expect(openHandles).not.toContainEqual(\n      expect.objectContaining({message: 'ZLIB'}),\n    );\n  });",
+            "file": "collectHandles.test.js",
+            "skipped": false,
+            "dir": "packages/jest-core/src/__tests__"
+        },
+        {
+            "name": "should not collect the SIGNREQUEST open handle",
+            "suites": [
+                "collectHandles"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 52
+            },
+            "line": 71,
+            "code": "  it('should not collect the SIGNREQUEST open handle', async () => {\n    const handleCollector = collectHandles();\n\n    const key =\n      '-----BEGIN PRIVATE KEY-----\\r\\nMC4CAQAwBQYDK2VwBCIEIHKj+sVa9WcD' +\n      '/q2DJUJaf43Kptc8xYuUQA4bOFj9vC8T\\r\\n-----END PRIVATE KEY-----';\n    const data = Buffer.from('a');\n    crypto.sign(null, data, key);\n\n    const openHandles = await handleCollector();\n\n    expect(openHandles).not.toContainEqual(\n      expect.objectContaining({message: 'SIGNREQUEST'}),\n    );\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
@@ -10825,10 +10840,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 70,
+                "line": 87,
                 "column": 75
             },
-            "line": 70,
+            "line": 87,
             "code": "  it('should collect handles opened in test functions with `done` callbacks', done => {\n    const handleCollector = collectHandles();\n    const server = http.createServer((_, response) => response.end('ok'));\n    server.listen(0, () => {\n      // Collect results while server is still open.\n      handleCollector()\n        .then(openHandles => {\n          server.close(() => {\n            expect(openHandles).toContainEqual(\n              expect.objectContaining({message: 'TCPSERVERWRAP'}),\n            );\n            done();\n          });\n        })\n        .catch(done);\n    });\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
@@ -10840,10 +10855,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 88,
+                "line": 105,
                 "column": 63
             },
-            "line": 88,
+            "line": 105,
             "code": "  it('should not collect handles that have been queued to close', async () => {\n    const handleCollector = collectHandles();\n    const server = http.createServer((_, response) => response.end('ok'));\n\n    // Start and stop server.\n    await new Promise(r => server.listen(0, r));\n    await new Promise(r => server.close(r));\n\n    const openHandles = await handleCollector();\n    expect(openHandles).toHaveLength(0);\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
@@ -10855,10 +10870,10 @@
                 "collectHandles"
             ],
             "updatePoint": {
-                "line": 100,
+                "line": 117,
                 "column": 62
             },
-            "line": 100,
+            "line": 117,
             "code": "  it('should collect handles indirectly triggered by user code', async () => {\n    const handleCollector = collectHandles();\n\n    // Calling `server.listen` with just a port (e.g. `server.listen(0)`)\n    // creates a `TCPSERVERWRAP` async resource. However, including a `host`\n    // option instead creates a `GETADDRINFOREQWRAP` resource that only\n    // lasts for the lifetime of the `listen()` call, but which *indirectly*\n    // creates a long-lived `TCPSERVERWRAP` resource. We want to make sure we\n    // capture that long-lived resource.\n    const server = new http.Server();\n    await new Promise(r => server.listen({host: 'localhost', port: 0}, r));\n\n    const openHandles = await handleCollector();\n\n    await new Promise(r => server.close(r));\n\n    expect(openHandles).toContainEqual(\n      expect.objectContaining({message: 'TCPSERVERWRAP'}),\n    );\n  });",
             "file": "collectHandles.test.js",
             "skipped": false,
