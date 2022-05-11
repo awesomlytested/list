@@ -6027,11 +6027,27 @@
                 "Cancel Token"
             ],
             "updatePoint": {
-                "line": 475,
+                "line": 480,
                 "column": 28
             },
-            "line": 475,
-            "code": "\t\ttest('request non existent', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\t\t\t// if the request doesn't exist we can still say it is canceled successfully\n\t\t\texpect(\n\t\t\t\trestClient.cancel(\n\t\t\t\t\tnew Promise<any>((req, res) => {})\n\t\t\t\t)\n\t\t\t).toBeTruthy();\n\t\t});",
+            "line": 480,
+            "code": "\t\ttest('request non existent', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\t\t\texpect(restClient.cancel(new Promise<any>((req, res) => {}))).toBe(false);\n\t\t});",
+            "file": "RestClient-unit-test.ts",
+            "skipped": false,
+            "dir": "packages/api-rest/__tests__"
+        },
+        {
+            "name": "request exist",
+            "suites": [
+                "RestClient test",
+                "Cancel Token"
+            ],
+            "updatePoint": {
+                "line": 485,
+                "column": 21
+            },
+            "line": 485,
+            "code": "\t\ttest('request exist', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\t\t\tconst request = Promise.resolve();\n\t\t\trestClient.updateRequestToBeCancellable(\n\t\t\t\trequest,\n\t\t\t\trestClient.getCancellableToken()\n\t\t\t);\n\t\t\texpect(restClient.cancel(request)).toBe(true);\n\t\t});",
             "file": "RestClient-unit-test.ts",
             "skipped": false,
             "dir": "packages/api-rest/__tests__"
@@ -6043,11 +6059,11 @@
                 "Cancel Token"
             ],
             "updatePoint": {
-                "line": 485,
+                "line": 495,
                 "column": 18
             },
-            "line": 485,
-            "code": "\t\ttest('happy case', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\n\t\t\tconst cancellableToken = restClient.getCancellableToken();\n\t\t\tconst request = restClient.ajax('url', 'method', { cancellableToken });\n\t\t\trestClient.updateRequestToBeCancellable(request, cancellableToken);\n\n\t\t\t// cancel the request\n\t\t\tconst cancelSuccess = restClient.cancel(request, 'message');\n\n\t\t\texpect(cancelSuccess).toBeTruthy();\n\t\t\texpect(cancelTokenSpy).toBeCalledTimes(1);\n\t\t\texpect(cancelMock).toBeCalledWith('message');\n\t\t});",
+            "line": 495,
+            "code": "\t\ttest('happy case', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\t\t\tjest\n\t\t\t\t.spyOn(RestClient.prototype, 'ajax')\n\t\t\t\t.mockImplementationOnce(() => Promise.resolve());\n\n\t\t\tconst cancellableToken = restClient.getCancellableToken();\n\t\t\tconst request = restClient.ajax('url', 'method', { cancellableToken });\n\t\t\trestClient.updateRequestToBeCancellable(request, cancellableToken);\n\n\t\t\t// cancel the request\n\t\t\tconst cancelSuccess = restClient.cancel(request, 'message');\n\n\t\t\texpect(cancelSuccess).toBeTruthy();\n\t\t\texpect(cancelTokenSpy).toBeCalledTimes(1);\n\t\t\texpect(cancelMock).toBeCalledWith('message');\n\t\t});",
             "file": "RestClient-unit-test.ts",
             "skipped": false,
             "dir": "packages/api-rest/__tests__"
@@ -6059,10 +6075,10 @@
                 "Cancel Token"
             ],
             "updatePoint": {
-                "line": 500,
+                "line": 513,
                 "column": 23
             },
-            "line": 500,
+            "line": 513,
             "code": "\t\ttest('iscancel called', () => {\n\t\t\tconst restClient = new RestClient(apiOptions);\n\t\t\trestClient.isCancel({});\n\t\t\texpect(isCancelSpy).toHaveBeenCalledTimes(1);\n\t\t});",
             "file": "RestClient-unit-test.ts",
             "skipped": false,
@@ -6214,6 +6230,38 @@
             },
             "line": 80,
             "code": "\ttest('graphql', async () => {\n\t\tjest\n\t\t\t.spyOn(GraphQLAPIClass.prototype, 'graphql')\n\t\t\t.mockResolvedValue('grapqhqlResponse' as any);\n\t\tconst api = new API(null);\n\t\texpect(await api.graphql({ query: 'query' })).toBe('grapqhqlResponse');\n\t});",
+            "file": "API-test.ts",
+            "skipped": false,
+            "dir": "packages/api/__tests__"
+        },
+        {
+            "name": "cancel RestAPI request",
+            "suites": [
+                "API test",
+                "cancel"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 30
+            },
+            "line": 89,
+            "code": "\t\ttest('cancel RestAPI request', async () => {\n\t\t\tjest\n\t\t\t\t.spyOn(GraphQLAPIClass.prototype, 'hasCancelToken')\n\t\t\t\t.mockImplementation(() => false);\n\t\t\tconst restAPICancelSpy = jest\n\t\t\t\t.spyOn(RestAPIClass.prototype, 'cancel')\n\t\t\t\t.mockImplementation(() => true);\n\t\t\tjest\n\t\t\t\t.spyOn(RestAPIClass.prototype, 'hasCancelToken')\n\t\t\t\t.mockImplementation(() => true);\n\t\t\tconst api = new API(null);\n\t\t\tconst request = Promise.resolve();\n\t\t\texpect(api.cancel(request)).toBe(true);\n\t\t\texpect(restAPICancelSpy).toHaveBeenCalled();\n\t\t});",
+            "file": "API-test.ts",
+            "skipped": false,
+            "dir": "packages/api/__tests__"
+        },
+        {
+            "name": "cancel GraphQLAPI request",
+            "suites": [
+                "API test",
+                "cancel"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 33
+            },
+            "line": 105,
+            "code": "\t\ttest('cancel GraphQLAPI request', async () => {\n\t\t\tjest\n\t\t\t\t.spyOn(GraphQLAPIClass.prototype, 'hasCancelToken')\n\t\t\t\t.mockImplementation(() => true);\n\t\t\tconst graphQLAPICancelSpy = jest\n\t\t\t\t.spyOn(GraphQLAPIClass.prototype, 'cancel')\n\t\t\t\t.mockImplementation(() => true);\n\t\t\tjest\n\t\t\t\t.spyOn(RestAPIClass.prototype, 'hasCancelToken')\n\t\t\t\t.mockImplementation(() => false);\n\t\t\tconst api = new API(null);\n\t\t\tconst request = Promise.resolve();\n\t\t\texpect(api.cancel(request)).toBe(true);\n\t\t\texpect(graphQLAPICancelSpy).toHaveBeenCalled();\n\t\t});",
             "file": "API-test.ts",
             "skipped": false,
             "dir": "packages/api/__tests__"
