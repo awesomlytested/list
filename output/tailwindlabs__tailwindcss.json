@@ -533,6 +533,38 @@
             "dir": "integrations/tailwindcss-cli/tests"
         },
         {
+            "name": "--help in ESM package",
+            "suites": [
+                "Init command"
+            ],
+            "updatePoint": {
+                "line": 376,
+                "column": 29,
+                "index": 13323
+            },
+            "line": 376,
+            "code": "  test('--help in ESM package', async () => {\n    let pkg = await readOutputFile('../package.json');\n    await writeInputFile('../package.json', JSON.stringify({ ...JSON.parse(pkg),\n      type: 'module'\n    }));\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.cjs\\` file\n           -p, --postcss            Initialize a \\`postcss.config.cjs\\` file\n               --types              Add TypeScript types for the \\`tailwind.config.cjs\\` file\n           -h, --help               Display usage information\n      `));\n    await writeInputFile('../package.json', pkg);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "cjs config created when in ESM package",
+            "suites": [
+                "Init command"
+            ],
+            "updatePoint": {
+                "line": 398,
+                "column": 46,
+                "index": 14156
+            },
+            "line": 398,
+            "code": "  test('cjs config created when in ESM package', async () => {\n    cleanupFile('tailwind.config.cjs');\n    let pkg = await readOutputFile('../package.json');\n    await writeInputFile('../package.json', JSON.stringify({ ...JSON.parse(pkg),\n      type: 'module'\n    }));\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: tailwind.config.cjs\n      \"\n    `);\n    expect(await fileExists('./tailwind.config.cjs')).toBe(true); // Not a clean way to test this.\n\n    expect(await readOutputFile('../tailwind.config.cjs')).toContain('module.exports =');\n    expect(await readOutputFile('../tailwind.config.cjs')).not.toContain(`/** @type {import('tailwindcss/types').Config} */`);\n    await writeInputFile('../package.json', pkg);\n  });",
+            "file": "cli.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
             "name": "should be possible to generate tailwind output",
             "suites": [
                 "static build"
