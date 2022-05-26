@@ -1855,11 +1855,11 @@
             "name": "Should display initial React components",
             "suites": [],
             "updatePoint": {
-                "line": 27,
+                "line": 33,
                 "column": 47,
-                "index": 647
+                "index": 720
             },
-            "line": 27,
+            "line": 33,
             "code": "  test('Should display initial React components', async () => {\n    const appRowCount = await page.evaluate(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_APP;\n      const container = document.getElementById('iframe').contentDocument;\n      const rows = findAllNodes(container, [createTestNameSelector('ListItem')]);\n      return rows.length;\n    });\n    expect(appRowCount).toBe(3);\n    const devToolsRowCount = await devToolsUtils.getElementCount(page, 'ListItem');\n    expect(devToolsRowCount).toBe(3);\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
@@ -1869,11 +1869,11 @@
             "name": "Should display newly added React components",
             "suites": [],
             "updatePoint": {
-                "line": 41,
+                "line": 47,
                 "column": 51,
-                "index": 1218
+                "index": 1291
             },
-            "line": 41,
+            "line": 47,
             "code": "  test('Should display newly added React components', async () => {\n    await listAppUtils.addItem(page, 'four');\n    const count = await devToolsUtils.getElementCount(page, 'ListItem');\n    expect(count).toBe(4);\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
@@ -1883,12 +1883,12 @@
             "name": "Should allow elements to be inspected",
             "suites": [],
             "updatePoint": {
-                "line": 46,
+                "line": 52,
                 "column": 45,
-                "index": 1432
+                "index": 1505
             },
-            "line": 46,
-            "code": "  test('Should allow elements to be inspected', async () => {\n    // Select the first list item in DevTools.\n    await devToolsUtils.selectElement(page, 'ListItem', 'List\\nApp'); // Then read the inspected values.\n\n    const [propName, propValue, sourceText] = await page.evaluate(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      const editableName = findAllNodes(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector('EditableName')])[0];\n      const editableValue = findAllNodes(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector('EditableValue')])[0];\n      const source = findAllNodes(container, [createTestNameSelector('InspectedElementView-Source')])[0];\n      return [editableName.value, editableValue.value, source.innerText];\n    });\n    expect(propName).toBe('label');\n    expect(propValue).toBe('\"one\"');\n    expect(sourceText).toContain('ListApp.js');\n  });",
+            "line": 52,
+            "code": "  test('Should allow elements to be inspected', async () => {\n    // Select the first list item in DevTools.\n    await devToolsUtils.selectElement(page, 'ListItem', 'List\\nApp'); // Prop names/values may not be editable based on the React version.\n    // If they're not editable, make sure they degrade gracefully\n\n    const isEditableName = semver.gte(config.use.react_version, '17.0.0');\n    const isEditableValue = semver.gte(config.use.react_version, '16.8.0'); // Then read the inspected values.\n\n    const [propName, propValue, sourceText] = await page.evaluate(isEditable => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools'); // Get name of first prop\n\n      const selectorName = isEditable.name ? 'EditableName' : 'NonEditableName';\n      const nameElement = findAllNodes(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector(selectorName)])[0];\n      const name = isEditable.name ? nameElement.value : nameElement.innerText; // Get value of first prop\n\n      const selectorValue = isEditable.value ? 'EditableValue' : 'NonEditableValue';\n      const valueElement = findAllNodes(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector(selectorValue)])[0];\n      const source = findAllNodes(container, [createTestNameSelector('InspectedElementView-Source')])[0];\n      const value = isEditable.value ? valueElement.value : valueElement.innerText;\n      return [name, value, source.innerText];\n    }, {\n      name: isEditableName,\n      value: isEditableValue\n    });\n    expect(propName).toBe('label');\n    expect(propValue).toBe('\"one\"');\n    expect(sourceText).toMatch(/ListApp[a-zA-Z]*\\.js/);\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
             "dir": "packages/react-devtools-inline/__tests__"
@@ -1897,12 +1897,12 @@
             "name": "should allow props to be edited",
             "suites": [],
             "updatePoint": {
-                "line": 65,
+                "line": 84,
                 "column": 39,
-                "index": 2497
+                "index": 3290
             },
-            "line": 65,
-            "code": "  test('should allow props to be edited', async () => {\n    // Select the first list item in DevTools.\n    await devToolsUtils.selectElement(page, 'ListItem', 'List\\nApp'); // Then edit the label prop.\n\n    await page.evaluate(() => {\n      const {\n        createTestNameSelector,\n        focusWithin\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      focusWithin(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector('EditableValue')]);\n    });\n    page.keyboard.press('Backspace'); // \"\n\n    page.keyboard.press('Backspace'); // e\n\n    page.keyboard.press('Backspace'); // n\n\n    page.keyboard.press('Backspace'); // o\n\n    page.keyboard.insertText('new\"');\n    page.keyboard.press('Enter');\n    await page.waitForFunction(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_APP;\n      const container = document.getElementById('iframe').contentDocument;\n      const rows = findAllNodes(container, [createTestNameSelector('ListItem')])[0];\n      return rows.innerText === 'new';\n    });\n  });",
+            "line": 84,
+            "code": "  test('should allow props to be edited', async () => {\n    runOnlyForReactRange('>=16.8'); // Select the first list item in DevTools.\n\n    await devToolsUtils.selectElement(page, 'ListItem', 'List\\nApp'); // Then edit the label prop.\n\n    await page.evaluate(() => {\n      const {\n        createTestNameSelector,\n        focusWithin\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      focusWithin(container, [createTestNameSelector('InspectedElementPropsTree'), createTestNameSelector('EditableValue')]);\n    });\n    page.keyboard.press('Backspace'); // \"\n\n    page.keyboard.press('Backspace'); // e\n\n    page.keyboard.press('Backspace'); // n\n\n    page.keyboard.press('Backspace'); // o\n\n    page.keyboard.insertText('new\"');\n    page.keyboard.press('Enter');\n    await page.waitForFunction(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_APP;\n      const container = document.getElementById('iframe').contentDocument;\n      const rows = findAllNodes(container, [createTestNameSelector('ListItem')])[0];\n      return rows.innerText === 'new';\n    });\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
             "dir": "packages/react-devtools-inline/__tests__"
@@ -1911,12 +1911,12 @@
             "name": "should load and parse hook names for the inspected element",
             "suites": [],
             "updatePoint": {
-                "line": 97,
+                "line": 117,
                 "column": 66,
-                "index": 3656
+                "index": 4482
             },
-            "line": 97,
-            "code": "  test('should load and parse hook names for the inspected element', async () => {\n    // Select the List component DevTools.\n    await devToolsUtils.selectElement(page, 'List', 'App'); // Then click to load and parse hook names.\n\n    await devToolsUtils.clickButton(page, 'LoadHookNamesButton'); // Make sure the expected hook names are parsed and displayed eventually.\n\n    await page.waitForFunction(hookNames => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      const hooksTree = findAllNodes(container, [createTestNameSelector('InspectedElementHooksTree')])[0];\n\n      if (!hooksTree) {\n        return false;\n      }\n\n      const hooksTreeText = hooksTree.innerText;\n\n      for (let i = 0; i < hookNames.length; i++) {\n        if (!hooksTreeText.includes(hookNames[i])) {\n          return false;\n        }\n      }\n\n      return true;\n    }, ['State(items)', 'Ref(inputRef)']);\n  });",
+            "line": 117,
+            "code": "  test('should load and parse hook names for the inspected element', async () => {\n    runOnlyForReactRange('>=16.8'); // Select the List component DevTools.\n\n    await devToolsUtils.selectElement(page, 'List', 'App'); // Then click to load and parse hook names.\n\n    await devToolsUtils.clickButton(page, 'LoadHookNamesButton'); // Make sure the expected hook names are parsed and displayed eventually.\n\n    await page.waitForFunction(hookNames => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      const hooksTree = findAllNodes(container, [createTestNameSelector('InspectedElementHooksTree')])[0];\n\n      if (!hooksTree) {\n        return false;\n      }\n\n      const hooksTreeText = hooksTree.innerText;\n\n      for (let i = 0; i < hookNames.length; i++) {\n        if (!hooksTreeText.includes(hookNames[i])) {\n          return false;\n        }\n      }\n\n      return true;\n    }, ['State(items)', 'Ref(inputRef)']);\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
             "dir": "packages/react-devtools-inline/__tests__"
@@ -1925,12 +1925,12 @@
             "name": "should allow searching for component by name",
             "suites": [],
             "updatePoint": {
-                "line": 126,
+                "line": 147,
                 "column": 52,
-                "index": 4653
+                "index": 5512
             },
-            "line": 126,
-            "code": "  test('should allow searching for component by name', async () => {\n    async function getComponentSearchResultsCount() {\n      return await page.evaluate(() => {\n        const {\n          createTestNameSelector,\n          findAllNodes\n        } = window.REACT_DOM_DEVTOOLS;\n        const container = document.getElementById('devtools');\n        const element = findAllNodes(container, [createTestNameSelector('ComponentSearchInput-ResultsCount')])[0];\n        return element.innerText;\n      });\n    }\n\n    await page.evaluate(() => {\n      const {\n        createTestNameSelector,\n        focusWithin\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      focusWithin(container, [createTestNameSelector('ComponentSearchInput-Input')]);\n    });\n    page.keyboard.insertText('List');\n    let count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 4');\n    page.keyboard.insertText('Item');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('2 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('3 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('3 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('2 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n  });",
+            "line": 147,
+            "code": "  test('should allow searching for component by name', async () => {\n    async function getComponentSearchResultsCount() {\n      return await page.evaluate(() => {\n        const {\n          createTestNameSelector,\n          findAllNodes\n        } = window.REACT_DOM_DEVTOOLS;\n        const container = document.getElementById('devtools');\n        const element = findAllNodes(container, [createTestNameSelector('ComponentSearchInput-ResultsCount')])[0];\n        return element.innerText;\n      });\n    }\n\n    async function focusComponentSearch() {\n      await page.evaluate(() => {\n        const {\n          createTestNameSelector,\n          focusWithin\n        } = window.REACT_DOM_DEVTOOLS;\n        const container = document.getElementById('devtools');\n        focusWithin(container, [createTestNameSelector('ComponentSearchInput-Input')]);\n      });\n    }\n\n    await focusComponentSearch();\n    page.keyboard.insertText('List');\n    let count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 4');\n    await focusComponentSearch();\n    page.keyboard.insertText('Item');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('2 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('3 | 3');\n    page.keyboard.press('Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('3 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('2 | 3');\n    page.keyboard.press('Shift+Enter');\n    count = await getComponentSearchResultsCount();\n    expect(count).toBe('1 | 3');\n  });",
             "file": "__e2e__/components.test.js",
             "skipped": false,
             "dir": "packages/react-devtools-inline/__tests__"
@@ -1939,12 +1939,12 @@
             "name": "should record renders and commits when active",
             "suites": [],
             "updatePoint": {
-                "line": 27,
+                "line": 31,
                 "column": 53,
-                "index": 649
+                "index": 687
             },
-            "line": 27,
-            "code": "  test('should record renders and commits when active', async () => {\n    async function getSnapshotSelectorText() {\n      return await page.evaluate(() => {\n        const {\n          createTestNameSelector,\n          findAllNodes\n        } = window.REACT_DOM_DEVTOOLS;\n        const container = document.getElementById('devtools');\n        const input = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Input')])[0];\n        const label = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Label')])[0];\n        return `${input.value}${label.innerText}`;\n      });\n    }\n\n    async function clickButtonAndVerifySnapshotSelectorText(buttonTagName, expectedText) {\n      await devToolsUtils.clickButton(page, buttonTagName);\n      const text = await getSnapshotSelectorText();\n      expect(text).toBe(expectedText);\n    }\n\n    await devToolsUtils.clickButton(page, 'ProfilerToggleButton');\n    await listAppUtils.addItem(page, 'four');\n    await listAppUtils.addItem(page, 'five');\n    await listAppUtils.addItem(page, 'six');\n    await devToolsUtils.clickButton(page, 'ProfilerToggleButton');\n    await page.waitForFunction(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      const input = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Input')]);\n      return input.length === 1;\n    });\n    const text = await getSnapshotSelectorText();\n    expect(text).toBe('1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '2 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '3 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '3 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '2 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '3 / 3');\n  });",
+            "line": 31,
+            "code": "  test('should record renders and commits when active', async () => {\n    // Profiling is only available in 16.5 and over\n    runOnlyForReactRange('>=16.5');\n\n    async function getSnapshotSelectorText() {\n      return await page.evaluate(() => {\n        const {\n          createTestNameSelector,\n          findAllNodes\n        } = window.REACT_DOM_DEVTOOLS;\n        const container = document.getElementById('devtools');\n        const input = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Input')])[0];\n        const label = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Label')])[0];\n        return `${input.value}${label.innerText}`;\n      });\n    }\n\n    async function clickButtonAndVerifySnapshotSelectorText(buttonTagName, expectedText) {\n      await devToolsUtils.clickButton(page, buttonTagName);\n      const text = await getSnapshotSelectorText();\n      expect(text).toBe(expectedText);\n    }\n\n    await devToolsUtils.clickButton(page, 'ProfilerToggleButton');\n    await listAppUtils.addItem(page, 'four');\n    await listAppUtils.addItem(page, 'five');\n    await listAppUtils.addItem(page, 'six');\n    await devToolsUtils.clickButton(page, 'ProfilerToggleButton');\n    await page.waitForFunction(() => {\n      const {\n        createTestNameSelector,\n        findAllNodes\n      } = window.REACT_DOM_DEVTOOLS;\n      const container = document.getElementById('devtools');\n      const input = findAllNodes(container, [createTestNameSelector('SnapshotSelector-Input')]);\n      return input.length === 1;\n    });\n    const text = await getSnapshotSelectorText();\n    expect(text).toBe('1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '2 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '3 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-NextButton', '1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '3 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '2 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '1 / 3');\n    await clickButtonAndVerifySnapshotSelectorText('SnapshotSelector-PreviousButton', '3 / 3');\n  });",
             "file": "__e2e__/profiler.test.js",
             "skipped": false,
             "dir": "packages/react-devtools-inline/__tests__"
