@@ -1695,23 +1695,23 @@
                 "index": 12785
             },
             "line": 507,
-            "code": "  it('should support composite useTransition hook', () => {\n    function Foo(props) {\n      React.useTransition();\n      const memoizedValue = React.useMemo(() => 'hello', []);\n      return /*#__PURE__*/React.createElement(\"div\", null, memoizedValue);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'Transition',\n      value: undefined,\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'hello',\n      subHooks: []\n    }]);\n  });",
+            "code": "  it('should support composite useTransition hook', () => {\n    function Foo(props) {\n      React.useTransition();\n      const memoizedValue = React.useMemo(() => 'hello', []);\n      React.useMemo(() => 'not used', []);\n      return /*#__PURE__*/React.createElement(\"div\", null, memoizedValue);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'Transition',\n      value: undefined,\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'hello',\n      subHooks: []\n    }, {\n      id: 2,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'not used',\n      subHooks: []\n    }]);\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
             "dir": "packages/react-debug-tools/src/__tests__"
         },
         {
-            "name": "should support composite useDeferredValue hook",
+            "name": "should support useDeferredValue hook",
             "suites": [
                 "ReactHooksInspectionIntegration"
             ],
             "updatePoint": {
-                "line": 533,
-                "column": 52,
-                "index": 13546
+                "line": 540,
+                "column": 42,
+                "index": 13695
             },
-            "line": 533,
-            "code": "  it('should support composite useDeferredValue hook', () => {\n    function Foo(props) {\n      React.useDeferredValue('abc', {\n        timeoutMs: 500\n      });\n      const [state] = React.useState(() => 'hello', []);\n      return /*#__PURE__*/React.createElement(\"div\", null, state);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'DeferredValue',\n      value: 'abc',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: true,\n      name: 'State',\n      value: 'hello',\n      subHooks: []\n    }]);\n  });",
+            "line": 540,
+            "code": "  it('should support useDeferredValue hook', () => {\n    function Foo(props) {\n      React.useDeferredValue('abc', {\n        timeoutMs: 500\n      });\n      const memoizedValue = React.useMemo(() => 1, []);\n      React.useMemo(() => 2, []);\n      return /*#__PURE__*/React.createElement(\"div\", null, memoizedValue);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'DeferredValue',\n      value: 'abc',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 1,\n      subHooks: []\n    }, {\n      id: 2,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 2,\n      subHooks: []\n    }]);\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
             "dir": "packages/react-debug-tools/src/__tests__"
@@ -1722,11 +1722,11 @@
                 "ReactHooksInspectionIntegration"
             ],
             "updatePoint": {
-                "line": 561,
+                "line": 575,
                 "column": 31,
-                "index": 14314
+                "index": 14605
             },
-            "line": 561,
+            "line": 575,
             "code": "  it('should support useId hook', () => {\n    function Foo(props) {\n      const id = React.useId();\n      const [state] = React.useState('hello');\n      return /*#__PURE__*/React.createElement(\"div\", {\n        id: id\n      }, state);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree.length).toEqual(2);\n    expect(tree[0].id).toEqual(0);\n    expect(tree[0].isStateEditable).toEqual(false);\n    expect(tree[0].name).toEqual('Id');\n    expect(String(tree[0].value).startsWith(':r')).toBe(true);\n    expect(tree[1]).toEqual({\n      id: 1,\n      isStateEditable: true,\n      name: 'State',\n      value: 'hello',\n      subHooks: []\n    });\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1739,11 +1739,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 589,
+                "line": 603,
                 "column": 67,
-                "index": 15232
+                "index": 15523
             },
-            "line": 589,
+            "line": 603,
             "code": "    it('should support inspectable values for multiple custom hooks', () => {\n      function useLabeledValue(label) {\n        const [value] = React.useState(label);\n        React.useDebugValue(`custom label ${label}`);\n        return value;\n      }\n\n      function useAnonymous(label) {\n        const [value] = React.useState(label);\n        return value;\n      }\n\n      function Example() {\n        useLabeledValue('a');\n        React.useState('b');\n        useAnonymous('c');\n        useLabeledValue('d');\n        return null;\n      }\n\n      const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Example, null));\n\n      const childFiber = renderer.root.findByType(Example)._currentFiber();\n\n      const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n      expect(tree).toEqual([{\n        isStateEditable: false,\n        id: null,\n        name: 'LabeledValue',\n        value: __DEV__ ? 'custom label a' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 0,\n          name: 'State',\n          value: 'a',\n          subHooks: []\n        }]\n      }, {\n        isStateEditable: true,\n        id: 1,\n        name: 'State',\n        value: 'b',\n        subHooks: []\n      }, {\n        isStateEditable: false,\n        id: null,\n        name: 'Anonymous',\n        value: undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 2,\n          name: 'State',\n          value: 'c',\n          subHooks: []\n        }]\n      }, {\n        isStateEditable: false,\n        id: null,\n        name: 'LabeledValue',\n        value: __DEV__ ? 'custom label d' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 3,\n          name: 'State',\n          value: 'd',\n          subHooks: []\n        }]\n      }]);\n    });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1756,11 +1756,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 658,
+                "line": 672,
                 "column": 65,
-                "index": 17034
+                "index": 17325
             },
-            "line": 658,
+            "line": 672,
             "code": "    it('should support inspectable values for nested custom hooks', () => {\n      function useInner() {\n        React.useDebugValue('inner');\n        React.useState(0);\n      }\n\n      function useOuter() {\n        React.useDebugValue('outer');\n        useInner();\n      }\n\n      function Example() {\n        useOuter();\n        return null;\n      }\n\n      const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Example, null));\n\n      const childFiber = renderer.root.findByType(Example)._currentFiber();\n\n      const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n      expect(tree).toEqual([{\n        isStateEditable: false,\n        id: null,\n        name: 'Outer',\n        value: __DEV__ ? 'outer' : undefined,\n        subHooks: [{\n          isStateEditable: false,\n          id: null,\n          name: 'Inner',\n          value: __DEV__ ? 'inner' : undefined,\n          subHooks: [{\n            isStateEditable: true,\n            id: 0,\n            name: 'State',\n            value: 0,\n            subHooks: []\n          }]\n        }]\n      }]);\n    });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1773,11 +1773,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 699,
+                "line": 713,
                 "column": 67,
-                "index": 18122
+                "index": 18413
             },
-            "line": 699,
+            "line": 713,
             "code": "    it('should support multiple inspectable values per custom hooks', () => {\n      function useMultiLabelCustom() {\n        React.useDebugValue('one');\n        React.useDebugValue('two');\n        React.useDebugValue('three');\n        React.useState(0);\n      }\n\n      function useSingleLabelCustom(value) {\n        React.useDebugValue(`single ${value}`);\n        React.useState(0);\n      }\n\n      function Example() {\n        useSingleLabelCustom('one');\n        useMultiLabelCustom();\n        useSingleLabelCustom('two');\n        return null;\n      }\n\n      const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Example, null));\n\n      const childFiber = renderer.root.findByType(Example)._currentFiber();\n\n      const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n      expect(tree).toEqual([{\n        isStateEditable: false,\n        id: null,\n        name: 'SingleLabelCustom',\n        value: __DEV__ ? 'single one' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 0,\n          name: 'State',\n          value: 0,\n          subHooks: []\n        }]\n      }, {\n        isStateEditable: false,\n        id: null,\n        name: 'MultiLabelCustom',\n        value: __DEV__ ? ['one', 'two', 'three'] : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 1,\n          name: 'State',\n          value: 0,\n          subHooks: []\n        }]\n      }, {\n        isStateEditable: false,\n        id: null,\n        name: 'SingleLabelCustom',\n        value: __DEV__ ? 'single two' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 2,\n          name: 'State',\n          value: 0,\n          subHooks: []\n        }]\n      }]);\n    });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1790,11 +1790,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 762,
+                "line": 776,
                 "column": 67,
-                "index": 19860
+                "index": 20151
             },
-            "line": 762,
+            "line": 776,
             "code": "    it('should ignore useDebugValue() made outside of a custom hook', () => {\n      function Example() {\n        React.useDebugValue('this is invalid');\n        return null;\n      }\n\n      const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Example, null));\n\n      const childFiber = renderer.root.findByType(Example)._currentFiber();\n\n      const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n      expect(tree).toHaveLength(0);\n    });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1807,11 +1807,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 775,
+                "line": 789,
                 "column": 59,
-                "index": 20324
+                "index": 20615
             },
-            "line": 775,
+            "line": 789,
             "code": "    it('should support an optional formatter function param', () => {\n      function useCustom() {\n        React.useDebugValue({\n          bar: 123\n        }, object => `bar:${object.bar}`);\n        React.useState(0);\n      }\n\n      function Example() {\n        useCustom();\n        return null;\n      }\n\n      const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Example, null));\n\n      const childFiber = renderer.root.findByType(Example)._currentFiber();\n\n      const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n      expect(tree).toEqual([{\n        isStateEditable: false,\n        id: null,\n        name: 'Custom',\n        value: __DEV__ ? 'bar:123' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 0,\n          name: 'State',\n          subHooks: [],\n          value: 0\n        }]\n      }]);\n    });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1824,11 +1824,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 808,
+                "line": 822,
                 "column": 42,
-                "index": 21184
+                "index": 21475
             },
-            "line": 808,
+            "line": 822,
             "code": "  it('should support defaultProps and lazy', async () => {\n    const Suspense = React.Suspense;\n\n    function Foo(props) {\n      const [value] = React.useState(props.defaultValue.substr(0, 3));\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n\n    Foo.defaultProps = {\n      defaultValue: 'default'\n    };\n\n    async function fakeImport(result) {\n      return {\n        default: result\n      };\n    }\n\n    const LazyFoo = React.lazy(() => fakeImport(Foo));\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: \"Loading...\"\n    }, /*#__PURE__*/React.createElement(LazyFoo, null)));\n    await LazyFoo;\n    Scheduler.unstable_flushAll();\n\n    const childFiber = renderer.root._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      isStateEditable: true,\n      id: 0,\n      name: 'State',\n      value: 'def',\n      subHooks: []\n    }]);\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1841,11 +1841,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 844,
+                "line": 858,
                 "column": 43,
-                "index": 22166
+                "index": 22457
             },
-            "line": 844,
+            "line": 858,
             "code": "  it('should support an injected dispatcher', () => {\n    function Foo(props) {\n      const [state] = React.useState('hello world');\n      return /*#__PURE__*/React.createElement(\"div\", null, state);\n    }\n\n    const initial = {};\n    let current = initial;\n    let getterCalls = 0;\n    const setterCalls = [];\n    const FakeDispatcherRef = {\n      get current() {\n        getterCalls++;\n        return current;\n      },\n\n      set current(value) {\n        setterCalls.push(value);\n        current = value;\n      }\n\n    };\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root._currentFiber();\n\n    let didCatch = false;\n\n    try {\n      ReactDebugTools.inspectHooksOfFiber(childFiber, FakeDispatcherRef);\n    } catch (error) {\n      expect(error.message).toBe('Error rendering inspected component');\n      expect(error.cause).toBeInstanceOf(Error);\n      expect(error.cause.message).toBe('Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' + ' one of the following reasons:\\n' + '1. You might have mismatching versions of React and the renderer (such as React DOM)\\n' + '2. You might be breaking the Rules of Hooks\\n' + '3. You might have more than one copy of React in the same app\\n' + 'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.');\n      didCatch = true;\n    } // avoid false positive if no error was thrown at all\n\n\n    expect(didCatch).toBe(true);\n    expect(getterCalls).toBe(1);\n    expect(setterCalls).toHaveLength(2);\n    expect(setterCalls[0]).not.toBe(initial);\n    expect(setterCalls[1]).toBe(initial);\n  }); // This test case is based on an open source bug report:",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1858,11 +1858,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 890,
+                "line": 904,
                 "column": 61,
-                "index": 24047
+                "index": 24338
             },
-            "line": 890,
+            "line": 904,
             "code": "  it('should properly advance the current hook for useContext', () => {\n    const MyContext = React.createContext(1);\n    let incrementCount;\n\n    function Foo(props) {\n      const context = React.useContext(MyContext);\n      const [data, setData] = React.useState({\n        count: context\n      });\n\n      incrementCount = () => setData(({\n        count\n      }) => ({\n        count: count + 1\n      }));\n\n      return /*#__PURE__*/React.createElement(\"div\", null, \"count: \", data.count);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n    expect(renderer.toJSON()).toEqual({\n      type: 'div',\n      props: {},\n      children: ['count: ', '1']\n    });\n    act(incrementCount);\n    expect(renderer.toJSON()).toEqual({\n      type: 'div',\n      props: {},\n      children: ['count: ', '2']\n    });\n\n    const childFiber = renderer.root._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      isStateEditable: false,\n      id: null,\n      name: 'Context',\n      value: 1,\n      subHooks: []\n    }, {\n      isStateEditable: true,\n      id: 0,\n      name: 'State',\n      value: {\n        count: 2\n      },\n      subHooks: []\n    }]);\n  }); // @gate enableUseMutableSource",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
@@ -1875,12 +1875,12 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 942,
+                "line": 956,
                 "column": 52,
-                "index": 25321
+                "index": 25612
             },
-            "line": 942,
-            "code": "  it('should support composite useMutableSource hook', () => {\n    const createMutableSource = React.createMutableSource || React.unstable_createMutableSource;\n    const useMutableSource = React.useMutableSource || React.unstable_useMutableSource;\n    const mutableSource = createMutableSource({}, () => 1);\n\n    function Foo(props) {\n      useMutableSource(mutableSource, () => 'snapshot', () => {});\n      React.useMemo(() => 'memo', []);\n      return /*#__PURE__*/React.createElement(\"div\", null);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'MutableSource',\n      value: 'snapshot',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'memo',\n      subHooks: []\n    }]);\n  });",
+            "line": 956,
+            "code": "  it('should support composite useMutableSource hook', () => {\n    const createMutableSource = React.createMutableSource || React.unstable_createMutableSource;\n    const useMutableSource = React.useMutableSource || React.unstable_useMutableSource;\n    const mutableSource = createMutableSource({}, () => 1);\n\n    function Foo(props) {\n      useMutableSource(mutableSource, () => 'snapshot', () => {});\n      React.useMemo(() => 'memo', []);\n      React.useMemo(() => 'not used', []);\n      return /*#__PURE__*/React.createElement(\"div\", null);\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'MutableSource',\n      value: 'snapshot',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'memo',\n      subHooks: []\n    }, {\n      id: 2,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'not used',\n      subHooks: []\n    }]);\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
             "dir": "packages/react-debug-tools/src/__tests__"
@@ -1892,12 +1892,12 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 972,
+                "line": 993,
                 "column": 56,
-                "index": 26335
+                "index": 26785
             },
-            "line": 972,
-            "code": "  it('should support composite useSyncExternalStore hook', () => {\n    const useSyncExternalStore = React.useSyncExternalStore;\n\n    function Foo() {\n      const value = useSyncExternalStore(() => () => {}, () => 'snapshot');\n      React.useMemo(() => 'memo', []);\n      return value;\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'SyncExternalStore',\n      value: 'snapshot',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'memo',\n      subHooks: []\n    }]);\n  });",
+            "line": 993,
+            "code": "  it('should support composite useSyncExternalStore hook', () => {\n    const useSyncExternalStore = React.useSyncExternalStore;\n\n    function Foo() {\n      const value = useSyncExternalStore(() => () => {}, () => 'snapshot');\n      React.useMemo(() => 'memo', []);\n      React.useMemo(() => 'not used', []);\n      return value;\n    }\n\n    const renderer = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Foo, null));\n\n    const childFiber = renderer.root.findByType(Foo)._currentFiber();\n\n    const tree = ReactDebugTools.inspectHooksOfFiber(childFiber);\n    expect(tree).toEqual([{\n      id: 0,\n      isStateEditable: false,\n      name: 'SyncExternalStore',\n      value: 'snapshot',\n      subHooks: []\n    }, {\n      id: 1,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'memo',\n      subHooks: []\n    }, {\n      id: 2,\n      isStateEditable: false,\n      name: 'Memo',\n      value: 'not used',\n      subHooks: []\n    }]);\n  });",
             "file": "ReactHooksInspectionIntegration-test.js",
             "skipped": false,
             "dir": "packages/react-debug-tools/src/__tests__"
