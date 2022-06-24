@@ -835,7 +835,7 @@
                 "index": 4695
             },
             "line": 168,
-            "code": "  it('updateItem: update the nodes inside expanded/collapsed combo', () => {\n    const nodes = graph.getNodes();\n    const newNodePoses = [{\n      x: 50,\n      y: 50\n    }, {\n      x: 150,\n      y: 150\n    }, {\n      x: 450,\n      y: 450\n    }, {\n      x: 450,\n      y: 400\n    }];\n    graph.updateItem(nodes[0], newNodePoses[0]);\n    graph.updateItem(nodes[1], newNodePoses[1]);\n    graph.updateItem(nodes[2], newNodePoses[2]);\n    graph.updateItem(nodes[3], newNodePoses[3]); // 上面手动更新单个节点是不会触发相关 combo 更新的，需要调用下面方法。但是下面方法是根据数据绘制的位置，如何控制根据内部元素位置还是 combo 数据位置\n    // 是否加参数，内部更新 combo 或渲染 combo 时才用 combo 数据位置\n\n    graph.updateCombos();\n    const expectComboPoses = [{\n      x: (newNodePoses[0].x + newNodePoses[1].x) / 2,\n      y: (newNodePoses[0].y + newNodePoses[1].y) / 2\n    }, {\n      x: (newNodePoses[2].x + newNodePoses[3].x) / 2,\n      y: (newNodePoses[2].y + newNodePoses[3].y) / 2\n    }];\n    const comboModels = graph.getCombos().map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(expectComboPoses[0].x);\n    expect(comboModels[0].y).toBe(expectComboPoses[0].y);\n    expect(comboModels[1].x).toBe(expectComboPoses[1].x);\n    expect(comboModels[1].y).toBe(expectComboPoses[1].y);\n  });",
+            "code": "  it('updateItem: update the nodes inside expanded/collapsed combo', () => {\n    const nodes = graph.getNodes();\n    const newNodePoses = [{\n      x: 50,\n      y: 50\n    }, {\n      x: 150,\n      y: 150\n    }, {\n      x: 450,\n      y: 450\n    }, {\n      x: 450,\n      y: 400\n    }];\n    graph.updateItem(nodes[0], newNodePoses[0]);\n    graph.updateItem(nodes[1], newNodePoses[1]);\n    graph.updateItem(nodes[2], newNodePoses[2]);\n    graph.updateItem(nodes[3], newNodePoses[3]); // 上面手动更新单个节点是不会触发相关 combo 更新的，需要调用下面方法。但是下面方法是根据数据绘制的位置，如何控制根据内部元素位置还是 combo 数据位置\n    // 是否加参数，内部更新 combo 或渲染 combo 时才用 combo 数据位置\n\n    graph.updateCombos();\n    const expectComboPoses = [{\n      x: (newNodePoses[0].x + newNodePoses[1].x) / 2,\n      y: (newNodePoses[0].y + newNodePoses[1].y) / 2\n    }, {\n      // x: (newNodePoses[2].x + newNodePoses[3].x) / 2,\n      // y: (newNodePoses[2].y + newNodePoses[3].y) / 2,\n      // 该 combo 是 collapsed，因此不受节点位置影响\n      x: 400,\n      y: 400\n    }];\n    const comboModels = graph.getCombos().map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(expectComboPoses[0].x);\n    expect(comboModels[0].y).toBe(expectComboPoses[0].y);\n    expect(comboModels[1].x).toBe(expectComboPoses[1].x);\n    expect(comboModels[1].y).toBe(expectComboPoses[1].y);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
             "dir": "packages/core/tests"
@@ -846,11 +846,11 @@
                 "simple data"
             ],
             "updatePoint": {
-                "line": 203,
+                "line": 206,
                 "column": 110,
-                "index": 5951
+                "index": 6025
             },
-            "line": 203,
+            "line": 206,
             "code": "  it('1 initial collapsed with pos, 2 expand, 3 move combo, 4 move node, 5 collapse, 6 move combo, 7 move node', done => {\n    graph.destroy();\n    const testData = clone(simpleData);\n    graph = new Graph(graphCfg);\n    graph.read(testData); // initial collapsed with pos\n\n    const combo = graph.findById('b');\n    const model = combo.getModel();\n    expect(model.x).toBe(400);\n    expect(model.y).toBe(400);\n    setTimeout(() => {\n      // 2 epxand\n      graph.collapseExpandCombo('b');\n      expect(model.x).toBe(400);\n      expect(model.y).toBe(400); // 3 move combo\n\n      graph.updateItem(combo, {\n        x: 200,\n        y: 100\n      });\n      expect(model.x).toBe(200);\n      expect(model.y).toBe(100); // 4 move node\n\n      const node = graph.findById('2');\n      graph.updateItem(node, {\n        x: 300,\n        y: 200\n      });\n      graph.updateCombos();\n      expect(node.getModel().x).toBe(300);\n      expect(node.getModel().y).toBe(200);\n      expect(model.x).toBe(262.5);\n      expect(model.y).toBe(150);\n      setTimeout(() => {\n        expect(Math.abs(combo.getKeyShape().attr('r') - 102) < 1).toBe(true); // 5 collapse\n\n        graph.collapseExpandCombo('b');\n        expect(model.x).toBe(262.5);\n        expect(model.y).toBe(150);\n        setTimeout(() => {\n          expect(Math.abs(combo.getKeyShape().attr('r') - 35) < 1).toBe(true); // 6 move combo\n\n          graph.updateItem(combo, {\n            x: 400,\n            y: 50\n          });\n          expect(model.x).toBe(400);\n          expect(model.y).toBe(50);\n          expect(Math.abs(combo.getKeyShape().attr('r') - 35) < 1).toBe(true); // 7 move node\n\n          const node = graph.findById('3');\n          graph.updateItem(node, {\n            x: 150,\n            y: 400\n          });\n          graph.updateCombos();\n          expect(node.getModel().x).toBe(150);\n          expect(node.getModel().y).toBe(400); // 收起状态下移动内部节点，combo 不会更新位置，因为计算 bbox 的时候忽略了隐藏元素\n\n          expect(model.x).toBe(400);\n          expect(model.y).toBe(50);\n          graph.collapseExpandCombo('b');\n          setTimeout(() => {\n            expect(model.x).toBe(293.75);\n            expect(model.y).toBe(250);\n            done();\n          }, 500);\n        }, 500);\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -862,11 +862,11 @@
                 "simple data"
             ],
             "updatePoint": {
-                "line": 274,
+                "line": 277,
                 "column": 113,
-                "index": 8208
+                "index": 8282
             },
-            "line": 274,
+            "line": 277,
             "code": "  it('1 initial collapsed without pos, 2 expand, 3 move combo, 4 move node, 5 collapse, 6 move combo, 7 move node', done => {\n    const testData = clone(simpleData);\n    testData.combos.forEach(combo => {\n      delete combo.x;\n      delete combo.y;\n    });\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData); // initial collapsed with pos\n\n    const combo = graph.findById('b');\n    const model = combo.getModel();\n    expect(model.x).toBe(175);\n    expect(model.y).toBe(30);\n    setTimeout(() => {\n      // 2 epxand\n      graph.collapseExpandCombo('b');\n      setTimeout(() => {\n        expect(model.x).toBe(175);\n        expect(model.y).toBe(30); // 3 move combo\n\n        graph.updateItem(combo, {\n          x: 200,\n          y: 100\n        });\n        expect(model.x).toBe(200);\n        expect(model.y).toBe(100); // 4 move node\n\n        const node = graph.findById('2');\n        graph.updateItem(node, {\n          x: 300,\n          y: 200\n        });\n        graph.updateCombos();\n        expect(node.getModel().x).toBe(300);\n        expect(node.getModel().y).toBe(200);\n        expect(model.x).toBe(262.5);\n        expect(model.y).toBe(150);\n        setTimeout(() => {\n          expect(Math.abs(combo.getKeyShape().attr('r') - 102) < 1).toBe(true); // 5 collapse\n\n          graph.collapseExpandCombo('b');\n          setTimeout(() => {\n            expect(model.x).toBe(262.5);\n            expect(model.y).toBe(150);\n            expect(Math.abs(combo.getKeyShape().attr('r') - 35) < 1).toBe(true); // 6 7 与上一个 it 内容相同，不再重复\n\n            done();\n          }, 500);\n        }, 500);\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -878,11 +878,11 @@
                 "simple data"
             ],
             "updatePoint": {
-                "line": 327,
+                "line": 330,
                 "column": 93,
-                "index": 9833
+                "index": 9907
             },
-            "line": 327,
+            "line": 330,
             "code": "  it('1 initial expand with pos, 2 move node, 3 move combo, 4 collapse, 5 move node, 6 expand', done => {\n    graph.destroy();\n    const testData = clone(simpleData);\n    graph = new Graph(graphCfg);\n    graph.read(testData); // 1 initial expand with pos\n\n    const combo = graph.findById('a');\n    const model = combo.getModel();\n    expect(model.x).toBe(100);\n    expect(model.y).toBe(400); // 2 move node\n\n    const node = graph.findById('1');\n    const node1Model = node.getModel();\n    const node0Model = graph.findById('0').getModel();\n    graph.updateItem(node, {\n      x: 100,\n      y: 100\n    });\n    graph.updateCombos();\n    expect(node.getModel().x).toBe(100);\n    expect(node.getModel().y).toBe(100);\n    expect(model.x).toBe(87.5);\n    expect(model.y).toBe(250);\n    setTimeout(() => {\n      expect(Math.abs(combo.getKeyShape().attr('r') - 187) < 1).toBe(true); // 3 move combo\n\n      graph.updateItem(combo, {\n        x: 300,\n        y: 400\n      });\n      expect(model.x).toBe(300);\n      expect(model.y).toBe(400);\n      expect(node1Model.x).toBe(300 - 87.5 + 100);\n      expect(node1Model.y).toBe(400 - 250 + 100);\n      expect(node0Model.x).toBe(287.5);\n      expect(node0Model.y).toBe(550); // 4 collapse\n\n      graph.collapseExpandCombo('a');\n      setTimeout(() => {\n        expect(Math.abs(combo.getKeyShape().attr('r') - 35) < 1).toBe(true);\n        expect(model.x).toBe(300);\n        expect(model.y).toBe(400); // 5 move node, collapse 状态下移动节点，combo 位置不变\n\n        graph.updateItem('0', {\n          x: 50,\n          y: 50\n        });\n        expect(node0Model.x).toBe(50);\n        expect(node0Model.y).toBe(50);\n        expect(model.x).toBe(300);\n        expect(model.y).toBe(400); // 6 expand\n\n        graph.collapseExpandCombo('a');\n        setTimeout(() => {\n          expect(Math.abs(combo.getKeyShape().attr('r') - 204) < 1).toBe(true);\n          expect(model.x).toBe(181.25);\n          expect(model.y).toBe(150);\n          done();\n        }, 500);\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -894,11 +894,11 @@
                 "simple data"
             ],
             "updatePoint": {
-                "line": 389,
+                "line": 392,
                 "column": 96,
-                "index": 11848
+                "index": 11922
             },
-            "line": 389,
+            "line": 392,
             "code": "  it('1 initial expand without pos, 2 move node, 3 move combo, 4 collapse, 5 move node, 6 expand', done => {\n    const testData = clone(simpleData);\n    testData.combos.forEach(combo => {\n      delete combo.x;\n      delete combo.y;\n    });\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData); // 1 initial collapsed without pos\n\n    const combo = graph.findById('a');\n    const model = combo.getModel();\n    expect(model.x).toBe(75);\n    expect(model.y).toBe(20);\n    setTimeout(() => {\n      // 2 move node\n      const node = graph.findById('1');\n      const node1Model = node.getModel();\n      const node0Model = graph.findById('0').getModel();\n      graph.updateItem(node, {\n        x: 300,\n        y: 200\n      });\n      graph.updateCombos();\n      expect(node1Model.x).toBe(300);\n      expect(node1Model.y).toBe(200);\n      expect(model.x).toBe(175);\n      expect(model.y).toBe(110);\n      setTimeout(() => {\n        expect(Math.abs(combo.getKeyShape().attr('r') - 193) < 1).toBe(true); // 3 move combo\n\n        graph.updateItem(combo, {\n          x: 50,\n          y: 350\n        });\n        expect(model.x).toBe(50);\n        expect(model.y).toBe(350);\n        expect(node1Model.x).toBe(50 - 175 + 300);\n        expect(node1Model.y).toBe(350 - 110 + 200);\n        expect(node0Model.x).toBe(-75);\n        expect(node0Model.y).toBe(260); // 4 collapse\n\n        graph.collapseExpandCombo('a');\n        setTimeout(() => {\n          expect(Math.abs(combo.getKeyShape().attr('r') - 35) < 1).toBe(true);\n          expect(model.x).toBe(50);\n          expect(model.y).toBe(350); // 5 expand\n\n          graph.collapseExpandCombo('a');\n          setTimeout(() => {\n            expect(Math.abs(combo.getKeyShape().attr('r') - 193) < 1).toBe(true);\n            expect(model.x).toBe(50);\n            expect(model.y).toBe(350);\n            graph.destroy();\n            done();\n          }, 500);\n        }, 500);\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -910,11 +910,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 471,
+                "line": 474,
                 "column": 44,
-                "index": 14248
+                "index": 14322
             },
-            "line": 471,
+            "line": 474,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // the child combo follow the parent\n\n    expect(comboBModel.x).toBe(100);\n    expect(comboBModel.y).toBe(200);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -926,11 +926,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 478,
+                "line": 481,
                 "column": 30,
-                "index": 14481
+                "index": 14555
             },
-            "line": 478,
+            "line": 481,
             "code": "  it('move child empty combo B', done => {\n    graph.updateItem('B', {\n      x: 330,\n      y: 120\n    });\n    expect(comboBModel.x).toBe(330);\n    expect(comboBModel.y).toBe(120); // the parent combo follow the child\n\n    graph.updateCombos();\n    expect(comboAModel.x).toBe(330);\n    expect(comboAModel.y).toBe(120); // collpase combo B\n\n    graph.collapseExpandCombo('B');\n    setTimeout(() => {\n      // move combo B\n      graph.updateItem('B', {\n        x: 430,\n        y: 200\n      });\n      expect(comboBModel.x).toBe(430);\n      expect(comboBModel.y).toBe(200); // the parrent follow the child\n\n      graph.updateCombos();\n      expect(comboAModel.x).toBe(430);\n      expect(comboAModel.y).toBe(200);\n      done();\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -942,11 +942,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 506,
+                "line": 509,
                 "column": 25,
-                "index": 15217
+                "index": 15291
             },
-            "line": 506,
+            "line": 509,
             "code": "  it('move parent combo A', done => {\n    graph.updateItem('A', {\n      x: 50,\n      y: 50\n    });\n    expect(comboAModel.x).toBe(50);\n    expect(comboAModel.y).toBe(50); // the child follow the parent\n\n    expect(comboBModel.x).toBe(50);\n    expect(comboBModel.y).toBe(50); // expand B\n\n    graph.collapseExpandCombo('B');\n    setTimeout(() => {\n      // no changes\n      expect(comboAModel.x).toBe(50);\n      expect(comboAModel.y).toBe(50);\n      expect(comboBModel.x).toBe(50);\n      expect(comboBModel.y).toBe(50);\n      done();\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -958,11 +958,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 527,
+                "line": 530,
                 "column": 52,
-                "index": 15796
+                "index": 15870
             },
-            "line": 527,
+            "line": 530,
             "code": "  it('parent combo without pos, child combo with pos', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    expect(comboBModel.x).toBe(300);\n    expect(comboBModel.y).toBe(400); // A has no position, follows the child\n\n    expect(comboAModel.x).toBe(300);\n    expect(comboAModel.y).toBe(400); // move B\n\n    graph.updateItem('B', {\n      x: 300,\n      y: 100\n    });\n    expect(comboBModel.x).toBe(300);\n    expect(comboBModel.y).toBe(100); // A follows the child\n\n    graph.updateCombos();\n    expect(comboAModel.x).toBe(300);\n    expect(comboAModel.y).toBe(100); // move A\n\n    graph.updateItem('A', {\n      x: 400,\n      y: 120\n    });\n    expect(comboBModel.x).toBe(400);\n    expect(comboBModel.y).toBe(120); // B follows the parent\n\n    expect(comboAModel.x).toBe(400);\n    expect(comboAModel.y).toBe(120);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -974,11 +974,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 565,
+                "line": 568,
                 "column": 48,
-                "index": 16891
+                "index": 16965
             },
-            "line": 565,
+            "line": 568,
             "code": "  it('parent combo with pos, child combo without', () => {\n    const testData = clone(data);\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    expect(comboBModel.x).toBe(100);\n    expect(comboBModel.y).toBe(200); // A has no position, follows the child\n\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -990,11 +990,11 @@
                 "hierarchy data 1: combo A has one child: an empty combo B"
             ],
             "updatePoint": {
-                "line": 582,
+                "line": 585,
                 "column": 59,
-                "index": 17478
+                "index": 17552
             },
-            "line": 582,
+            "line": 585,
             "code": "  it('parent combo collapsed with pos, child combo with pos', done => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    expect(comboBModel.x).toBe(100);\n    expect(comboBModel.y).toBe(200); // A has no position, follows the child\n\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // move A\n\n    graph.updateItem('A', {\n      x: 300,\n      y: 350\n    });\n    expect(comboAModel.x).toBe(300);\n    expect(comboAModel.y).toBe(350); // child follows A\n\n    expect(comboBModel.x).toBe(300);\n    expect(comboBModel.y).toBe(350); // expand A\n\n    graph.collapseExpandCombo('A');\n    setTimeout(() => {\n      expect(comboAModel.x).toBe(300);\n      expect(comboAModel.y).toBe(350); // child follows A\n\n      expect(comboBModel.x).toBe(300);\n      expect(comboBModel.y).toBe(350);\n      graph.destroy();\n      done();\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1006,11 +1006,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 649,
+                "line": 652,
                 "column": 44,
-                "index": 19215
+                "index": 19289
             },
-            "line": 649,
+            "line": 652,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // the child combo follow the parent\n\n    expect(comboBModel.x).toBe(232.75);\n    expect(comboBModel.y).toBe(377.75);\n    expect(nodeModel.x).toBe(-57.25);\n    expect(nodeModel.y).toBe(-2.25);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1022,11 +1022,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 658,
+                "line": 661,
                 "column": 30,
-                "index": 19529
+                "index": 19603
             },
-            "line": 658,
+            "line": 661,
             "code": "  it('move child empty combo B', () => {\n    graph.updateItem('B', {\n      x: 330,\n      y: 120\n    });\n    expect(comboBModel.x).toBe(330);\n    expect(comboBModel.y).toBe(120); // the sibling node is not changed\n\n    expect(nodeModel.x).toBe(-57.25);\n    expect(nodeModel.y).toBe(-2.25); // the parent combo follows the children\n\n    graph.updateCombos();\n    expect(comboAModel.x).toBe(148.625);\n    expect(comboAModel.y).toBe(71.125);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1038,11 +1038,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 673,
+                "line": 676,
                 "column": 25,
-                "index": 19968
+                "index": 20042
             },
-            "line": 673,
+            "line": 676,
             "code": "  it('move parent combo A', () => {\n    // done\n    graph.updateItem('A', {\n      x: 450,\n      y: 350\n    });\n    expect(comboAModel.x).toBe(450);\n    expect(comboAModel.y).toBe(350); // the child follow the parent\n\n    expect(comboBModel.x).toBe(450 - 148.625 + 330);\n    expect(comboBModel.y).toBe(350 - 71.125 + 120);\n    expect(nodeModel.x).toBe(450 - 148.625 - 57.25);\n    expect(nodeModel.y).toBe(350 - 71.125 - 2.25);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1054,11 +1054,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 687,
+                "line": 690,
                 "column": 49,
-                "index": 20424
+                "index": 20498
             },
-            "line": 687,
+            "line": 690,
             "code": "  it('parent combo without pos, children with pos', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    node = graph.findById('0');\n    nodeModel = node.getModel();\n    expect(comboBModel.x).toBe(300);\n    expect(comboBModel.y).toBe(400);\n    expect(nodeModel.x).toBe(10);\n    expect(nodeModel.y).toBe(20); // A has no position, follows the child\n\n    expect(comboAModel.x).toBe(167.25);\n    expect(comboAModel.y).toBe(222.25);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1070,11 +1070,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 708,
+                "line": 711,
                 "column": 52,
-                "index": 21143
+                "index": 21217
             },
-            "line": 708,
+            "line": 711,
             "code": "  it('parent combo with pos, child combo without pos', () => {\n    const testData = clone(data);\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    delete testData.nodes[0].x;\n    delete testData.nodes[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    node = graph.findById('0');\n    nodeModel = node.getModel();\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // B and 0 have no position, follow the parent\n    // the position is randomed, but inside the parent parent\n\n    expect(comboBModel.x).not.toBe(NaN);\n    expect(comboBModel.y).not.toBe(NaN);\n    expect(nodeModel.x).not.toBe(NaN);\n    expect(nodeModel.y).not.toBe(NaN);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1086,11 +1086,11 @@
                 "hierarchy data 2: combo A has 2 children: an empty combo B, a node"
             ],
             "updatePoint": {
-                "line": 732,
+                "line": 735,
                 "column": 59,
-                "index": 22014
+                "index": 22088
             },
-            "line": 732,
+            "line": 735,
             "code": "  it('parent combo collapsed with pos, child combo with pos', () => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200);\n    expect(comboBModel.x).not.toBe(NaN);\n    expect(comboBModel.y).not.toBe(NaN);\n    expect(nodeModel.x).not.toBe(NaN);\n    expect(nodeModel.y).not.toBe(NaN);\n    graph.destroy();\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1102,11 +1102,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 796,
+                "line": 799,
                 "column": 44,
-                "index": 23564
+                "index": 23638
             },
-            "line": 796,
+            "line": 799,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // the child combo follow the parent\n\n    expect(comboBModel.x).toBe(161.7898448916085);\n    expect(comboBModel.y).toBe(321.7898448916085);\n    expect(nodeModels[0].x).toBe(1.7898448916085101);\n    expect(nodeModels[0].y).toBe(41.78984489160848);\n    expect(nodeModels[1].x).toBe(11.78984489160851);\n    expect(nodeModels[1].y).toBe(51.78984489160848);\n    expect(nodeModels[2].x).toBe(156.7898448916085);\n    expect(nodeModels[2].y).toBe(316.7898448916085);\n    expect(nodeModels[3].x).toBe(166.7898448916085);\n    expect(nodeModels[3].y).toBe(326.7898448916085);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1118,11 +1118,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 811,
+                "line": 814,
                 "column": 24,
-                "index": 24244
+                "index": 24318
             },
-            "line": 811,
+            "line": 814,
             "code": "  it('move child combo B', () => {\n    graph.updateItem('B', {\n      x: 330,\n      y: 120\n    });\n    graph.updateCombos();\n    expect(comboBModel.x).toBe(330);\n    expect(comboBModel.y).toBe(120); // the sibling node is not changed\n\n    expect(nodeModels[0].x).toBe(1.7898448916085101);\n    expect(nodeModels[0].y).toBe(41.78984489160848);\n    expect(nodeModels[1].x).toBe(11.78984489160851);\n    expect(nodeModels[1].y).toBe(51.78984489160848); // the children nodes of combo B follow B\n\n    expect(nodeModels[2].x).toBe(325);\n    expect(nodeModels[2].y).toBe(115);\n    expect(nodeModels[3].x).toBe(335);\n    expect(nodeModels[3].y).toBe(125); // the parent combo follows the children\n\n    expect(comboAModel.x).toBe(184.10507755419576);\n    expect(comboAModel.y).toBe(99.10507755419573);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1134,11 +1134,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 833,
+                "line": 836,
                 "column": 25,
-                "index": 25042
+                "index": 25116
             },
-            "line": 833,
+            "line": 836,
             "code": "  it('move parent combo A', done => {\n    graph.updateItem('A', {\n      x: 150,\n      y: 150\n    });\n    expect(comboAModel.x).toBe(150);\n    expect(comboAModel.y).toBe(150); // the child follow the parent\n\n    const dx = 150 - 184.10507755419576,\n          dy = 150 - 99.10507755419573;\n    expect(comboBModel.x).toBe(dx + 330);\n    expect(comboBModel.y).toBe(dy + 120);\n    expect(nodeModels[0].x).toBe(dx + 1.7898448916085101);\n    expect(nodeModels[0].y).toBe(dy + 41.78984489160848);\n    expect(nodeModels[1].x).toBe(dx + 11.78984489160851);\n    expect(nodeModels[1].y).toBe(dy + 51.78984489160848);\n    expect(nodeModels[2].x).toBe(dx + 325);\n    expect(nodeModels[2].y).toBe(dy + 115);\n    expect(nodeModels[3].x).toBe(dx + 335);\n    expect(nodeModels[3].y).toBe(dy + 125); // collapse B\n\n    graph.collapseExpandCombo('B');\n    setTimeout(() => {\n      // move B\n      graph.updateItem('B', {\n        x: 50,\n        y: 50\n      });\n      expect(comboBModel.x).toBe(50);\n      expect(comboBModel.y).toBe(50);\n      graph.updateCombos();\n      setTimeout(() => {\n        expect(Math.abs(comboA.getKeyShape().attr('r') - 105) < 1).toBe(true);\n        expect(comboAModel.x).toBe(21.092383668706375);\n        expect(comboAModel.y).toBe(64.09238366870638);\n        done();\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1150,11 +1150,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 872,
+                "line": 875,
                 "column": 49,
-                "index": 26375
+                "index": 26449
             },
-            "line": 872,
+            "line": 875,
             "code": "  it('parent combo without pos, children with pos', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    nodes = graph.getNodes();\n    nodeModels = nodes.map(node => node.getModel());\n    expect(comboBModel.x).toBe(300);\n    expect(comboBModel.y).toBe(400);\n    expect(nodeModels[0].x).toBe(data.nodes[0].x);\n    expect(nodeModels[0].y).toBe(data.nodes[0].y);\n    expect(nodeModels[1].x).toBe(data.nodes[1].x);\n    expect(nodeModels[1].y).toBe(data.nodes[1].y); // 2 3 follows B\n\n    expect(nodeModels[2].x).toBe(295);\n    expect(nodeModels[2].y).toBe(395);\n    expect(nodeModels[3].x).toBe(305);\n    expect(nodeModels[3].y).toBe(405); // A has no position, follows the child\n\n    expect(comboAModel.x).toBe(238.2101551083915);\n    expect(comboAModel.y).toBe(278.2101551083915);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1166,11 +1166,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 900,
+                "line": 903,
                 "column": 52,
-                "index": 27444
+                "index": 27518
             },
-            "line": 900,
+            "line": 903,
             "code": "  it('parent combo with pos, child combo without pos', () => {\n    const testData = clone(data);\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    testData.nodes.forEach(node => {\n      delete node.x;\n      delete node.y;\n    });\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    nodes = graph.getNodes();\n    nodeModels = nodes.map(node => node.getModel());\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200); // B and nodes have no position, follow the parent\n\n    expect(comboBModel.x).toBe(100);\n    expect(comboBModel.y).toBe(200);\n    nodeModels.forEach(nodeModel => {\n      expect(nodeModel.x).toBe(100);\n      expect(nodeModel.y).toBe(200);\n    }); // move node 3\n\n    graph.updateItem('3', {\n      x: 300,\n      y: 400\n    });\n    expect(nodeModels[3].x).toBe(300);\n    expect(nodeModels[3].y).toBe(400);\n    graph.updateCombos(); // B and A follow the change\n\n    expect(comboBModel.x).toBe((100 + 300) / 2);\n    expect(comboBModel.y).toBe((200 + 400) / 2);\n    expect(comboAModel.x).toBe((100 + 300) / 2);\n    expect(comboAModel.y).toBe((200 + 400) / 2);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1182,11 +1182,11 @@
                 "hierarchy data3: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 940,
+                "line": 943,
                 "column": 59,
-                "index": 28741
+                "index": 28815
             },
-            "line": 940,
+            "line": 943,
             "code": "  it('parent combo collapsed with pos, child combo with pos', done => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    comboA = graph.findById('A');\n    comboAModel = comboA.getModel();\n    comboB = graph.findById('B');\n    comboBModel = comboB.getModel();\n    nodes = graph.getNodes();\n    nodeModels = nodes.map(node => node.getModel());\n    expect(comboAModel.x).toBe(100);\n    expect(comboAModel.y).toBe(200);\n    setTimeout(() => {\n      // expand A\n      graph.collapseExpandCombo('A');\n      setTimeout(() => {\n        expect(comboB.isVisible()).toBe(true); // the child combo follow the parent\n\n        expect(comboBModel.x).toBe(161.7898448916085);\n        expect(comboBModel.y).toBe(321.7898448916085);\n        expect(nodeModels[0].x).toBe(1.7898448916085101);\n        expect(nodeModels[0].y).toBe(41.78984489160848);\n        expect(nodeModels[1].x).toBe(11.78984489160851);\n        expect(nodeModels[1].y).toBe(51.78984489160848);\n        expect(nodeModels[2].x).toBe(156.7898448916085);\n        expect(nodeModels[2].y).toBe(316.7898448916085);\n        expect(nodeModels[3].x).toBe(166.7898448916085);\n        expect(nodeModels[3].y).toBe(326.7898448916085);\n        graph.destroy();\n        done();\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1198,11 +1198,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1002,
+                "line": 1005,
                 "column": 44,
-                "index": 30693
+                "index": 30767
             },
-            "line": 1002,
+            "line": 1005,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200); // the child combo follow the parent\n\n    expect(comboModels[1].x).toBe(175);\n    expect(comboModels[1].y).toBe(350);\n    expect(comboModels[2].x).toBe(25);\n    expect(comboModels[2].y).toBe(50);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1214,11 +1214,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1011,
+                "line": 1014,
                 "column": 24,
-                "index": 31010
+                "index": 31084
             },
-            "line": 1011,
+            "line": 1014,
             "code": "  it('move child combo B', () => {\n    graph.updateItem('B', {\n      x: 130,\n      y: 120\n    });\n    graph.updateCombos();\n    expect(comboModels[1].x).toBe(130);\n    expect(comboModels[1].y).toBe(120); // the sibling node is not changed\n\n    expect(comboModels[2].x).toBe(25);\n    expect(comboModels[2].y).toBe(50); // the parent combo follows the children\n\n    expect(comboModels[0].x).toBe(77.5);\n    expect(comboModels[0].y).toBe(85);\n    expect(Math.abs(combos[0].getKeyShape().attr('r') - 240) < 1).toBe(true);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1230,11 +1230,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1027,
+                "line": 1030,
                 "column": 25,
-                "index": 31535
+                "index": 31609
             },
-            "line": 1027,
+            "line": 1030,
             "code": "  it('move parent combo A', () => {\n    graph.updateItem('A', {\n      x: 150,\n      y: 150\n    });\n    expect(comboModels[0].x).toBe(150);\n    expect(comboModels[0].y).toBe(150); // the child follow the parent\n\n    const dx = 150 - 77.5,\n          dy = 150 - 85;\n    expect(comboModels[1].x).toBe(dx + 130);\n    expect(comboModels[1].y).toBe(dy + 120);\n    expect(comboModels[2].x).toBe(dx + 25);\n    expect(comboModels[2].y).toBe(dy + 50);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1246,11 +1246,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1042,
+                "line": 1045,
                 "column": 49,
-                "index": 32006
+                "index": 32080
             },
-            "line": 1042,
+            "line": 1045,
             "code": "  it('parent combo without pos, children with pos', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[1].x).toBe(300);\n    expect(comboModels[1].y).toBe(400);\n    expect(comboModels[2].x).toBe(150);\n    expect(comboModels[2].y).toBe(100); // A has no position, follows the child\n\n    expect(comboModels[0].x).toBe((300 + 150) / 2);\n    expect(comboModels[0].y).toBe((400 + 100) / 2);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1262,11 +1262,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1059,
+                "line": 1062,
                 "column": 52,
-                "index": 32695
+                "index": 32769
             },
-            "line": 1059,
+            "line": 1062,
             "code": "  it('parent combo with pos, child combo without pos', () => {\n    const testData = clone(data);\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    delete testData.combos[2].x;\n    delete testData.combos[2].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200);\n    expect(comboModels[1].x).not.toBe(NaN);\n    expect(comboModels[1].y).not.toBe(NaN);\n    expect(comboModels[2].x).not.toBe(NaN);\n    expect(comboModels[2].y).not.toBe(NaN); // move node B and C\n\n    graph.updateItem('B', {\n      x: 300,\n      y: 400\n    });\n    graph.updateItem('C', {\n      x: 200,\n      y: 400\n    });\n    expect(comboModels[1].x).toBe(300);\n    expect(comboModels[1].y).toBe(400);\n    expect(comboModels[2].x).toBe(200);\n    expect(comboModels[2].y).toBe(400);\n    graph.updateCombos();\n    expect(comboModels[0].x).toBe((300 + 200) / 2);\n    expect(comboModels[0].y).toBe((400 + 400) / 2);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1278,11 +1278,11 @@
                 "hierarchy data4: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1093,
+                "line": 1096,
                 "column": 59,
-                "index": 33846
+                "index": 33920
             },
-            "line": 1093,
+            "line": 1096,
             "code": "  it('parent combo collapsed with pos, child combo with pos', done => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200);\n    setTimeout(() => {\n      // expand A\n      graph.collapseExpandCombo('A');\n      setTimeout(() => {\n        expect(combos[1].isVisible()).toBe(true);\n        expect(combos[2].isVisible()).toBe(true); // the child combo follow the parent\n\n        expect(comboModels[1].x).toBe(175);\n        expect(comboModels[1].y).toBe(350);\n        expect(comboModels[2].x).toBe(25);\n        expect(comboModels[2].y).toBe(50);\n        graph.destroy();\n        done();\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1294,11 +1294,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1161,
+                "line": 1164,
                 "column": 44,
-                "index": 35664
+                "index": 35738
             },
-            "line": 1161,
+            "line": 1164,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200); // the child combo follow the parent\n\n    expect(comboModels[1].x).toBe(100);\n    expect(comboModels[1].y).toBe(224.29780138165995);\n    expect(comboModels[2].x).toBe(50);\n    expect(comboModels[2].y).toBe(124.29780138165995);\n    expect(node0Model.x).toBe(50);\n    expect(node0Model.y).toBe(224.29780138165995);\n    expect(node1Model.x).toBe(150);\n    expect(node1Model.y).toBe(224.29780138165995);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1310,11 +1310,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1174,
+                "line": 1177,
                 "column": 24,
-                "index": 36185
+                "index": 36259
             },
-            "line": 1174,
+            "line": 1177,
             "code": "  it('move child combo B', done => {\n    graph.updateItem('B', {\n      x: 130,\n      y: 120\n    });\n    graph.updateCombos();\n    expect(comboModels[1].x).toBe(130);\n    expect(comboModels[1].y).toBe(120); // the sibling node is not changed\n\n    expect(comboModels[2].x).toBe(50);\n    expect(comboModels[2].y).toBe(124.29780138165995); // the parent combo follows the children\n\n    setTimeout(() => {\n      expect(comboModels[0].x).toBe(115.70219861834002);\n      expect(comboModels[0].y).toBe(120);\n      expect(Math.abs(combos[0].getKeyShape().attr('r') - 157) < 1).toBe(true);\n      done();\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1326,11 +1326,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1193,
+                "line": 1196,
                 "column": 25,
-                "index": 36799
+                "index": 36873
             },
-            "line": 1193,
+            "line": 1196,
             "code": "  it('move parent combo A', () => {\n    graph.updateItem('A', {\n      x: 150,\n      y: 150\n    });\n    expect(comboModels[0].x).toBe(150);\n    expect(comboModels[0].y).toBe(150); // the child follow the parent\n\n    const dx = 150 - 115.70219861834002,\n          dy = 150 - 120;\n    expect(comboModels[1].x).toBe(dx + 130);\n    expect(comboModels[1].y).toBe(dy + 120);\n    expect(comboModels[2].x).toBe(dx + 50);\n    expect(comboModels[2].y).toBe(dy + 124.29780138165995);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1342,11 +1342,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1208,
+                "line": 1211,
                 "column": 49,
-                "index": 37301
+                "index": 37375
             },
-            "line": 1208,
+            "line": 1211,
             "code": "  it('parent combo without pos, children with pos', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[1].x).toBe(300);\n    expect(comboModels[1].y).toBe(400);\n    expect(comboModels[2].x).toBe(250);\n    expect(comboModels[2].y).toBe(300); // A has no position, follows the child\n\n    expect(comboModels[0].x).toBe(300);\n    expect(comboModels[0].y).toBe(375.70219861834005);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1358,11 +1358,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1225,
+                "line": 1228,
                 "column": 52,
-                "index": 37981
+                "index": 38055
             },
-            "line": 1225,
+            "line": 1228,
             "code": "  it('parent combo with pos, child combo without pos', () => {\n    const testData = clone(data);\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    delete testData.combos[2].x;\n    delete testData.combos[2].y;\n    testData.nodes.forEach(node => {\n      delete node.x;\n      delete node.y;\n    });\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200);\n    expect(comboModels[1].x).not.toBe(NaN);\n    expect(comboModels[1].y).not.toBe(NaN);\n    expect(comboModels[2].x).not.toBe(NaN);\n    expect(comboModels[2].y).not.toBe(NaN); // move node B and C\n\n    graph.updateItem('B', {\n      x: 300,\n      y: 400\n    });\n    graph.updateItem('C', {\n      x: 200,\n      y: 400\n    });\n    expect(comboModels[1].x).toBe(300);\n    expect(comboModels[1].y).toBe(400);\n    expect(comboModels[2].x).toBe(200);\n    expect(comboModels[2].y).toBe(400);\n    graph.updateCombos();\n    expect(comboModels[0].x).toBe(252.42462120245875);\n    expect(comboModels[0].y).toBe(400);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1374,11 +1374,11 @@
                 "hierarchy data5: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1263,
+                "line": 1266,
                 "column": 59,
-                "index": 39210
+                "index": 39284
             },
-            "line": 1263,
+            "line": 1266,
             "code": "  it('parent combo collapsed with pos, child combo with pos', done => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200);\n    setTimeout(() => {\n      // expand A\n      graph.collapseExpandCombo('A');\n      setTimeout(() => {\n        expect(combos[1].isVisible()).toBe(true);\n        expect(combos[2].isVisible()).toBe(true); // the child combo follow the parent\n\n        expect(comboModels[1].x).toBe(100);\n        expect(comboModels[1].y).toBe(224.29780138165995);\n        expect(comboModels[2].x).toBe(50);\n        expect(comboModels[2].y).toBe(124.29780138165995);\n        graph.destroy();\n        done();\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1390,11 +1390,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1316,
+                "line": 1319,
                 "column": 44,
-                "index": 40769
+                "index": 40843
             },
-            "line": 1316,
+            "line": 1319,
             "code": "  it('nested combo has different initial pos', () => {\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200); // the child combo follow the parent\n\n    expect(comboModels[1].x).toBe(100);\n    expect(comboModels[1].y).toBe(200);\n    expect(comboModels[2].x).toBe(100);\n    expect(comboModels[2].y).toBe(200);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1406,11 +1406,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1325,
+                "line": 1328,
                 "column": 24,
-                "index": 41088
+                "index": 41162
             },
-            "line": 1325,
+            "line": 1328,
             "code": "  it('move child combo B', done => {\n    graph.updateItem('B', {\n      x: 130,\n      y: 120\n    });\n    graph.updateCombos();\n    expect(comboModels[1].x).toBe(130);\n    expect(comboModels[1].y).toBe(120); // child follows\n\n    expect(comboModels[2].x).toBe(130);\n    expect(comboModels[2].y).toBe(120); // the parent combo follows the children\n\n    setTimeout(() => {\n      expect(comboModels[0].x).toBe(130);\n      expect(comboModels[0].y).toBe(120);\n      expect(Math.abs(combos[0].getKeyShape().attr('r') - 130) < 1).toBe(true);\n      done();\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1422,11 +1422,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1344,
+                "line": 1347,
                 "column": 25,
-                "index": 41655
+                "index": 41729
             },
-            "line": 1344,
+            "line": 1347,
             "code": "  it('move parent combo A', () => {\n    graph.updateItem('A', {\n      x: 150,\n      y: 150\n    });\n    expect(comboModels[0].x).toBe(150);\n    expect(comboModels[0].y).toBe(150); // the child follow the parent\n\n    expect(comboModels[1].x).toBe(150);\n    expect(comboModels[1].y).toBe(150);\n    expect(comboModels[2].x).toBe(150);\n    expect(comboModels[2].y).toBe(150);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1438,11 +1438,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1357,
+                "line": 1360,
                 "column": 52,
-                "index": 42059
+                "index": 42133
             },
-            "line": 1357,
+            "line": 1360,
             "code": "  it('parent combo without pos, B and C has position', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel()); // follow B\n\n    expect(comboModels[1].x).toBe(300);\n    expect(comboModels[1].y).toBe(400);\n    expect(comboModels[2].x).toBe(300);\n    expect(comboModels[2].y).toBe(400); // A has no position, follows the child\n\n    expect(comboModels[0].x).toBe(300);\n    expect(comboModels[0].y).toBe(400);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1454,11 +1454,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1375,
+                "line": 1378,
                 "column": 47,
-                "index": 42732
+                "index": 42806
             },
-            "line": 1375,
+            "line": 1378,
             "code": "  it('A and B combo without pos, C has position', () => {\n    const testData = clone(data);\n    delete testData.combos[0].x;\n    delete testData.combos[0].y;\n    delete testData.combos[1].x;\n    delete testData.combos[1].y;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel()); // follow C\n\n    expect(comboModels[1].x).toBe(400);\n    expect(comboModels[1].y).toBe(500);\n    expect(comboModels[2].x).toBe(400);\n    expect(comboModels[2].y).toBe(500); // A has no position, follows the child\n\n    expect(comboModels[0].x).toBe(400);\n    expect(comboModels[0].y).toBe(500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1470,11 +1470,11 @@
                 "hierarchy data6: combo A has 2 children: combo B with 2 nodes, 2 nodes"
             ],
             "updatePoint": {
-                "line": 1395,
+                "line": 1398,
                 "column": 59,
-                "index": 43483
+                "index": 43557
             },
-            "line": 1395,
+            "line": 1398,
             "code": "  it('parent combo collapsed with pos, child combo with pos', done => {\n    const testData = clone(data);\n    testData.combos[0].collapsed = true;\n    graph.destroy();\n    graph = new Graph(graphCfg);\n    graph.read(testData);\n    combos = [graph.findById('A'), graph.findById('B'), graph.findById('C')];\n    comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[0].x).toBe(100);\n    expect(comboModels[0].y).toBe(200);\n    setTimeout(() => {\n      // expand A\n      graph.collapseExpandCombo('A');\n      setTimeout(() => {\n        expect(combos[1].isVisible()).toBe(true);\n        expect(combos[2].isVisible()).toBe(true); // the child combo follow the parent\n\n        expect(comboModels[1].x).toBe(100);\n        expect(comboModels[1].y).toBe(200);\n        expect(comboModels[2].x).toBe(100);\n        expect(comboModels[2].y).toBe(200);\n        graph.destroy();\n        done();\n      }, 500);\n    }, 500);\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
@@ -1486,11 +1486,11 @@
                 "placea grid combo and nodes"
             ],
             "updatePoint": {
-                "line": 1486,
+                "line": 1489,
                 "column": 10,
-                "index": 45379
+                "index": 45453
             },
-            "line": 1486,
+            "line": 1489,
             "code": "  it('grid', () => {\n    const testData = clone(data);\n    const groupNodes = groupBy(testData.nodes, node => node.comboId);\n    Object.keys(groupNodes).forEach(key => {\n      groupNodes[key].forEach((node, i) => {\n        node.x = i * 50;\n        node.y = 0;\n      });\n    });\n    testData.combos[0].x = 250;\n    testData.combos[0].y = 250;\n    testData.combos[1].x = 0;\n    testData.combos[1].y = 100;\n    testData.combos[2].x = 250;\n    testData.combos[2].y = 450;\n    testData.combos[3].x = 250;\n    testData.combos[3].y = 550;\n    graph.read(testData);\n    const combos = testData.combos.map(cdata => graph.findById(cdata.id));\n    const comboModels = combos.map(combo => combo.getModel());\n    expect(comboModels[2].x).toBe(comboModels[0].x);\n    expect(comboModels[2].x).toBe(comboModels[1].x);\n    expect(comboModels[2].x).toBe(comboModels[3].x);\n    graph.destroy();\n  });",
             "file": "unit/shape/combo-collapsed-pos-spec.ts",
             "skipped": false,
