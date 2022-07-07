@@ -13377,15 +13377,30 @@
             "dir": "packages/plugins/typescript/resolvers/tests"
         },
         {
-            "name": "Should generate basic type resolvers with external mappers",
+            "name": "Should generate basic type resolvers with external mappers using a .js extension",
             "suites": [
                 "ResolversTypes"
             ],
             "updatePoint": {
                 "line": 709,
-                "column": 64
+                "column": 86
             },
             "line": 709,
+            "code": "  it('Should generate basic type resolvers with external mappers using a .js extension', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-file.js#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyCustomOtherType } from './my-file.js';`);\n  });",
+            "file": "mapping.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/resolvers/tests"
+        },
+        {
+            "name": "Should generate basic type resolvers with external mappers",
+            "suites": [
+                "ResolversTypes"
+            ],
+            "updatePoint": {
+                "line": 725,
+                "column": 64
+            },
+            "line": 725,
             "code": "  it('Should generate basic type resolvers with external mappers', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-file#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyCustomOtherType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n          bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n          __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n        };\n      `);\n\n    expect(result.content)\n      .toBeSimilarStringTo(`export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n      name: 'MyScalar';\n        }\n      `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await validate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13397,10 +13412,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 791,
+                "line": 807,
                 "column": 89
             },
-            "line": 791,
+            "line": 807,
             "code": "  it('Should generate basic type resolvers with external mappers using same imported type', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: './my-file#MyCustomOtherType',\n          MyOtherType: './my-file#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyCustomOtherType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n          bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n          __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n        };\n      `);\n\n    expect(result.content)\n      .toBeSimilarStringTo(`export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n      name: 'MyScalar';\n        }\n      `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await validate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13412,10 +13427,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 874,
+                "line": 890,
                 "column": 82
             },
-            "line": 874,
+            "line": 890,
             "code": "  it('Should generate the correct resolvers when used with mappers with interfaces', async () => {\n    const spy = jest.spyOn(console, 'warn').mockImplementation();\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Node: 'MyNodeType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await validate(mergeOutputs([result, `type MyNodeType = {};`]));\n\n    spy.mockRestore();\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13427,10 +13442,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 957,
+                "line": 973,
                 "column": 72
             },
-            "line": 957,
+            "line": 973,
             "code": "  it('Should generate basic type resolvers with defaultMapper set to any', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: 'any',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await validate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13442,10 +13457,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1025,
+                "line": 1041,
                 "column": 88
             },
-            "line": 1025,
+            "line": 1041,
             "code": "  it('Should generate basic type resolvers with defaultMapper set to external identifier', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: './my-file#MyBaseType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyBaseType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await validate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13457,10 +13472,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1095,
+                "line": 1111,
                 "column": 79
             },
-            "line": 1095,
+            "line": 1111,
             "code": "  it('Should replace using Omit when non-mapped type is pointing to mapped type', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: 'MyOtherTypeCustom',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversTypes['MyOtherType']>, unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherTypeCustom>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n    await validate(mergeOutputs([result, 'type MyOtherTypeCustom = {};']));\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13472,10 +13487,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1128,
+                "line": 1144,
                 "column": 83
             },
-            "line": 1128,
+            "line": 1144,
             "code": "  it('Should not replace using Omit when non-mapped type is pointing to mapped type', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: 'MyOtherTypeCustom',\n          MyType: 'MyTypeCustom',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<MyTypeCustom>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherTypeCustom>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n    await validate(mergeOutputs([result, `type MyTypeCustom = {}; type MyOtherTypeCustom = {};`]));\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13487,10 +13502,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1162,
+                "line": 1178,
                 "column": 66
             },
-            "line": 1162,
+            "line": 1178,
             "code": "  it('Should build ResolversTypes object when there are no mappers', async () => {\n    const result = await plugin(schema, [], {}, { outputFile: '' });\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Child>;\n        MyOtherType: ResolverTypeWrapper<MyOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13502,10 +13517,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1185,
+                "line": 1201,
                 "column": 31
             },
-            "line": 1185,
+            "line": 1201,
             "code": "  it('should support namespaces', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-file#MyNamespace#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversTypes['MyOtherType']>, unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyCustomOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversParentTypes['MyOtherType']>, unionChild?: Maybe<ResolversParentTypes['ChildUnion']> };\n      String: Scalars['String'];\n      Child: Omit<Child, 'parent'> & { parent?: Maybe<ResolversParentTypes['MyType']> };\n      MyOtherType: MyNamespace.MyCustomOtherType;\n      ChildUnion: ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType'];\n      Query: {};\n      Subscription: {};\n      Node: ResolversParentTypes['SomeNode'];\n      ID: Scalars['ID'];\n      SomeNode: SomeNode;\n      MyUnion: ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType'];\n      MyScalar: Scalars['MyScalar'];\n      Int: Scalars['Int'];\n      Boolean: Scalars['Boolean'];\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13517,10 +13532,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1239,
+                "line": 1255,
                 "column": 46
             },
-            "line": 1239,
+            "line": 1255,
             "code": "  it('should support namespaces in contextType', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        contextType: './my-file#MyNamespace#MyContextType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toContain(`<ContextType = MyNamespace.MyContextType>`);\n    expect(result.content).not.toContain(`<ContextType = MyNamespace>`);\n    expect(result.content).not.toContain(`<ContextType = MyContextType>`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13532,10 +13547,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1257,
+                "line": 1273,
                 "column": 48
             },
-            "line": 1257,
+            "line": 1273,
             "code": "  it('should support namespaces in defaultMapper', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        defaultMapper: './my-file#MyNamespace#MyDefaultMapper',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        String: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Child: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        ChildUnion: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        SomeNode: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyUnion: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyScalar: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Int: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Boolean: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversParentTypes = {\n        MyType: MyNamespace.MyDefaultMapper;\n        String: MyNamespace.MyDefaultMapper;\n        Child: MyNamespace.MyDefaultMapper;\n        MyOtherType: MyNamespace.MyDefaultMapper;\n        ChildUnion: MyNamespace.MyDefaultMapper;\n        Query: {};\n        Subscription: {};\n        Node: ResolversParentTypes['SomeNode'];\n        ID: MyNamespace.MyDefaultMapper;\n        SomeNode: MyNamespace.MyDefaultMapper;\n        MyUnion: MyNamespace.MyDefaultMapper;\n        MyScalar: MyNamespace.MyDefaultMapper;\n        Int: MyNamespace.MyDefaultMapper;\n        Boolean: MyNamespace.MyDefaultMapper;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13547,10 +13562,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1308,
+                "line": 1324,
                 "column": 48
             },
-            "line": 1308,
+            "line": 1324,
             "code": "  it('should support namespaces in rootValueType', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        noSchemaStitching: true,\n        rootValueType: './my-file#MyNamespace#MyRootType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Child>;\n        MyOtherType: ResolverTypeWrapper<MyOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<MyNamespace.MyRootType>;\n        Subscription: ResolverTypeWrapper<MyNamespace.MyRootType>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversParentTypes['ChildUnion']> };\n      String: Scalars['String'];\n      Child: Child;\n      MyOtherType: MyOtherType;\n      ChildUnion: ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType'];\n      Query: MyNamespace.MyRootType;\n      Subscription: MyNamespace.MyRootType;\n      Node: ResolversParentTypes['SomeNode'];\n      ID: Scalars['ID'];\n      SomeNode: SomeNode;\n      MyUnion: ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType'];\n      MyScalar: Scalars['MyScalar'];\n      Int: Scalars['Int'];\n      Boolean: Scalars['Boolean'];\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -13562,10 +13577,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1360,
+                "line": 1376,
                 "column": 51
             },
-            "line": 1360,
+            "line": 1376,
             "code": "  it('should support namespaces and {T} placeholder', async () => {\n    const result = (await plugin(\n      schema,\n      [],\n      {\n        defaultMapper: './my-file#MyNamespace#MyDefaultMapper<{T}>',\n        mappers: {\n          MyType: './my-file#MyNamespace#MyType<{T}>',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<MyNamespace.MyType<MyType>>;\n        String: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['String']>>;\n        Child: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<MyOtherType>>;\n        ChildUnion: MyNamespace.MyDefaultMapper<ResolversTypes['Child'] | ResolversTypes['MyOtherType']>;\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['ID']>>;\n        SomeNode: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<SomeNode>>;\n        MyUnion: MyNamespace.MyDefaultMapper<ResolversTypes['MyType'] | ResolversTypes['MyOtherType']>;\n        MyScalar: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['MyScalar']>>;\n        Int: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['Int']>>;\n        Boolean: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['Boolean']>>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: MyNamespace.MyType<MyType>;\n      String: MyNamespace.MyDefaultMapper<Scalars['String']>;\n      Child: MyNamespace.MyDefaultMapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversParentTypes['MyType']> }>;\n      MyOtherType: MyNamespace.MyDefaultMapper<MyOtherType>;\n      ChildUnion: MyNamespace.MyDefaultMapper<ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType']>;\n      Query: {};\n      Subscription: {};\n      Node: ResolversParentTypes['SomeNode'];\n      ID: MyNamespace.MyDefaultMapper<Scalars['ID']>;\n      SomeNode: MyNamespace.MyDefaultMapper<SomeNode>;\n      MyUnion: MyNamespace.MyDefaultMapper<ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType']>;\n      MyScalar: MyNamespace.MyDefaultMapper<Scalars['MyScalar']>;\n      Int: MyNamespace.MyDefaultMapper<Scalars['Int']>;\n      Boolean: MyNamespace.MyDefaultMapper<Scalars['Boolean']>;\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -19449,7 +19464,7 @@
                 "column": 50
             },
             "line": 10,
-            "code": "  it('can generate simple examples uppercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n          \"/* eslint-disable */\n          import * as graphql from './graphql.js';\n          import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n          const documents = {\n              \\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.ADocument,\n              \\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.BDocument,\n              \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.CFragmentDoc,\n          };\n\n          export function gql(source: \\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"];\n\n          export function gql(source: string): unknown;\n          export function gql(source: string) {\n            return (documents as any)[source] ?? {};\n          }\n\n          export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n        `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
+            "code": "  it('can generate simple examples uppercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql.js\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n          \"/* eslint-disable */\n          import * as graphql from './graphql.js';\n          import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n          const documents = {\n              \\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.ADocument,\n              \\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.BDocument,\n              \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.CFragmentDoc,\n          };\n\n          export function gql(source: \\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query A {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query B {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"];\n\n          export function gql(source: string): unknown;\n          export function gql(source: string) {\n            return (documents as any)[source] ?? {};\n          }\n\n          export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n        `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
             "dir": "packages/presets/gql-tag-operations/tests"
@@ -19464,7 +19479,7 @@
                 "column": 50
             },
             "line": 65,
-            "code": "  it('can generate simple examples lowercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-lowercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n          \"/* eslint-disable */\n          import * as graphql from './graphql.js';\n          import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n          const documents = {\n              \\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.ADocument,\n              \\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.BDocument,\n              \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.CFragmentDoc,\n          };\n\n          export function gql(source: \\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"];\n\n          export function gql(source: string): unknown;\n          export function gql(source: string) {\n            return (documents as any)[source] ?? {};\n          }\n\n          export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n        `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
+            "code": "  it('can generate simple examples lowercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-lowercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql.js\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n          \"/* eslint-disable */\n          import * as graphql from './graphql.js';\n          import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n          const documents = {\n              \\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.ADocument,\n              \\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.BDocument,\n              \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\": graphql.CFragmentDoc,\n          };\n\n          export function gql(source: \\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query a {\\\\\\\\n    a\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  query b {\\\\\\\\n    b\\\\\\\\n  }\\\\\\\\n\\\\\"];\n          export function gql(source: \\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"): (typeof documents)[\\\\\"\\\\\\\\n  fragment C on Query {\\\\\\\\n    c\\\\\\\\n  }\\\\\\\\n\\\\\"];\n\n          export function gql(source: string): unknown;\n          export function gql(source: string) {\n            return (documents as any)[source] ?? {};\n          }\n\n          export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n        `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
             "dir": "packages/presets/gql-tag-operations/tests"
@@ -19525,7 +19540,7 @@
                 "column": 29
             },
             "line": 338,
-            "code": "    it('fragmentMasking: true', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: true,\n            },\n          },\n        },\n      });\n\n      expect(result).toHaveLength(4);\n      const fileNames = result.map(res => res.filename);\n      expect(fileNames).toContain('out1/fragment-masking.ts');\n      expect(fileNames).toContain('out1/index.ts');\n      expect(fileNames).toContain('out1/gql.ts');\n      expect(fileNames).toContain('out1/graphql.ts');\n\n      const gqlFile = result.find(file => file.filename === 'out1/index.ts');\n      expect(gqlFile.content).toMatchInlineSnapshot(`\n              \"export * from \\\\\"./gql\\\\\"\n              export * from \\\\\"./fragment-masking\\\\\"\"\n            `);\n      const fragmentMaskingFile = result.find(file => file.filename === 'out1/fragment-masking.ts');\n      expect(fragmentMaskingFile.content).toMatchInlineSnapshot(`\n        \"import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n\n        export type FragmentType<TDocumentType extends DocumentNode<any, any>> = TDocumentType extends DocumentNode<\n          infer TType,\n          any\n        >\n          ? TType extends { ' $fragmentName': infer TKey }\n            ? TKey extends string\n              ? { ' $fragmentRefs': { [key in TKey]: TType } }\n              : never\n            : never\n          : never;\n\n        // return non-nullable if \\`fragmentType\\` is non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>>\n        ): TType;\n        // return nullable if \\`fragmentType\\` is nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n        ): TType | null | undefined;\n        // return array of non-nullable if \\`fragmentType\\` is array of non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n        ): ReadonlyArray<TType>;\n        // return array of nullable if \\`fragmentType\\` is array of nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): ReadonlyArray<TType> | null | undefined\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): TType | ReadonlyArray<TType> | null | undefined {\n          return fragmentType as any\n        }\n        \"\n      `);\n    });",
+            "code": "    it('fragmentMasking: true', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: true,\n            },\n          },\n        },\n      });\n\n      expect(result).toHaveLength(4);\n      const fileNames = result.map(res => res.filename);\n      expect(fileNames).toContain('out1/fragment-masking.ts');\n      expect(fileNames).toContain('out1/index.ts');\n      expect(fileNames).toContain('out1/gql.ts');\n      expect(fileNames).toContain('out1/graphql.ts');\n\n      const gqlFile = result.find(file => file.filename === 'out1/index.ts');\n      expect(gqlFile.content).toMatchInlineSnapshot(`\n        \"export * from \\\\\"./gql.js\\\\\"\n        export * from \\\\\"./fragment-masking.js\\\\\"\"\n      `);\n      const fragmentMaskingFile = result.find(file => file.filename === 'out1/fragment-masking.ts');\n      expect(fragmentMaskingFile.content).toMatchInlineSnapshot(`\n        \"import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n\n        export type FragmentType<TDocumentType extends DocumentNode<any, any>> = TDocumentType extends DocumentNode<\n          infer TType,\n          any\n        >\n          ? TType extends { ' $fragmentName': infer TKey }\n            ? TKey extends string\n              ? { ' $fragmentRefs': { [key in TKey]: TType } }\n              : never\n            : never\n          : never;\n\n        // return non-nullable if \\`fragmentType\\` is non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>>\n        ): TType;\n        // return nullable if \\`fragmentType\\` is nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n        ): TType | null | undefined;\n        // return array of non-nullable if \\`fragmentType\\` is array of non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n        ): ReadonlyArray<TType>;\n        // return array of nullable if \\`fragmentType\\` is array of nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): ReadonlyArray<TType> | null | undefined\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): TType | ReadonlyArray<TType> | null | undefined {\n          return fragmentType as any\n        }\n        \"\n      `);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
             "dir": "packages/presets/gql-tag-operations/tests"
@@ -19663,13 +19678,26 @@
             "dir": "packages/presets/graphql-modules/tests"
         },
         {
-            "name": "should work with naming conventions",
+            "name": "should include esm import statement",
             "suites": [],
             "updatePoint": {
                 "line": 162,
                 "column": 41
             },
             "line": 162,
+            "code": "test('should include esm import statement', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types.js',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    import * as core from \"../types.js\";\n  `);\n});",
+            "file": "builder.spec.ts",
+            "skipped": false,
+            "dir": "packages/presets/graphql-modules/tests"
+        },
+        {
+            "name": "should work with naming conventions",
+            "suites": [],
+            "updatePoint": {
+                "line": 178,
+                "column": 41
+            },
+            "line": 178,
             "code": "test('should work with naming conventions', () => {\n  const output = buildModule('test', parse(`type query_root { test: ID! } schema { query: query_root }`), {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toContain(`Pick<core.Query_RootResolvers, `);\n  expect(output).toContain(`Pick<core.Query_Root,`);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19679,10 +19707,10 @@
             "name": "encapsulate: should wrap correctly with namespace",
             "suites": [],
             "updatePoint": {
-                "line": 177,
+                "line": 193,
                 "column": 55
             },
-            "line": 177,
+            "line": 193,
             "code": "test('encapsulate: should wrap correctly with namespace', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'namespace',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`export namespace TestModule {`);\n  expect(output).toMatchSnapshot();\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19692,10 +19720,10 @@
             "name": "encapsulate: should wrap correctly with a declared namespace",
             "suites": [],
             "updatePoint": {
-                "line": 192,
+                "line": 208,
                 "column": 66
             },
-            "line": 192,
+            "line": 208,
             "code": "test('encapsulate: should wrap correctly with a declared namespace', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'namespace',\n    shouldDeclare: true,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`declare namespace TestModule {`);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19705,10 +19733,10 @@
             "name": "encapsulate: should wrap correctly with prefix",
             "suites": [],
             "updatePoint": {
-                "line": 206,
+                "line": 222,
                 "column": 52
             },
-            "line": 206,
+            "line": 222,
             "code": "test('encapsulate: should wrap correctly with prefix', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'prefix',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toMatchSnapshot();\n  expect(output).toContain(`export type Test_Article`);\n  expect(output).toContain(`export type Test_User`);\n  expect(output).toContain(`export type Test_Scalars`);\n  expect(output).toContain(`export type Test_ArticleResolvers`);\n  expect(output).toContain(`export interface Test_Resolvers`);\n  expect(output).toContain(`export interface Test_MiddlewareMap`);\n  expect(output).toContain(`interface DefinedFields {`);\n  expect(output).toContain(`interface DefinedEnumValues {`);\n  expect(output).toContain(`interface DefinedInputFields {`);\n  expect(output).not.toBeSimilarStringTo(`export namespace Test {`);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19718,10 +19746,10 @@
             "name": "should pick fields from defined and extended types",
             "suites": [],
             "updatePoint": {
-                "line": 230,
+                "line": 246,
                 "column": 56
             },
-            "line": 230,
+            "line": 246,
             "code": "test('should pick fields from defined and extended types', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    interface DefinedFields {\n      Article: 'id' | 'title' | 'text' | 'author' | 'comments' | 'url';\n      Query: 'articles' | 'articleById' | 'articlesByUser';\n      User: 'articles';\n      Node: 'id';\n    };\n  `);\n\n  expect(output).toBeSimilarStringTo(`\n    interface DefinedEnumValues {\n      UserKind: 'ADMIN' | 'WRITER' | 'REGULAR';\n    };\n  `);\n\n  expect(output).toBeSimilarStringTo(`\n    interface DefinedInputFields {\n      NewArticle: 'title' | 'text';\n    };\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19731,10 +19759,10 @@
             "name": "should reexport used types but not defined in module",
             "suites": [],
             "updatePoint": {
-                "line": 263,
+                "line": 279,
                 "column": 58
             },
-            "line": 263,
+            "line": 279,
             "code": "test('should reexport used types but not defined in module', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    export type User = core.User;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type Comment = core.Comment;\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19744,10 +19772,10 @@
             "name": "should export partial types, only those defined in module or root types",
             "suites": [],
             "updatePoint": {
-                "line": 282,
+                "line": 298,
                 "column": 77
             },
-            "line": 282,
+            "line": 298,
             "code": "test('should export partial types, only those defined in module or root types', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    export type Article = Pick<core.Article, DefinedFields['Article']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type Query = Pick<core.Query, DefinedFields['Query']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type UserKind = DefinedEnumValues['UserKind'];\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type NewArticle = Pick<core.NewArticle, DefinedInputFields['NewArticle']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type Node = Pick<core.Node, DefinedFields['Node']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type ArticleOrUser = core.ArticleOrUser;\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19757,10 +19785,10 @@
             "name": "should export partial types of scalars, only those defined in module or root types",
             "suites": [],
             "updatePoint": {
-                "line": 313,
+                "line": 329,
                 "column": 88
             },
-            "line": 313,
+            "line": 329,
             "code": "test('should export partial types of scalars, only those defined in module or root types', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    export type Scalars = Pick<core.Scalars, 'DateTime' | 'URL'>;\n  `);\n\n  // DateTime type should not be generated\n  expect(output).not.toBeSimilarStringTo(`\n    export type DateTime =\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19770,10 +19798,10 @@
             "name": "should use and export resolver signatures of types defined or extended in a module",
             "suites": [],
             "updatePoint": {
-                "line": 334,
+                "line": 350,
                 "column": 88
             },
-            "line": 334,
+            "line": 350,
             "code": "test('should use and export resolver signatures of types defined or extended in a module', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    export type ArticleResolvers = Pick<core.ArticleResolvers, DefinedFields['Article'] | '__isTypeOf'>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type QueryResolvers = Pick<core.QueryResolvers, DefinedFields['Query']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type UserResolvers = Pick<core.UserResolvers, DefinedFields['User']>;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type DateTimeScalarConfig = core.DateTimeScalarConfig;\n  `);\n  expect(output).toBeSimilarStringTo(`\n    export type UrlScalarConfig = core.UrlScalarConfig;\n  `);\n  // Interfaces should not have resolvers\n  // We want Object types to have __isTypeOf\n  expect(output).toBeSimilarStringTo(`\n    export type NodeResolvers\n  `);\n  // Unions should not have resolvers\n  // We want Object types to have __isTypeOf\n  expect(output).not.toBeSimilarStringTo(`\n    export type ArticleOrUserResolvers\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19783,10 +19811,10 @@
             "name": "should not generate resolver signatures of types that are not defined or extened by a module",
             "suites": [],
             "updatePoint": {
-                "line": 372,
+                "line": 388,
                 "column": 98
             },
-            "line": 372,
+            "line": 388,
             "code": "test('should not generate resolver signatures of types that are not defined or extened by a module', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).not.toContain('CommentResolvers');\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19796,10 +19824,10 @@
             "name": "should generate an aggregation of individual resolver signatures",
             "suites": [],
             "updatePoint": {
-                "line": 386,
+                "line": 402,
                 "column": 70
             },
-            "line": 386,
+            "line": 402,
             "code": "test('should generate an aggregation of individual resolver signatures', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toBeSimilarStringTo(`\n    export interface Resolvers {\n      Article?: ArticleResolvers;\n      Query?: QueryResolvers;\n      User?: UserResolvers;\n      DateTime?: core.Resolvers['DateTime'];\n      URL?: core.Resolvers['URL'];\n    };\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -19809,10 +19837,10 @@
             "name": "should generate a signature for ResolveMiddleware (with widlcards)",
             "suites": [],
             "updatePoint": {
-                "line": 408,
+                "line": 424,
                 "column": 72
             },
-            "line": 408,
+            "line": 424,
             "code": "test('should generate a signature for ResolveMiddleware (with widlcards)', () => {\n  const output = buildModule('test', testDoc, {\n    importPath: '../types',\n    importNamespace: 'core',\n    encapsulate: 'none',\n    shouldDeclare: false,\n    rootTypes: ROOT_TYPES,\n    baseVisitor,\n    useGraphQLModules: true,\n  });\n\n  expect(output).toContain(`import * as gm from \"graphql-modules\";`);\n\n  expect(output).toBeSimilarStringTo(`\n    export interface MiddlewareMap {\n      '*'?: {\n        '*'?: gm.Middleware[];\n      };\n      Article?: {\n        '*'?: gm.Middleware[];\n        id?: gm.Middleware[];\n        title?: gm.Middleware[];\n        text?: gm.Middleware[];\n        author?: gm.Middleware[];\n        comments?: gm.Middleware[];\n        url?: gm.Middleware[];\n      };\n      User?: {\n        '*'?: gm.Middleware[];\n        articles?: gm.Middleware[];\n      };\n      Query?: {\n        '*'?: gm.Middleware[];\n        articles?: gm.Middleware[];\n        articleById?: gm.Middleware[];\n        articlesByUser?: gm.Middleware[];\n      };\n    };\n  `);\n});",
             "file": "builder.spec.ts",
             "skipped": false,
@@ -20055,7 +20083,7 @@
                 "column": 94
             },
             "line": 168,
-            "code": "    it('#3066 - should respect higher level of fragments usage, and ignore fragments per input', async () => {\n      const doTest = async (operationsStr: string, expected: string) => {\n        const testSchema = buildSchema(/* GraphQL */ `\n          schema {\n            query: Query\n          }\n\n          type Query {\n            list: [Book]\n            pages: [Page]\n          }\n\n          type Book {\n            id: ID!\n            title: String!\n            pages: [Page!]!\n          }\n\n          type Page {\n            id: ID!\n            number: Int!\n          }\n        `);\n        const result = await preset.buildGeneratesSection({\n          baseOutputDir: './src/',\n          config: {},\n          presetConfig: {\n            cwd: '/some/deep/path',\n            baseTypesPath: 'types.ts',\n          },\n          schemaAst: testSchema,\n          schema: getCachedDocumentNodeFromSchema(testSchema),\n          documents: [\n            {\n              location: '/some/deep/path/src/graphql/queries.graphql',\n              document: parse(operationsStr),\n            },\n            {\n              location: '/some/deep/path/src/graphql/fragments.graphql',\n              document: parse(/* GraphQL */ `\n                fragment Page on Page {\n                  id\n                  number\n                }\n\n                fragment Book on Book {\n                  id\n                  title\n                  pages {\n                    ...Page\n                  }\n                }\n              `),\n            },\n          ],\n          plugins: [{ 'typescript-react-apollo': {} }],\n          pluginMap: { 'typescript-react-apollo': {} as any },\n        });\n\n        expect(result[0].filename).toContain(`queries.generated.ts`);\n        expect(getFragmentImportsFromResult(result)).toBe(expected);\n      };\n\n      await doTest(\n        /* GraphQL */ `\n          query Pages {\n            pages {\n              ...Page\n            }\n          }\n\n          query List {\n            list {\n              ...Book\n            }\n          }\n        `,\n        `import { PageFragmentDoc, PageFragment, BookFragmentDoc, BookFragment } from './fragments.generated';`\n      );\n\n      // Try to flip the order of operations to see if it's still works\n      await doTest(\n        /* GraphQL */ `\n          query List {\n            list {\n              ...Book\n            }\n          }\n\n          query Pages {\n            pages {\n              ...Page\n            }\n          }\n        `,\n        `import { BookFragmentDoc, BookFragment, PageFragmentDoc, PageFragment } from './fragments.generated';`\n      );\n    });",
+            "code": "    it('#3066 - should respect higher level of fragments usage, and ignore fragments per input', async () => {\n      const doTest = async (operationsStr: string, expected: string) => {\n        const testSchema = buildSchema(/* GraphQL */ `\n          schema {\n            query: Query\n          }\n\n          type Query {\n            list: [Book]\n            pages: [Page]\n          }\n\n          type Book {\n            id: ID!\n            title: String!\n            pages: [Page!]!\n          }\n\n          type Page {\n            id: ID!\n            number: Int!\n          }\n        `);\n        const result = await preset.buildGeneratesSection({\n          baseOutputDir: './src/',\n          config: {},\n          presetConfig: {\n            cwd: '/some/deep/path',\n            baseTypesPath: 'types.ts',\n          },\n          schemaAst: testSchema,\n          schema: getCachedDocumentNodeFromSchema(testSchema),\n          documents: [\n            {\n              location: '/some/deep/path/src/graphql/queries.graphql',\n              document: parse(operationsStr),\n            },\n            {\n              location: '/some/deep/path/src/graphql/fragments.graphql',\n              document: parse(/* GraphQL */ `\n                fragment Page on Page {\n                  id\n                  number\n                }\n\n                fragment Book on Book {\n                  id\n                  title\n                  pages {\n                    ...Page\n                  }\n                }\n              `),\n            },\n          ],\n          plugins: [{ 'typescript-react-apollo': {} }],\n          pluginMap: { 'typescript-react-apollo': {} as any },\n        });\n\n        expect(result[0].filename).toContain(`queries.generated.ts`);\n        expect(getFragmentImportsFromResult(result)).toBe(expected);\n      };\n\n      await doTest(\n        /* GraphQL */ `\n          query Pages {\n            pages {\n              ...Page\n            }\n          }\n\n          query List {\n            list {\n              ...Book\n            }\n          }\n        `,\n        `import { PageFragmentDoc, PageFragment, BookFragmentDoc, BookFragment } from './fragments.generated.js';`\n      );\n\n      // Try to flip the order of operations to see if it's still works\n      await doTest(\n        /* GraphQL */ `\n          query List {\n            list {\n              ...Book\n            }\n          }\n\n          query Pages {\n            pages {\n              ...Page\n            }\n          }\n        `,\n        `import { BookFragmentDoc, BookFragment, PageFragmentDoc, PageFragment } from './fragments.generated.js';`\n      );\n    });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20071,7 +20099,7 @@
                 "column": 100
             },
             "line": 267,
-            "code": "    it('#2365 - Should not add Fragment suffix to import identifier when dedupeOperationSuffix: true', async () => {\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {\n          dedupeOperationSuffix: true,\n        },\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: schemaNode,\n        schema: schemaDocumentNode,\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/me-query.graphql',\n            document: parse(/* GraphQL */ `\n              query {\n                user {\n                  id\n                  ...UserFieldsFragment\n                }\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/user-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment UserFieldsFragment on User {\n                id\n                username\n              }\n            `),\n          },\n        ],\n        plugins: [{ 'typescript-react-apollo': {} }],\n        pluginMap: { 'typescript-react-apollo': {} as any },\n      });\n\n      expect(result.map(o => o.plugins)[0]).toEqual(\n        expect.arrayContaining([\n          {\n            add: {\n              content: `import * as Types from '../types';\\n`,\n            },\n          },\n          {\n            'typescript-react-apollo': {},\n          },\n        ])\n      );\n\n      expect(getFragmentImportsFromResult(result)).toContain(\n        `import { UserFieldsFragmentDoc, UserFieldsFragment } from './user-fragment.generated';`\n      );\n    });",
+            "code": "    it('#2365 - Should not add Fragment suffix to import identifier when dedupeOperationSuffix: true', async () => {\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {\n          dedupeOperationSuffix: true,\n        },\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: schemaNode,\n        schema: schemaDocumentNode,\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/me-query.graphql',\n            document: parse(/* GraphQL */ `\n              query {\n                user {\n                  id\n                  ...UserFieldsFragment\n                }\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/user-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment UserFieldsFragment on User {\n                id\n                username\n              }\n            `),\n          },\n        ],\n        plugins: [{ 'typescript-react-apollo': {} }],\n        pluginMap: { 'typescript-react-apollo': {} as any },\n      });\n\n      expect(result.map(o => o.plugins)[0]).toEqual(\n        expect.arrayContaining([\n          {\n            add: {\n              content: `import * as Types from '../types.js';\\n`,\n            },\n          },\n          {\n            'typescript-react-apollo': {},\n          },\n        ])\n      );\n\n      expect(getFragmentImportsFromResult(result)).toContain(\n        `import { UserFieldsFragmentDoc, UserFieldsFragment } from './user-fragment.generated.js';`\n      );\n    });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20087,7 +20115,7 @@
                 "column": 98
             },
             "line": 323,
-            "code": "    it('#2365 - Should add Fragment suffix to import identifier when dedupeOperationSuffix not set', async () => {\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {},\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: schemaNode,\n        schema: schemaDocumentNode,\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/me-query.graphql',\n            document: parse(/* GraphQL */ `\n              query {\n                user {\n                  id\n                  ...UserFieldsFragment\n                }\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/user-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment UserFieldsFragment on User {\n                id\n                username\n              }\n            `),\n          },\n        ],\n        plugins: [{ 'typescript-react-apollo': {} }],\n        pluginMap: { 'typescript-react-apollo': {} as any },\n      });\n\n      expect(result.map(o => o.plugins)[0]).toEqual(\n        expect.arrayContaining([\n          {\n            add: {\n              content: `import * as Types from '../types';\\n`,\n            },\n          },\n          {\n            'typescript-react-apollo': {},\n          },\n        ])\n      );\n\n      expect(getFragmentImportsFromResult(result)).toContain(\n        `import { UserFieldsFragmentFragmentDoc, UserFieldsFragmentFragment } from './user-fragment.generated';`\n      );\n    });",
+            "code": "    it('#2365 - Should add Fragment suffix to import identifier when dedupeOperationSuffix not set', async () => {\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {},\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: schemaNode,\n        schema: schemaDocumentNode,\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/me-query.graphql',\n            document: parse(/* GraphQL */ `\n              query {\n                user {\n                  id\n                  ...UserFieldsFragment\n                }\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/user-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment UserFieldsFragment on User {\n                id\n                username\n              }\n            `),\n          },\n        ],\n        plugins: [{ 'typescript-react-apollo': {} }],\n        pluginMap: { 'typescript-react-apollo': {} as any },\n      });\n\n      expect(result.map(o => o.plugins)[0]).toEqual(\n        expect.arrayContaining([\n          {\n            add: {\n              content: `import * as Types from '../types.js';\\n`,\n            },\n          },\n          {\n            'typescript-react-apollo': {},\n          },\n        ])\n      );\n\n      expect(getFragmentImportsFromResult(result)).toContain(\n        `import { UserFieldsFragmentFragmentDoc, UserFieldsFragmentFragment } from './user-fragment.generated.js';`\n      );\n    });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20103,7 +20131,7 @@
                 "column": 69
             },
             "line": 377,
-            "code": "    it('#6439 - generating code only for the last query inside a file', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/issue-6439.ts'),\n        generates: {\n          'out1.ts': {\n            preset,\n            presetConfig: {\n              baseTypesPath: 'types.ts',\n            },\n            plugins: ['typescript-operations'],\n          },\n        },\n      });\n\n      expect(result[0].content).toMatchInlineSnapshot(`\n        \"import * as Types from '../../../../../out1.ts/types';\n\n        export type AQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type AQuery = { __typename?: 'Query', a?: string | null };\n\n        export type BQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type BQuery = { __typename?: 'Query', a?: string | null };\n\n        export type CQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type CQuery = { __typename?: 'Query', a?: string | null };\n        \"\n      `);\n    });",
+            "code": "    it('#6439 - generating code only for the last query inside a file', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/issue-6439.ts'),\n        generates: {\n          'out1.ts': {\n            preset,\n            presetConfig: {\n              baseTypesPath: 'types.ts',\n            },\n            plugins: ['typescript-operations'],\n          },\n        },\n      });\n\n      expect(result[0].content).toMatchInlineSnapshot(`\n        \"import * as Types from '../../../../../out1.ts/types.js';\n\n        export type AQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type AQuery = { __typename?: 'Query', a?: string | null };\n\n        export type BQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type BQuery = { __typename?: 'Query', a?: string | null };\n\n        export type CQueryVariables = Types.Exact<{ [key: string]: never; }>;\n\n\n        export type CQuery = { __typename?: 'Query', a?: string | null };\n        \"\n      `);\n    });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20151,7 +20179,7 @@
                 "column": 96
             },
             "line": 486,
-            "code": "    it('#7547 - importing root types when a fragment spread a fragment without any fields itself', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum Role {\n          ADMIN\n          USER\n        }\n\n        type User {\n          id: ID!\n          type: Role!\n        }\n      `);\n\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {\n          dedupeOperationSuffix: true,\n        },\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: testSchema,\n        schema: getCachedDocumentNodeFromSchema(testSchema),\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/a-fragment.gql',\n            document: parse(/* GraphQL */ `\n              fragment AFragment on User {\n                ...BFragment\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/b-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment BFragment on User {\n                ...CFragment\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/c-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment CFragment on User {\n                id\n                type\n              }\n            `),\n          },\n        ],\n        plugins: [{ typescript: {} }],\n        pluginMap: { typescript: {} as any },\n      });\n\n      for (const o of result) {\n        expect(o.plugins).toEqual(\n          expect.arrayContaining([{ add: { content: `import * as Types from '../types';\\n` } }])\n        );\n      }\n    });",
+            "code": "    it('#7547 - importing root types when a fragment spread a fragment without any fields itself', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum Role {\n          ADMIN\n          USER\n        }\n\n        type User {\n          id: ID!\n          type: Role!\n        }\n      `);\n\n      const result = await preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {\n          dedupeOperationSuffix: true,\n        },\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schemaAst: testSchema,\n        schema: getCachedDocumentNodeFromSchema(testSchema),\n        documents: [\n          {\n            location: '/some/deep/path/src/graphql/a-fragment.gql',\n            document: parse(/* GraphQL */ `\n              fragment AFragment on User {\n                ...BFragment\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/b-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment BFragment on User {\n                ...CFragment\n              }\n            `),\n          },\n          {\n            location: '/some/deep/path/src/graphql/c-fragment.graphql',\n            document: parse(/* GraphQL */ `\n              fragment CFragment on User {\n                id\n                type\n              }\n            `),\n          },\n        ],\n        plugins: [{ typescript: {} }],\n        pluginMap: { typescript: {} as any },\n      });\n\n      for (const o of result) {\n        expect(o.plugins).toEqual(\n          expect.arrayContaining([{ add: { content: `import * as Types from '../types.js';\\n` } }])\n        );\n      }\n    });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20173,16 +20201,32 @@
             "dir": "packages/presets/near-operation-file/tests"
         },
         {
-            "name": "Should build the correct operation files paths",
+            "name": "should not add imports for fragments in the same location",
             "suites": [
                 "near-operation-file preset",
                 "Issues"
             ],
             "updatePoint": {
                 "line": 584,
-                "column": 52
+                "column": 63
             },
             "line": 584,
+            "code": "  it('should not add imports for fragments in the same location', async () => {\n    const location = '/some/deep/path/src/graphql/me-query.graphql';\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {\n        dedupeOperationSuffix: true,\n      },\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location,\n          document: parse(/* GraphQL */ `\n            query {\n              user {\n                id\n                ...UserFieldsFragment\n              }\n            }\n          `),\n        },\n        {\n          location,\n          document: parse(/* GraphQL */ `\n            fragment UserFieldsFragment on User {\n              id\n              username\n            }\n          `),\n        },\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toEqual('');\n  });",
+            "file": "near-operation-file.spec.ts",
+            "skipped": false,
+            "dir": "packages/presets/near-operation-file/tests"
+        },
+        {
+            "name": "Should build the correct operation files paths",
+            "suites": [
+                "near-operation-file preset",
+                "Issues"
+            ],
+            "updatePoint": {
+                "line": 626,
+                "column": 52
+            },
+            "line": 626,
             "code": "  it('Should build the correct operation files paths', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments,\n      plugins: [],\n      pluginMap: {},\n    });\n\n    expect(result.map(a => a.filename)).toEqual([\n      '/some/deep/path/src/graphql/me-query.generated.ts',\n      '/some/deep/path/src/graphql/user-fragment.generated.ts',\n      '/some/deep/path/src/graphql/me.query.generated.ts',\n      '/some/deep/path/src/graphql/something-query.generated.ts',\n      '/some/deep/path/src/graphql/nested/somethingElse.generated.ts',\n      '/some/deep/path/src/graphql/nested/from-js.generated.ts',\n      '/some/deep/path/src/graphql/component.generated.ts',\n    ]);\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20195,10 +20239,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 609,
+                "line": 651,
                 "column": 69
             },
-            "line": 609,
+            "line": 651,
             "code": "  it('Should build the correct operation files paths with a subfolder', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        folder: '__generated__',\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments,\n      plugins: [],\n      pluginMap: {},\n    });\n    expect(result.map(a => a.filename)).toEqual([\n      '/some/deep/path/src/graphql/__generated__/me-query.generated.ts',\n      '/some/deep/path/src/graphql/__generated__/user-fragment.generated.ts',\n      '/some/deep/path/src/graphql/__generated__/me.query.generated.ts',\n      '/some/deep/path/src/graphql/__generated__/something-query.generated.ts',\n      '/some/deep/path/src/graphql/nested/__generated__/somethingElse.generated.ts',\n      '/some/deep/path/src/graphql/nested/__generated__/from-js.generated.ts',\n      '/some/deep/path/src/graphql/__generated__/component.generated.ts',\n    ]);\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20211,10 +20255,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 634,
+                "line": 676,
                 "column": 52
             },
-            "line": 634,
+            "line": 676,
             "code": "  it('Should skip the duplicate documents validation', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments,\n      plugins: [],\n      pluginMap: {},\n    });\n\n    expect(result[0].skipDocumentsValidation).toBeTruthy();\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20227,10 +20271,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 651,
+                "line": 693,
                 "column": 48
             },
-            "line": 651,
+            "line": 693,
             "code": "  it('Should allow to customize output extension', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n        extension: '.flow.js',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments,\n      plugins: [],\n      pluginMap: {},\n    });\n\n    expect(result.map(a => a.filename)).toEqual([\n      '/some/deep/path/src/graphql/me-query.flow.js',\n      '/some/deep/path/src/graphql/user-fragment.flow.js',\n      '/some/deep/path/src/graphql/me.query.flow.js',\n      '/some/deep/path/src/graphql/something-query.flow.js',\n      '/some/deep/path/src/graphql/nested/somethingElse.flow.js',\n      '/some/deep/path/src/graphql/nested/from-js.flow.js',\n      '/some/deep/path/src/graphql/component.flow.js',\n    ]);\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20243,11 +20287,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 678,
+                "line": 720,
                 "column": 61
             },
-            "line": 678,
-            "code": "  it('Should prepend the \"add\" plugin with the correct import', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ typescript: {} }],\n      pluginMap: { typescript: {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
+            "line": 720,
+            "code": "  it('Should prepend the \"add\" plugin with the correct import', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ typescript: {} }],\n      pluginMap: { typescript: {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types.js';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20259,10 +20303,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 704,
+                "line": 746,
                 "column": 89
             },
-            "line": 704,
+            "line": 746,
             "code": "  it('Should prepend the \"add\" plugin with the correct import when used with package name', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: '~@custom-package/types',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ typescript: {} }],\n      pluginMap: { typescript: {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '@custom-package/types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20275,11 +20319,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 730,
+                "line": 772,
                 "column": 94
             },
-            "line": 730,
-            "code": "  it('Should prepend the \"add\" plugin with the correct import, when only using fragment spread', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: [\n        { location: '/some/deep/path/src/graphql/me-query.graphql', document: minimalOperationAst },\n        testDocuments[1],\n      ],\n      plugins: [{ typescript: {} }],\n      pluginMap: { typescript: {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[1]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
+            "line": 772,
+            "code": "  it('Should prepend the \"add\" plugin with the correct import, when only using fragment spread', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schema: schemaDocumentNode,\n      schemaAst: schemaNode,\n      documents: [\n        { location: '/some/deep/path/src/graphql/me-query.graphql', document: minimalOperationAst },\n        testDocuments[1],\n      ],\n      plugins: [{ typescript: {} }],\n      pluginMap: { typescript: {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[1]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types.js';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20291,10 +20335,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 759,
+                "line": 801,
                 "column": 95
             },
-            "line": 759,
+            "line": 801,
             "code": "  it('should fail when multiple fragments with the same name but different definition are found', () => {\n    expect(() =>\n      preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {},\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schema: schemaDocumentNode,\n        schemaAst: schemaNode,\n        documents: [\n          testDocuments[1],\n          {\n            location: `/some/deep/path/src/graphql/user-fragment.graphql`,\n            document: parse(/* GraphQL */ `\n              fragment UserFields on User {\n                id\n              }\n            `),\n          },\n        ],\n        plugins: [{ typescript: {} }],\n        pluginMap: { typescript: {} as any },\n      })\n    ).toThrow('Multiple fragments with the name(s) \"UserFields\" were found.');\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20307,10 +20351,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 787,
+                "line": 829,
                 "column": 89
             },
-            "line": 787,
+            "line": 829,
             "code": "  it('should NOT fail when multiple fragments with the same name and definition are found', () => {\n    expect(() =>\n      preset.buildGeneratesSection({\n        baseOutputDir: './src/',\n        config: {},\n        presetConfig: {\n          cwd: '/some/deep/path',\n          baseTypesPath: 'types.ts',\n        },\n        schema: schemaDocumentNode,\n        schemaAst: schemaNode,\n        documents: [testDocuments[1], testDocuments[1]],\n        plugins: [{ typescript: {} }],\n        pluginMap: { typescript: {} as any },\n      })\n    ).not.toThrow('Multiple fragments with the name(s) \"UserFields\" were found.');\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20323,10 +20367,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 805,
+                "line": 847,
                 "column": 109
             },
-            "line": 805,
+            "line": 847,
             "code": "  it('Should NOT prepend the \"add\" plugin with Types import when selection set does not include direct fields', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: './test.graphql',\n          document: parse(/* GraphQL */ `\n            query {\n              user {\n                ...UserFields\n              }\n            }\n          `),\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).not.toEqual(\n      expect.arrayContaining([{ add: { content: `import * as Types from '../types.js';\\n` } }])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20339,11 +20383,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 837,
+                "line": 879,
                 "column": 79
             },
-            "line": 837,
-            "code": "  it('Should prepend the \"add\" plugin with Types import when arguments are used', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: './test.graphql',\n          document: parse(/* GraphQL */ `\n            query ($id: String) {\n              user(id: $id) {\n                ...UserFields\n              }\n            }\n          `),\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from './src/types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
+            "line": 879,
+            "code": "  it('Should prepend the \"add\" plugin with Types import when arguments are used', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: './test.graphql',\n          document: parse(/* GraphQL */ `\n            query ($id: String) {\n              user(id: $id) {\n                ...UserFields\n              }\n            }\n          `),\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from './src/types.js';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20355,11 +20399,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 875,
+                "line": 917,
                 "column": 73
             },
-            "line": 875,
-            "code": "  it('Should prepend the \"add\" plugin with the correct import (long path)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/graphql/nested/here/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../../../types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
+            "line": 917,
+            "code": "  it('Should prepend the \"add\" plugin with the correct import (long path)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/graphql/nested/here/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../../../types.js';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20371,11 +20415,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 906,
+                "line": 948,
                 "column": 72
             },
-            "line": 906,
-            "code": "  it('Should prepend the \"add\" plugin with the correct import (siblings)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from './types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
+            "line": 948,
+            "code": "  it('Should prepend the \"add\" plugin with the correct import (siblings)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from './types.js';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20387,10 +20431,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 937,
+                "line": 979,
                 "column": 70
             },
-            "line": 937,
+            "line": 979,
             "code": "  it('Should not generate an absolute path if the path starts with \"~\"', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: '~@internal/types',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '@internal/types';\\n`,\n          },\n        },\n      ])\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20403,10 +20447,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 968,
+                "line": 1010,
                 "column": 61
             },
-            "line": 968,
+            "line": 1010,
             "code": "  it('Should add \"add\" plugin to plugins map if its not there', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.pluginMap.add)[0]).toBeDefined();\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20419,10 +20463,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 986,
+                "line": 1028,
                 "column": 49
             },
-            "line": 986,
+            "line": 1028,
             "code": "  it('Should add \"namespacedImportName\" to config', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.config.namespacedImportName)[0]).toBe('Types');\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20435,11 +20479,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1004,
+                "line": 1046,
                 "column": 60
             },
-            "line": 1004,
-            "code": "  it('Should add import to external fragment when its in use', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types';\\n`,\n          },\n        },\n        {\n          'typescript-react-apollo': {},\n        },\n      ])\n    );\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from './user-fragment.generated';`\n    );\n  });",
+            "line": 1046,
+            "code": "  it('Should add import to external fragment when its in use', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '../types.js';\\n`,\n          },\n        },\n        {\n          'typescript-react-apollo': {},\n        },\n      ])\n    );\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from './user-fragment.generated.js';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20451,10 +20495,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1037,
+                "line": 1079,
                 "column": 80
             },
-            "line": 1037,
+            "line": 1079,
             "code": "  it('Should allow external fragments to be imported from packages with function', async () => {\n    const spy = jest.fn();\n    await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: '~@types',\n        importAllFragmentsFrom: spy.mockReturnValue(false),\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(spy.mock.calls.length).toBe(1);\n    expect(spy.mock.calls[0][1]).toBe('/some/deep/path/src/graphql/me-query.generated.ts');\n    expect(spy.mock.calls[0][0].path).toBe('/some/deep/path/src/graphql/user-fragment.generated.ts');\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20467,10 +20511,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1059,
+                "line": 1101,
                 "column": 66
             },
-            "line": 1059,
+            "line": 1101,
             "code": "  it('Should allow external fragments to be imported from packages', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: '~@types',\n        importAllFragmentsFrom: `~@fragments`,\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: testDocuments.slice(0, 2),\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(result.map(o => o.plugins)[0]).toEqual(\n      expect.arrayContaining([\n        {\n          add: {\n            content: `import * as Types from '@types';\\n`,\n          },\n        },\n        {\n          'typescript-react-apollo': {},\n        },\n      ])\n    );\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from '@fragments';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
@@ -20483,11 +20527,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1093,
+                "line": 1135,
                 "column": 72
             },
-            "line": 1093,
-            "code": "  it('Should add import to external fragment when its in use (long path)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/graphql/nested/down/here/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from '../../../user-fragment.generated';`\n    );\n  });",
+            "line": 1135,
+            "code": "  it('Should add import to external fragment when its in use (long path)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        {\n          location: '/some/deep/path/src/graphql/nested/down/here/me-query.graphql',\n          document: operationAst,\n        },\n        testDocuments[1],\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from '../../../user-fragment.generated.js';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20499,11 +20543,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1119,
+                "line": 1161,
                 "column": 78
             },
-            "line": 1119,
-            "code": "  it('Should add import to external fragment when its in use (nested fragment)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        testDocuments[0],\n        {\n          location: '/some/deep/path/src/graphql/nested/down/here/user-fragment.graphql',\n          document: fragmentAst,\n        },\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from './nested/down/here/user-fragment.generated';`\n    );\n  });",
+            "line": 1161,
+            "code": "  it('Should add import to external fragment when its in use (nested fragment)', async () => {\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {},\n      presetConfig: {\n        cwd: '/some/deep/path',\n        baseTypesPath: 'types.ts',\n      },\n      schemaAst: schemaNode,\n      schema: schemaDocumentNode,\n      documents: [\n        testDocuments[0],\n        {\n          location: '/some/deep/path/src/graphql/nested/down/here/user-fragment.graphql',\n          document: fragmentAst,\n        },\n      ],\n      plugins: [{ 'typescript-react-apollo': {} }],\n      pluginMap: { 'typescript-react-apollo': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { UserFieldsFragmentDoc, UserFieldsFragment } from './nested/down/here/user-fragment.generated.js';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20515,11 +20559,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1145,
+                "line": 1187,
                 "column": 57
             },
-            "line": 1145,
-            "code": "  it('Should import relevant fragments on dedupeFragments', async () => {\n    const testSchema = parse(/* GraphQL */ `\n      schema {\n        query: Query\n      }\n\n      type Query {\n        animals: [Animal!]!\n      }\n\n      type Group {\n        id: ID!\n        name: String!\n      }\n      type Animal {\n        id: ID!\n        name: String!\n        group: Group\n      }\n    `);\n\n    const operations = [\n      {\n        location: '/operations/document.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./fragments/MyAnimalFragment.graphql\"\n\n          query Test {\n            animals {\n              ...MyAnimalFragment\n            }\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/AnotherGroupFragment.graphql',\n        document: parse(/* GraphQL */ `\n          fragment AnotherGroupFragment on Group {\n            id\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/MyAnimalFragment.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./MyGroupFragment.graphql\"\n\n          fragment MyAnimalFragment on Animal {\n            name\n            group {\n              ...MyGroupFragment\n            }\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/MyGroupFragment.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./AnotherGroupFragment.graphql\"\n\n          fragment MyGroupFragment on Group {\n            ...AnotherGroupFragment\n            name\n          }\n        `),\n      },\n    ];\n\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {\n        skipTypename: true,\n        dedupeFragments: true,\n        exportFragmentSpreadSubTypes: true,\n      },\n      presetConfig: {\n        extension: '.ts',\n        baseTypesPath: '../types',\n      },\n      schema: testSchema,\n      schemaAst: buildASTSchema(testSchema),\n      documents: operations,\n      plugins: [{ typescript: {} }, { 'typescript-operations': {} }, { 'typed-document-node': {} }],\n      pluginMap: { typescript: {} as any, 'typescript-operations': {} as any, 'typed-document-node': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { MyGroupFragmentFragmentDoc, MyGroupFragmentFragment } from './fragments/MyGroupFragment';`\n    );\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { AnotherGroupFragmentFragmentDoc, AnotherGroupFragmentFragment } from './fragments/AnotherGroupFragment';`\n    );\n  });",
+            "line": 1187,
+            "code": "  it('Should import relevant fragments on dedupeFragments', async () => {\n    const testSchema = parse(/* GraphQL */ `\n      schema {\n        query: Query\n      }\n\n      type Query {\n        animals: [Animal!]!\n      }\n\n      type Group {\n        id: ID!\n        name: String!\n      }\n      type Animal {\n        id: ID!\n        name: String!\n        group: Group\n      }\n    `);\n\n    const operations = [\n      {\n        location: '/operations/document.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./fragments/MyAnimalFragment.graphql\"\n\n          query Test {\n            animals {\n              ...MyAnimalFragment\n            }\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/AnotherGroupFragment.graphql',\n        document: parse(/* GraphQL */ `\n          fragment AnotherGroupFragment on Group {\n            id\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/MyAnimalFragment.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./MyGroupFragment.graphql\"\n\n          fragment MyAnimalFragment on Animal {\n            name\n            group {\n              ...MyGroupFragment\n            }\n          }\n        `),\n      },\n      {\n        location: '/operations/fragments/MyGroupFragment.graphql',\n        document: parse(/* GraphQL */ `\n          #import \"./AnotherGroupFragment.graphql\"\n\n          fragment MyGroupFragment on Group {\n            ...AnotherGroupFragment\n            name\n          }\n        `),\n      },\n    ];\n\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {\n        skipTypename: true,\n        dedupeFragments: true,\n        exportFragmentSpreadSubTypes: true,\n      },\n      presetConfig: {\n        extension: '.ts',\n        baseTypesPath: '../types',\n      },\n      schema: testSchema,\n      schemaAst: buildASTSchema(testSchema),\n      documents: operations,\n      plugins: [{ typescript: {} }, { 'typescript-operations': {} }, { 'typed-document-node': {} }],\n      pluginMap: { typescript: {} as any, 'typescript-operations': {} as any, 'typed-document-node': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { MyGroupFragmentFragmentDoc, MyGroupFragmentFragment } from './fragments/MyGroupFragment.js';`\n    );\n\n    expect(getFragmentImportsFromResult(result)).toContain(\n      `import { AnotherGroupFragmentFragmentDoc, AnotherGroupFragmentFragment } from './fragments/AnotherGroupFragment.js';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
@@ -20531,11 +20575,11 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1240,
+                "line": 1282,
                 "column": 64
             },
-            "line": 1240,
-            "code": "  it('Should import relevant nested fragments on dedupeFragments', async () => {\n    const schema = parse(/* GraphQL */ `\n      type Address {\n        city: String\n      }\n\n      type Author {\n        address: Address\n      }\n\n      type Book {\n        author: Author\n      }\n\n      type Query {\n        book: Book\n      }\n    `);\n\n    const operations = [\n      {\n        location: '/author.graphql',\n        document: parse(/* GraphQL */ `\n          fragment Address on Address {\n            city\n          }\n\n          fragment Author on Author {\n            address {\n              ...Address\n            }\n          }\n        `),\n      },\n      {\n        location: '/book.graphql',\n        document: parse(/* GraphQL */ `\n          fragment Book on Book {\n            author {\n              ...Author\n            }\n          }\n\n          query Book {\n            book {\n              ...Book\n            }\n          }\n        `),\n      },\n    ];\n\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {\n        dedupeFragments: true,\n      },\n      presetConfig: {\n        extension: '.ts',\n        baseTypesPath: './types',\n      },\n      schema,\n      schemaAst: buildASTSchema(schema),\n      documents: operations,\n      plugins: [{ typescript: {} }, { 'typescript-operations': {} }, { 'typed-document-node': {} }],\n      pluginMap: { typescript: {} as any, 'typescript-operations': {} as any, 'typed-document-node': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result, 1)).toContain(\n      `import { AuthorFragmentDoc, AuthorFragment, AddressFragmentDoc, AddressFragment } from './author';`\n    );\n  });",
+            "line": 1282,
+            "code": "  it('Should import relevant nested fragments on dedupeFragments', async () => {\n    const schema = parse(/* GraphQL */ `\n      type Address {\n        city: String\n      }\n\n      type Author {\n        address: Address\n      }\n\n      type Book {\n        author: Author\n      }\n\n      type Query {\n        book: Book\n      }\n    `);\n\n    const operations = [\n      {\n        location: '/author.graphql',\n        document: parse(/* GraphQL */ `\n          fragment Address on Address {\n            city\n          }\n\n          fragment Author on Author {\n            address {\n              ...Address\n            }\n          }\n        `),\n      },\n      {\n        location: '/book.graphql',\n        document: parse(/* GraphQL */ `\n          fragment Book on Book {\n            author {\n              ...Author\n            }\n          }\n\n          query Book {\n            book {\n              ...Book\n            }\n          }\n        `),\n      },\n    ];\n\n    const result = await preset.buildGeneratesSection({\n      baseOutputDir: './src/',\n      config: {\n        dedupeFragments: true,\n      },\n      presetConfig: {\n        extension: '.ts',\n        baseTypesPath: './types',\n      },\n      schema,\n      schemaAst: buildASTSchema(schema),\n      documents: operations,\n      plugins: [{ typescript: {} }, { 'typescript-operations': {} }, { 'typed-document-node': {} }],\n      pluginMap: { typescript: {} as any, 'typescript-operations': {} as any, 'typed-document-node': {} as any },\n    });\n\n    expect(getFragmentImportsFromResult(result, 1)).toContain(\n      `import { AuthorFragmentDoc, AuthorFragment, AddressFragmentDoc, AddressFragment } from './author.js';`\n    );\n  });",
             "file": "near-operation-file.spec.ts",
             "skipped": false,
             "dir": "packages/presets/near-operation-file/tests"
