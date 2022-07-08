@@ -505,15 +505,45 @@
             "dir": "packages/graphql-codegen-cli/tests"
         },
         {
-            "name": "Should set --overwrite with new YML api",
+            "name": "Should overwrite ignoreNoDocuments config using cli flags to false",
             "suites": [
                 "CLI Flags"
             ],
             "updatePoint": {
                 "line": 123,
-                "column": 45
+                "column": 72
             },
             "line": 123,
+            "code": "  it('Should overwrite ignoreNoDocuments config using cli flags to false', async () => {\n    mockConfig(`\n        schema: schema.graphql\n        ignoreNoDocuments: true\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--ignore-no-documents=false');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.ignoreNoDocuments).toBeFalsy();\n  });",
+            "file": "cli-flags.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "Should overwrite ignoreNoDocuments config using cli flags to true",
+            "suites": [
+                "CLI Flags"
+            ],
+            "updatePoint": {
+                "line": 137,
+                "column": 71
+            },
+            "line": 137,
+            "code": "  it('Should overwrite ignoreNoDocuments config using cli flags to true', async () => {\n    mockConfig(`\n        schema: schema.graphql\n        ignoreNoDocuments: false\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--ignore-no-documents');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.ignoreNoDocuments).toBeTruthy();\n  });",
+            "file": "cli-flags.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "Should set --overwrite with new YML api",
+            "suites": [
+                "CLI Flags"
+            ],
+            "updatePoint": {
+                "line": 151,
+                "column": 45
+            },
+            "line": 151,
             "code": "  it('Should set --overwrite with new YML api', async () => {\n    mockConfig(`\n        schema: schema.graphql\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--overwrite');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.overwrite).toBeTruthy();\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -525,10 +555,10 @@
                 "CLI Flags"
             ],
             "updatePoint": {
-                "line": 136,
+                "line": 164,
                 "column": 55
             },
-            "line": 136,
+            "line": 164,
             "code": "  it('Should interpolate environmental variables in YML', async () => {\n    process.env.SCHEMA_PATH = 'schema-env.graphql';\n    mockConfig(`\n        schema: \\${SCHEMA_PATH}\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--overwrite');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.schema).toBe('schema-env.graphql');\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -540,10 +570,10 @@
                 "CLI Flags"
             ],
             "updatePoint": {
-                "line": 150,
+                "line": 178,
                 "column": 64
             },
-            "line": 150,
+            "line": 178,
             "code": "  it('Should interpolate multiple environmental variables in YML', async () => {\n    process.env.SCHEMA_SCHEME = 'https';\n    process.env.SCHEMA_HOST = 'localhost';\n    mockConfig(`\n        schema: \\${SCHEMA_SCHEME}://\\${SCHEMA_HOST}/graphql\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--overwrite');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.schema).toBe('https://localhost/graphql');\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -555,10 +585,10 @@
                 "CLI Flags"
             ],
             "updatePoint": {
-                "line": 165,
+                "line": 193,
                 "column": 81
             },
-            "line": 165,
+            "line": 193,
             "code": "  it('Should interpolate environmental variables in YML and support default value', async () => {\n    process.env.SCHEMA_PATH = '';\n\n    mockConfig(`\n        schema: \\${SCHEMA_PATH:schema.graphql}\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--overwrite');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.schema).toBe('schema.graphql');\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -570,10 +600,10 @@
                 "CLI Flags"
             ],
             "updatePoint": {
-                "line": 180,
+                "line": 208,
                 "column": 96
             },
-            "line": 180,
+            "line": 208,
             "code": "  it('Should interpolate environmental variables in YML and support default value containing \":\"', async () => {\n    process.env.SCHEMA_PATH = '';\n\n    mockConfig(`\n        schema: \\${SCHEMA_PATH:http://url-to-graphql-api}\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--overwrite');\n    const context = await createContext(parseArgv(args));\n    const config = context.getConfig();\n    expect(config.schema).toBe('http://url-to-graphql-api');\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -585,10 +615,10 @@
                 "CLI Flags"
             ],
             "updatePoint": {
-                "line": 195,
+                "line": 223,
                 "column": 58
             },
-            "line": 195,
+            "line": 223,
             "code": "  it('Should load require extensions provided by cli flags', async () => {\n    process.env.SCHEMA_PATH = 'schema-env.graphql';\n    mockConfig(`\n        schema: \\${SCHEMA_PATH}\n        generates:\n            file.ts:\n                - plugin\n    `);\n    const args = createArgv('--require my-extension');\n\n    try {\n      await createContext(parseArgv(args));\n      expect(true).toBeFalsy();\n    } catch (e) {\n      expect(e.code).toEqual('MODULE_NOT_FOUND');\n    }\n  });",
             "file": "cli-flags.spec.ts",
             "skipped": false,
@@ -8635,6 +8665,21 @@
             },
             "line": 50,
             "code": "  it('Should generate JSDoc documentation with variables and selection from the operations themselves', async () => {\n    const variables = ['id', 'offset', 'limit'];\n    const input = variables.map(v => `$${v}: Int`).join(', ');\n\n    const fields = ['name', 'phone', 'country'];\n    const selection = fields.join(', ');\n\n    const documents = [\n      { document: parse(`query ${queryName}(${input}) { ${selection} }`) },\n      { document: parse(`mutation ${mutationName}(${input}) { ${selection} }`) },\n    ];\n\n    const result = await plugin(null, documents, {});\n\n    expect(result.content).toContain(`const { ${variables.join(', ')} } = req.variables`);\n    expect(result.content).toContain(`ctx.data({ ${selection} })`);\n    expect(result.content).toMatchSnapshot('content with variables and selection JSDoc documentation');\n  });",
+            "file": "msw.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/msw/tests"
+        },
+        {
+            "name": "Should use the \"importOperationTypesFrom\" setting",
+            "suites": [
+                "msw"
+            ],
+            "updatePoint": {
+                "line": 69,
+                "column": 55
+            },
+            "line": 69,
+            "code": "  it('Should use the \"importOperationTypesFrom\" setting', async () => {\n    const importOperationTypesFrom = 'Types';\n    const result = await plugin(null, documents, { importOperationTypesFrom });\n\n    // handler variable and result type\n    const queryVariablesType = `${importOperationTypesFrom}.${queryName}QueryVariables`;\n    const queryType = `${importOperationTypesFrom}.${queryName}Query`;\n    expect(result.content).toContain(`GraphQLRequest<${queryVariablesType}>`);\n    expect(result.content).toContain(`GraphQLContext<${queryType}>`);\n    expect(result.content).toContain(`graphql.query<${queryType}, ${queryVariablesType}>`);\n\n    const mutationVariablesType = `${importOperationTypesFrom}.${mutationName}MutationVariables`;\n    const mutationType = `${importOperationTypesFrom}.${mutationName}Mutation`;\n    expect(result.content).toContain(`GraphQLRequest<${mutationVariablesType}>`);\n    expect(result.content).toContain(`GraphQLContext<${mutationType}>`);\n    expect(result.content).toContain(`graphql.mutation<${mutationType}, ${mutationVariablesType}>`);\n\n    expect(result.content).toMatchSnapshot('content with types configured via importOperationTypesFrom');\n  });",
             "file": "msw.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/msw/tests"
