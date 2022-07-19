@@ -520,7 +520,22 @@
                 "column": 76
             },
             "line": 74,
-            "code": "  test('an error is thrown if the audit endpoint responds with a non-OK code', async () => {\n    const registry = 'http://registry.registry/'\n    nock(registry)\n      .post('/-/npm/v1/security/audits')\n      .reply(500, { message: 'Something bad happened' })\n\n    let err!: PnpmError\n    try {\n      await audit({\n        importers: {},\n        lockfileVersion: 5,\n      }, {\n        registry,\n        retry: {\n          retries: 0,\n        },\n      })\n    } catch (_err: any) { // eslint-disable-line\n      err = _err\n    }\n\n    expect(err).toBeDefined()\n    expect(err.code).toEqual('ERR_PNPM_AUDIT_BAD_RESPONSE')\n    expect(err.message).toEqual('The audit endpoint (at http://registry.registry/-/npm/v1/security/audits) responded with 500: {\"message\":\"Something bad happened\"}')\n  })",
+            "code": "  test('an error is thrown if the audit endpoint responds with a non-OK code', async () => {\n    const registry = 'http://registry.registry/'\n    const getCredentials = () => ({ authHeaderValue: undefined, alwaysAuth: undefined })\n    nock(registry, {\n      badheaders: ['authorization'],\n    })\n      .post('/-/npm/v1/security/audits')\n      .reply(500, { message: 'Something bad happened' })\n\n    let err!: PnpmError\n    try {\n      await audit({\n        importers: {},\n        lockfileVersion: 5,\n      },\n      getCredentials,\n      {\n        registry,\n        retry: {\n          retries: 0,\n        },\n      })\n    } catch (_err: any) { // eslint-disable-line\n      err = _err\n    }\n\n    expect(err).toBeDefined()\n    expect(err.code).toEqual('ERR_PNPM_AUDIT_BAD_RESPONSE')\n    expect(err.message).toEqual('The audit endpoint (at http://registry.registry/-/npm/v1/security/audits) responded with 500: {\"message\":\"Something bad happened\"}')\n  })",
+            "file": "index.ts",
+            "skipped": false,
+            "dir": "packages/audit/test"
+        },
+        {
+            "name": "authorization header is sent if alwaysAuth is true",
+            "suites": [
+                "audit"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 58
+            },
+            "line": 105,
+            "code": "  test('authorization header is sent if alwaysAuth is true', async () => {\n    const registry = 'http://registry.registry/'\n    const getCredentials = () => ({ authHeaderValue: 'Bearer 123', alwaysAuth: true })\n\n    nock(registry, {\n      reqheaders: { authorization: 'Bearer 123' },\n    })\n      .post('/-/npm/v1/security/audits')\n      .reply(200, {})\n\n    await audit({\n      importers: {},\n      lockfileVersion: 5,\n    },\n    getCredentials,\n    {\n      registry,\n      retry: {\n        retries: 0,\n      },\n    })\n  })",
             "file": "index.ts",
             "skipped": false,
             "dir": "packages/audit/test"
