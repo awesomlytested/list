@@ -3960,7 +3960,7 @@
                 "column": 18
             },
             "line": 103,
-            "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.record({\n\t\t\t\tname: 'event',\n\t\t\t\tattributes: 'attributes',\n\t\t\t\tmetrics: 'metrics',\n\t\t\t});\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
+            "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.record({\n\t\t\t\tname: 'event',\n\t\t\t\tattributes: {\n\t\t\t\t\tkey: 'value',\n\t\t\t\t},\n\t\t\t\tmetrics: {\n\t\t\t\t\tmetric: 123,\n\t\t\t\t},\n\t\t\t});\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
             "dir": "packages/analytics/__tests__"
@@ -3972,10 +3972,10 @@
                 "updateEndpoint test"
             ],
             "updatePoint": {
-                "line": 119,
+                "line": 123,
                 "column": 18
             },
-            "line": 119,
+            "line": 123,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.updateEndpoint({\n\t\t\t\tUserId: 'id',\n\t\t\t});\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -3988,10 +3988,10 @@
                 "analytics turn on/off test"
             ],
             "updatePoint": {
-                "line": 133,
+                "line": 137,
                 "column": 20
             },
-            "line": 133,
+            "line": 137,
             "code": "\t\ttest('disable test', () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tanalytics.disable();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4004,10 +4004,10 @@
                 "analytics turn on/off test"
             ],
             "updatePoint": {
-                "line": 138,
+                "line": 142,
                 "column": 19
             },
-            "line": 138,
+            "line": 142,
             "code": "\t\ttest('enable test', () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tanalytics.enable();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4020,10 +4020,10 @@
                 "getPluggable test"
             ],
             "updatePoint": {
-                "line": 145,
+                "line": 149,
                 "column": 18
             },
-            "line": 145,
+            "line": 149,
             "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new Analytics();\n\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\n\t\t\texpect(analytics.getPluggable(provider.getProviderName())).toBeInstanceOf(\n\t\t\t\tAWSAnalyticsProvider\n\t\t\t);\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4036,10 +4036,10 @@
                 "removePluggable test"
             ],
             "updatePoint": {
-                "line": 158,
+                "line": 162,
                 "column": 18
             },
-            "line": 158,
+            "line": 162,
             "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new Analytics();\n\n\t\t\t// this provider is added by default in the configure method\n\t\t\t// of analytics when initialized. No need to add it again here.\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\n\t\t\tanalytics.removePluggable(provider.getProviderName());\n\n\t\t\texpect(analytics.getPluggable(provider.getProviderName())).toBeNull();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -16177,12 +16177,28 @@
             "dir": "packages/aws-amplify/__tests__"
         },
         {
+            "name": "should use Amplify components from the ssr context",
+            "suites": [
+                "withSSRContext",
+                "DataStore"
+            ],
+            "updatePoint": {
+                "line": 73,
+                "column": 56
+            },
+            "line": 73,
+            "code": "\t\tit('should use Amplify components from the ssr context', () => {\n\t\t\tconst { Auth, API, DataStore } = withSSRContext();\n\n\t\t\texpect(DataStore.Auth).toBe(Auth);\n\t\t\texpect(DataStore.Auth).not.toBe(Amplify.Auth);\n\n\t\t\texpect(DataStore.API).toBe(API);\n\t\t\texpect(DataStore.API).not.toBe(Amplify.API);\n\t\t});",
+            "file": "withSSRContext-test.ts",
+            "skipped": false,
+            "dir": "packages/aws-amplify/__tests__"
+        },
+        {
             "name": "should be the same instance as Amplify.I18n",
             "suites": [
                 "withSSRContext",
                 "I18n"
             ],
-            "line": 76,
+            "line": 86,
             "code": "\t\tit.skip('should be the same instance as Amplify.I18n', () => {",
             "file": "withSSRContext-test.ts",
             "skipped": true,
