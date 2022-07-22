@@ -1533,7 +1533,7 @@
                 "index": 5470
             },
             "line": 223,
-            "code": "  it('should support an injected dispatcher', () => {\n    function Foo(props) {\n      const [state] = React.useState('hello world');\n      return /*#__PURE__*/React.createElement(\"div\", null, state);\n    }\n\n    const initial = {};\n    let current = initial;\n    let getterCalls = 0;\n    const setterCalls = [];\n    const FakeDispatcherRef = {\n      get current() {\n        getterCalls++;\n        return current;\n      },\n\n      set current(value) {\n        setterCalls.push(value);\n        current = value;\n      }\n\n    };\n    let didCatch = false;\n    expect(() => {\n      // mock the Error constructor to check the internal of the error instance\n      try {\n        ReactDebugTools.inspectHooks(Foo, {}, FakeDispatcherRef);\n      } catch (error) {\n        expect(error.message).toBe('Error rendering inspected component'); // error.cause is the original error\n\n        expect(error.cause).toBeInstanceOf(Error);\n        expect(error.cause.message).toBe(\"Cannot read property 'useState' of null\");\n      }\n\n      didCatch = true;\n    }).toErrorDev('Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' + ' one of the following reasons:\\n' + '1. You might have mismatching versions of React and the renderer (such as React DOM)\\n' + '2. You might be breaking the Rules of Hooks\\n' + '3. You might have more than one copy of React in the same app\\n' + 'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.', {\n      withoutStack: true\n    }); // avoid false positive if no error was thrown at all\n\n    expect(didCatch).toBe(true);\n    expect(getterCalls).toBe(1);\n    expect(setterCalls).toHaveLength(2);\n    expect(setterCalls[0]).not.toBe(initial);\n    expect(setterCalls[1]).toBe(initial);\n  });",
+            "code": "  it('should support an injected dispatcher', () => {\n    const initial = {\n      useState() {\n        throw new Error(\"Should've been proxied\");\n      }\n\n    };\n    let current = initial;\n    let getterCalls = 0;\n    const setterCalls = [];\n    const FakeDispatcherRef = {\n      get current() {\n        getterCalls++;\n        return current;\n      },\n\n      set current(value) {\n        setterCalls.push(value);\n        current = value;\n      }\n\n    };\n\n    function Foo(props) {\n      const [state] = FakeDispatcherRef.current.useState('hello world');\n      return /*#__PURE__*/React.createElement(\"div\", null, state);\n    }\n\n    ReactDebugTools.inspectHooks(Foo, {}, FakeDispatcherRef);\n    expect(getterCalls).toBe(2);\n    expect(setterCalls).toHaveLength(2);\n    expect(setterCalls[0]).not.toBe(initial);\n    expect(setterCalls[1]).toBe(initial);\n  });",
             "file": "ReactHooksInspection-test.js",
             "skipped": false,
             "dir": "packages/react-debug-tools/src/__tests__"
@@ -1545,11 +1545,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 269,
+                "line": 258,
                 "column": 62,
-                "index": 7325
+                "index": 6383
             },
-            "line": 269,
+            "line": 258,
             "code": "    it('should be ignored when called outside of a custom hook', () => {\n      function Foo(props) {\n        React.useDebugValue('this is invalid');\n        return null;\n      }\n\n      const tree = ReactDebugTools.inspectHooks(Foo, {});\n      expect(tree).toHaveLength(0);\n    });",
             "file": "ReactHooksInspection-test.js",
             "skipped": false,
@@ -1562,11 +1562,11 @@
                 "useDebugValue"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 267,
                 "column": 59,
-                "index": 7603
+                "index": 6661
             },
-            "line": 278,
+            "line": 267,
             "code": "    it('should support an optional formatter function param', () => {\n      function useCustom() {\n        React.useDebugValue({\n          bar: 123\n        }, object => `bar:${object.bar}`);\n        React.useState(0);\n      }\n\n      function Foo(props) {\n        useCustom();\n        return null;\n      }\n\n      const tree = ReactDebugTools.inspectHooks(Foo, {});\n      expect(tree).toEqual([{\n        isStateEditable: false,\n        id: null,\n        name: 'Custom',\n        value: __DEV__ ? 'bar:123' : undefined,\n        subHooks: [{\n          isStateEditable: true,\n          id: 0,\n          name: 'State',\n          subHooks: [],\n          value: 0\n        }]\n      }]);\n    });",
             "file": "ReactHooksInspection-test.js",
             "skipped": false,
