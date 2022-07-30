@@ -7033,7 +7033,7 @@
                 "column": 19
             },
             "line": 1731,
-            "code": "\t\ttest('no UserPool', async () => {\n\t\t\tconst auth = new Auth({\n\t\t\t\tuserPoolId: undefined,\n\t\t\t\tuserPoolWebClientId: 'awsUserPoolsWebClientId',\n\t\t\t\tregion: 'region',\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t\tmandatorySignIn: false,\n\t\t\t});\n\t\t\tconst errorMessage = new NoUserPoolError(\n\t\t\t\tAuthErrorTypes.MissingAuthConfig\n\t\t\t);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(auth.currentSession().then()).rejects.toThrow(NoUserPoolError);\n\t\t\texpect(auth.currentSession().then()).rejects.toEqual(errorMessage);\n\t\t});",
+            "code": "\t\ttest('no UserPool', async () => {\n\t\t\tconst auth = new Auth({\n\t\t\t\tuserPoolId: undefined,\n\t\t\t\tuserPoolWebClientId: 'awsUserPoolsWebClientId',\n\t\t\t\tregion: 'region',\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t\tmandatorySignIn: false,\n\t\t\t});\n\n\t\t\tconst noUserPoolError = Error('No User Pool in the configuration.');\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(auth.currentSession().then()).rejects.toThrow(Error);\n\t\t\texpect(auth.currentSession().then()).rejects.toEqual(noUserPoolError);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
             "dir": "packages/auth/__tests__"
@@ -7045,10 +7045,10 @@
                 "currentAuthenticatedUser"
             ],
             "updatePoint": {
-                "line": 1750,
+                "line": 1749,
                 "column": 39
             },
-            "line": 1750,
+            "line": 1749,
             "code": "\t\ttest('happy case with source userpool', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(user);\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentAuthenticatedUser()).toEqual(user);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7061,10 +7061,10 @@
                 "currentAuthenticatedUser"
             ],
             "updatePoint": {
-                "line": 1770,
+                "line": 1769,
                 "column": 41
             },
-            "line": 1770,
+            "line": 1769,
             "code": "\t\ttest('happy case with source federation', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\tsetItem() {},\n\t\t\t\t\t\tgetItem() {\n\t\t\t\t\t\t\treturn JSON.stringify({\n\t\t\t\t\t\t\t\tuser: {\n\t\t\t\t\t\t\t\t\tname: 'federated user',\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\ttoken: '12345',\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t},\n\t\t\t\t\t\tremoveItem() {},\n\t\t\t\t\t};\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentAuthenticatedUser()).toStrictEqual({\n\t\t\t\tname: 'federated user',\n\t\t\t\ttoken: '12345',\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7077,10 +7077,10 @@
                 "userSession test"
             ],
             "updatePoint": {
-                "line": 1805,
+                "line": 1804,
                 "column": 18
             },
-            "line": 1805,
+            "line": 1804,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(null, session);\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.userSession(user)).toEqual(session);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7093,10 +7093,10 @@
                 "userSession test"
             ],
             "updatePoint": {
-                "line": 1824,
+                "line": 1823,
                 "column": 22
             },
-            "line": 1824,
+            "line": 1823,
             "code": "\t\ttest('callback error', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback('err', null);\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.userSession(user);\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('err');\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7109,10 +7109,10 @@
                 "userSession test"
             ],
             "updatePoint": {
-                "line": 1847,
+                "line": 1846,
                 "column": 15
             },
-            "line": 1847,
+            "line": 1846,
             "code": "\t\ttest('no user', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = null;\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.userSession(user);\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).not.toBeNull();\n\t\t\t}\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7125,10 +7125,10 @@
                 "userSession test"
             ],
             "updatePoint": {
-                "line": 1859,
+                "line": 1858,
                 "column": 34
             },
-            "line": 1859,
+            "line": 1858,
             "code": "\t\ttest('refresh token revoked case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => user);\n\t\t\tconst getSessionSpy = jest\n\t\t\t\t.spyOn(user, 'getSession')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('Refresh Token has been revoked'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\t\t\tconst credentialsClearSpy = jest.spyOn(Credentials, 'clear');\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\t\t\tawait expect(auth.userSession(user)).rejects.toThrowError(\n\t\t\t\t'Refresh Token has been revoked'\n\t\t\t);\n\t\t\texpect(getSessionSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(credentialsClearSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7141,10 +7141,10 @@
                 "currentUserCredentials test"
             ],
             "updatePoint": {
-                "line": 1894,
+                "line": 1893,
                 "column": 27
             },
-            "line": 1894,
+            "line": 1893,
             "code": "\t\ttest('with federated info', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\tsetItem() {},\n\t\t\t\t\t\tgetItem() {\n\t\t\t\t\t\t\treturn JSON.stringify({\n\t\t\t\t\t\t\t\tprovider: 'google',\n\t\t\t\t\t\t\t\ttoken: 'token',\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t},\n\t\t\t\t\t\tremoveItem() {},\n\t\t\t\t\t};\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Credentials, 'refreshFederatedToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('cred');\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserCredentials()).toBe('cred');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7157,10 +7157,10 @@
                 "currentUserCredentials test"
             ],
             "updatePoint": {
-                "line": 1925,
+                "line": 1924,
                 "column": 28
             },
-            "line": 1925,
+            "line": 1924,
             "code": "\t\ttest('with cognito session', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\tsetItem() {},\n\t\t\t\t\t\tgetItem() {\n\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t},\n\t\t\t\t\t\tremoveItem() {},\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('session' as any);\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(Credentials, 'set')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('cred' as any);\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserCredentials()).toBe('cred');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyon3.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7173,10 +7173,10 @@
                 "currentUserCredentials test"
             ],
             "updatePoint": {
-                "line": 1959,
+                "line": 1958,
                 "column": 18
             },
-            "line": 1959,
+            "line": 1958,
             "code": "\t\ttest('with guest', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\tsetItem() {},\n\t\t\t\t\t\tgetItem() {\n\t\t\t\t\t\t\treturn null;\n\t\t\t\t\t\t},\n\t\t\t\t\t\tremoveItem() {},\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.reject('err' as any);\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(Credentials, 'set')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('cred' as any);\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserCredentials()).toBe('cred');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyon3.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7189,10 +7189,10 @@
                 "currentUserCredentials test"
             ],
             "updatePoint": {
-                "line": 1993,
+                "line": 1992,
                 "column": 24
             },
-            "line": 1993,
+            "line": 1992,
             "code": "\t\ttest('json parse error', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\tsetItem() {},\n\t\t\t\t\t\tgetItem() {\n\t\t\t\t\t\t\treturn undefined;\n\t\t\t\t\t\t},\n\t\t\t\t\t\tremoveItem() {},\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('session') as any;\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(Credentials, 'set')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve('cred' as any);\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserCredentials()).toBe('cred');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyon3.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7205,10 +7205,10 @@
                 "verifyUserAttribute test"
             ],
             "updatePoint": {
-                "line": 2041,
+                "line": 2040,
                 "column": 18
             },
-            "line": 2041,
+            "line": 2040,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest.spyOn(\n\t\t\t\tCognitoUser.prototype,\n\t\t\t\t'getAttributeVerificationCode'\n\t\t\t);\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\tawait auth.verifyUserAttribute(user, 'email');\n\t\t\texpect(spyon).toBeCalled();\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7221,10 +7221,10 @@
                 "verifyUserAttribute test"
             ],
             "updatePoint": {
-                "line": 2060,
+                "line": 2059,
                 "column": 17
             },
-            "line": 2060,
+            "line": 2059,
             "code": "\t\ttest('onFailure', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getAttributeVerificationCode')\n\t\t\t\t.mockImplementationOnce((attr, callback) => {\n\t\t\t\t\tcallback.onFailure('err' as any);\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.verifyUserAttribute(user, 'email');\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('err');\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7237,10 +7237,10 @@
                 "verifyUserAttributeSubmit"
             ],
             "updatePoint": {
-                "line": 2085,
+                "line": 2084,
                 "column": 18
             },
-            "line": 2085,
+            "line": 2084,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'verifyAttribute');\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(\n\t\t\t\tawait auth.verifyUserAttributeSubmit(user, 'attribute', 'code')\n\t\t\t).toBe('success');\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7253,10 +7253,10 @@
                 "verifyUserAttributeSubmit"
             ],
             "updatePoint": {
-                "line": 2102,
+                "line": 2101,
                 "column": 17
             },
-            "line": 2102,
+            "line": 2101,
             "code": "\t\ttest('onFailure', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'verifyAttribute')\n\t\t\t\t.mockImplementationOnce((attr, code, callback) => {\n\t\t\t\t\tcallback.onFailure('err' as any);\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.verifyUserAttributeSubmit(user, 'email', 'code');\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('err');\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7269,10 +7269,10 @@
                 "verifyUserAttributeSubmit"
             ],
             "updatePoint": {
-                "line": 2125,
+                "line": 2124,
                 "column": 18
             },
-            "line": 2125,
+            "line": 2124,
             "code": "\t\ttest('code empty', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst errorMessage = new AuthError(AuthErrorTypes.EmptyCode);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth.verifyUserAttributeSubmit(user, 'email', null).then()\n\t\t\t).rejects.toThrow(AuthError);\n\t\t\texpect(\n\t\t\t\tauth.verifyUserAttributeSubmit(user, 'email', null).then()\n\t\t\t).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7285,10 +7285,10 @@
                 "verifyCurrentUserAttribute test"
             ],
             "updatePoint": {
-                "line": 2144,
+                "line": 2143,
                 "column": 18
             },
-            "line": 2144,
+            "line": 2143,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(user);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'verifyUserAttribute')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres();\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tawait auth.verifyCurrentUserAttribute('attr');\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(spyon).toBeCalled();\n\t\t\texpect(spyon2).toBeCalledWith(user, 'attr');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7301,10 +7301,10 @@
                 "verifyCurrentUserAttributeSubmit test"
             ],
             "updatePoint": {
-                "line": 2179,
+                "line": 2178,
                 "column": 18
             },
-            "line": 2179,
+            "line": 2178,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(user);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'verifyUserAttributeSubmit')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres();\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tawait auth.verifyCurrentUserAttributeSubmit('attr', 'code');\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(spyon).toBeCalled();\n\t\t\texpect(spyon2).toBeCalledWith(user, 'attr', 'code');\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7317,10 +7317,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2226,
+                "line": 2225,
                 "column": 18
             },
-            "line": 2226,
+            "line": 2225,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'clear')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve();\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\n\t\t\tawait auth.signOut();\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(spyon).toBeCalled();\n\t\t\texpect(spyon2).toBeCalled();\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7333,10 +7333,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2255,
+                "line": 2254,
                 "column": 38
             },
-            "line": 2255,
+            "line": 2254,
             "code": "\t\ttest('happy case for source userpool', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tauth['credentials_source'] = 'aws';\n\t\t\tauth['credentials'] = {\n\t\t\t\tIdentityPoolId: 'identityPoolId',\n\t\t\t};\n\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserCredentials')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((resolve, reject) => {\n\t\t\t\t\t\tresolve();\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest.spyOn(CognitoUser.prototype, 'signOut');\n\t\t\t// @ts-ignore\n\n\t\t\tawait auth.signOut();\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(spyon2).toBeCalled();\n\n\t\t\tspyonAuth.mockClear();\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7349,10 +7349,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2291,
+                "line": 2290,
                 "column": 36
             },
-            "line": 2291,
+            "line": 2290,
             "code": "\t\ttest('happy case for globalSignOut', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'clear')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve();\n\t\t\t\t});\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest.spyOn(CognitoUser.prototype, 'globalSignOut');\n\n\t\t\tawait auth.signOut({ global: true });\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(spyon2).toBeCalled();\n\n\t\t\tspyonAuth.mockClear();\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7365,10 +7365,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2320,
+                "line": 2319,
                 "column": 34
             },
-            "line": 2320,
+            "line": 2319,
             "code": "\t\ttest('happy case for no userpool', async () => {\n\t\t\t// @ts-ignore\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\n\t\t\texpect(await auth.signOut()).toBeUndefined();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7381,10 +7381,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2327,
+                "line": 2326,
                 "column": 27
             },
-            "line": 2327,
+            "line": 2326,
             "code": "\t\ttest('no User in userpool', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn null;\n\t\t\t\t});\n\t\t\texpect(await auth.signOut()).toBeUndefined();\n\n\t\t\tspyon.mockReset();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7397,10 +7397,10 @@
                 "signOut test"
             ],
             "updatePoint": {
-                "line": 2340,
+                "line": 2339,
                 "column": 36
             },
-            "line": 2340,
+            "line": 2339,
             "code": "\t\ttest('get guest credentials failed', async () => {\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\n\t\t\texpect(await auth.signOut()).toBeUndefined();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7413,10 +7413,10 @@
                 "changePassword"
             ],
             "updatePoint": {
-                "line": 2348,
+                "line": 2347,
                 "column": 18
             },
-            "line": 2348,
+            "line": 2347,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst oldPassword = 'oldPassword1';\n\t\t\tconst newPassword = 'newPassword1.';\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(session);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.changePassword(user, oldPassword, newPassword)).toBe(\n\t\t\t\t'SUCCESS'\n\t\t\t);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7429,10 +7429,10 @@
                 "changePassword"
             ],
             "updatePoint": {
-                "line": 2373,
+                "line": 2372,
                 "column": 41
             },
-            "line": 2373,
+            "line": 2372,
             "code": "\t\ttest('happy case clientMetadata default', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'changePassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst oldPassword = 'oldPassword1';\n\t\t\tconst newPassword = 'newPassword1.';\n\n\t\t\tawait auth.changePassword(user, oldPassword, newPassword);\n\n\t\t\texpect(await CognitoUser.prototype.changePassword).toBeCalledWith(\n\t\t\t\toldPassword,\n\t\t\t\tnewPassword,\n\t\t\t\tjasmine.any(Function),\n\t\t\t\t{\n\t\t\t\t\tfoo: 'bar',\n\t\t\t\t}\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7445,10 +7445,10 @@
                 "changePassword"
             ],
             "updatePoint": {
-                "line": 2396,
+                "line": 2395,
                 "column": 43
             },
-            "line": 2396,
+            "line": 2395,
             "code": "\t\ttest('happy case clientMetadata parameter', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'changePassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst oldPassword = 'oldPassword1';\n\t\t\tconst newPassword = 'newPassword1.';\n\n\t\t\tawait auth.changePassword(user, oldPassword, newPassword, {\n\t\t\t\tcustom: 'value',\n\t\t\t});\n\n\t\t\texpect(await CognitoUser.prototype.changePassword).toBeCalledWith(\n\t\t\t\toldPassword,\n\t\t\t\tnewPassword,\n\t\t\t\tjasmine.any(Function),\n\t\t\t\t{\n\t\t\t\t\tcustom: 'value',\n\t\t\t\t}\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7461,10 +7461,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2423,
+                "line": 2422,
                 "column": 18
             },
-            "line": 2423,
+            "line": 2422,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.forgotPassword('username')).toBeUndefined();\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7477,10 +7477,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2434,
+                "line": 2433,
                 "column": 41
             },
-            "line": 2434,
+            "line": 2433,
             "code": "\t\ttest('happy case clientMetadata default', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\n\t\t\tawait auth.forgotPassword('username');\n\n\t\t\texpect(await CognitoUser.prototype.forgotPassword).toBeCalledWith(\n\t\t\t\t{\n\t\t\t\t\tinputVerificationCode: jasmine.any(Function),\n\t\t\t\t\tonFailure: jasmine.any(Function),\n\t\t\t\t\tonSuccess: jasmine.any(Function),\n\t\t\t\t},\n\t\t\t\t{ foo: 'bar' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7493,10 +7493,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2451,
+                "line": 2450,
                 "column": 43
             },
-            "line": 2451,
+            "line": 2450,
             "code": "\t\ttest('happy case clientMetadata parameter', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\n\t\t\tawait auth.forgotPassword('username', { custom: 'value' });\n\n\t\t\texpect(await CognitoUser.prototype.forgotPassword).toBeCalledWith(\n\t\t\t\t{\n\t\t\t\t\tinputVerificationCode: jasmine.any(Function),\n\t\t\t\t\tonFailure: jasmine.any(Function),\n\t\t\t\t\tonSuccess: jasmine.any(Function),\n\t\t\t\t},\n\t\t\t\t{ custom: 'value' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7509,10 +7509,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2468,
+                "line": 2467,
                 "column": 17
             },
-            "line": 2468,
+            "line": 2467,
             "code": "\t\ttest('onFailure', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'forgotPassword')\n\t\t\t\t.mockImplementationOnce(callback => {\n\t\t\t\t\tcallback.onFailure(new Error('err'));\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.forgotPassword('username');\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toEqual(new Error('err'));\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7525,10 +7525,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2487,
+                "line": 2486,
                 "column": 29
             },
-            "line": 2487,
+            "line": 2486,
             "code": "\t\ttest('inputVerificationCode', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'forgotPassword')\n\t\t\t\t.mockImplementationOnce(callback => {\n\t\t\t\t\tcallback.inputVerificationCode('data');\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.forgotPassword('username')).toBe('data');\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7541,10 +7541,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2502,
+                "line": 2501,
                 "column": 23
             },
-            "line": 2502,
+            "line": 2501,
             "code": "\t\ttest('no user pool id', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\t\t\tconst errorMessage = new NoUserPoolError(\n\t\t\t\tAuthErrorTypes.MissingAuthConfig\n\t\t\t);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(auth.forgotPassword('username').then()).rejects.toThrow(\n\t\t\t\tNoUserPoolError\n\t\t\t);\n\t\t\texpect(auth.forgotPassword('username').then()).rejects.toEqual(\n\t\t\t\terrorMessage\n\t\t\t);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7557,10 +7557,10 @@
                 "forgotPassword"
             ],
             "updatePoint": {
-                "line": 2521,
+                "line": 2520,
                 "column": 19
             },
-            "line": 2521,
+            "line": 2520,
             "code": "\t\ttest('no username', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.forgotPassword(null);\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).not.toBeNull();\n\t\t\t}\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7573,10 +7573,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2537,
+                "line": 2536,
                 "column": 18
             },
-            "line": 2537,
+            "line": 2536,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'confirmPassword');\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(\n\t\t\t\tawait auth.forgotPasswordSubmit('username', 'code', 'password')\n\t\t\t).toBeUndefined();\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7589,10 +7589,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2550,
+                "line": 2549,
                 "column": 18
             },
-            "line": 2550,
+            "line": 2549,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'confirmPassword');\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.forgotPassword('username')).toBeUndefined();\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7605,10 +7605,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2561,
+                "line": 2560,
                 "column": 41
             },
-            "line": 2561,
+            "line": 2560,
             "code": "\t\ttest('happy case clientMetadata default', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst username = 'username';\n\t\t\tconst code = 'code';\n\t\t\tconst password = 'password';\n\n\t\t\tawait auth.forgotPasswordSubmit(username, code, password);\n\n\t\t\texpect(await CognitoUser.prototype.confirmPassword).toBeCalledWith(\n\t\t\t\tcode,\n\t\t\t\tpassword,\n\t\t\t\t{\n\t\t\t\t\tonFailure: jasmine.any(Function),\n\t\t\t\t\tonSuccess: jasmine.any(Function),\n\t\t\t\t},\n\t\t\t\t{ foo: 'bar' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7621,10 +7621,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2582,
+                "line": 2581,
                 "column": 43
             },
-            "line": 2582,
+            "line": 2581,
             "code": "\t\ttest('happy case clientMetadata parameter', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'forgotPassword');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst username = 'username';\n\t\t\tconst code = 'code';\n\t\t\tconst password = 'password';\n\n\t\t\tawait auth.forgotPasswordSubmit(username, code, password, {\n\t\t\t\tcustom: 'value',\n\t\t\t});\n\n\t\t\texpect(await CognitoUser.prototype.confirmPassword).toBeCalledWith(\n\t\t\t\tcode,\n\t\t\t\tpassword,\n\t\t\t\t{\n\t\t\t\t\tonFailure: jasmine.any(Function),\n\t\t\t\t\tonSuccess: jasmine.any(Function),\n\t\t\t\t},\n\t\t\t\t{ custom: 'value' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7637,10 +7637,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2605,
+                "line": 2604,
                 "column": 30
             },
-            "line": 2605,
+            "line": 2604,
             "code": "\t\ttest('confirmPassword failed', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'confirmPassword')\n\t\t\t\t.mockImplementationOnce((code, password, callback) => {\n\t\t\t\t\tcallback.onFailure(new Error('err'));\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.forgotPasswordSubmit('username', 'code', 'password');\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toEqual(new Error('err'));\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7653,10 +7653,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2624,
+                "line": 2623,
                 "column": 30
             },
-            "line": 2624,
+            "line": 2623,
             "code": "\t\ttest('no user pool in config', async () => {\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\t\t\tconst errorMessage = new NoUserPoolError(\n\t\t\t\tAuthErrorTypes.MissingAuthConfig\n\t\t\t);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', 'code', 'password').then()\n\t\t\t).rejects.toThrow(NoUserPoolError);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', 'code', 'password').then()\n\t\t\t).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7669,10 +7669,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2639,
+                "line": 2638,
                 "column": 19
             },
-            "line": 2639,
+            "line": 2638,
             "code": "\t\ttest('no username', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst errorMessage = new AuthError(AuthErrorTypes.EmptyUsername);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit(null, 'code', 'password').then()\n\t\t\t).rejects.toThrow(AuthError);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit(null, 'code', 'password').then()\n\t\t\t).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7685,10 +7685,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2652,
+                "line": 2651,
                 "column": 15
             },
-            "line": 2652,
+            "line": 2651,
             "code": "\t\ttest('no code', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst errorMessage = new AuthError(AuthErrorTypes.EmptyCode);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', null, 'password').then()\n\t\t\t).rejects.toThrow(AuthError);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', null, 'password').then()\n\t\t\t).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7701,10 +7701,10 @@
                 "forgotPasswordSubmit"
             ],
             "updatePoint": {
-                "line": 2665,
+                "line": 2664,
                 "column": 19
             },
-            "line": 2665,
+            "line": 2664,
             "code": "\t\ttest('no password', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst errorMessage = new AuthError(AuthErrorTypes.EmptyPassword);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', 'code', null).then()\n\t\t\t).rejects.toThrow(AuthError);\n\t\t\texpect(\n\t\t\t\tauth.forgotPasswordSubmit('username', 'code', null).then()\n\t\t\t).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7717,10 +7717,10 @@
                 "currentUserInfo test"
             ],
             "updatePoint": {
-                "line": 2680,
+                "line": 2679,
                 "column": 46
             },
-            "line": 2680,
+            "line": 2679,
             "code": "\t\ttest('happy case with aws or userpool source', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(user);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userAttributes')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\tauth['credentials'] = {\n\t\t\t\t\t\tIdentityPoolId: 'identityPoolId',\n\t\t\t\t\t\tIdentityId: 'identityId',\n\t\t\t\t\t};\n\t\t\t\t\tauth['credentials']['identityId'] = 'identityId';\n\t\t\t\t\treturn new Promise((res: any, rej) => {\n\t\t\t\t\t\tres([\n\t\t\t\t\t\t\t{ Name: 'email', Value: 'email' },\n\t\t\t\t\t\t\t{ Name: 'phone_number', Value: 'phone_number' },\n\t\t\t\t\t\t\t{ Name: 'email_verified', Value: 'false' },\n\t\t\t\t\t\t\t{ Name: 'phone_number_verified', Value: 'true' },\n\t\t\t\t\t\t\t{ Name: 'sub', Value: '123-456789' },\n\t\t\t\t\t\t]);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(auth, 'currentCredentials')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve({\n\t\t\t\t\t\tidentityId: 'identityId',\n\t\t\t\t\t} as any);\n\t\t\t\t});\n\n\t\t\tconst spyon4 = jest\n\t\t\t\t.spyOn(Credentials, 'getCredSource')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn 'aws';\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserInfo()).toEqual({\n\t\t\t\tusername: 'username',\n\t\t\t\tid: 'identityId',\n\t\t\t\tattributes: {\n\t\t\t\t\temail: 'email',\n\t\t\t\t\tphone_number: 'phone_number',\n\t\t\t\t\temail_verified: false,\n\t\t\t\t\tphone_number_verified: true,\n\t\t\t\t\tsub: '123-456789',\n\t\t\t\t},\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyon3.mockClear();\n\t\t\tspyon4.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7733,10 +7733,10 @@
                 "currentUserInfo test"
             ],
             "updatePoint": {
-                "line": 2747,
+                "line": 2746,
                 "column": 44
             },
-            "line": 2747,
+            "line": 2746,
             "code": "\t\ttest('return empty object if error happens', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({\n\t\t\t\t\t\t\tusername: 'username',\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userAttributes')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\trej('err');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentCredentials')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve({\n\t\t\t\t\t\tIdentityPoolId: 'identityPoolId',\n\t\t\t\t\t\tidentityId: 'identityId',\n\t\t\t\t\t} as any);\n\t\t\t\t});\n\n\t\t\tconst spyon4 = jest\n\t\t\t\t.spyOn(Credentials, 'getCredSource')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn 'aws';\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserInfo()).toEqual({});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyon3.mockClear();\n\t\t\tspyon4.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7749,10 +7749,10 @@
                 "currentUserInfo test"
             ],
             "updatePoint": {
-                "line": 2796,
+                "line": 2795,
                 "column": 32
             },
-            "line": 2796,
+            "line": 2795,
             "code": "\t\ttest('no current userpool user', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tauth['credentials_source'] = 'aws';\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(null);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Credentials, 'getCredSource')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn 'aws';\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserInfo()).toBeNull();\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7765,10 +7765,10 @@
                 "currentUserInfo test"
             ],
             "updatePoint": {
-                "line": 2825,
+                "line": 2824,
                 "column": 22
             },
-            "line": 2825,
+            "line": 2824,
             "code": "\t\ttest('federated user', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tauth['user'] = 'federated_user';\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'getCredSource')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn 'federated';\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserInfo()).toBe('federated_user');\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7781,10 +7781,10 @@
                 "updateUserAttributes test"
             ],
             "updatePoint": {
-                "line": 2847,
+                "line": 2846,
                 "column": 18
             },
-            "line": 2847,
+            "line": 2846,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst attributes = {\n\t\t\t\temail: 'email',\n\t\t\t\tphone_number: 'phone_number',\n\t\t\t\tsub: 'sub',\n\t\t\t};\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres(session);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.updateUserAttributes(user, attributes)).toBe('SUCCESS');\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7797,10 +7797,10 @@
                 "updateUserAttributes test"
             ],
             "updatePoint": {
-                "line": 2875,
+                "line": 2874,
                 "column": 41
             },
-            "line": 2875,
+            "line": 2874,
             "code": "\t\ttest('happy case clientMetadata default', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'updateAttributes');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tawait auth.updateUserAttributes(user, {});\n\n\t\t\texpect(await CognitoUser.prototype.updateAttributes).toBeCalledWith(\n\t\t\t\t[],\n\t\t\t\tjasmine.any(Function),\n\t\t\t\t{ foo: 'bar' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7813,10 +7813,10 @@
                 "updateUserAttributes test"
             ],
             "updatePoint": {
-                "line": 2893,
+                "line": 2892,
                 "column": 43
             },
-            "line": 2893,
+            "line": 2892,
             "code": "\t\ttest('happy case clientMetadata parameter', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'updateAttributes');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tawait auth.updateUserAttributes(user, {}, { custom: 'value' });\n\n\t\t\texpect(await CognitoUser.prototype.updateAttributes).toBeCalledWith(\n\t\t\t\t[],\n\t\t\t\tjasmine.any(Function),\n\t\t\t\t{ custom: 'value' }\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7829,10 +7829,10 @@
                 "deleteUserAttributes test"
             ],
             "updatePoint": {
-                "line": 2913,
+                "line": 2912,
                 "column": 18
             },
-            "line": 2913,
+            "line": 2912,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst attributeNames = ['email', 'phone_number'];\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userSession')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise(res => {\n\t\t\t\t\t\tres(session);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.deleteUserAttributes(user, attributeNames)).toBe(\n\t\t\t\t'SUCCESS'\n\t\t\t);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7845,10 +7845,10 @@
                 "deleteUserAttributes test"
             ],
             "updatePoint": {
-                "line": 2939,
+                "line": 2938,
                 "column": 51
             },
-            "line": 2939,
+            "line": 2938,
             "code": "\t\ttest('happy case to call with expected attributes', async () => {\n\t\t\tconst spyon = jest.spyOn(CognitoUser.prototype, 'deleteAttributes');\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tawait auth.deleteUserAttributes(user, ['email', 'phone_number']);\n\n\t\t\texpect(await CognitoUser.prototype.deleteAttributes).toBeCalledWith(\n\t\t\t\t['email', 'phone_number'],\n\t\t\t\tjasmine.any(Function)\n\t\t\t);\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7861,10 +7861,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 2973,
+                "line": 2972,
                 "column": 39
             },
-            "line": 2973,
+            "line": 2972,
             "code": "\t\ttest('Happy path should delete a user', async () => {\n\t\t\tconst spy1 = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spy2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\n\t\t\texpect(await auth.deleteUser()).toBe('SUCCESS');\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\t// TODO: test session cleared properly\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7877,10 +7877,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 2993,
+                "line": 2992,
                 "column": 39
             },
-            "line": 2993,
+            "line": 2992,
             "code": "\t\ttest('no user pool should throw error', async () => {\n\t\t\tconst noUserPoolAuth = new Auth(authOptionsWithNoUserPoolId);\n\t\t\ttry {\n\t\t\t\tawait noUserPoolAuth.deleteUser();\n\t\t\t} catch (error) {\n\t\t\t\texpect(error).toEqual(new Error('Cognito User pool does not exist'));\n\t\t\t}\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7893,10 +7893,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 3002,
+                "line": 3001,
                 "column": 34
             },
-            "line": 3002,
+            "line": 3001,
             "code": "\t\ttest('no user should throw error', async () => {\n\t\t\tconst spy1 = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn null;\n\t\t\t\t});\n\n\t\t\ttry {\n\t\t\t\tawait auth.deleteUser();\n\t\t\t} catch (error) {\n\t\t\t\texpect(error).toEqual(new Error('No current user.'));\n\t\t\t}\n\t\t\tspy1.mockReset();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7909,10 +7909,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 3017,
+                "line": 3016,
                 "column": 37
             },
-            "line": 3017,
+            "line": 3016,
             "code": "\t\ttest('no session should throw error', async () => {\n\t\t\tconst spy1 = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spy2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(new Error('no session'), null);\n\t\t\t\t});\n\n\t\t\ttry {\n\t\t\t\tawait auth.deleteUser();\n\t\t\t} catch (error) {\n\t\t\t\texpect(error).toEqual(Error('no session'));\n\t\t\t}\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7925,10 +7925,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 3036,
+                "line": 3035,
                 "column": 48
             },
-            "line": 3036,
+            "line": 3035,
             "code": "\t\ttest('getSession call fail should signout user', async () => {\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst getSessionSpy = jest\n\t\t\t\t.spyOn(user, 'getSession')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('Refresh Token has been revoked'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\t\t\tconst credentialsClearSpy = jest.spyOn(Credentials, 'clear');\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\t\t\tawait expect(auth.deleteUser()).rejects.toThrowError(\n\t\t\t\t'Refresh Token has been revoked'\n\t\t\t);\n\t\t\texpect(getSessionSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(credentialsClearSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7941,10 +7941,10 @@
                 "delete user test suite"
             ],
             "updatePoint": {
-                "line": 3066,
+                "line": 3065,
                 "column": 40
             },
-            "line": 3066,
+            "line": 3065,
             "code": "\t\ttest('cognito deleteUser call fails...', async () => {\n\t\t\tconst spy1 = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spy2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\t\t\tconst spy3 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'deleteUser')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\treturn callback(new Error('Cognito deleteUser error'), null);\n\t\t\t\t});\n\n\t\t\ttry {\n\t\t\t\tawait auth.deleteUser();\n\t\t\t} catch (error) {\n\t\t\t\texpect(error).toEqual(Error('Cognito deleteUser error'));\n\t\t\t}\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7957,10 +7957,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3092,
+                "line": 3091,
                 "column": 41
             },
-            "line": 3092,
+            "line": 3091,
             "code": "\t\ttest('No Identity Pool and No User Pool', async () => {\n\t\t\tconst options: AuthOptions = {};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tlet error;\n\t\t\ttry {\n\t\t\t\tawait auth.federatedSignIn(\n\t\t\t\t\t'google',\n\t\t\t\t\t{ token: 'token', expires_at: 1234 },\n\t\t\t\t\t{ name: 'username' }\n\t\t\t\t);\n\t\t\t} catch (e) {\n\t\t\t\terror = e;\n\t\t\t}\n\n\t\t\texpect(error).toEqual(\n\t\t\t\tnew Error(\n\t\t\t\t\t'Federation requires either a User Pool or Identity Pool in config'\n\t\t\t\t)\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7973,10 +7973,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3115,
+                "line": 3114,
                 "column": 20
             },
-            "line": 3115,
+            "line": 3114,
             "code": "\t\ttest('No User Pool', async () => {\n\t\t\tconst options: AuthOptions = {};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tlet error;\n\t\t\ttry {\n\t\t\t\tawait auth.federatedSignIn();\n\t\t\t} catch (e) {\n\t\t\t\terror = e;\n\t\t\t}\n\n\t\t\texpect(error).toEqual(\n\t\t\t\tnew Error(\n\t\t\t\t\t'Federation requires either a User Pool or Identity Pool in config'\n\t\t\t\t)\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -7989,10 +7989,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3134,
+                "line": 3133,
                 "column": 36
             },
-            "line": 3134,
+            "line": 3133,
             "code": "\t\ttest('Identity Pool Missing Tokens', async () => {\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tlet error;\n\t\t\ttry {\n\t\t\t\tawait auth.federatedSignIn();\n\t\t\t} catch (e) {\n\t\t\t\terror = e;\n\t\t\t}\n\n\t\t\texpect(error).toEqual(\n\t\t\t\tnew Error(\n\t\t\t\t\t'Federation with Identity Pools requires tokens passed as arguments'\n\t\t\t\t)\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8005,10 +8005,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3156,
+                "line": 3155,
                 "column": 27
             },
-            "line": 3156,
+            "line": 3155,
             "code": "\t\ttest('Identity Pools Only', async () => {\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\t\t\tlet user = null;\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'set')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\tuser = { name: 'username', email: 'xxx@email.com' };\n\t\t\t\t\treturn Promise.resolve('cred' as any);\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentAuthenticatedUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\tif (!user) return Promise.reject('error');\n\t\t\t\t\telse return Promise.resolve(user);\n\t\t\t\t});\n\n\t\t\tawait auth.federatedSignIn(\n\t\t\t\t'google',\n\t\t\t\t{ token: 'token', expires_at: 1234 },\n\t\t\t\t{ name: 'username' }\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalled();\n\t\t\texpect(spyon2).toBeCalled();\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8021,10 +8021,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3189,
+                "line": 3188,
                 "column": 23
             },
-            "line": 3189,
+            "line": 3188,
             "code": "\t\ttest('User Pools Only', async () => {\n\t\t\tconst urlOpener = jest.fn();\n\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tuserPoolId: 'userPoolId',\n\t\t\t\toauth: {\n\t\t\t\t\tdomain: 'mydomain.auth.us-east-1.amazoncognito.com',\n\t\t\t\t\tscope: ['aws.cognito.signin.user.admin'],\n\t\t\t\t\tredirectSignIn: 'http://localhost:3000/',\n\t\t\t\t\tredirectSignOut: 'http://localhost:3000/',\n\t\t\t\t\tresponseType: 'code',\n\t\t\t\t\turlOpener,\n\t\t\t\t},\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tconst spyon3 = jest.spyOn(OAuth.prototype, 'oauthSignIn');\n\n\t\t\tawait auth.federatedSignIn();\n\n\t\t\texpect(spyon3).toBeCalled();\n\t\t\tspyon3.mockClear();\n\t\t\texpect(urlOpener).toBeCalled();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8037,10 +8037,10 @@
                 "federatedSignIn test"
             ],
             "updatePoint": {
-                "line": 3216,
+                "line": 3215,
                 "column": 37
             },
-            "line": 3216,
+            "line": 3215,
             "code": "\t\ttest('User Pools and Identity Pools', async () => {\n\t\t\tconst urlOpener = jest.fn();\n\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t\tuserPoolId: 'userPoolId',\n\t\t\t\toauth: {\n\t\t\t\t\tdomain: 'mydomain.auth.us-east-1.amazoncognito.com',\n\t\t\t\t\tscope: ['aws.cognito.signin.user.admin'],\n\t\t\t\t\tredirectSignIn: 'http://localhost:3000/',\n\t\t\t\t\tredirectSignOut: 'http://localhost:3000/',\n\t\t\t\t\tresponseType: 'code',\n\t\t\t\t\turlOpener,\n\t\t\t\t},\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tconst spyon3 = jest.spyOn(OAuth.prototype, 'oauthSignIn');\n\n\t\t\tlet user = null;\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'set')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\tuser = { name: 'username', email: 'xxx@email.com' };\n\t\t\t\t\treturn Promise.resolve('cred' as any);\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(Auth.prototype, 'currentAuthenticatedUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\tif (!user) return Promise.reject('error');\n\t\t\t\t\telse return Promise.resolve(user);\n\t\t\t\t});\n\n\t\t\tawait auth.federatedSignIn(\n\t\t\t\t'google',\n\t\t\t\t{ token: 'token', expires_at: 1234 },\n\t\t\t\t{ name: 'username' }\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalled();\n\t\t\texpect(spyon2).toBeCalled();\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\n\t\t\texpect(spyon3).not.toBeCalled();\n\t\t\tspyon3.mockClear();\n\t\t\texpect(urlOpener).not.toBeCalled();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8053,10 +8053,10 @@
                 "handleAuthResponse test"
             ],
             "updatePoint": {
-                "line": 3287,
+                "line": 3286,
                 "column": 28
             },
-            "line": 3287,
+            "line": 3286,
             "code": "\t\ttest('User Pools Code Flow', async () => {\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tuserPoolId: 'userPoolId',\n\t\t\t\toauth: {\n\t\t\t\t\tdomain: 'mydomain.auth.us-east-1.amazoncognito.com',\n\t\t\t\t\tscope: ['aws.cognito.signin.user.admin'],\n\t\t\t\t\tredirectSignIn: 'http://localhost:3000/',\n\t\t\t\t\tredirectSignOut: 'http://localhost:3000/',\n\t\t\t\t\tresponseType: 'code',\n\t\t\t\t},\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tconst handleAuthResponseSpy = jest\n\t\t\t\t.spyOn(OAuth.prototype, 'handleAuthResponse')\n\t\t\t\t.mockReturnValueOnce({ idToken: '' } as any);\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getIdToken')\n\t\t\t\t.mockReturnValueOnce({ decodePayload: () => ({}) } as any);\n\t\t\tjest.spyOn(Credentials, 'set').mockImplementationOnce(c => c);\n\t\t\t(auth as any).createCognitoUser = jest.fn(() => ({\n\t\t\t\tgetUsername: jest.fn(),\n\t\t\t\tsetSignInUserSession: jest.fn(),\n\t\t\t}));\n\t\t\t// Mock to help assert invocation order of other spies\n\t\t\tconst trackSpies = jest.fn();\n\t\t\tconst replaceStateSpy = jest\n\t\t\t\t.spyOn(window.history, 'replaceState')\n\t\t\t\t.mockImplementation((stateObj, title, url) => {\n\t\t\t\t\ttrackSpies(\n\t\t\t\t\t\t`window.history.replaceState(${JSON.stringify(\n\t\t\t\t\t\t\tstateObj\n\t\t\t\t\t\t)}, ${JSON.stringify(title)}, '${url}')`\n\t\t\t\t\t);\n\t\t\t\t\treturn this;\n\t\t\t\t});\n\t\t\tconst hubSpy = jest\n\t\t\t\t.spyOn(Hub, 'dispatch')\n\t\t\t\t.mockImplementation((channel, { event }) =>\n\t\t\t\t\t// payload.data isn't necessary for tracking order of dispatch events\n\t\t\t\t\ttrackSpies(\n\t\t\t\t\t\t`Hub.dispatch('${channel}', { data: ..., event: '${event}' })`\n\t\t\t\t\t)\n\t\t\t\t);\n\n\t\t\tconst code = 'XXXX-YYY-ZZZ';\n\t\t\tconst state = 'STATEABC';\n\t\t\tconst url = `${\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t}?code=${code}&state=${state}`;\n\n\t\t\t(oauthStorage.getState as jest.Mock<any>).mockReturnValueOnce(state);\n\t\t\tawait (auth as any)._handleAuthResponse(url);\n\n\t\t\texpect(handleAuthResponseSpy).toHaveBeenCalledWith(url);\n\t\t\texpect(replaceStateSpy).toHaveBeenCalledWith(\n\t\t\t\t{},\n\t\t\t\tnull,\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t);\n\n\t\t\t// replaceState should be called *prior* to `signIn` dispatch,\n\t\t\t// so that customers can override with a new value\n\t\t\texpect(trackSpies.mock.calls).toMatchInlineSnapshot(`\n\t\t\tArray [\n\t\t\t  Array [\n\t\t\t    \"Hub.dispatch('auth', { data: ..., event: 'parsingCallbackUrl' })\",\n\t\t\t  ],\n\t\t\t  Array [\n\t\t\t    \"window.history.replaceState({}, null, 'http://localhost:3000/')\",\n\t\t\t  ],\n\t\t\t  Array [\n\t\t\t    \"Hub.dispatch('auth', { data: ..., event: 'signIn' })\",\n\t\t\t  ],\n\t\t\t  Array [\n\t\t\t    \"Hub.dispatch('auth', { data: ..., event: 'cognitoHostedUI' })\",\n\t\t\t  ],\n\t\t\t]\n\t\t`);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8069,10 +8069,10 @@
                 "handleAuthResponse test"
             ],
             "updatePoint": {
-                "line": 3370,
+                "line": 3369,
                 "column": 32
             },
-            "line": 3370,
+            "line": 3369,
             "code": "\t\ttest('User Pools Implicit Flow', async () => {\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tuserPoolId: 'userPoolId',\n\t\t\t\toauth: {\n\t\t\t\t\tdomain: 'mydomain.auth.us-east-1.amazoncognito.com',\n\t\t\t\t\tscope: ['aws.cognito.signin.user.admin'],\n\t\t\t\t\tredirectSignIn: 'http://localhost:3000/',\n\t\t\t\t\tredirectSignOut: 'http://localhost:3000/',\n\t\t\t\t\tresponseType: 'token',\n\t\t\t\t},\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tconst handleAuthResponseSpy = jest\n\t\t\t\t.spyOn(OAuth.prototype, 'handleAuthResponse')\n\t\t\t\t.mockReturnValueOnce({ idToken: '' } as any);\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getIdToken')\n\t\t\t\t.mockReturnValueOnce({ decodePayload: () => ({}) } as any);\n\t\t\tjest.spyOn(Credentials, 'set').mockImplementationOnce(c => c);\n\t\t\t(auth as any).createCognitoUser = jest.fn(() => ({\n\t\t\t\tgetUsername: jest.fn(),\n\t\t\t\tsetSignInUserSession: jest.fn(),\n\t\t\t}));\n\t\t\tconst replaceStateSpy = jest\n\t\t\t\t.spyOn(window.history, 'replaceState')\n\t\t\t\t.mockReturnThis();\n\n\t\t\tconst token = 'XXXX.YYY.ZZZ';\n\t\t\tconst state = 'STATEABC';\n\t\t\tconst url = `${\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t}#access_token=${token}&state=${state}`;\n\n\t\t\tawait (auth as any)._handleAuthResponse(url);\n\n\t\t\texpect(handleAuthResponseSpy).toHaveBeenCalledWith(url);\n\t\t\texpect(replaceStateSpy).toHaveBeenCalledWith(\n\t\t\t\t{},\n\t\t\t\tnull,\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8085,10 +8085,10 @@
                 "handleAuthResponse test"
             ],
             "updatePoint": {
-                "line": 3416,
+                "line": 3415,
                 "column": 21
             },
-            "line": 3416,
+            "line": 3415,
             "code": "\t\ttest('No User Pools', async () => {\n\t\t\tconst urlOpener = jest.fn();\n\n\t\t\tconst options: AuthOptions = {};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tlet error;\n\t\t\ttry {\n\t\t\t\tawait (auth as any)._handleAuthResponse(' ');\n\t\t\t} catch (e) {\n\t\t\t\terror = e;\n\t\t\t}\n\n\t\t\texpect(error).toEqual(\n\t\t\t\tnew Error('OAuth responses require a User Pool defined in config')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8101,10 +8101,10 @@
                 "handleAuthResponse test"
             ],
             "updatePoint": {
-                "line": 3435,
+                "line": 3434,
                 "column": 37
             },
-            "line": 3435,
+            "line": 3434,
             "code": "\t\ttest('User Pools and Identity Pools', async () => {\n\t\t\tconst options: AuthOptions = {\n\t\t\t\tregion: 'region',\n\t\t\t\tuserPoolId: 'userPoolId',\n\t\t\t\toauth: {\n\t\t\t\t\tdomain: 'mydomain.auth.us-east-1.amazoncognito.com',\n\t\t\t\t\tscope: ['aws.cognito.signin.user.admin'],\n\t\t\t\t\tredirectSignIn: 'http://localhost:3000/',\n\t\t\t\t\tredirectSignOut: 'http://localhost:3000/',\n\t\t\t\t\tresponseType: 'code',\n\t\t\t\t},\n\t\t\t\tidentityPoolId: 'awsCognitoIdentityPoolId',\n\t\t\t};\n\n\t\t\tconst auth = new Auth(options);\n\n\t\t\tconst handleAuthResponseSpy = jest\n\t\t\t\t.spyOn(OAuth.prototype, 'handleAuthResponse')\n\t\t\t\t.mockReturnValueOnce({ idToken: '' } as any);\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getIdToken')\n\t\t\t\t.mockReturnValueOnce({ decodePayload: () => ({}) } as any);\n\t\t\tjest.spyOn(Credentials, 'set').mockImplementationOnce(c => c);\n\t\t\t(auth as any).createCognitoUser = jest.fn(() => ({\n\t\t\t\tgetUsername: jest.fn(),\n\t\t\t\tsetSignInUserSession: jest.fn(),\n\t\t\t}));\n\t\t\tconst replaceStateSpy = jest\n\t\t\t\t.spyOn(window.history, 'replaceState')\n\t\t\t\t.mockReturnThis();\n\n\t\t\tconst code = 'XXXX-YYY-ZZZ';\n\t\t\tconst url = `${\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t}?code=${code}`;\n\t\t\tawait (auth as any)._handleAuthResponse(url);\n\n\t\t\texpect(handleAuthResponseSpy).toHaveBeenCalledWith(url);\n\t\t\texpect(replaceStateSpy).toHaveBeenCalledWith(\n\t\t\t\t{},\n\t\t\t\tnull,\n\t\t\t\t(options.oauth as AwsCognitoOAuthOpts).redirectSignIn\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8117,10 +8117,10 @@
                 "verifiedContact test"
             ],
             "updatePoint": {
-                "line": 3482,
+                "line": 3481,
                 "column": 34
             },
-            "line": 3482,
+            "line": 3481,
             "code": "\t\ttest('happy case with unverified', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userAttributes')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res: any, rej) => {\n\t\t\t\t\t\tres([\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'email',\n\t\t\t\t\t\t\t\tValue: 'email@amazon.com',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'phone_number',\n\t\t\t\t\t\t\t\tValue: '+12345678901',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t]);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect(await auth.verifiedContact(user)).toEqual({\n\t\t\t\tunverified: { email: 'email@amazon.com', phone_number: '+12345678901' },\n\t\t\t\tverified: {},\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8133,10 +8133,10 @@
                 "verifiedContact test"
             ],
             "updatePoint": {
-                "line": 3514,
+                "line": 3513,
                 "column": 32
             },
-            "line": 3514,
+            "line": 3513,
             "code": "\t\ttest('happy case with verified', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userAttributes')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res: any, rej) => {\n\t\t\t\t\t\tres([\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'email',\n\t\t\t\t\t\t\t\tValue: 'email@amazon.com',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'phone_number',\n\t\t\t\t\t\t\t\tValue: '+12345678901',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'email_verified',\n\t\t\t\t\t\t\t\tValue: true,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'phone_number_verified',\n\t\t\t\t\t\t\t\tValue: true,\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t]);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect(await auth.verifiedContact(user)).toEqual({\n\t\t\t\tunverified: {},\n\t\t\t\tverified: { email: 'email@amazon.com', phone_number: '+12345678901' },\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8149,10 +8149,10 @@
                 "verifiedContact test"
             ],
             "updatePoint": {
-                "line": 3554,
+                "line": 3553,
                 "column": 43
             },
-            "line": 3554,
+            "line": 3553,
             "code": "\t\ttest('happy case with verified as strings', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Auth.prototype, 'userAttributes')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res: any, rej) => {\n\t\t\t\t\t\tres([\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'email',\n\t\t\t\t\t\t\t\tValue: 'email@amazon.com',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'phone_number',\n\t\t\t\t\t\t\t\tValue: '+12345678901',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'email_verified',\n\t\t\t\t\t\t\t\tValue: 'true',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tName: 'phone_number_verified',\n\t\t\t\t\t\t\t\tValue: 'True',\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t]);\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\texpect(await auth.verifiedContact(user)).toEqual({\n\t\t\t\tunverified: {},\n\t\t\t\tverified: { email: 'email@amazon.com', phone_number: '+12345678901' },\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8165,10 +8165,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3600,
+                "line": 3599,
                 "column": 18
             },
-            "line": 3600,
+            "line": 3599,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tPreferredMfaSetting: 'SMS',\n\t\t\t\t\t\tUserAttributes: [{ Name: 'address', Value: 'xxxx' }],\n\t\t\t\t\t};\n\t\t\t\t\tcallback(null, data);\n\t\t\t\t});\n\n\t\t\tconst spyon4 = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon5 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: USER_ADMIN_SCOPE };\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(await auth.currentUserPoolUser()).toBe(\n\t\t\t\tObject.assign(user, {\n\t\t\t\t\tattributes: {\n\t\t\t\t\t\taddress: 'xxxx',\n\t\t\t\t\t},\n\t\t\t\t\tpreferredMFA: 'SMS',\n\t\t\t\t})\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8181,10 +8181,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3651,
+                "line": 3650,
                 "column": 23
             },
-            "line": 3651,
+            "line": 3650,
             "code": "\t\ttest('no current user', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn null;\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.currentUserPoolUser();\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('No current user');\n\t\t\t}\n\t\t\tspyon.mockReset();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8197,10 +8197,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3673,
+                "line": 3672,
                 "column": 29
             },
-            "line": 3673,
+            "line": 3672,
             "code": "\t\ttest('No userPool in config', async () => {\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst errorMessage = new NoUserPoolError(\n\t\t\t\tAuthErrorTypes.MissingAuthConfig\n\t\t\t);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(auth.currentUserPoolUser().then()).rejects.toThrow(\n\t\t\t\tNoUserPoolError\n\t\t\t);\n\t\t\texpect(auth.currentUserPoolUser().then()).rejects.toEqual(errorMessage);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8213,10 +8213,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3690,
+                "line": 3689,
                 "column": 25
             },
-            "line": 3690,
+            "line": 3689,
             "code": "\t\ttest('get session error', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback('err', null);\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest.spyOn(CognitoUser.prototype, 'getUserData');\n\n\t\t\texpect.assertions(2);\n\t\t\ttry {\n\t\t\t\tawait auth.currentUserPoolUser();\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('err');\n\t\t\t\texpect(spyon3).not.toBeCalled();\n\t\t\t}\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8229,10 +8229,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3719,
+                "line": 3718,
                 "column": 69
             },
-            "line": 3719,
+            "line": 3718,
             "code": "\t\ttest('get session error - refresh token revoked should signout user', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst getSessionSpy = jest\n\t\t\t\t.spyOn(user, 'getSession')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('Refresh Token has been revoked'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\t\t\tconst credentialsClearSpy = jest.spyOn(Credentials, 'clear');\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\t\t\tawait expect(auth.currentUserPoolUser()).rejects.toThrowError(\n\t\t\t\t'Refresh Token has been revoked'\n\t\t\t);\n\t\t\texpect(getSessionSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(credentialsClearSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8245,10 +8245,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3754,
+                "line": 3753,
                 "column": 90
             },
-            "line": 3754,
+            "line": 3753,
             "code": "\t\ttest('get user data error because of user is deleted, disabled or token has been revoked', async () => {\n\t\t\tjest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(createMockLocalStorage);\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('User is disabled.'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest.spyOn(CognitoUser.prototype, 'signOut');\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: USER_ADMIN_SCOPE };\n\t\t\t\t});\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\t\t\tawait expect(auth.currentUserPoolUser()).rejects.toThrow(\n\t\t\t\t'User is disabled.'\n\t\t\t);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8261,10 +8261,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3806,
+                "line": 3805,
                 "column": 103
             },
-            "line": 3806,
+            "line": 3805,
             "code": "\t\ttest('get user data error because of user is deleted, disabled or token has been revoked - oAuth case', async () => {\n\t\t\tconst mockLocalStorage = createMockLocalStorage();\n\t\t\tjest\n\t\t\t\t.spyOn(StorageHelper.prototype, 'getStorage')\n\t\t\t\t.mockImplementation(() => mockLocalStorage);\n\t\t\tmockLocalStorage.setItem('amplify-signin-with-hostedUI', 'true');\n\n\t\t\t// need window.open defined as oAuthHandler will invoke window.open\n\t\t\tjest.spyOn(window, 'open').mockImplementationOnce(() => {\n\t\t\t\treturn {} as Window;\n\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptionsWithHostedUIConfig);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('User is disabled.'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest.spyOn(CognitoUser.prototype, 'signOut');\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: USER_ADMIN_SCOPE };\n\t\t\t\t});\n\t\t\tawait expect(auth.currentUserPoolUser()).rejects.toThrow(\n\t\t\t\t'Session is invalid due to: User is disabled. and failed to clean up invalid session: Signout timeout fail'\n\t\t\t);\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8277,10 +8277,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3858,
+                "line": 3857,
                 "column": 63
             },
-            "line": 3858,
+            "line": 3857,
             "code": "\t\ttest('bypass the error if the user is not deleted or disabled', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tmessage: 'other error',\n\t\t\t\t\t\t},\n\t\t\t\t\t\tnull\n\t\t\t\t\t);\n\t\t\t\t});\n\n\t\t\tconst spyon4 = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon5 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: USER_ADMIN_SCOPE };\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\n\t\t\texpect(await auth.currentUserPoolUser()).toEqual(user);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8293,10 +8293,10 @@
                 "currentUserPoolUser test"
             ],
             "updatePoint": {
-                "line": 3903,
+                "line": 3902,
                 "column": 77
             },
-            "line": 3903,
+            "line": 3902,
             "code": "\t\ttest('directly return the user if no permission(scope) to get the user data', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn user;\n\t\t\t\t});\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getSession')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\treturn callback(null, session);\n\t\t\t\t});\n\n\t\t\tconst spyon3 = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tPreferredMfaSetting: 'SMS',\n\t\t\t\t\t\tUserAttributes: [{ Name: 'address', Value: 'xxxx' }],\n\t\t\t\t\t};\n\t\t\t\t\tcallback(null, data);\n\t\t\t\t});\n\n\t\t\tconst spyon4 = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon5 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: '' };\n\t\t\t\t});\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(spyon3).not.toBeCalled();\n\t\t\texpect(await auth.currentUserPoolUser()).toBe(user);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8309,10 +8309,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 3950,
+                "line": 3949,
                 "column": 18
             },
-            "line": 3950,
+            "line": 3949,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'sendCustomChallengeAnswer')\n\t\t\t\t.mockImplementationOnce((challengeResponses, callback) => {\n\t\t\t\t\tcallback.onSuccess(session);\n\t\t\t\t});\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst userAfterCustomChallengeAnswer = Object.assign(\n\t\t\t\tnew CognitoUser({\n\t\t\t\t\tUsername: 'username',\n\t\t\t\t\tPool: userPool,\n\t\t\t\t}),\n\t\t\t\t{\n\t\t\t\t\tchallengeName: 'CUSTOM_CHALLENGE',\n\t\t\t\t\tchallengeParam: 'challengeParam',\n\t\t\t\t}\n\t\t\t);\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve(user);\n\t\t\t\t});\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(\n\t\t\t\tawait auth.sendCustomChallengeAnswer(\n\t\t\t\t\tuserAfterCustomChallengeAnswer,\n\t\t\t\t\t'challengeResponse'\n\t\t\t\t)\n\t\t\t).toEqual(user);\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8325,10 +8325,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 3990,
+                "line": 3989,
                 "column": 41
             },
-            "line": 3990,
+            "line": 3989,
             "code": "\t\ttest('happy case clientMetadata default', async () => {\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\n\t\t\tconst spyon = jest.spyOn(\n\t\t\t\tCognitoUser.prototype,\n\t\t\t\t'sendCustomChallengeAnswer'\n\t\t\t);\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve(user);\n\t\t\t\t});\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tawait auth.sendCustomChallengeAnswer(user, 'answer');\n\n\t\t\texpect(\n\t\t\t\tawait CognitoUser.prototype.sendCustomChallengeAnswer\n\t\t\t).toBeCalledWith('answer', authCallbacks, { foo: 'bar' });\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8341,10 +8341,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 4015,
+                "line": 4014,
                 "column": 43
             },
-            "line": 4015,
+            "line": 4014,
             "code": "\t\ttest('happy case clientMetadata parameter', async () => {\n\t\t\tconst auth = new Auth(authOptionsWithClientMetadata);\n\n\t\t\tconst spyon = jest.spyOn(\n\t\t\t\tCognitoUser.prototype,\n\t\t\t\t'sendCustomChallengeAnswer'\n\t\t\t);\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(auth, 'currentUserPoolUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve(user);\n\t\t\t\t});\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\n\t\t\tawait auth.sendCustomChallengeAnswer(user, 'answer', { custom: 'value' });\n\n\t\t\texpect(\n\t\t\t\tawait CognitoUser.prototype.sendCustomChallengeAnswer\n\t\t\t).toBeCalledWith('answer', authCallbacks, { custom: 'value' });\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8357,10 +8357,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 4040,
+                "line": 4039,
                 "column": 23
             },
-            "line": 4040,
+            "line": 4039,
             "code": "\t\ttest('customChallenge', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'sendCustomChallengeAnswer')\n\t\t\t\t.mockImplementationOnce((challengeResponses, callback) => {\n\t\t\t\t\tcallback.customChallenge('challengeParam');\n\t\t\t\t});\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst userAfterCustomChallengeAnswer = Object.assign(\n\t\t\t\tnew CognitoUser({\n\t\t\t\t\tUsername: 'username',\n\t\t\t\t\tPool: userPool,\n\t\t\t\t}),\n\t\t\t\t{\n\t\t\t\t\tchallengeName: 'CUSTOM_CHALLENGE',\n\t\t\t\t\tchallengeParam: 'challengeParam',\n\t\t\t\t}\n\t\t\t);\n\n\t\t\texpect.assertions(1);\n\t\t\texpect(\n\t\t\t\tawait auth.sendCustomChallengeAnswer(\n\t\t\t\t\tuserAfterCustomChallengeAnswer,\n\t\t\t\t\t'challengeResponse'\n\t\t\t\t)\n\t\t\t).toEqual(userAfterCustomChallengeAnswer);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8373,10 +8373,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 4073,
+                "line": 4072,
                 "column": 17
             },
-            "line": 4073,
+            "line": 4072,
             "code": "\t\ttest('onFailure', async () => {\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'sendCustomChallengeAnswer')\n\t\t\t\t.mockImplementationOnce((challengeResponses, callback) => {\n\t\t\t\t\tcallback.onFailure('err');\n\t\t\t\t});\n\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst userAfterCustomChallengeAnswer = Object.assign(\n\t\t\t\tnew CognitoUser({\n\t\t\t\t\tUsername: 'username',\n\t\t\t\t\tPool: userPool,\n\t\t\t\t}),\n\t\t\t\t{\n\t\t\t\t\tchallengeName: 'CUSTOM_CHALLENGE',\n\t\t\t\t\tchallengeParam: 'challengeParam',\n\t\t\t\t}\n\t\t\t);\n\n\t\t\texpect.assertions(1);\n\t\t\ttry {\n\t\t\t\tawait auth.sendCustomChallengeAnswer(\n\t\t\t\t\tuserAfterCustomChallengeAnswer,\n\t\t\t\t\t'challengeResponse'\n\t\t\t\t);\n\t\t\t} catch (e) {\n\t\t\t\texpect(e).toBe('err');\n\t\t\t}\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8389,10 +8389,10 @@
                 "sendCustomChallengeAnswer"
             ],
             "updatePoint": {
-                "line": 4105,
+                "line": 4104,
                 "column": 19
             },
-            "line": 4105,
+            "line": 4104,
             "code": "\t\ttest('no userPool', async () => {\n\t\t\tconst spyon = jest.spyOn(\n\t\t\t\tCognitoUser.prototype,\n\t\t\t\t'sendCustomChallengeAnswer'\n\t\t\t);\n\n\t\t\tconst auth = new Auth(authOptionsWithNoUserPoolId);\n\t\t\tconst userAfterCustomChallengeAnswer = Object.assign(\n\t\t\t\tnew CognitoUser({\n\t\t\t\t\tUsername: 'username',\n\t\t\t\t\tPool: userPool,\n\t\t\t\t}),\n\t\t\t\t{\n\t\t\t\t\tchallengeName: 'CUSTOM_CHALLENGE',\n\t\t\t\t\tchallengeParam: 'challengeParam',\n\t\t\t\t}\n\t\t\t);\n\t\t\tconst errorMessage = new NoUserPoolError(\n\t\t\t\tAuthErrorTypes.MissingAuthConfig\n\t\t\t);\n\n\t\t\texpect.assertions(2);\n\t\t\texpect(\n\t\t\t\tauth\n\t\t\t\t\t.sendCustomChallengeAnswer(\n\t\t\t\t\t\tuserAfterCustomChallengeAnswer,\n\t\t\t\t\t\t'challengeResponse'\n\t\t\t\t\t)\n\t\t\t\t\t.then()\n\t\t\t).rejects.toThrow(AuthError);\n\n\t\t\texpect(\n\t\t\t\tauth\n\t\t\t\t\t.sendCustomChallengeAnswer(\n\t\t\t\t\t\tuserAfterCustomChallengeAnswer,\n\t\t\t\t\t\t'challengeResponse'\n\t\t\t\t\t)\n\t\t\t\t\t.then()\n\t\t\t).rejects.toEqual(errorMessage);\n\n\t\t\tspyon.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8405,10 +8405,10 @@
                 "Device Tracking"
             ],
             "updatePoint": {
-                "line": 4150,
+                "line": 4149,
                 "column": 34
             },
-            "line": 4150,
+            "line": 4149,
             "code": "\t\ttest('remember device happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: '' };\n\t\t\t\t});\n\n\t\t\tconst spyOnCognito = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'setDeviceStatusRemembered')\n\t\t\t\t.mockImplementationOnce(\n\t\t\t\t\t(obj: {\n\t\t\t\t\t\tonSuccess: (success: string) => void;\n\t\t\t\t\t\tonFailure: (err: any) => void;\n\t\t\t\t\t}) => {\n\t\t\t\t\t\tobj.onSuccess('SUCCESS');\n\t\t\t\t\t}\n\t\t\t\t);\n\t\t\tawait auth.rememberDevice().then(res => {\n\t\t\t\texpect(spyOnCognito).toBeCalled();\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyOnCognito.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8421,10 +8421,10 @@
                 "Device Tracking"
             ],
             "updatePoint": {
-                "line": 4183,
+                "line": 4182,
                 "column": 32
             },
-            "line": 4183,
+            "line": 4182,
             "code": "\t\ttest('forget device happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: '' };\n\t\t\t\t});\n\n\t\t\tconst spyOnCognito = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'forgetDevice')\n\t\t\t\t.mockImplementationOnce(\n\t\t\t\t\t(obj: {\n\t\t\t\t\t\tonSuccess: (success: string) => void;\n\t\t\t\t\t\tonFailure: (err: any) => void;\n\t\t\t\t\t}) => {\n\t\t\t\t\t\tobj.onSuccess('SUCCESS');\n\t\t\t\t\t}\n\t\t\t\t);\n\n\t\t\tawait auth.forgetDevice().then(res => {\n\t\t\t\texpect(spyOnCognito).toBeCalled();\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyOnCognito.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8437,10 +8437,10 @@
                 "Device Tracking"
             ],
             "updatePoint": {
-                "line": 4218,
+                "line": 4217,
                 "column": 60
             },
-            "line": 4218,
+            "line": 4217,
             "code": "\t\ttest('list devices with no devices from Cognito happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: '' };\n\t\t\t\t});\n\n\t\t\tconst spyOnCognito = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'listDevices')\n\t\t\t\t.mockImplementationOnce(\n\t\t\t\t\t(\n\t\t\t\t\t\tMAX_DEVICES,\n\t\t\t\t\t\tnone: string,\n\t\t\t\t\t\tobj: {\n\t\t\t\t\t\t\tonSuccess: (success: Object) => void;\n\t\t\t\t\t\t\tonFailure: (err: any) => void;\n\t\t\t\t\t\t}\n\t\t\t\t\t) => {\n\t\t\t\t\t\tobj.onSuccess({ Devices: [] });\n\t\t\t\t\t}\n\t\t\t\t);\n\n\t\t\tawait auth.fetchDevices().then(res => {\n\t\t\t\texpect(spyOnCognito).toBeCalled();\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyOnCognito.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8453,10 +8453,10 @@
                 "Device Tracking"
             ],
             "updatePoint": {
-                "line": 4257,
+                "line": 4256,
                 "column": 62
             },
-            "line": 4257,
+            "line": 4256,
             "code": "\t\ttest('list devices with mock devices from Cognito happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(CognitoUserSession.prototype, 'getAccessToken')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new CognitoAccessToken({ AccessToken: 'accessToken' });\n\t\t\t\t});\n\n\t\t\tconst spyon2 = jest\n\t\t\t\t.spyOn(CognitoAccessToken.prototype, 'decodePayload')\n\t\t\t\t.mockImplementation(() => {\n\t\t\t\t\treturn { scope: '' };\n\t\t\t\t});\n\n\t\t\tconst spyOnCognito = jest\n\t\t\t\t.spyOn(CognitoUser.prototype, 'listDevices')\n\t\t\t\t.mockImplementationOnce(\n\t\t\t\t\t(\n\t\t\t\t\t\tMAX_DEVICES,\n\t\t\t\t\t\tnone: string,\n\t\t\t\t\t\tobj: {\n\t\t\t\t\t\t\tonSuccess: (success: Object) => void;\n\t\t\t\t\t\t\tonFailure: (err: any) => void;\n\t\t\t\t\t\t}\n\t\t\t\t\t) => {\n\t\t\t\t\t\tobj.onSuccess({\n\t\t\t\t\t\t\tDevices: mockDeviceArray,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t);\n\n\t\t\tawait auth.fetchDevices().then(res => {\n\t\t\t\texpect(res).toMatchObject(transformedMockData);\n\t\t\t\texpect(spyOnCognito).toBeCalled();\n\t\t\t});\n\n\t\t\tspyon.mockClear();\n\t\t\tspyon2.mockClear();\n\t\t\tspyOnCognito.mockClear();\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8469,10 +8469,10 @@
                 "getPreferredMFA test"
             ],
             "updatePoint": {
-                "line": 4312,
+                "line": 4311,
                 "column": 18
             },
-            "line": 4312,
+            "line": 4311,
             "code": "\t\ttest('happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst getUserDataSpy = jest\n\t\t\t\t.spyOn(user, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tPreferredMfaSetting: 'SMS',\n\t\t\t\t\t};\n\t\t\t\t\tcallback(null, data);\n\t\t\t\t});\n\t\t\tconst res = await auth.getPreferredMFA(user);\n\t\t\texpect(res).toEqual('SMS');\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledTimes(1);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8485,10 +8485,10 @@
                 "getPreferredMFA test"
             ],
             "updatePoint": {
-                "line": 4331,
+                "line": 4330,
                 "column": 32
             },
-            "line": 4331,
+            "line": 4330,
             "code": "\t\ttest('should allow bypassCache', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst getUserDataSpy = jest\n\t\t\t\t.spyOn(user, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tPreferredMfaSetting: 'SMS',\n\t\t\t\t\t};\n\t\t\t\t\tcallback(null, data);\n\t\t\t\t});\n\t\t\tconst res = await auth.getPreferredMFA(user, { bypassCache: true });\n\t\t\texpect(res).toEqual('SMS');\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledWith(expect.any(Function), {\n\t\t\t\tbypassCache: true,\n\t\t\t});\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8501,10 +8501,10 @@
                 "getPreferredMFA test"
             ],
             "updatePoint": {
-                "line": 4352,
+                "line": 4351,
                 "column": 87
             },
-            "line": 4352,
+            "line": 4351,
             "code": "\t\ttest('get user data error because user is deleted, disabled or token has been revoked', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementation(() => user);\n\t\t\tconst getUserDataSpy = jest\n\t\t\t\t.spyOn(user, 'getUserData')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\tcallback(new Error('Access Token has been revoked'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\t\t\tconst credentialsClearSpy = jest.spyOn(Credentials, 'clear');\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\n\t\t\tawait expect(\n\t\t\t\tauth.getPreferredMFA(user, { bypassCache: true })\n\t\t\t).rejects.toThrow('Access Token has been revoked');\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledWith(expect.any(Function), {\n\t\t\t\tbypassCache: true,\n\t\t\t});\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(credentialsClearSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8517,10 +8517,10 @@
                 "setPreferredMFA test"
             ],
             "updatePoint": {
-                "line": 4401,
+                "line": 4400,
                 "column": 16
             },
-            "line": 4401,
+            "line": 4400,
             "code": "\t\tit('happy path', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tconst getUserDataSpy = jest\n\t\t\t\t.spyOn(user, 'getUserData')\n\t\t\t\t.mockImplementation((callback: any) => {\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tPreferredMfaSetting: 'SMS',\n\t\t\t\t\t};\n\t\t\t\t\tcallback(null, data);\n\t\t\t\t});\n\t\t\tconst setUserMfaPreferenceSpy = jest.spyOn(user, 'setUserMfaPreference');\n\t\t\tconst res = await auth.setPreferredMFA(user, 'SOFTWARE_TOKEN_MFA');\n\t\t\texpect(setUserMfaPreferenceSpy).toHaveBeenCalledWith(\n\t\t\t\tnull,\n\t\t\t\t{ Enabled: true, PreferredMfa: true },\n\t\t\t\texpect.any(Function)\n\t\t\t);\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledWith(expect.any(Function), {\n\t\t\t\tbypassCache: true,\n\t\t\t});\n\t\t\t// once at the beginning, once after calling setUserMfaPreference\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledTimes(2);\n\t\t\texpect(res).toStrictEqual('success');\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
@@ -8533,10 +8533,10 @@
                 "setPreferredMFA test"
             ],
             "updatePoint": {
-                "line": 4430,
+                "line": 4429,
                 "column": 87
             },
-            "line": 4430,
+            "line": 4429,
             "code": "\t\ttest('get user data error because user is deleted, disabled or token has been revoked', async () => {\n\t\t\tconst auth = new Auth(authOptions);\n\t\t\tconst user = new CognitoUser({\n\t\t\t\tUsername: 'username',\n\t\t\t\tPool: userPool,\n\t\t\t});\n\t\t\tjest\n\t\t\t\t.spyOn(CognitoUserPool.prototype, 'getCurrentUser')\n\t\t\t\t.mockImplementationOnce(() => user);\n\t\t\tconst getUserDataSpy = jest\n\t\t\t\t.spyOn(user, 'getUserData')\n\t\t\t\t.mockImplementationOnce((callback: any) => {\n\t\t\t\t\tcallback(new Error('Access Token has been revoked'), null);\n\t\t\t\t});\n\t\t\tconst userSignoutSpy = jest\n\t\t\t\t.spyOn(user, 'signOut')\n\t\t\t\t.mockImplementationOnce(() => {});\n\t\t\tconst credentialsClearSpy = jest.spyOn(Credentials, 'clear');\n\t\t\tconst hubSpy = jest.spyOn(Hub, 'dispatch');\n\t\t\tawait expect(\n\t\t\t\tauth.setPreferredMFA(user, 'SOFTWARE_TOKEN_MFA')\n\t\t\t).rejects.toThrow('Access Token has been revoked');\n\t\t\texpect(getUserDataSpy).toHaveBeenCalledWith(expect.any(Function), {\n\t\t\t\tbypassCache: true,\n\t\t\t});\n\t\t\texpect(userSignoutSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(credentialsClearSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(hubSpy).toHaveBeenCalledWith(\n\t\t\t\t'auth',\n\t\t\t\t{ data: null, event: 'signOut', message: 'A user has been signed out' },\n\t\t\t\t'Auth',\n\t\t\t\tSymbol.for('amplify_default')\n\t\t\t);\n\t\t});",
             "file": "auth-unit-test.ts",
             "skipped": false,
