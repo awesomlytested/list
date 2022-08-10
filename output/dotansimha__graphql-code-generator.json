@@ -7825,10 +7825,10 @@
                 "sdk"
             ],
             "updatePoint": {
-                "line": 88,
+                "line": 99,
                 "column": 45
             },
-            "line": 88,
+            "line": 99,
             "code": "    it('Should generate a correct wrap method', async () => {\n      const config = {};\n      const docs = [{ filePath: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n\n      const usage = `\nasync function test() {\n  const requester = <R, V> (doc: DocumentNode, vars: V): Promise<R> => Promise.resolve({} as unknown as R);\n  const sdk = getSdk(requester);\n\n  await sdk.feed();\n  await sdk.feed3();\n  await sdk.feed4();\n\n  const result = await sdk.feed2({ v: \"1\" });\n\n  if (result.feed) {\n    if (result.feed[0]) {\n      const id = result.feed[0].id\n    }\n  }\n}`;\n      const output = await validate(result, config, docs, schema, usage);\n\n      expect(output).toMatchSnapshot();\n    });",
             "file": "generic-sdk.spec.ts",
             "skipped": false,
@@ -7841,10 +7841,10 @@
                 "sdk"
             ],
             "updatePoint": {
-                "line": 117,
+                "line": 128,
                 "column": 70
             },
-            "line": 117,
+            "line": 128,
             "code": "    it('Should generate a correct wrap method with documentMode=string', async () => {\n      const config = { documentMode: DocumentMode.string };\n      const docs = [{ filePath: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n\n      const usage = `\nasync function test() {\n  const requester = <R, V> (doc: string, vars: V): Promise<R> => Promise.resolve({} as unknown as R);\n  const sdk = getSdk(requester);\n\n  await sdk.feed();\n  await sdk.feed3();\n  await sdk.feed4();\n\n  const result = await sdk.feed2({ v: \"1\" });\n\n  if (result.feed) {\n    if (result.feed[0]) {\n      const id = result.feed[0].id\n    }\n  }\n}`;\n      const output = await validate(result, config, docs, schema, usage);\n\n      expect(output).toMatchSnapshot();\n    });",
             "file": "generic-sdk.spec.ts",
             "skipped": false,
@@ -7857,11 +7857,27 @@
                 "sdk"
             ],
             "updatePoint": {
-                "line": 146,
+                "line": 157,
                 "column": 33
             },
-            "line": 146,
+            "line": 157,
             "code": "    it('Should support rawRequest', async () => {\n      const config = { rawRequest: true };\n      const docs = [{ filePath: '', document: basicDoc }];\n      const result = (await plugin(schema, docs, config, {\n        outputFile: 'graphql.ts',\n      })) as Types.ComplexPluginOutput;\n\n      const usage = `\n        async function rawRequestTest() {\n          const requester = <R, V> (doc: string, vars: V): Promise<ExecutionResult<R>> => Promise.resolve({} as unknown as ExecutionResult<R>);\n          const sdk = getSdk(requester);\n\n          await sdk.feed();\n          await sdk.feed3();\n          await sdk.feed4();\n\n          const result = await sdk.feed2({ v: \"1\" });\n\n          if (result.data.feed) {\n            if (result.data.feed[0]) {\n              const id = result.data.feed[0].id\n            }\n          }\n        }\n      `;\n      const output = await validate(result, config, docs, schema, usage);\n\n      expect(output).toMatchSnapshot();\n    });",
+            "file": "generic-sdk.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/generic-sdk/tests"
+        },
+        {
+            "name": "Should generate a correct wrap method when usingObservableFrom is not set",
+            "suites": [
+                "generic-sdk",
+                "sdk"
+            ],
+            "updatePoint": {
+                "line": 187,
+                "column": 81
+            },
+            "line": 187,
+            "code": "    it('Should generate a correct wrap method when usingObservableFrom is not set', async () => {\n      const config = {};\n      const docs = [{ filePath: '', document: docWithSubscription }];\n      const result = (await plugin(schema, docs, config, { outputFile: 'graphql.ts' })) as Types.ComplexPluginOutput;\n\n      const usage = /* TypeScript */ `\n        async function test() {\n          const sdk = getSdk((() => {}) as any);\n          const test = sdk.commentAdded();\n          for await (const item of test) {\n            console.log(item.data);\n            console.log(item.errors);\n          }\n        }\n      `;\n\n      const output = await validate(result, config, docs, schema, usage);\n      expect(output).toMatchSnapshot();\n    });",
             "file": "generic-sdk.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/generic-sdk/tests"
@@ -7873,10 +7889,10 @@
                 "sdk"
             ],
             "updatePoint": {
-                "line": 176,
+                "line": 207,
                 "column": 77
             },
-            "line": 176,
+            "line": 207,
             "code": "    it('Should generate a correct wrap method when usingObservableFrom is set', async () => {\n      const config = { usingObservableFrom: \"import Observable from 'zen-observable';\" };\n      const docs = [{ filePath: '', document: docWithSubscription }];\n      const result = (await plugin(schema, docs, config, { outputFile: 'graphql.ts' })) as Types.ComplexPluginOutput;\n\n      const output = await validate(result, config, docs, schema, '');\n      expect(output).toMatchSnapshot();\n    });",
             "file": "generic-sdk.spec.ts",
             "skipped": false,
@@ -7889,10 +7905,10 @@
                 "sdk"
             ],
             "updatePoint": {
-                "line": 185,
+                "line": 216,
                 "column": 56
             },
-            "line": 185,
+            "line": 216,
             "code": "    it('Should throw if it encounters unnamed operations', async () => {\n      const config = { usingObservableFrom: \"import Observable from 'zen-observable';\" };\n      const docs = [{ filePath: '', document: unnamedDoc }];\n      try {\n        await plugin(schema, docs, config, { outputFile: 'graphql.ts' });\n        fail('Should throw');\n      } catch (err: unknown) {\n        expect(err).toMatchInlineSnapshot(`\n[Error: Plugin 'generic-sdk' cannot generate SDK for unnamed operation.\n\n{\n  feed {\n    id\n  }\n}]\n`);\n      }\n    });",
             "file": "generic-sdk.spec.ts",
             "skipped": false,
