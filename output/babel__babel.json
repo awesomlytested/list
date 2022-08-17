@@ -3657,7 +3657,7 @@
                 "root"
             ],
             "line": 913,
-            "code": "      test.each([\"babel.config.json\", \"babel.config.js\", \"babel.config.cjs\", \"babel.config.mjs\"])(\"should load %s asynchronously\", async name => {\n        const esm = isMJS(name);\n\n        if (skipUnsupportedESM(esm, `should load ${name} asynchronously`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-load-config-async-${name}`);\n        const filename = tmp(\"src.js\");\n        await config(name);\n        await expect(loadOptionsAsync({\n          filename,\n          cwd\n        }, esm)).resolves.toEqual({ ...getDefaults(),\n          filename,\n          cwd,\n          root: cwd,\n          comments: true\n        });\n      });",
+            "code": "      test.each([\"babel.config.json\", \"babel.config.js\", \"babel.config.cjs\", \"babel.config.mjs\"])(\"should load %s asynchronously\", async name => {\n        const esm = isMJS(name);\n\n        if (esm && skipUnsupportedESM(`should load ${name} asynchronously`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-load-config-async-${name}`);\n        const filename = tmp(\"src.js\");\n        await config(name);\n        await expect(loadOptionsAsync({\n          filename,\n          cwd\n        }, esm)).resolves.toEqual({ ...getDefaults(),\n          filename,\n          cwd,\n          root: cwd,\n          comments: true\n        });\n      });",
             "file": "config-chain.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3670,7 +3670,7 @@
                 "root"
             ],
             "line": 937,
-            "code": "      test.each(pairs([\"babel.config.json\", \"babel.config.js\", \"babel.config.cjs\", \"babel.config.mjs\"]))(\"should throw if both %s and %s are used\", async (name1, name2) => {\n        const esm = isMJS(name1) || isMJS(name2);\n\n        if (skipUnsupportedESM(esm, `should throw if both ${name1} and ${name2} are used`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-dup-config-${name1}-${name2}`);\n        await Promise.all([config(name1), config(name2)]);\n        await expect(loadOptionsAsync({\n          filename: tmp(\"src.js\"),\n          cwd\n        }, esm)).rejects.toThrow(/Multiple configuration files found/);\n      });",
+            "code": "      test.each(pairs([\"babel.config.json\", \"babel.config.js\", \"babel.config.cjs\", \"babel.config.mjs\"]))(\"should throw if both %s and %s are used\", async (name1, name2) => {\n        const esm = isMJS(name1) || isMJS(name2);\n\n        if (esm && skipUnsupportedESM(`should throw if both ${name1} and ${name2} are used`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-dup-config-${name1}-${name2}`);\n        await Promise.all([config(name1), config(name2)]);\n        await expect(loadOptionsAsync({\n          filename: tmp(\"src.js\"),\n          cwd\n        }, esm)).rejects.toThrow(/Multiple configuration files found/);\n      });",
             "file": "config-chain.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3698,7 +3698,7 @@
             "updatePoint": {
                 "line": 975,
                 "column": 54,
-                "index": 33630
+                "index": 33634
             },
             "line": 975,
             "code": "      test(\"should not load .babelrc.mjs synchronously\", async () => {\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(\"babel-test-load-config-sync-.babelrc.mjs\");\n        const filename = tmp(\"src.js\");\n        await config(\".babelrc.mjs\");\n        expect(() => loadOptions({\n          filename,\n          cwd\n        })).toThrow(/is only supported when running Babel asynchronously/);\n      });",
@@ -3714,7 +3714,7 @@
                 "relative"
             ],
             "line": 988,
-            "code": "      test.each([\"package.json\", \".babelrc\", \".babelrc.js\", \".babelrc.cjs\", \".babelrc.mjs\"].filter(Boolean))(\"should load %s asynchronously\", async name => {\n        const esm = isMJS(name);\n\n        if (skipUnsupportedESM(esm, `should load ${name} asynchronously`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-load-config-${name}`);\n        const filename = tmp(\"src.js\");\n        await config(name);\n        await expect(loadOptionsAsync({\n          filename,\n          cwd\n        }, esm)).resolves.toEqual({ ...getDefaults(),\n          filename,\n          cwd,\n          root: cwd,\n          comments: true\n        });\n      });",
+            "code": "      test.each([\"package.json\", \".babelrc\", \".babelrc.js\", \".babelrc.cjs\", \".babelrc.mjs\"].filter(Boolean))(\"should load %s asynchronously\", async name => {\n        const esm = isMJS(name);\n\n        if (esm && skipUnsupportedESM(`should load ${name} asynchronously`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-load-config-${name}`);\n        const filename = tmp(\"src.js\");\n        await config(name);\n        await expect(loadOptionsAsync({\n          filename,\n          cwd\n        }, esm)).resolves.toEqual({ ...getDefaults(),\n          filename,\n          cwd,\n          root: cwd,\n          comments: true\n        });\n      });",
             "file": "config-chain.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3729,7 +3729,7 @@
             "updatePoint": {
                 "line": 1012,
                 "column": 34,
-                "index": 34769
+                "index": 34775
             },
             "line": 1012,
             "code": "      it(\"should load .babelignore\", () => {\n        const filename = fixture(\"config-files\", \"babelignore\", \"src.js\");\n        expect(loadOptions({\n          filename,\n          cwd: path.dirname(filename)\n        })).toBeNull();\n      });",
@@ -3745,7 +3745,7 @@
                 "relative"
             ],
             "line": 1019,
-            "code": "      test.each(pairs([\"package.json\", \".babelrc\", \".babelrc.js\", \".babelrc.cjs\", \".babelrc.mjs\", \".babelrc.json\"]))(\"should throw if both %s and %s are used\", async (name1, name2) => {\n        const esm = isMJS(name1) || isMJS(name2);\n\n        if (skipUnsupportedESM(esm, `should throw if both ${name1} and ${name2} are used`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-dup-config-${name1}-${name2}`);\n        await Promise.all([config(name1), config(name2)]);\n        await expect(loadOptionsAsync({\n          filename: tmp(\"src.js\"),\n          cwd\n        }, esm)).rejects.toThrow(/Multiple configuration files found/);\n      });",
+            "code": "      test.each(pairs([\"package.json\", \".babelrc\", \".babelrc.js\", \".babelrc.cjs\", \".babelrc.mjs\", \".babelrc.json\"]))(\"should throw if both %s and %s are used\", async (name1, name2) => {\n        const esm = isMJS(name1) || isMJS(name2);\n\n        if (esm && skipUnsupportedESM(`should throw if both ${name1} and ${name2} are used`)) {\n          return;\n        }\n\n        const {\n          cwd,\n          tmp,\n          config\n        } = await getTemp(`babel-test-dup-config-${name1}-${name2}`);\n        await Promise.all([config(name1), config(name2)]);\n        await expect(loadOptionsAsync({\n          filename: tmp(\"src.js\"),\n          cwd\n        }, esm)).rejects.toThrow(/Multiple configuration files found/);\n      });",
             "file": "config-chain.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3760,7 +3760,7 @@
             "updatePoint": {
                 "line": 1037,
                 "column": 63,
-                "index": 35762
+                "index": 35770
             },
             "line": 1037,
             "code": "      it(\"should ignore package.json without a 'babel' property\", () => {\n        const filename = fixture(\"config-files\", \"pkg-ignored\", \"src.js\");\n        expect(loadOptions({\n          filename,\n          cwd: path.dirname(filename)\n        })).toEqual({ ...getDefaults(),\n          filename: filename,\n          cwd: path.dirname(filename),\n          root: path.dirname(filename),\n          comments: true\n        });\n      });",
@@ -3776,7 +3776,7 @@
                 "relative"
             ],
             "line": 1049,
-            "code": "      test.each`\n        config             | dir                     | error\n        ${\".babelrc\"}      | ${\"babelrc-error\"}      | ${/Error while parsing config - /}\n        ${\".babelrc.json\"} | ${\"babelrc-json-error\"} | ${/Error while parsing config - /}\n        ${\".babelrc.js\"}   | ${\"babelrc-js-error\"}   | ${/Babelrc threw an error/}\n        ${\".babelrc.cjs\"}  | ${\"babelrc-cjs-error\"}  | ${/Babelrc threw an error/}\n        ${\".babelrc.mjs\"}  | ${\"babelrc-mjs-error\"}  | ${/Babelrc threw an error/}\n        ${\"package.json\"}  | ${\"pkg-error\"}          | ${/Error while parsing JSON - /}\n      `(\"should show helpful errors for $config\", async ({\n        config,\n        dir,\n        error\n      }) => {\n        const esm = isMJS(config);\n\n        if (skipUnsupportedESM(esm, `should show helpful errors for ${config}`)) {\n          return;\n        }\n\n        const filename = fixture(\"config-files\", dir, \"src.js\");\n        await expect(loadOptionsAsync({\n          filename,\n          cwd: path.dirname(filename)\n        }, esm)).rejects.toThrow(error);\n      });",
+            "code": "      test.each`\n        config             | dir                     | error\n        ${\".babelrc\"}      | ${\"babelrc-error\"}      | ${/Error while parsing config - /}\n        ${\".babelrc.json\"} | ${\"babelrc-json-error\"} | ${/Error while parsing config - /}\n        ${\".babelrc.js\"}   | ${\"babelrc-js-error\"}   | ${/Babelrc threw an error/}\n        ${\".babelrc.cjs\"}  | ${\"babelrc-cjs-error\"}  | ${/Babelrc threw an error/}\n        ${\".babelrc.mjs\"}  | ${\"babelrc-mjs-error\"}  | ${/Babelrc threw an error/}\n        ${\"package.json\"}  | ${\"pkg-error\"}          | ${/Error while parsing JSON - /}\n      `(\"should show helpful errors for $config\", async ({\n        config,\n        dir,\n        error\n      }) => {\n        const esm = isMJS(config);\n\n        if (esm && skipUnsupportedESM(`should show helpful errors for ${config}`)) {\n          return;\n        }\n\n        const filename = fixture(\"config-files\", dir, \"src.js\");\n        await expect(loadOptionsAsync({\n          filename,\n          cwd: path.dirname(filename)\n        }, esm)).rejects.toThrow(error);\n      });",
             "file": "config-chain.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3791,7 +3791,7 @@
             "updatePoint": {
                 "line": 1074,
                 "column": 76,
-                "index": 37280
+                "index": 37290
             },
             "line": 1074,
             "code": "      it(\"loadPartialConfig should return a list of files that were extended\", () => {\n        const filename = fixture(\"config-files\", \"babelrc-extended\", \"src.js\");\n        expect(babel.loadPartialConfig({\n          filename,\n          cwd: path.dirname(filename)\n        })).toEqual({\n          babelignore: fixture(\"config-files\", \".babelignore\"),\n          babelrc: fixture(\"config-files\", \"babelrc-extended\", \".babelrc\"),\n          config: undefined,\n          fileHandling: \"transpile\",\n          options: { ...getDefaults(),\n            filename: filename,\n            cwd: path.dirname(filename),\n            root: path.dirname(filename),\n            comments: true\n          },\n          files: new Set([fixture(\"config-files\", \".babelignore\"), fixture(\"config-files\", \"babelrc-extended\", \".babelrc-extended\"), fixture(\"config-files\", \"babelrc-extended\", \".babelrc\")])\n        });\n      });",
@@ -3809,7 +3809,7 @@
             "updatePoint": {
                 "line": 1093,
                 "column": 59,
-                "index": 38164
+                "index": 38174
             },
             "line": 1093,
             "code": "      it(\"loadPartialConfig should return null when ignored\", () => {\n        const filename = fixture(\"config-files\", \"babelignore\", \"src.js\");\n        expect(babel.loadPartialConfig({\n          filename,\n          cwd: path.dirname(filename)\n        })).toBeNull();\n      });",
@@ -3827,7 +3827,7 @@
             "updatePoint": {
                 "line": 1100,
                 "column": 99,
-                "index": 38482
+                "index": 38492
             },
             "line": 1100,
             "code": "      it(\"loadPartialConfig should return a list of files when ignored with showIgnoredFiles option\", () => {\n        const filename = fixture(\"config-files\", \"babelignore\", \"src.js\");\n        expect(babel.loadPartialConfig({\n          filename,\n          cwd: path.dirname(filename),\n          showIgnoredFiles: true\n        })).toEqual({\n          babelignore: fixture(\"config-files\", \"babelignore\", \".babelignore\"),\n          babelrc: undefined,\n          config: undefined,\n          fileHandling: \"ignored\",\n          options: { ...getDefaults(),\n            filename: filename,\n            cwd: path.dirname(filename),\n            root: path.dirname(filename)\n          },\n          files: new Set([fixture(\"config-files\", \"babelignore\", \".babelignore\")])\n        });\n      });",
@@ -3845,7 +3845,7 @@
             "updatePoint": {
                 "line": 1119,
                 "column": 59,
-                "index": 39226
+                "index": 39236
             },
             "line": 1119,
             "code": "      it(\"loadPartialConfig can be called with no arguments\", () => {\n        const cwd = process.cwd();\n\n        try {\n          process.chdir(fixture(\"config-files\", \"babelrc-extended\"));\n          expect(() => babel.loadPartialConfig()).not.toThrow();\n        } finally {\n          process.chdir(cwd);\n        }\n      });",
@@ -3863,7 +3863,7 @@
             "updatePoint": {
                 "line": 1130,
                 "column": 70,
-                "index": 39570
+                "index": 39580
             },
             "line": 1130,
             "code": "    it(\"should throw when `test` presents but `filename` is not passed\", () => {\n      expect(() => loadOptions({\n        test: /\\.ts$/,\n        plugins: []\n      })).toThrow(/Configuration contains string\\/RegExp pattern/);\n    });",
@@ -3881,7 +3881,7 @@
             "updatePoint": {
                 "line": 1136,
                 "column": 76,
-                "index": 39809
+                "index": 39819
             },
             "line": 1136,
             "code": "    it(\"should throw when `preset` requires `filename` but it was not passed\", () => {\n      expect(() => {\n        loadOptions({\n          presets: [\"./fixtures/config-loading/preset4\"]\n        });\n      }).toThrow(/Preset \\/\\* your preset \\*\\/ requires a filename/);\n    });",
@@ -3899,7 +3899,7 @@
             "updatePoint": {
                 "line": 1143,
                 "column": 86,
-                "index": 40096
+                "index": 40106
             },
             "line": 1143,
             "code": "    it(\"should throw when `preset.overrides` requires `filename` but it was not passed\", () => {\n      expect(() => {\n        loadOptions({\n          presets: [\"./fixtures/config-loading/preset5\"]\n        });\n      }).toThrow(/Preset \\/\\* your preset \\*\\/ requires a filename/);\n    });",
@@ -3917,7 +3917,7 @@
             "updatePoint": {
                 "line": 1150,
                 "column": 71,
-                "index": 40368
+                "index": 40378
             },
             "line": 1150,
             "code": "    it(\"should not throw error on $schema property in json config files\", () => {\n      const filename = fixture(\"config-files\", \"babel-config-json-$schema-property\", \"babel.config.json\");\n      expect(() => {\n        babel.loadPartialConfig({\n          filename,\n          cwd: path.dirname(filename)\n        });\n      }).not.toThrow();\n    });",
@@ -3929,15 +3929,15 @@
             "name": "should preserve disabled plugins in the partial config",
             "suites": [
                 "@babel/core config loading",
-                "loadPartialConfig"
+                "loadPartialConfigSync"
             ],
             "updatePoint": {
-                "line": 67,
+                "line": 66,
                 "column": 62,
-                "index": 2237
+                "index": 2196
             },
-            "line": 67,
-            "code": "    it(\"should preserve disabled plugins in the partial config\", () => {\n      const plugin = function () {\n        return {};\n      };\n\n      const opts = loadPartialConfig({ ...makeOpts(true),\n        babelrc: false,\n        configFile: false,\n        plugins: [[plugin, false]]\n      });\n      expect(opts.options.plugins.length).toBe(1);\n      const item = opts.options.plugins[0];\n      expect(item.value).toBe(plugin);\n      expect(item.options).toBe(false);\n    });",
+            "line": 66,
+            "code": "    it(\"should preserve disabled plugins in the partial config\", () => {\n      const plugin = function () {\n        return {};\n      };\n\n      const opts = loadPartialConfigSync({ ...makeOpts(true),\n        babelrc: false,\n        configFile: false,\n        plugins: [[plugin, false]]\n      });\n      expect(opts.options.plugins.length).toBe(1);\n      const item = opts.options.plugins[0];\n      expect(item.value).toBe(plugin);\n      expect(item.options).toBe(false);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3946,15 +3946,15 @@
             "name": "should preserve disabled presets in the partial config",
             "suites": [
                 "@babel/core config loading",
-                "loadPartialConfig"
+                "loadPartialConfigSync"
             ],
             "updatePoint": {
-                "line": 82,
+                "line": 81,
                 "column": 62,
-                "index": 2710
+                "index": 2673
             },
-            "line": 82,
-            "code": "    it(\"should preserve disabled presets in the partial config\", () => {\n      const preset = function () {\n        return {};\n      };\n\n      const opts = loadPartialConfig({ ...makeOpts(true),\n        babelrc: false,\n        configFile: false,\n        presets: [[preset, false]]\n      });\n      expect(opts.options.presets.length).toBe(1);\n      const item = opts.options.presets[0];\n      expect(item.value).toBe(preset);\n      expect(item.options).toBe(false);\n    });",
+            "line": 81,
+            "code": "    it(\"should preserve disabled presets in the partial config\", () => {\n      const preset = function () {\n        return {};\n      };\n\n      const opts = loadPartialConfigSync({ ...makeOpts(true),\n        babelrc: false,\n        configFile: false,\n        presets: [[preset, false]]\n      });\n      expect(opts.options.presets.length).toBe(1);\n      const item = opts.options.presets[0];\n      expect(item.value).toBe(preset);\n      expect(item.options).toBe(false);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3963,15 +3963,15 @@
             "name": "should always set 'rootMode' to 'root'",
             "suites": [
                 "@babel/core config loading",
-                "loadPartialConfig"
+                "loadPartialConfigSync"
             ],
             "updatePoint": {
-                "line": 97,
+                "line": 96,
                 "column": 46,
-                "index": 3167
+                "index": 3134
             },
-            "line": 97,
-            "code": "    it(\"should always set 'rootMode' to 'root'\", async () => {\n      const cwd = path.join(path.dirname(fileURLToPath(import.meta.url)), \"fixtures\", \"config-loading\", \"root\", \"nested\");\n      const {\n        options\n      } = await loadPartialConfig({\n        cwd,\n        filename: path.join(cwd, \"file.js\"),\n        rootMode: \"upward\"\n      });\n      expect(options.root).toBe(path.join(cwd, \"..\"));\n      expect(options.rootMode).toBe(\"root\");\n    });",
+            "line": 96,
+            "code": "    it(\"should always set 'rootMode' to 'root'\", async () => {\n      const cwd = path.join(path.dirname(fileURLToPath(import.meta.url)), \"fixtures\", \"config-loading\", \"root\", \"nested\");\n      const {\n        options\n      } = await loadPartialConfigSync({\n        cwd,\n        filename: path.join(cwd, \"file.js\"),\n        rootMode: \"upward\"\n      });\n      expect(options.root).toBe(path.join(cwd, \"..\"));\n      expect(options.rootMode).toBe(\"root\");\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3980,15 +3980,15 @@
             "name": "should load and cache the config with plugins and presets",
             "suites": [
                 "@babel/core config loading",
-                "config file"
+                "loadOptionsSync"
             ],
             "updatePoint": {
-                "line": 111,
+                "line": 110,
                 "column": 65,
-                "index": 3681
+                "index": 3656
             },
-            "line": 111,
-            "code": "    it(\"should load and cache the config with plugins and presets\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      expect(options1.plugins.map(p => p.key)).toEqual([\"plugin1\", \"plugin2\", \"plugin6\", \"plugin5\", \"plugin4\", \"plugin3\"]);\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 110,
+            "code": "    it(\"should load and cache the config with plugins and presets\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      expect(options1.plugins.map(p => p.key)).toEqual([\"plugin1\", \"plugin2\", \"plugin6\", \"plugin5\", \"plugin4\", \"plugin3\"]);\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -3997,15 +3997,15 @@
             "name": "should load and cache the config for unique opts objects",
             "suites": [
                 "@babel/core config loading",
-                "config file"
+                "loadOptionsSync"
             ],
             "updatePoint": {
-                "line": 122,
+                "line": 121,
                 "column": 64,
-                "index": 4216
+                "index": 4185
             },
-            "line": 122,
-            "code": "    it(\"should load and cache the config for unique opts objects\", () => {\n      const options1 = loadConfig(makeOpts(true)).options;\n      expect(options1.plugins.map(p => p.key)).toEqual([\"plugin1\", \"plugin2\", \"plugin4\", \"plugin3\"]);\n      const options2 = loadConfig(makeOpts(true)).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 121,
+            "code": "    it(\"should load and cache the config for unique opts objects\", () => {\n      const options1 = loadOptionsSync(makeOpts(true));\n      expect(options1.plugins.map(p => p.key)).toEqual([\"plugin1\", \"plugin2\", \"plugin4\", \"plugin3\"]);\n      const options2 = loadOptionsSync(makeOpts(true));\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4014,15 +4014,15 @@
             "name": "should invalidate config file plugins",
             "suites": [
                 "@babel/core config loading",
-                "config file"
+                "loadOptionsSync"
             ],
             "updatePoint": {
-                "line": 132,
+                "line": 131,
                 "column": 45,
-                "index": 4699
+                "index": 4662
             },
-            "line": 132,
-            "code": "    it(\"should invalidate config file plugins\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      process.env.INVALIDATE_PLUGIN1 = true;\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins[0]).not.toBe(options1.plugins[0]);\n\n      for (let i = 1; i < options1.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n\n      process.env.INVALIDATE_PLUGIN3 = true;\n      const options3 = loadConfig(opts).options;\n      expect(options3.plugins.length).toBe(options1.plugins.length);\n      expect(options3.plugins.length).toBe(6);\n      expect(options3.plugins[0]).not.toBe(options1.plugins[0]);\n      expect(options3.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 1; i < 5; i++) {\n        expect(options3.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 131,
+            "code": "    it(\"should invalidate config file plugins\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      process.env.INVALIDATE_PLUGIN1 = true;\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins[0]).not.toBe(options1.plugins[0]);\n\n      for (let i = 1; i < options1.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n\n      process.env.INVALIDATE_PLUGIN3 = true;\n      const options3 = loadOptionsSync(opts);\n      expect(options3.plugins.length).toBe(options1.plugins.length);\n      expect(options3.plugins.length).toBe(6);\n      expect(options3.plugins[0]).not.toBe(options1.plugins[0]);\n      expect(options3.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 1; i < 5; i++) {\n        expect(options3.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4031,15 +4031,15 @@
             "name": "should invalidate config file presets and their children",
             "suites": [
                 "@babel/core config loading",
-                "config file"
+                "loadOptionsSync"
             ],
             "updatePoint": {
-                "line": 155,
+                "line": 154,
                 "column": 64,
-                "index": 5669
+                "index": 5623
             },
-            "line": 155,
-            "code": "    it(\"should invalidate config file presets and their children\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      process.env.INVALIDATE_PRESET1 = true;\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 0; i < 5; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n\n      process.env.INVALIDATE_PRESET2 = true;\n      const options3 = loadConfig(opts).options;\n      expect(options3.plugins.length).toBe(options1.plugins.length);\n      expect(options3.plugins.length).toBe(6);\n      expect(options3.plugins[4]).not.toBe(options1.plugins[4]);\n      expect(options3.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 0; i < 4; i++) {\n        expect(options3.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 154,
+            "code": "    it(\"should invalidate config file presets and their children\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      process.env.INVALIDATE_PRESET1 = true;\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 0; i < 5; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n\n      process.env.INVALIDATE_PRESET2 = true;\n      const options3 = loadOptionsSync(opts);\n      expect(options3.plugins.length).toBe(options1.plugins.length);\n      expect(options3.plugins.length).toBe(6);\n      expect(options3.plugins[4]).not.toBe(options1.plugins[4]);\n      expect(options3.plugins[5]).not.toBe(options1.plugins[5]);\n\n      for (let i = 0; i < 4; i++) {\n        expect(options3.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4048,15 +4048,32 @@
             "name": "should invalidate the config file and its plugins/presets",
             "suites": [
                 "@babel/core config loading",
-                "config file"
+                "loadOptionsSync"
             ],
             "updatePoint": {
-                "line": 179,
+                "line": 178,
                 "column": 65,
-                "index": 6665
+                "index": 6610
             },
-            "line": 179,
-            "code": "    it(\"should invalidate the config file and its plugins/presets\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      process.env.INVALIDATE_BABELRC = true;\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[0]).not.toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).not.toBe(options1.plugins[1]);\n      expect(options2.plugins[4]).not.toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).not.toBe(options1.plugins[5]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n    });",
+            "line": 178,
+            "code": "    it(\"should invalidate the config file and its plugins/presets\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      process.env.INVALIDATE_BABELRC = true;\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[0]).not.toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).not.toBe(options1.plugins[1]);\n      expect(options2.plugins[4]).not.toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).not.toBe(options1.plugins[5]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n    });",
+            "file": "config-loading.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "should load and cache the config with plugins and presets when executed in parallel",
+            "suites": [
+                "@babel/core config loading",
+                "loadOptionsAsync"
+            ],
+            "updatePoint": {
+                "line": 194,
+                "column": 91,
+                "index": 7431
+            },
+            "line": 194,
+            "code": "    it(\"should load and cache the config with plugins and presets when executed in parallel\", async () => {\n      const opts = makeOpts();\n      const [options1, options2] = await Promise.all([loadOptionsAsync(opts), loadOptionsAsync(opts)]);\n      expect(options1.plugins.map(p => p.key)).toEqual([\"plugin1\", \"plugin2\", \"plugin6\", \"plugin5\", \"plugin4\", \"plugin3\"]);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4068,12 +4085,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 195,
+                "line": 206,
                 "column": 67,
-                "index": 7480
+                "index": 8038
             },
-            "line": 195,
-            "code": "    it(\"should not invalidate the plugins when given a fresh object\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      const options2 = loadConfig(Object.assign({}, opts)).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 206,
+            "code": "    it(\"should not invalidate the plugins when given a fresh object\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      const options2 = loadOptionsSync(Object.assign({}, opts));\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4085,12 +4102,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 205,
+                "line": 216,
                 "column": 67,
-                "index": 7913
+                "index": 8465
             },
-            "line": 205,
-            "code": "    it(\"should not invalidate the plugins when given a fresh arrays\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      const options2 = loadConfig({ ...opts,\n        plugins: opts.plugins.slice()\n      }).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 216,
+            "code": "    it(\"should not invalidate the plugins when given a fresh arrays\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      const options2 = loadOptionsSync({ ...opts,\n        plugins: opts.plugins.slice()\n      });\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4102,12 +4119,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 217,
+                "line": 228,
                 "column": 67,
-                "index": 8379
+                "index": 8925
             },
-            "line": 217,
-            "code": "    it(\"should not invalidate the presets when given a fresh arrays\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      const options2 = loadConfig({ ...opts,\n        presets: opts.presets.slice()\n      }).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
+            "line": 228,
+            "code": "    it(\"should not invalidate the presets when given a fresh arrays\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      const options2 = loadOptionsSync({ ...opts,\n        presets: opts.presets.slice()\n      });\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n\n      for (let i = 0; i < options2.plugins.length; i++) {\n        expect(options2.plugins[i]).toBe(options1.plugins[i]);\n      }\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4119,12 +4136,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 229,
+                "line": 240,
                 "column": 64,
-                "index": 8842
+                "index": 9382
             },
-            "line": 229,
-            "code": "    it(\"should invalidate the plugins when given a fresh options\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      const options2 = loadConfig({ ...opts,\n        plugins: opts.plugins.map(([plg, opt]) => [plg, { ...opt\n        }])\n      }).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[2]).not.toBe(options1.plugins[2]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
+            "line": 240,
+            "code": "    it(\"should invalidate the plugins when given a fresh options\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      const options2 = loadOptionsSync({ ...opts,\n        plugins: opts.plugins.map(([plg, opt]) => [plg, { ...opt\n        }])\n      });\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[2]).not.toBe(options1.plugins[2]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4136,12 +4153,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 245,
+                "line": 256,
                 "column": 64,
-                "index": 9631
+                "index": 10165
             },
-            "line": 245,
-            "code": "    it(\"should invalidate the presets when given a fresh options\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      const options2 = loadConfig({ ...opts,\n        presets: opts.presets.map(([plg, opt]) => [plg, { ...opt\n        }])\n      }).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[3]).not.toBe(options1.plugins[3]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
+            "line": 256,
+            "code": "    it(\"should invalidate the presets when given a fresh options\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      const options2 = loadOptionsSync({ ...opts,\n        presets: opts.presets.map(([plg, opt]) => [plg, { ...opt\n        }])\n      });\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[3]).not.toBe(options1.plugins[3]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4153,12 +4170,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 261,
+                "line": 272,
                 "column": 50,
-                "index": 10406
+                "index": 10934
             },
-            "line": 261,
-            "code": "    it(\"should invalidate the programmatic plugins\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      process.env.INVALIDATE_PLUGIN6 = true;\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[2]).not.toBe(options1.plugins[2]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
+            "line": 272,
+            "code": "    it(\"should invalidate the programmatic plugins\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      process.env.INVALIDATE_PLUGIN6 = true;\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[2]).not.toBe(options1.plugins[2]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[3]).toBe(options1.plugins[3]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4170,12 +4187,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 275,
+                "line": 286,
                 "column": 69,
-                "index": 11154
+                "index": 11676
             },
-            "line": 275,
-            "code": "    it(\"should invalidate the programmatic presets and their children\", () => {\n      const opts = makeOpts();\n      const options1 = loadConfig(opts).options;\n      process.env.INVALIDATE_PRESET3 = true;\n      const options2 = loadConfig(opts).options;\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[3]).not.toBe(options1.plugins[3]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
+            "line": 286,
+            "code": "    it(\"should invalidate the programmatic presets and their children\", () => {\n      const opts = makeOpts();\n      const options1 = loadOptionsSync(opts);\n      process.env.INVALIDATE_PRESET3 = true;\n      const options2 = loadOptionsSync(opts);\n      expect(options2.plugins.length).toBe(options1.plugins.length);\n      expect(options2.plugins.length).toBe(6);\n      expect(options2.plugins[3]).not.toBe(options1.plugins[3]);\n      expect(options2.plugins[0]).toBe(options1.plugins[0]);\n      expect(options2.plugins[1]).toBe(options1.plugins[1]);\n      expect(options2.plugins[2]).toBe(options1.plugins[2]);\n      expect(options2.plugins[4]).toBe(options1.plugins[4]);\n      expect(options2.plugins[5]).toBe(options1.plugins[5]);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4187,12 +4204,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 289,
+                "line": 300,
                 "column": 46,
-                "index": 11879
+                "index": 12395
             },
-            "line": 289,
-            "code": "    it(\"should thrown when plugin is not valid\", () => {\n      const fooPlugin = {\n        inherits: \"inhertis-should-not-be-string\"\n      };\n      const opts = {\n        cwd: path.dirname(FILEPATH),\n        filename: FILEPATH,\n        plugins: [fooPlugin]\n      };\n      expect(() => loadConfig(opts)).toThrow(/\\.inherits must be a function, or undefined/);\n    });",
+            "line": 300,
+            "code": "    it(\"should thrown when plugin is not valid\", () => {\n      const fooPlugin = {\n        inherits: \"inhertis-should-not-be-string\"\n      };\n      const opts = {\n        cwd: path.dirname(FILEPATH),\n        filename: FILEPATH,\n        plugins: [fooPlugin]\n      };\n      expect(() => loadOptionsSync(opts)).toThrow(/\\.inherits must be a function, or undefined/);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4204,12 +4221,12 @@
                 "programmatic plugins/presets"
             ],
             "updatePoint": {
-                "line": 300,
+                "line": 311,
                 "column": 57,
-                "index": 12257
+                "index": 12778
             },
-            "line": 300,
-            "code": "    it(\"should throw when plugin contains `enter` handler\", () => {\n      const fooPlugin = {\n        visitor: {\n          enter() {}\n\n        }\n      };\n      const opts = {\n        cwd: path.dirname(FILEPATH),\n        filename: FILEPATH,\n        plugins: [fooPlugin]\n      };\n      expect(() => loadConfig(opts)).toThrow(/\\.visitor cannot contain catch-all \"enter\" or \"exit\" handlers\\. Please target individual nodes\\./);\n    });",
+            "line": 311,
+            "code": "    it(\"should throw when plugin contains `enter` handler\", () => {\n      const fooPlugin = {\n        visitor: {\n          enter() {}\n\n        }\n      };\n      const opts = {\n        cwd: path.dirname(FILEPATH),\n        filename: FILEPATH,\n        plugins: [fooPlugin]\n      };\n      expect(() => loadOptionsSync(opts)).toThrow(/\\.visitor cannot contain catch-all \"enter\" or \"exit\" handlers\\. Please target individual nodes\\./);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4221,12 +4238,12 @@
                 "caller metadata"
             ],
             "updatePoint": {
-                "line": 316,
+                "line": 327,
                 "column": 39,
-                "index": 12715
+                "index": 13241
             },
-            "line": 316,
-            "code": "    it(\"should pass caller data through\", () => {\n      const options1 = loadConfig({ ...makeOpts(),\n        caller: {\n          name: \"babel-test\",\n          someFlag: true\n        }\n      }).options;\n      expect(options1.caller.name).toBe(\"babel-test\");\n      expect(options1.caller.someFlag).toBe(true);\n    });",
+            "line": 327,
+            "code": "    it(\"should pass caller data through\", () => {\n      const options1 = loadOptionsSync({ ...makeOpts(),\n        caller: {\n          name: \"babel-test\",\n          someFlag: true\n        }\n      });\n      expect(options1.caller.name).toBe(\"babel-test\");\n      expect(options1.caller.someFlag).toBe(true);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4238,12 +4255,12 @@
                 "caller metadata"
             ],
             "updatePoint": {
-                "line": 326,
+                "line": 337,
                 "column": 47,
-                "index": 13039
+                "index": 13562
             },
-            "line": 326,
-            "code": "    it(\"should pass unknown caller data through\", () => {\n      const options1 = loadConfig({ ...makeOpts(),\n        caller: undefined\n      }).options;\n      expect(options1.caller).toBeUndefined();\n    });",
+            "line": 337,
+            "code": "    it(\"should pass unknown caller data through\", () => {\n      const options1 = loadOptionsSync({ ...makeOpts(),\n        caller: undefined\n      });\n      expect(options1.caller).toBeUndefined();\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -4255,12 +4272,12 @@
                 "caller metadata"
             ],
             "updatePoint": {
-                "line": 332,
+                "line": 343,
                 "column": 49,
-                "index": 13249
+                "index": 13769
             },
-            "line": 332,
-            "code": "    it(\"should pass caller data to test functions\", () => {\n      const options1 = loadConfig({ ...makeOpts(),\n        caller: {\n          name: \"babel-test\",\n          someFlag: true\n        },\n        overrides: [{\n          test: (filename, {\n            caller\n          }) => caller.name === \"babel-test\",\n          comments: false\n        }, {\n          test: (filename, {\n            caller\n          }) => caller.name !== \"babel-test\",\n          ast: false\n        }]\n      }).options;\n      expect(options1.comments).toBe(false);\n      expect(options1.ast).not.toBe(false);\n    });",
+            "line": 343,
+            "code": "    it(\"should pass caller data to test functions\", () => {\n      const options1 = loadOptionsSync({ ...makeOpts(),\n        caller: {\n          name: \"babel-test\",\n          someFlag: true\n        },\n        overrides: [{\n          test: (filename, {\n            caller\n          }) => caller.name === \"babel-test\",\n          comments: false\n        }, {\n          test: (filename, {\n            caller\n          }) => caller.name !== \"babel-test\",\n          ast: false\n        }]\n      });\n      expect(options1.comments).toBe(false);\n      expect(options1.ast).not.toBe(false);\n    });",
             "file": "config-loading.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
