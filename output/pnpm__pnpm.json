@@ -894,7 +894,7 @@
                 "column": 91
             },
             "line": 22,
-            "code": "test('a conflict is detected when the same peer is required with ranges that do not overlap', async () => {\n  prepareEmpty()\n\n  const peerDependencyIssues = await getPeerDependencyIssues([\n    {\n      manifest: {\n        dependencies: {\n          'has-foo100-peer': '1.0.0',\n          'has-foo101-peer': '1.0.0',\n        },\n      },\n      rootDir: process.cwd(),\n    },\n  ], await testDefaults())\n\n  expect(peerDependencyIssues['.'].conflicts.length).toBe(1)\n})",
+            "code": "test('a conflict is detected when the same peer is required with ranges that do not overlap', async () => {\n  prepareEmpty()\n\n  const peerDependencyIssues = await getPeerDependencyIssues([\n    {\n      manifest: {\n        dependencies: {\n          '@pnpm.e2e/has-foo100-peer': '1.0.0',\n          '@pnpm.e2e/has-foo101-peer': '1.0.0',\n        },\n      },\n      rootDir: process.cwd(),\n    },\n  ], await testDefaults())\n\n  expect(peerDependencyIssues['.'].conflicts.length).toBe(1)\n})",
             "file": "getPeerDependencyIssues.test.ts",
             "skipped": false,
             "dir": "packages/core/test"
@@ -1194,6 +1194,19 @@
             },
             "line": 120,
             "code": "test('install with --merge-git-branch-lockfiles', async () => {\n  prepareEmpty()\n\n  const branchName: string = 'main-branch'\n  getCurrentBranch['mockReturnValue'](branchName)\n\n  const otherLockfilePath: string = path.resolve('pnpm-lock.other.yaml')\n  await writeYamlFile(otherLockfilePath, {\n    whatever: 'whatever',\n  })\n\n  expect(fs.existsSync(otherLockfilePath)).toBe(true)\n  expect(fs.existsSync(WANTED_LOCKFILE)).toBe(false)\n\n  const opts = await testDefaults({\n    useGitBranchLockfile: true,\n    mergeGitBranchLockfiles: true,\n  })\n  await install({\n    dependencies: {\n      'is-positive': '^3.0.0',\n    },\n  }, opts)\n\n  expect(fs.existsSync(otherLockfilePath)).toBe(false)\n  expect(fs.existsSync(WANTED_LOCKFILE)).toBe(true)\n})",
+            "file": "install/gitBranchLockfile.test.ts",
+            "skipped": false,
+            "dir": "packages/core/test"
+        },
+        {
+            "name": "install with --merge-git-branch-lockfiles when merged lockfile is up to date",
+            "suites": [],
+            "updatePoint": {
+                "line": 148,
+                "column": 82
+            },
+            "line": 148,
+            "code": "test('install with --merge-git-branch-lockfiles when merged lockfile is up to date', async () => {\n  const project = prepareEmpty()\n\n  // @types/semver installed in the main branch\n  await writeYamlFile(WANTED_LOCKFILE, {\n    dependencies: {\n      '@types/semver': '5.3.31',\n    },\n    lockfileVersion: LOCKFILE_VERSION,\n    packages: {\n      '/@types/semver/5.3.31': {\n        resolution: {\n          integrity: 'sha512-WBv5F9HrWTyG800cB9M3veCVkFahqXN7KA7c3VUCYZm/xhNzzIFiXiq+rZmj75j7GvWelN3YNrLX7FjtqBvhMw==',\n        },\n      },\n    },\n    specifiers: {\n      '@types/semver': '5.3.31',\n    },\n  }, { lineWidth: 1000 })\n\n  const branchName: string = 'main-branch'\n  getCurrentBranch['mockReturnValue'](branchName)\n\n  // is-positive installed in the other branch\n  const otherLockfilePath: string = path.resolve('pnpm-lock.other.yaml')\n  const otherLockfileContent = {\n    dependencies: {\n      '@types/semver': '5.3.31',\n      'is-positive': '3.1.0',\n    },\n    lockfileVersion: LOCKFILE_VERSION,\n    packages: {\n      '/@types/semver/5.3.31': {\n        resolution: {\n          integrity: 'sha512-WBv5F9HrWTyG800cB9M3veCVkFahqXN7KA7c3VUCYZm/xhNzzIFiXiq+rZmj75j7GvWelN3YNrLX7FjtqBvhMw==',\n        },\n      },\n      '/is-positive/3.1.0': {\n        resolution: {\n          integrity: 'sha512-8ND1j3y9/HP94TOvGzr69/FgbkX2ruOldhLEsTWwcJVfo4oRjwemJmJxt7RJkKYH8tz7vYBP9JcKQY8CLuJ90Q==',\n        },\n      },\n    },\n    specifiers: {\n      '@types/semver': '5.3.31',\n      'is-positive': '^3.1.0',\n    },\n  }\n  await writeYamlFile(otherLockfilePath, otherLockfileContent, { lineWidth: 1000 })\n\n  // the other branch merged to the main branch\n  const projectManifest: ProjectManifest = {\n    dependencies: {\n      '@types/semver': '5.3.31',\n      'is-positive': '^3.1.0',\n    },\n  }\n  const opts = await testDefaults({\n    useGitBranchLockfile: true,\n    mergeGitBranchLockfiles: true,\n    frozenLockfile: true,\n  })\n  await install(projectManifest, opts)\n\n  expect(fs.existsSync(otherLockfilePath)).toBe(false)\n  expect(fs.existsSync(WANTED_LOCKFILE)).toBe(true)\n\n  const wantedLockfileAfterMergeOther = await project.readLockfile()\n  expect(wantedLockfileAfterMergeOther).toEqual(otherLockfileContent)\n})",
             "file": "install/gitBranchLockfile.test.ts",
             "skipped": false,
             "dir": "packages/core/test"
