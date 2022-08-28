@@ -1866,7 +1866,7 @@
                 "index": 23690
             },
             "line": 718,
-            "code": "    it(\"should always throw\", function () {\n      expect(() => babel.transformSync(``, {\n        configFile: false,\n        plugins: [function () {\n          return {\n            visitor: {\n              Program(path) {\n                try {\n                  path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n                } catch {}\n\n                path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n              }\n\n            }\n          };\n        }]\n      })).toThrowErrorMatchingInlineSnapshot(`\"unknown: Unknown helper fooBar\"`);\n    });",
+            "code": "    it(\"should always throw\", function () {\n      expect(() => babel.transformSync(``, {\n        configFile: false,\n        plugins: [function () {\n          return {\n            visitor: {\n              Program(path) {\n                try {\n                  path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n                } catch {}\n\n                path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n              }\n\n            }\n          };\n        }]\n      })).toThrowErrorMatchingInlineSnapshot(`\"unknown file: Unknown helper fooBar\"`);\n    });",
             "file": "api.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
@@ -2149,7 +2149,7 @@
             "updatePoint": {
                 "line": 100,
                 "column": 30,
-                "index": 6677
+                "index": 6707
             },
             "line": 100,
             "code": "      it(\"called synchronously\", async () => {\n        process.chdir(\"plugin-mjs-native\");\n        await expect(spawnTransformSync()).rejects.toThrow(`[BABEL]: You appear to be using a native ECMAScript module plugin, which is` + ` only supported when running Babel asynchronously.`);\n      });",
@@ -2167,7 +2167,7 @@
             "updatePoint": {
                 "line": 104,
                 "column": 31,
-                "index": 6973
+                "index": 7003
             },
             "line": 104,
             "code": "      it(\"called asynchronously\", async () => {\n        process.chdir(\"plugin-mjs-native\");\n        await expect(spawnTransformAsync()).resolves.toMatchObject({\n          code: `\"success\"`\n        });\n      });",
@@ -2185,7 +2185,7 @@
             "updatePoint": {
                 "line": 136,
                 "column": 30,
-                "index": 8746
+                "index": 8791
             },
             "line": 136,
             "code": "      it(\"called synchronously\", async () => {\n        process.chdir(\"preset-mjs-native\");\n        await expect(spawnTransformSync()).rejects.toThrow(`[BABEL]: You appear to be using a native ECMAScript module preset, which is` + ` only supported when running Babel asynchronously.`);\n      });",
@@ -2203,7 +2203,7 @@
             "updatePoint": {
                 "line": 140,
                 "column": 31,
-                "index": 9042
+                "index": 9087
             },
             "line": 140,
             "code": "      it(\"called asynchronously\", async () => {\n        process.chdir(\"preset-mjs-native\");\n        await expect(spawnTransformAsync()).resolves.toMatchObject({\n          code: `\"success\"`\n        });\n      });",
@@ -2221,7 +2221,7 @@
             "updatePoint": {
                 "line": 146,
                 "column": 39,
-                "index": 9261
+                "index": 9306
             },
             "line": 146,
             "code": "      it(\"must use the 'default' export\", async () => {\n        process.chdir(\"preset-mjs-named-exports-native\");\n        await expect(spawnTransformAsync()).rejects.toThrow(`Unexpected falsy value: undefined`);\n      });",
@@ -4279,6 +4279,182 @@
             "line": 343,
             "code": "    it(\"should pass caller data to test functions\", () => {\n      const options1 = loadOptionsSync({ ...makeOpts(),\n        caller: {\n          name: \"babel-test\",\n          someFlag: true\n        },\n        overrides: [{\n          test: (filename, {\n            caller\n          }) => caller.name === \"babel-test\",\n          comments: false\n        }, {\n          test: (filename, {\n            caller\n          }) => caller.name !== \"babel-test\",\n          ast: false\n        }]\n      });\n      expect(options1.comments).toBe(false);\n      expect(options1.ast).not.toBe(false);\n    });",
             "file": "config-loading.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "error inside config function",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 57,
+                "column": 34,
+                "index": 2575
+            },
+            "line": 57,
+            "code": "  it(\"error inside config function\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"error-config-function\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Error inside config!\n          at myConfig (<CWD>/packages/babel-core/test/fixtures/errors/error-config-function/babel.config.js:_:_)\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "error inside config function with more frames",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 72,
+                "column": 51,
+                "index": 3276
+            },
+            "line": 72,
+            "code": "  it(\"error inside config function with more frames\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"error-config-function-more-frames\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Error inside config!\n          at f (<CWD>/packages/babel-core/test/fixtures/errors/error-config-function-more-frames/babel.config.js:_:_)\n          at g (<CWD>/packages/babel-core/test/fixtures/errors/error-config-function-more-frames/babel.config.js:_:_)\n          at myConfig (<CWD>/packages/babel-core/test/fixtures/errors/error-config-function-more-frames/babel.config.js:_:_)\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "error inside config file",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 89,
+                "column": 30,
+                "index": 4216
+            },
+            "line": 89,
+            "code": "  it(\"error inside config file\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"error-config-file\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Error inside config!\n          at <CWD>/packages/babel-core/test/fixtures/errors/error-config-file/babel.config.js:_:_\n          at require (... internal node frames ...)\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "error inside config file with more frames",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 105,
+                "column": 47,
+                "index": 4946
+            },
+            "line": 105,
+            "code": "  it(\"error inside config file with more frames\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"error-config-file-more-frames\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Error inside config!\n          at f (<CWD>/packages/babel-core/test/fixtures/errors/error-config-file-more-frames/babel.config.js:_:_)\n          at g (<CWD>/packages/babel-core/test/fixtures/errors/error-config-file-more-frames/babel.config.js:_:_)\n          at <CWD>/packages/babel-core/test/fixtures/errors/error-config-file-more-frames/babel.config.js:_:_\n          at require (... internal node frames ...)\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "invalid JSON config file",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 123,
+                "column": 30,
+                "index": 5911
+            },
+            "line": 123,
+            "code": "  it(\"invalid JSON config file\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"invalid-json\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Error while parsing config - JSON5: invalid character '}' at 3:1\n          at <CWD>/packages/babel-core/test/fixtures/errors/invalid-json/babel.config.json\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "use 'exclude' without filename",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 138,
+                "column": 36,
+                "index": 6610
+            },
+            "line": 138,
+            "code": "  it(\"use 'exclude' without filename\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"use-exclude\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Configuration contains string/RegExp pattern, but no filename was passed to Babel\n          at <CWD>/packages/babel-core/test/fixtures/errors/use-exclude/babel.config.js\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "use 'exclude' without filename in programmatic options",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 153,
+                "column": 60,
+                "index": 7346
+            },
+            "line": 153,
+            "code": "  it(\"use 'exclude' without filename in programmatic options\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        configFile: false,\n        exclude: /node_modules/\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: Configuration contains string/RegExp pattern, but no filename was passed to Babel\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "use 'exclude' without filename in preset",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 168,
+                "column": 46,
+                "index": 8002
+            },
+            "line": 168,
+            "code": "  it(\"use 'exclude' without filename in preset\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"use-exclude-in-preset\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: [BABEL] unknown file: Preset /* your preset */ requires a filename to be set when babel is called directly,\n      \\`\\`\\`\n      babel.transformSync(code, { filename: 'file.ts', presets: [/* your preset */] });\n      \\`\\`\\`\n      See https://babeljs.io/docs/en/options#filename for more information.\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "invalid option",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 186,
+                "column": 20,
+                "index": 8836
+            },
+            "line": 186,
+            "code": "  it(\"invalid option\", function () {\n    expectError(() => {\n      babel.parseSync(\"foo;\", {\n        root: fixture(\"invalid-option\")\n      });\n    }).toMatchInlineSnapshot(`\n      \"Error: .sourceType must be \\\\\"module\\\\\", \\\\\"script\\\\\", \\\\\"unambiguous\\\\\", or undefined\n          at <CWD>/packages/babel-core/test/fixtures/errors/invalid-option/babel.config.json\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "invalid option in programmatic options",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 201,
+                "column": 44,
+                "index": 9562
+            },
+            "line": 201,
+            "code": "  it(\"invalid option in programmatic options\", function () {\n    expectError(() => babel.parseSync(\"foo;\", {\n      root: fixture(\"valid\"),\n      sourceType: \"foo\"\n    })).toMatchInlineSnapshot(`\n      \"Error: .sourceType must be \\\\\"module\\\\\", \\\\\"script\\\\\", \\\\\"unambiguous\\\\\", or undefined\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "internal errors have the full stack trace",
+            "suites": [
+                "@babel/core errors"
+            ],
+            "updatePoint": {
+                "line": 214,
+                "column": 47,
+                "index": 10195
+            },
+            "line": 214,
+            "code": "  it(\"internal errors have the full stack trace\", function () {\n    expectError(() => {\n      const {\n        map\n      } = Array.prototype;\n\n      try {\n        Array.prototype.map = () => {\n          throw new Error(\"Internal error! This is a fake bug :)\");\n        };\n\n        babel.parseSync(\"foo;\", {\n          root: fixture(\"valid\")\n        });\n      } finally {\n        Array.prototype.map = map;\n      }\n    }).toMatchInlineSnapshot(`\n      \"Error: Internal error! This is a fake bug :)\n          at Array.map (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at loadOneConfig (<CWD>/packages/babel-core/lib/config/files/configuration.js:_:_)\n          at loadOneConfig.next (<anonymous>)\n          at buildRootChain (<CWD>/packages/babel-core/lib/config/config-chain.js:_:_)\n          at buildRootChain.next (<anonymous>)\n          at loadPrivatePartialConfig (<CWD>/packages/babel-core/lib/config/partial.js:_:_)\n          at loadPrivatePartialConfig.next (<anonymous>)\n          at loadFullConfig (<CWD>/packages/babel-core/lib/config/full.js:_:_)\n          at loadFullConfig.next (<anonymous>)\n          at parse (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at parse.next (<anonymous>)\n          at evaluateSync (<CWD>/node_modules/gensync/index.js:_:_)\n          at sync (<CWD>/node_modules/gensync/index.js:_:_)\n          at stopHiding - secret - don't use this - v1 (<CWD>/packages/babel-core/lib/errors/rewrite-stack-trace.js:_:_)\n          at Module.parseSync (<CWD>/packages/babel-core/lib/parse.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at expectError (<CWD>/packages/babel-core/test/errors-stacks.js:_:_)\n          at <CWD>/packages/babel-core/test/errors-stacks.js:_:_\n          at ... internal jest frames ...\"\n    `);\n  });",
+            "file": "errors-stacks.js",
             "skipped": false,
             "dir": "packages/babel-core/test"
         },
