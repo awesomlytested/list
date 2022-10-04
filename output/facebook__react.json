@@ -1278,18 +1278,18 @@
             "dir": "packages/react-client/src/__tests__"
         },
         {
-            "name": "propagates ServerContext and cleansup providers in flight",
+            "name": "propagates ServerContext and cleans up the providers in flight",
             "suites": [
                 "ReactFlight",
                 "ServerContext"
             ],
             "updatePoint": {
                 "line": 658,
-                "column": 65,
-                "index": 23657
+                "column": 70,
+                "index": 23662
             },
             "line": 658,
-            "code": "    it('propagates ServerContext and cleansup providers in flight', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function Foo() {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer\"\n        }, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n\n      function Bar() {\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"span\", null, context);\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server2\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer2\"), /*#__PURE__*/React.createElement(\"span\", null, \"default\")));\n    }); // @gate enableServerContext",
+            "code": "    it('propagates ServerContext and cleans up the providers in flight', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function Foo() {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer\"\n        }, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n\n      function Bar() {\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"span\", null, context);\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server2\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer2\"), /*#__PURE__*/React.createElement(\"span\", null, \"default\")));\n    }); // @gate enableServerContext",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1303,7 +1303,7 @@
             "updatePoint": {
                 "line": 685,
                 "column": 69,
-                "index": 25464
+                "index": 25469
             },
             "line": 685,
             "code": "    it('propagates ServerContext providers in flight after suspending', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function Foo() {\n        return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(React.Suspense, {\n          fallback: 'Loading'\n        }, /*#__PURE__*/React.createElement(Bar, null))));\n      }\n\n      let resolve;\n      const promise = new Promise(res => {\n        resolve = () => {\n          promise.unsuspend = true;\n          res();\n        };\n      });\n\n      function Bar() {\n        if (!promise.unsuspend) {\n          Scheduler.unstable_yieldValue('suspended');\n          throw promise;\n        }\n\n        Scheduler.unstable_yieldValue('rendered');\n        const context = React.useContext(ServerContext);\n        return context;\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      expect(Scheduler).toHaveYielded(['suspended']);\n      await act(async () => {\n        resolve();\n        await promise;\n        jest.runAllImmediates();\n      });\n      expect(Scheduler).toHaveYielded(['rendered']);\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"div\", null, \"hi this is server\"));\n    }); // @gate enableServerContext",
@@ -1320,7 +1320,7 @@
             "updatePoint": {
                 "line": 731,
                 "column": 42,
-                "index": 27080
+                "index": 27085
             },
             "line": 731,
             "code": "    it('serializes ServerContext to client', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function ClientBar() {\n        Scheduler.unstable_yieldValue('ClientBar');\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"span\", null, context);\n      }\n\n      const Bar = moduleReference(ClientBar);\n\n      function Foo() {\n        return /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null));\n      }\n\n      const model = {\n        foo: /*#__PURE__*/React.createElement(Foo, null)\n      };\n      const transport = ReactNoopFlightServer.render(model);\n      expect(Scheduler).toHaveYielded([]);\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        const flightModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render(flightModel.foo);\n      });\n      expect(Scheduler).toHaveYielded(['ClientBar']);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\"));\n      expect(() => {\n        React.createServerContext('ServerContext', 'default');\n      }).toThrow('ServerContext: ServerContext already defined');\n    }); // @gate enableServerContext",
@@ -1329,18 +1329,18 @@
             "dir": "packages/react-client/src/__tests__"
         },
         {
-            "name": "takes ServerContext from client for refetching usecases",
+            "name": "takes ServerContext from the client for refetching use cases",
             "suites": [
                 "ReactFlight",
                 "ServerContext"
             ],
             "updatePoint": {
                 "line": 766,
-                "column": 63,
-                "index": 28512
+                "column": 68,
+                "index": 28522
             },
             "line": 766,
-            "code": "    it('takes ServerContext from client for refetching usecases', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"span\", null, React.useContext(ServerContext));\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Bar, null), {\n        context: [['ServerContext', 'Override']]\n      });\n      await act(async () => {\n        const flightModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render(flightModel);\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"Override\"));\n    }); // @gate enableServerContext",
+            "code": "    it('takes ServerContext from the client for refetching use cases', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"span\", null, React.useContext(ServerContext));\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Bar, null), {\n        context: [['ServerContext', 'Override']]\n      });\n      await act(async () => {\n        const flightModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render(flightModel);\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"Override\"));\n    }); // @gate enableServerContext",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1354,7 +1354,7 @@
             "updatePoint": {
                 "line": 783,
                 "column": 74,
-                "index": 29273
+                "index": 29283
             },
             "line": 783,
             "code": "    it('sets default initial value when defined lazily on server or client', async () => {\n      let ServerContext;\n\n      function inlineLazyServerContextInitialization() {\n        if (!ServerContext) {\n          ServerContext = React.createServerContext('ServerContext', 'default');\n        }\n\n        return ServerContext;\n      }\n\n      let ClientContext;\n\n      function inlineContextInitialization() {\n        if (!ClientContext) {\n          ClientContext = React.createServerContext('ServerContext', 'default');\n        }\n\n        return ClientContext;\n      }\n\n      function ClientBaz() {\n        const context = inlineContextInitialization();\n        const value = React.useContext(context);\n        return /*#__PURE__*/React.createElement(\"div\", null, value);\n      }\n\n      const Baz = moduleReference(ClientBaz);\n\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, React.useContext(inlineLazyServerContextInitialization())), /*#__PURE__*/React.createElement(Baz, null));\n      }\n\n      function ServerApp() {\n        const Context = inlineLazyServerContextInitialization();\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Context.Provider, {\n          value: \"test\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n\n      function ClientApp({\n        serverModel\n      }) {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, serverModel, /*#__PURE__*/React.createElement(ClientBaz, null));\n      }\n\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(ServerApp, null));\n      expect(ClientContext).toBe(undefined); // Reset all modules, except flight-modules which keeps the registry of client components\n\n      const flightModules = require('react-noop-renderer/flight-modules');\n\n      jest.resetModules();\n      jest.mock('react-noop-renderer/flight-modules', () => flightModules);\n      React = require('react');\n      ReactNoop = require('react-noop-renderer');\n      ReactNoopFlightServer = require('react-noop-renderer/flight-server');\n      ReactNoopFlightClient = require('react-noop-renderer/flight-client');\n      act = require('jest-react').act;\n      Scheduler = require('scheduler');\n      await act(async () => {\n        const serverModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render( /*#__PURE__*/React.createElement(ClientApp, {\n          serverModel: serverModel\n        }));\n      });\n      expect(ClientContext).not.toBe(ServerContext);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"test\"), /*#__PURE__*/React.createElement(\"div\", null, \"test\")), /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"default\"), /*#__PURE__*/React.createElement(\"div\", null, \"default\")), /*#__PURE__*/React.createElement(\"div\", null, \"default\")));\n    });",
