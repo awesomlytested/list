@@ -4931,6 +4931,454 @@
             "dir": "packages/analytics/__tests__"
         },
         {
+            "name": "happy-case-query",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 76,
+                "column": 24
+            },
+            "line": 76,
+            "code": "\t\ttest('happy-case-query', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(graphqlOperation(GetEvent, variables));\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "cancel-graphql-query",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 131,
+                "column": 28
+            },
+            "line": 131,
+            "code": "\t\ttest('cancel-graphql-query', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\trej('error cancelled');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tconst promiseResponse = api.graphql(\n\t\t\t\tgraphqlOperation(GetEvent, variables)\n\t\t\t);\n\t\t\tapi.cancel(promiseResponse as Promise<any>, 'testmessage');\n\n\t\t\texpect.assertions(5);\n\n\t\t\texpect(cancelTokenSpy).toBeCalledTimes(1);\n\t\t\texpect(cancelMock).toBeCalledWith('testmessage');\n\t\t\ttry {\n\t\t\t\tawait promiseResponse;\n\t\t\t} catch (err) {\n\t\t\t\texpect(err).toEqual('error cancelled');\n\t\t\t\texpect(api.isCancel(err)).toBeTruthy();\n\t\t\t}\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy-case-query-ast",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 199,
+                "column": 28
+            },
+            "line": 199,
+            "code": "\t\ttest('happy-case-query-ast', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(graphqlOperation(getEventDoc, variables));\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy-case-query-oidc with Cache token",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 254,
+                "column": 46
+            },
+            "line": 254,
+            "code": "\t\ttest('happy-case-query-oidc with Cache token', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tconst spyonCache = jest\n\t\t\t\t.spyOn(Cache, 'getItem')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn {\n\t\t\t\t\t\ttoken: 'id_token',\n\t\t\t\t\t};\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'OPENID_CONNECT',\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: 'id_token',\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(graphqlOperation(GetEvent, variables));\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\n\t\t\tspyonCache.mockClear();\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy-case-query-oidc with auth storage federated token",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 327,
+                "column": 63
+            },
+            "line": 327,
+            "code": "\t\ttest('happy-case-query-oidc with auth storage federated token', async () => {\n\t\t\tconst spyonCredentials = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tconst spyonCache = jest\n\t\t\t\t.spyOn(Cache, 'getItem')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn null;\n\t\t\t\t});\n\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Auth, 'currentAuthenticatedUser')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({\n\t\t\t\t\t\t\tname: 'federated user',\n\t\t\t\t\t\t\ttoken: 'federated_token_from_storage',\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'OPENID_CONNECT',\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: 'federated_token_from_storage',\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(graphqlOperation(GetEvent, variables));\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\n\t\t\tspyonCredentials.mockClear();\n\t\t\tspyonCache.mockClear();\n\t\t\tspyonAuth.mockClear();\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy case query with AWS_LAMBDA",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 411,
+                "column": 40
+            },
+            "line": 411,
+            "code": "\t\ttest('happy case query with AWS_LAMBDA', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com';\n\t\t\tconst region = 'us-east-2';\n\t\t\tconst variables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'AWS_LAMBDA',\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t\tAuthorization: 'myAuthToken',\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthToken: 'myAuthToken',\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "additional headers with AWS_LAMBDA",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 458,
+                "column": 42
+            },
+            "line": 458,
+            "code": "\t\ttest('additional headers with AWS_LAMBDA', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com';\n\t\t\tconst region = 'us-east-2';\n\t\t\tconst variables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'AWS_LAMBDA',\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t\tAuthorization: 'myAuthToken',\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(\n\t\t\t\t{\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthToken: 'myAuthToken',\n\t\t\t\t},\n\t\t\t\t{ Authorization: 'anotherAuthToken' }\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth default case AWS_IAM, using API_KEY as auth mode",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 508,
+                "column": 67
+            },
+            "line": 508,
+            "code": "\t\ttest('multi-auth default case AWS_IAM, using API_KEY as auth mode', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'AWS_IAM',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': 'secret-api-key',\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.API_KEY,\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth default case api-key, using AWS_IAM as auth mode",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 568,
+                "column": 67
+            },
+            "line": 568,
+            "code": "\t\ttest('multi-auth default case api-key, using AWS_IAM as auth mode', async () => {\n\t\t\texpect.assertions(1);\n\t\t\tjest.spyOn(Credentials, 'get').mockReturnValue(Promise.resolve('cred'));\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = { 'x-amz-user-agent': Constants.userAgent };\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AWS_IAM,\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth default case api-key, using AWS_LAMBDA as auth mode",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 614,
+                "column": 70
+            },
+            "line": 614,
+            "code": "\t\ttest('multi-auth default case api-key, using AWS_LAMBDA as auth mode', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t\tAuthorization: 'myAuthToken',\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AWS_LAMBDA,\n\t\t\t\tauthToken: 'myAuthToken',\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth default case api-key, using OIDC as auth mode",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 664,
+                "column": 64
+            },
+            "line": 664,
+            "code": "\t\ttest('multi-auth default case api-key, using OIDC as auth mode', async () => {\n\t\t\texpect.assertions(1);\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tjest.spyOn(Cache, 'getItem').mockReturnValue({ token: 'oidc_token' });\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: 'oidc_token',\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.OPENID_CONNECT,\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth using OIDC as auth mode, but no federatedSign",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 724,
+                "column": 64
+            },
+            "line": 724,
+            "code": "\t\ttest('multi-auth using OIDC as auth mode, but no federatedSign', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tjest.spyOn(Cache, 'getItem').mockReturnValue(null);\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\texpect(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.OPENID_CONNECT,\n\t\t\t\t})\n\t\t\t).rejects.toThrowError('No federated jwt');\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth using CUP as auth mode, but no userpool",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 761,
+                "column": 58
+            },
+            "line": 761,
+            "code": "\t\ttest('multi-auth using CUP as auth mode, but no userpool', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\texpect(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,\n\t\t\t\t})\n\t\t\t).rejects.toThrow();\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth using AWS_LAMBDA as auth mode, but no auth token specified",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 785,
+                "column": 77
+            },
+            "line": 785,
+            "code": "\t\ttest('multi-auth using AWS_LAMBDA as auth mode, but no auth token specified', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'AWS_IAM',\n\t\t\t});\n\n\t\t\texpect(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AWS_LAMBDA,\n\t\t\t\t})\n\t\t\t).rejects.toThrowError(GraphQLAuthError.NO_AUTH_TOKEN);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth using API_KEY as auth mode, but no api-key configured",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 808,
+                "column": 72
+            },
+            "line": 808,
+            "code": "\t\ttest('multi-auth using API_KEY as auth mode, but no api-key configured', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'AWS_IAM',\n\t\t\t});\n\n\t\t\texpect(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.API_KEY,\n\t\t\t\t})\n\t\t\t).rejects.toThrowError('No api-key configured');\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth using AWS_IAM as auth mode, but no credentials",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 841,
+                "column": 65
+            },
+            "line": 841,
+            "code": "\t\ttest('multi-auth using AWS_IAM as auth mode, but no credentials', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tjest.spyOn(Credentials, 'get').mockReturnValue(Promise.reject());\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\texpect(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery: GetEvent,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AWS_IAM,\n\t\t\t\t})\n\t\t\t).rejects.toThrowError('No credentials');\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "multi-auth default case api-key, using CUP as auth mode",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 867,
+                "column": 63
+            },
+            "line": 867,
+            "code": "\t\ttest('multi-auth default case api-key, using CUP as auth mode', async () => {\n\t\t\texpect.assertions(1);\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockReturnValue(Promise.resolve({}));\n\n\t\t\tjest.spyOn(Auth, 'currentSession').mockReturnValue({\n\t\t\t\tgetAccessToken: () => ({\n\t\t\t\t\tgetJwtToken: () => 'Secret-Token',\n\t\t\t\t}),\n\t\t\t} as any);\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tapiKey = 'secret-api-key';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: 'Secret-Token',\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql({\n\t\t\t\tquery: GetEvent,\n\t\t\t\tvariables,\n\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,\n\t\t\t});\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "authMode on subscription",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 920,
+                "column": 32
+            },
+            "line": 920,
+            "code": "\t\ttest('authMode on subscription', async () => {\n\t\t\texpect.assertions(1);\n\n\t\t\tjest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementation(async (url, init) => ({\n\t\t\t\t\textensions: {\n\t\t\t\t\t\tsubscription: {\n\t\t\t\t\t\t\tnewSubscriptions: {},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t}));\n\n\t\t\tconst cache_config = {\n\t\t\t\tcapacityInBytes: 3000,\n\t\t\t\titemMaxSize: 800,\n\t\t\t\tdefaultTTL: 3000000,\n\t\t\t\tdefaultPriority: 5,\n\t\t\t\twarningThreshold: 0.8,\n\t\t\t\tstorage: window.localStorage,\n\t\t\t};\n\n\t\t\tCache.configure(cache_config);\n\n\t\t\tjest.spyOn(Cache, 'getItem').mockReturnValue({ token: 'id_token' });\n\n\t\t\tconst spyon_pubsub = jest\n\t\t\t\t.spyOn(PubSub, 'subscribe')\n\t\t\t\t.mockImplementation(jest.fn(() => Observable.of({})));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst SubscribeToEventComments = `subscription SubscribeToEventComments($eventId: String!) {\n\t\t\t\tsubscribeToEventComments(eventId: $eventId) {\n\t\t\t\t\teventId\n\t\t\t\t\tcommentId\n\t\t\t\t\tcontent\n\t\t\t\t}\n\t\t\t}`;\n\n\t\t\tconst doc = parse(SubscribeToEventComments);\n\t\t\tconst query = print(doc);\n\n\t\t\t(\n\t\t\t\tapi.graphql({\n\t\t\t\t\tquery,\n\t\t\t\t\tvariables,\n\t\t\t\t\tauthMode: GRAPHQL_AUTH_MODE.OPENID_CONNECT,\n\t\t\t\t}) as any\n\t\t\t).subscribe();\n\n\t\t\texpect(spyon_pubsub).toBeCalledWith(\n\t\t\t\t'',\n\t\t\t\texpect.objectContaining({\n\t\t\t\t\tauthenticationType: 'OPENID_CONNECT',\n\t\t\t\t})\n\t\t\t);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy-case-subscription",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 990,
+                "column": 31
+            },
+            "line": 990,
+            "code": "\t\ttest('happy-case-subscription', async done => {\n\t\t\tjest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementation(async (url, init) => ({\n\t\t\t\t\textensions: {\n\t\t\t\t\t\tsubscription: {\n\t\t\t\t\t\t\tnewSubscriptions: {},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tPubSub.subscribe = jest.fn(() => Observable.of({}));\n\n\t\t\tconst SubscribeToEventComments = `subscription SubscribeToEventComments($eventId: String!) {\n\t\t\t\tsubscribeToEventComments(eventId: $eventId) {\n\t\t\t\t\teventId\n\t\t\t\t\tcommentId\n\t\t\t\t\tcontent\n\t\t\t\t}\n\t\t\t}`;\n\n\t\t\tconst doc = parse(SubscribeToEventComments);\n\t\t\tconst query = print(doc);\n\n\t\t\tconst observable = (\n\t\t\t\tapi.graphql(graphqlOperation(query, variables)) as Observable<object>\n\t\t\t).subscribe({\n\t\t\t\tnext: () => {\n\t\t\t\t\texpect(PubSub.subscribe).toHaveBeenCalledTimes(1);\n\t\t\t\t\tconst subscribeOptions = (PubSub.subscribe as any).mock.calls[0][1];\n\t\t\t\t\texpect(subscribeOptions.provider).toBe(\n\t\t\t\t\t\tINTERNAL_AWS_APPSYNC_REALTIME_PUBSUB_PROVIDER\n\t\t\t\t\t);\n\t\t\t\t\tdone();\n\t\t\t\t},\n\t\t\t});\n\n\t\t\texpect(observable).not.toBe(undefined);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy case subscription with additionalHeaders",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1043,
+                "column": 54
+            },
+            "line": 1043,
+            "code": "\t\ttest('happy case subscription with additionalHeaders', async done => {\n\t\t\tjest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementation(async (url, init) => ({\n\t\t\t\t\textensions: {\n\t\t\t\t\t\tsubscription: {\n\t\t\t\t\t\t\tnewSubscriptions: {},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t}));\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tPubSub.subscribe = jest.fn(() => Observable.of({}));\n\n\t\t\tconst SubscribeToEventComments = `subscription SubscribeToEventComments($eventId: String!) {\n\t\t\t\tsubscribeToEventComments(eventId: $eventId) {\n\t\t\t\t\teventId\n\t\t\t\t\tcommentId\n\t\t\t\t\tcontent\n\t\t\t\t}\n\t\t\t}`;\n\n\t\t\tconst doc = parse(SubscribeToEventComments);\n\t\t\tconst query = print(doc);\n\n\t\t\tconst additionalHeaders = {\n\t\t\t\t'x-custom-header': 'value',\n\t\t\t};\n\n\t\t\tconst observable = (\n\t\t\t\tapi.graphql(\n\t\t\t\t\tgraphqlOperation(query, variables),\n\t\t\t\t\tadditionalHeaders\n\t\t\t\t) as Observable<object>\n\t\t\t).subscribe({\n\t\t\t\tnext: () => {\n\t\t\t\t\texpect(PubSub.subscribe).toHaveBeenCalledTimes(1);\n\t\t\t\t\tconst subscribeOptions = (PubSub.subscribe as any).mock.calls[0][1];\n\t\t\t\t\texpect(subscribeOptions.additionalHeaders).toBe(additionalHeaders);\n\t\t\t\t\tdone();\n\t\t\t\t},\n\t\t\t});\n\n\t\t\texpect(observable).not.toBe(undefined);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy case mutation",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1101,
+                "column": 27
+            },
+            "line": 1101,
+            "code": "\t\ttest('happy case mutation', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = {\n\t\t\t\t\tid: '809392da-ec91-4ef0-b219-5238a8f942b2',\n\t\t\t\t\tcontent: 'lalala',\n\t\t\t\t\tcreatedAt: new Date().toISOString(),\n\t\t\t\t};\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\t\t\tconst AddComment = `mutation AddComment($eventId: ID!, $content: String!, $createdAt: String!) {\n\t\t\t\tcommentOnEvent(eventId: $eventId, content: $content, createdAt: $createdAt) {\n\t\t\t\t\teventId\n\t\t\t\t\tcontent\n\t\t\t\t\tcreatedAt\n\t\t\t\t}\n\t\t\t}`;\n\n\t\t\tconst doc = parse(AddComment);\n\t\t\tconst query = print(doc);\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tawait api.graphql(graphqlOperation(AddComment, variables));\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "happy case query with additionalHeaders",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1169,
+                "column": 47
+            },
+            "line": 1169,
+            "code": "\t\ttest('happy case query with additionalHeaders', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' };\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t\tgraphql_headers: async () =>\n\t\t\t\t\tPromise.resolve({\n\t\t\t\t\t\tsomeHeaderSetAtConfigThatWillBeOverridden: 'initialValue',\n\t\t\t\t\t\tsomeOtherHeaderSetAtConfig: 'expectedValue',\n\t\t\t\t\t}),\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': Constants.userAgent,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\n\t\t\tconst additionalHeaders = {\n\t\t\t\tsomeAddtionalHeader: 'foo',\n\t\t\t\tsomeHeaderSetAtConfigThatWillBeOverridden: 'expectedValue',\n\t\t\t};\n\n\t\t\tawait api.graphql(\n\t\t\t\tgraphqlOperation(GetEvent, variables),\n\t\t\t\tadditionalHeaders\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalledWith(url, {\n\t\t\t\t...init,\n\t\t\t\theaders: {\n\t\t\t\t\tsomeAddtionalHeader: 'foo',\n\t\t\t\t\tsomeHeaderSetAtConfigThatWillBeOverridden: 'expectedValue',\n\t\t\t\t\t...init.headers,\n\t\t\t\t\tsomeOtherHeaderSetAtConfig: 'expectedValue',\n\t\t\t\t},\n\t\t\t});\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "sends userAgent with suffix in request",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1245,
+                "column": 46
+            },
+            "line": 1245,
+            "code": "\t\ttest('sends userAgent with suffix in request', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tuserAgentSuffix = '/DataStore';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': `${Constants.userAgent}${userAgentSuffix}`,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t};\n\t\t\tlet authToken: undefined;\n\n\t\t\tawait api.graphql(\n\t\t\t\tgraphqlOperation(GetEvent, variables, authToken, userAgentSuffix)\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "call isInstanceCreated",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1304,
+                "column": 30
+            },
+            "line": 1304,
+            "code": "\t\ttest('call isInstanceCreated', () => {\n\t\t\tconst createInstanceMock = spyOn(API.prototype, 'createInstance');\n\t\t\tconst api = new API(config);\n\t\t\tapi.createInstanceIfNotCreated();\n\t\t\texpect(createInstanceMock).toHaveBeenCalled();\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "should not call createInstance when there is already an instance",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1311,
+                "column": 72
+            },
+            "line": 1311,
+            "code": "\t\ttest('should not call createInstance when there is already an instance', () => {\n\t\t\tconst api = new API(config);\n\t\t\tapi.createInstance();\n\t\t\tconst createInstanceMock = spyOn(API.prototype, 'createInstance');\n\t\t\tapi.createInstanceIfNotCreated();\n\t\t\texpect(createInstanceMock).not.toHaveBeenCalled();\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "without aws_project_region",
+            "suites": [
+                "API test",
+                "configure test"
+            ],
+            "updatePoint": {
+                "line": 1321,
+                "column": 34
+            },
+            "line": 1321,
+            "code": "\t\ttest('without aws_project_region', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\tmyoption: 'myoption',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\tmyoption: 'myoption',\n\t\t\t});\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "with aws_project_region",
+            "suites": [
+                "API test",
+                "configure test"
+            ],
+            "updatePoint": {
+                "line": 1333,
+                "column": 31
+            },
+            "line": 1333,
+            "code": "\t\ttest('with aws_project_region', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\taws_project_region: 'region',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\taws_project_region: 'region',\n\t\t\t\theader: {},\n\t\t\t\tregion: 'region',\n\t\t\t});\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
+            "name": "with API options",
+            "suites": [
+                "API test",
+                "configure test"
+            ],
+            "updatePoint": {
+                "line": 1347,
+                "column": 24
+            },
+            "line": 1347,
+            "code": "\t\ttest('with API options', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\tAPI: {\n\t\t\t\t\taws_project_region: 'api-region',\n\t\t\t\t},\n\t\t\t\taws_project_region: 'region',\n\t\t\t\taws_appsync_region: 'appsync-region',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\taws_project_region: 'api-region',\n\t\t\t\taws_appsync_region: 'appsync-region',\n\t\t\t\theader: {},\n\t\t\t\tregion: 'api-region',\n\t\t\t});\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
             "name": "without aws_project_region",
             "suites": [
                 "Rest API test",
