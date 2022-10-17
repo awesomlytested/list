@@ -952,7 +952,7 @@
             "dir": "packages/react-cache/src/__tests__"
         },
         {
-            "name": "can render a server component",
+            "name": "can render a Server Component",
             "suites": [
                 "ReactFlight"
             ],
@@ -962,13 +962,13 @@
                 "index": 2732
             },
             "line": 92,
-            "code": "  it('can render a server component', async () => {\n    function Bar({\n      text\n    }) {\n      return text.toUpperCase();\n    }\n    function Foo() {\n      return {\n        bar: /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(Bar, {\n          text: \"a\"\n        }), \", \", /*#__PURE__*/React.createElement(Bar, {\n          text: \"b\"\n        }))\n      };\n    }\n    const transport = ReactNoopFlightServer.render({\n      foo: /*#__PURE__*/React.createElement(Foo, null)\n    });\n    const model = await ReactNoopFlightClient.read(transport);\n    expect(model).toEqual({\n      foo: {\n        bar: /*#__PURE__*/React.createElement(\"div\", null, 'A', ', ', 'B')\n      }\n    });\n  });",
+            "code": "  it('can render a Server Component', async () => {\n    function Bar({\n      text\n    }) {\n      return text.toUpperCase();\n    }\n    function Foo() {\n      return {\n        bar: /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(Bar, {\n          text: \"a\"\n        }), \", \", /*#__PURE__*/React.createElement(Bar, {\n          text: \"b\"\n        }))\n      };\n    }\n    const transport = ReactNoopFlightServer.render({\n      foo: /*#__PURE__*/React.createElement(Foo, null)\n    });\n    const model = await ReactNoopFlightClient.read(transport);\n    expect(model).toEqual({\n      foo: {\n        bar: /*#__PURE__*/React.createElement(\"div\", null, 'A', ', ', 'B')\n      }\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
         },
         {
-            "name": "can render a client component using a module reference and render there",
+            "name": "can render a Client Component using a module reference and render there",
             "suites": [
                 "ReactFlight"
             ],
@@ -978,7 +978,7 @@
                 "index": 3481
             },
             "line": 117,
-            "code": "  it('can render a client component using a module reference and render there', async () => {\n    function UserClient(props) {\n      return /*#__PURE__*/React.createElement(\"span\", null, props.greeting, \", \", props.name);\n    }\n    const User = moduleReference(UserClient);\n    function Greeting({\n      firstName,\n      lastName\n    }) {\n      return /*#__PURE__*/React.createElement(User, {\n        greeting: \"Hello\",\n        name: firstName + ' ' + lastName\n      });\n    }\n    const model = {\n      greeting: /*#__PURE__*/React.createElement(Greeting, {\n        firstName: \"Seb\",\n        lastName: \"Smith\"\n      })\n    };\n    const transport = ReactNoopFlightServer.render(model);\n    await act(async () => {\n      const rootModel = await ReactNoopFlightClient.read(transport);\n      const greeting = rootModel.greeting;\n      ReactNoop.render(greeting);\n    });\n    expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"Hello, Seb Smith\"));\n  });",
+            "code": "  it('can render a Client Component using a module reference and render there', async () => {\n    function UserClient(props) {\n      return /*#__PURE__*/React.createElement(\"span\", null, props.greeting, \", \", props.name);\n    }\n    const User = moduleReference(UserClient);\n    function Greeting({\n      firstName,\n      lastName\n    }) {\n      return /*#__PURE__*/React.createElement(User, {\n        greeting: \"Hello\",\n        name: firstName + ' ' + lastName\n      });\n    }\n    const model = {\n      greeting: /*#__PURE__*/React.createElement(Greeting, {\n        firstName: \"Seb\",\n        lastName: \"Smith\"\n      })\n    };\n    const transport = ReactNoopFlightServer.render(model);\n    await act(async () => {\n      const rootModel = await ReactNoopFlightClient.read(transport);\n      const greeting = rootModel.greeting;\n      ReactNoop.render(greeting);\n    });\n    expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"Hello, Seb Smith\"));\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1074,23 +1074,23 @@
                 "index": 10762
             },
             "line": 310,
-            "code": "  it('should error if a non-serializable value is passed to a host component', async () => {\n    function EventHandlerProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        className: \"foo\",\n        onClick: function () {}\n      }, \"Test\");\n    }\n    function FunctionProp() {\n      return /*#__PURE__*/React.createElement(\"div\", null, () => {});\n    }\n    function SymbolProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        foo: Symbol('foo')\n      });\n    }\n    const ref = React.createRef();\n    function RefProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        ref: ref\n      });\n    }\n    const options = {\n      onError(x) {\n        return __DEV__ ? 'a dev digest' : `digest(\"${x.message}\")`;\n      }\n    };\n    const event = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(EventHandlerProp, null), options);\n    const fn = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(FunctionProp, null), options);\n    const symbol = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(SymbolProp, null), options);\n    const refs = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(RefProp, null), options);\n    function Client({\n      promise\n    }) {\n      return use(promise);\n    }\n    await act(async () => {\n      startTransition(() => {\n        ReactNoop.render( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Event handlers cannot be passed to client component props.\"\n        }, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(event)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Functions cannot be passed directly to client components because they're not serializable.\"\n        }, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(fn)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Only global symbols received from Symbol.for(...) can be passed to client components.\"\n        }, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(symbol)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Refs cannot be used in server components, nor passed to client components.\"\n        }, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(refs)\n        }))));\n      });\n    });\n  });",
+            "code": "  it('should error if a non-serializable value is passed to a host component', async () => {\n    function ClientImpl({\n      children\n    }) {\n      return children;\n    }\n    const Client = moduleReference(ClientImpl);\n    function EventHandlerProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        className: \"foo\",\n        onClick: function () {}\n      }, \"Test\");\n    }\n    function FunctionProp() {\n      return /*#__PURE__*/React.createElement(\"div\", null, () => {});\n    }\n    function SymbolProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        foo: Symbol('foo')\n      });\n    }\n    const ref = React.createRef();\n    function RefProp() {\n      return /*#__PURE__*/React.createElement(\"div\", {\n        ref: ref\n      });\n    }\n    function EventHandlerPropClient() {\n      return /*#__PURE__*/React.createElement(Client, {\n        className: \"foo\",\n        onClick: function () {}\n      }, \"Test\");\n    }\n    function FunctionPropClient() {\n      return /*#__PURE__*/React.createElement(Client, null, () => {});\n    }\n    function SymbolPropClient() {\n      return /*#__PURE__*/React.createElement(Client, {\n        foo: Symbol('foo')\n      });\n    }\n    function RefPropClient() {\n      return /*#__PURE__*/React.createElement(Client, {\n        ref: ref\n      });\n    }\n    const options = {\n      onError(x) {\n        return __DEV__ ? 'a dev digest' : `digest(\"${x.message}\")`;\n      }\n    };\n    const event = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(EventHandlerProp, null), options);\n    const fn = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(FunctionProp, null), options);\n    const symbol = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(SymbolProp, null), options);\n    const refs = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(RefProp, null), options);\n    const eventClient = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(EventHandlerPropClient, null), options);\n    const fnClient = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(FunctionPropClient, null), options);\n    const symbolClient = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(SymbolPropClient, null), options);\n    const refsClient = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(RefPropClient, null), options);\n    function Render({\n      promise\n    }) {\n      return use(promise);\n    }\n    await act(async () => {\n      startTransition(() => {\n        ReactNoop.render( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Event handlers cannot be passed to Client Component props.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(event)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Functions cannot be passed directly to Client Components because they're not serializable.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(fn)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Only global symbols received from Symbol.for(...) can be passed to Client Components.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(symbol)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Refs cannot be used in Server Components, nor passed to Client Components.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(refs)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Event handlers cannot be passed to Client Component props.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(eventClient)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Functions cannot be passed directly to Client Components because they're not serializable.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(fnClient)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Only global symbols received from Symbol.for(...) can be passed to Client Components.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(symbolClient)\n        })), /*#__PURE__*/React.createElement(ErrorBoundary, {\n          expectedMessage: \"Refs cannot be used in Server Components, nor passed to Client Components.\"\n        }, /*#__PURE__*/React.createElement(Render, {\n          promise: ReactNoopFlightClient.read(refsClient)\n        }))));\n      });\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
         },
         {
-            "name": "should trigger the inner most error boundary inside a client component",
+            "name": "should trigger the inner most error boundary inside a Client Component",
             "suites": [
                 "ReactFlight"
             ],
             "updatePoint": {
-                "line": 369,
+                "line": 414,
                 "column": 76,
-                "index": 13345
+                "index": 15634
             },
-            "line": 369,
-            "code": "  it('should trigger the inner most error boundary inside a client component', async () => {\n    function ServerComponent() {\n      throw new Error('This was thrown in the server component.');\n    }\n    function ClientComponent({\n      children\n    }) {\n      // This should catch the error thrown by the server component, even though it has already happened.\n      // We currently need to wrap it in a div because as it's set up right now, a lazy reference will\n      // throw during reconciliation which will trigger the parent of the error boundary.\n      // This is similar to how these will suspend the parent if it's a direct child of a Suspense boundary.\n      // That's a bug.\n      return /*#__PURE__*/React.createElement(ErrorBoundary, {\n        expectedMessage: \"This was thrown in the server component.\"\n      }, /*#__PURE__*/React.createElement(\"div\", null, children));\n    }\n    const ClientComponentReference = moduleReference(ClientComponent);\n    function Server() {\n      return /*#__PURE__*/React.createElement(ClientComponentReference, null, /*#__PURE__*/React.createElement(ServerComponent, null));\n    }\n    const data = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Server, null), {\n      onError(x) {\n        // ignore\n      }\n    });\n    function Client({\n      promise\n    }) {\n      return use(promise);\n    }\n    await act(async () => {\n      startTransition(() => {\n        ReactNoop.render( /*#__PURE__*/React.createElement(NoErrorExpected, null, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(data)\n        })));\n      });\n    });\n  });",
+            "line": 414,
+            "code": "  it('should trigger the inner most error boundary inside a Client Component', async () => {\n    function ServerComponent() {\n      throw new Error('This was thrown in the Server Component.');\n    }\n    function ClientComponent({\n      children\n    }) {\n      // This should catch the error thrown by the Server Component, even though it has already happened.\n      // We currently need to wrap it in a div because as it's set up right now, a lazy reference will\n      // throw during reconciliation which will trigger the parent of the error boundary.\n      // This is similar to how these will suspend the parent if it's a direct child of a Suspense boundary.\n      // That's a bug.\n      return /*#__PURE__*/React.createElement(ErrorBoundary, {\n        expectedMessage: \"This was thrown in the Server Component.\"\n      }, /*#__PURE__*/React.createElement(\"div\", null, children));\n    }\n    const ClientComponentReference = moduleReference(ClientComponent);\n    function Server() {\n      return /*#__PURE__*/React.createElement(ClientComponentReference, null, /*#__PURE__*/React.createElement(ServerComponent, null));\n    }\n    const data = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Server, null), {\n      onError(x) {\n        // ignore\n      }\n    });\n    function Client({\n      promise\n    }) {\n      return use(promise);\n    }\n    await act(async () => {\n      startTransition(() => {\n        ReactNoop.render( /*#__PURE__*/React.createElement(NoErrorExpected, null, /*#__PURE__*/React.createElement(Client, {\n          promise: ReactNoopFlightClient.read(data)\n        })));\n      });\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1101,12 +1101,28 @@
                 "ReactFlight"
             ],
             "updatePoint": {
-                "line": 407,
+                "line": 452,
                 "column": 75,
-                "index": 14971
+                "index": 17260
             },
-            "line": 407,
-            "code": "  it('should warn in DEV if a toJSON instance is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: new Date()\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to client components from server components. ', {\n      withoutStack: true\n    });\n  });",
+            "line": 452,
+            "code": "  it('should warn in DEV if a toJSON instance is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: new Date()\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Date objects are not supported.', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a toJSON instance is passed to a host component child",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 462,
+                "column": 81,
+                "index": 17728
+            },
+            "line": 462,
+            "code": "  it('should warn in DEV if a toJSON instance is passed to a host component child', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"div\", null, \"Current date: \", new Date()));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Date objects cannot be rendered as text children. Try formatting it using toString().\\n' + '  <div>Current date: {Date}</div>\\n' + '                     ^^^^^^', {\n      withoutStack: true\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1117,28 +1133,12 @@
                 "ReactFlight"
             ],
             "updatePoint": {
-                "line": 417,
+                "line": 470,
                 "column": 74,
-                "index": 15396
+                "index": 18231
             },
-            "line": 417,
-            "code": "  it('should warn in DEV if a special object is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: Math\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to client components from server components. ' + 'Built-ins like Math are not supported.', {\n      withoutStack: true\n    });\n  });",
-            "file": "ReactFlight-test.js",
-            "skipped": false,
-            "dir": "packages/react-client/src/__tests__"
-        },
-        {
-            "name": "should NOT warn in DEV for key getters",
-            "suites": [
-                "ReactFlight"
-            ],
-            "updatePoint": {
-                "line": 427,
-                "column": 44,
-                "index": 15828
-            },
-            "line": 427,
-            "code": "  it('should NOT warn in DEV for key getters', () => {\n    const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"div\", {\n      key: \"a\"\n    }));\n    ReactNoopFlightClient.read(transport);\n  });",
+            "line": 470,
+            "code": "  it('should warn in DEV if a special object is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: Math\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Math objects are not supported.\\n' + '  <input value={Math}>\\n' + '               ^^^^^^', {\n      withoutStack: true\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1149,12 +1149,124 @@
                 "ReactFlight"
             ],
             "updatePoint": {
-                "line": 433,
+                "line": 480,
                 "column": 80,
-                "index": 16086
+                "index": 18749
             },
-            "line": 433,
-            "code": "  it('should warn in DEV if an object with symbols is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: {\n          [Symbol.iterator]: {}\n        }\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to client components from server components. ' + 'Objects with symbol properties like Symbol.iterator are not supported.', {\n      withoutStack: true\n    });\n  });",
+            "line": 480,
+            "code": "  it('should warn in DEV if an object with symbols is passed to a host component', () => {\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: {\n          [Symbol.iterator]: {}\n        }\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Objects with symbol properties like Symbol.iterator are not supported.', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a toJSON instance is passed to a Client Component",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 492,
+                "column": 77,
+                "index": 19285
+            },
+            "line": 492,
+            "code": "  it('should warn in DEV if a toJSON instance is passed to a Client Component', () => {\n    function ClientImpl({\n      value\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, {\n        value: new Date()\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Date objects are not supported.', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a toJSON instance is passed to a Client Component child",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 508,
+                "column": 83,
+                "index": 19922
+            },
+            "line": 508,
+            "code": "  it('should warn in DEV if a toJSON instance is passed to a Client Component child', () => {\n    function ClientImpl({\n      children\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, children);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, null, \"Current date: \", new Date()));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Date objects are not supported.\\n' + '  <>Current date: {Date}</>\\n' + '                  ^^^^^^', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a special object is passed to a Client Component",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 522,
+                "column": 76,
+                "index": 20622
+            },
+            "line": 522,
+            "code": "  it('should warn in DEV if a special object is passed to a Client Component', () => {\n    function ClientImpl({\n      value\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, {\n        value: Math\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Math objects are not supported.\\n' + '  <... value={Math}>\\n' + '             ^^^^^^', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if an object with symbols is passed to a Client Component",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 538,
+                "column": 82,
+                "index": 21305
+            },
+            "line": 538,
+            "code": "  it('should warn in DEV if an object with symbols is passed to a Client Component', () => {\n    function ClientImpl({\n      value\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, {\n        value: {\n          [Symbol.iterator]: {}\n        }\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Objects with symbol properties like Symbol.iterator are not supported.', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a special object is passed to a nested object in Client Component",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 556,
+                "column": 93,
+                "index": 22024
+            },
+            "line": 556,
+            "code": "  it('should warn in DEV if a special object is passed to a nested object in Client Component', () => {\n    function ClientImpl({\n      value\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, {\n        value: {\n          hello: Math,\n          title: /*#__PURE__*/React.createElement(\"h1\", null, \"hi\")\n        }\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Math objects are not supported.\\n' + '  {hello: Math, title: <h1/>}\\n' + '          ^^^^', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should warn in DEV if a special object is passed to a nested array in Client Component",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 575,
+                "column": 92,
+                "index": 22819
+            },
+            "line": 575,
+            "code": "  it('should warn in DEV if a special object is passed to a nested array in Client Component', () => {\n    function ClientImpl({\n      value\n    }) {\n      return /*#__PURE__*/React.createElement(\"div\", null, value);\n    }\n    const Client = moduleReference(ClientImpl);\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Client, {\n        value: ['looooong string takes up noise', Math, /*#__PURE__*/React.createElement(\"h1\", null, \"hi\")]\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ' + 'Math objects are not supported.\\n' + '  [..., Math, <h1/>]\\n' + '        ^^^^', {\n      withoutStack: true\n    });\n  });",
+            "file": "ReactFlight-test.js",
+            "skipped": false,
+            "dir": "packages/react-client/src/__tests__"
+        },
+        {
+            "name": "should NOT warn in DEV for key getters",
+            "suites": [
+                "ReactFlight"
+            ],
+            "updatePoint": {
+                "line": 591,
+                "column": 44,
+                "index": 23545
+            },
+            "line": 591,
+            "code": "  it('should NOT warn in DEV for key getters', () => {\n    const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"div\", {\n      key: \"a\"\n    }));\n    ReactNoopFlightClient.read(transport);\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1165,12 +1277,12 @@
                 "ReactFlight"
             ],
             "updatePoint": {
-                "line": 445,
+                "line": 597,
                 "column": 74,
-                "index": 16619
+                "index": 23797
             },
-            "line": 445,
-            "code": "  it('should warn in DEV if a class instance is passed to a host component', () => {\n    class Foo {\n      method() {}\n    }\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: new Foo()\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to client components from server components. ', {\n      withoutStack: true\n    });\n  });",
+            "line": 597,
+            "code": "  it('should warn in DEV if a class instance is passed to a host component', () => {\n    class Foo {\n      method() {}\n    }\n    expect(() => {\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(\"input\", {\n        value: new Foo()\n      }));\n      ReactNoopFlightClient.read(transport);\n    }).toErrorDev('Only plain objects can be passed to Client Components from Server Components. ', {\n      withoutStack: true\n    });\n  });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1182,11 +1294,11 @@
                 "Hooks"
             ],
             "updatePoint": {
-                "line": 467,
+                "line": 619,
                 "column": 28,
-                "index": 17244
+                "index": 24422
             },
-            "line": 467,
+            "line": 619,
             "code": "    it('should support useId', async () => {\n      function App() {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(DivWithId, null), /*#__PURE__*/React.createElement(DivWithId, null));\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(App, null));\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S1:\"\n      }), /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S2:\"\n      })));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1199,11 +1311,11 @@
                 "Hooks"
             ],
             "updatePoint": {
-                "line": 481,
+                "line": 633,
                 "column": 64,
-                "index": 17998
+                "index": 25176
             },
-            "line": 481,
+            "line": 633,
             "code": "    it('accepts an identifier prefix that prefixes generated ids', async () => {\n      function App() {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(DivWithId, null), /*#__PURE__*/React.createElement(DivWithId, null));\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(App, null), {\n        identifierPrefix: 'foo'\n      });\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":fooS1:\"\n      }), /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":fooS2:\"\n      })));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1216,12 +1328,12 @@
                 "Hooks"
             ],
             "updatePoint": {
-                "line": 497,
+                "line": 649,
                 "column": 135,
-                "index": 18872
+                "index": 26050
             },
-            "line": 497,
-            "code": "    it('[TODO] it does not warn if you render a server element passed to a client module reference twice on the client when using useId', async () => {\n      // @TODO Today if you render a server component with useId and pass it to a client component and that client component renders the element in two or more\n      // places the id used on the server will be duplicated in the client. This is a deviation from the guarantees useId makes for Fizz/Client and is a consequence\n      // of the fact that the server component is actually rendered on the server and is reduced to a set of host elements before being passed to the Client component\n      // so the output passed to the Client has no knowledge of the useId use. In the future we would like to add a DEV warning when this happens. For now\n      // we just accept that it is a nuance of useId in Flight\n      function App() {\n        const id = React.useId();\n        const div = /*#__PURE__*/React.createElement(\"div\", {\n          prop: id\n        }, id);\n        return /*#__PURE__*/React.createElement(ClientDoublerModuleRef, {\n          el: div\n        });\n      }\n      function ClientDoubler({\n        el\n      }) {\n        Scheduler.unstable_yieldValue('ClientDoubler');\n        return /*#__PURE__*/React.createElement(React.Fragment, null, el, el);\n      }\n      const ClientDoublerModuleRef = moduleReference(ClientDoubler);\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(App, null));\n      expect(Scheduler).toHaveYielded([]);\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(Scheduler).toHaveYielded(['ClientDoubler']);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S1:\"\n      }, \":S1:\"), /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S1:\"\n      }, \":S1:\")));\n    });",
+            "line": 649,
+            "code": "    it('[TODO] it does not warn if you render a server element passed to a client module reference twice on the client when using useId', async () => {\n      // @TODO Today if you render a Server Component with useId and pass it to a Client Component and that Client Component renders the element in two or more\n      // places the id used on the server will be duplicated in the client. This is a deviation from the guarantees useId makes for Fizz/Client and is a consequence\n      // of the fact that the Server Component is actually rendered on the server and is reduced to a set of host elements before being passed to the Client component\n      // so the output passed to the Client has no knowledge of the useId use. In the future we would like to add a DEV warning when this happens. For now\n      // we just accept that it is a nuance of useId in Flight\n      function App() {\n        const id = React.useId();\n        const div = /*#__PURE__*/React.createElement(\"div\", {\n          prop: id\n        }, id);\n        return /*#__PURE__*/React.createElement(ClientDoublerModuleRef, {\n          el: div\n        });\n      }\n      function ClientDoubler({\n        el\n      }) {\n        Scheduler.unstable_yieldValue('ClientDoubler');\n        return /*#__PURE__*/React.createElement(React.Fragment, null, el, el);\n      }\n      const ClientDoublerModuleRef = moduleReference(ClientDoubler);\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(App, null));\n      expect(Scheduler).toHaveYielded([]);\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(Scheduler).toHaveYielded(['ClientDoubler']);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S1:\"\n      }, \":S1:\"), /*#__PURE__*/React.createElement(\"div\", {\n        prop: \":S1:\"\n      }, \":S1:\")));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
@@ -1233,11 +1345,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 534,
+                "line": 686,
                 "column": 48,
-                "index": 20839
+                "index": 28017
             },
-            "line": 534,
+            "line": 686,
             "code": "    it('supports basic createServerContext usage', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'hello from server');\n      function Foo() {\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"div\", null, context);\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"div\", null, \"hello from server\"));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1250,11 +1362,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 550,
+                "line": 702,
                 "column": 52,
-                "index": 21624
+                "index": 28802
             },
-            "line": 550,
+            "line": 702,
             "code": "    it('propagates ServerContext providers in flight', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n      function Foo() {\n        return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null)));\n      }\n      function Bar() {\n        const context = React.useContext(ServerContext);\n        return context;\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"div\", null, \"hi this is server\"));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1267,11 +1379,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 571,
+                "line": 723,
                 "column": 65,
-                "index": 22611
+                "index": 29789
             },
-            "line": 571,
+            "line": 723,
             "code": "    it('errors if you try passing JSX through ServerContext value', () => {\n      const ServerContext = React.createServerContext('ServerContext', {\n        foo: {\n          bar: /*#__PURE__*/React.createElement(\"span\", null, \"hi this is default\")\n        }\n      });\n      function Foo() {\n        return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: {\n            foo: {\n              bar: /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\")\n            }\n          }\n        }, /*#__PURE__*/React.createElement(Bar, null)));\n      }\n      function Bar() {\n        const context = React.useContext(ServerContext);\n        return context.foo.bar;\n      }\n      expect(() => {\n        ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      }).toErrorDev('React elements are not allowed in ServerContext', {\n        withoutStack: true\n      });\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1284,11 +1396,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 598,
+                "line": 750,
                 "column": 70,
-                "index": 23621
+                "index": 30799
             },
-            "line": 598,
+            "line": 750,
             "code": "    it('propagates ServerContext and cleans up the providers in flight', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n      function Foo() {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer\"\n        }, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server outer2\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n      function Bar() {\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"span\", null, context);\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      await act(async () => {\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server2\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer\"), /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server outer2\"), /*#__PURE__*/React.createElement(\"span\", null, \"default\")));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1301,11 +1413,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 623,
+                "line": 775,
                 "column": 69,
-                "index": 25429
+                "index": 32607
             },
-            "line": 623,
+            "line": 775,
             "code": "    it('propagates ServerContext providers in flight after suspending', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n      function Foo() {\n        return /*#__PURE__*/React.createElement(\"div\", null, /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(React.Suspense, {\n          fallback: 'Loading'\n        }, /*#__PURE__*/React.createElement(Bar, null))));\n      }\n      let resolve;\n      const promise = new Promise(res => {\n        resolve = () => {\n          promise.unsuspend = true;\n          res();\n        };\n      });\n      function Bar() {\n        if (!promise.unsuspend) {\n          Scheduler.unstable_yieldValue('suspended');\n          throw promise;\n        }\n        Scheduler.unstable_yieldValue('rendered');\n        const context = React.useContext(ServerContext);\n        return context;\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Foo, null));\n      expect(Scheduler).toHaveYielded(['suspended']);\n      await act(async () => {\n        resolve();\n        await promise;\n        jest.runAllImmediates();\n      });\n      expect(Scheduler).toHaveYielded(['rendered']);\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        ReactNoop.render(await ReactNoopFlightClient.read(transport));\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"div\", null, \"hi this is server\"));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1318,11 +1430,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 665,
+                "line": 817,
                 "column": 42,
-                "index": 27044
+                "index": 34222
             },
-            "line": 665,
+            "line": 817,
             "code": "    it('serializes ServerContext to client', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n      function ClientBar() {\n        Scheduler.unstable_yieldValue('ClientBar');\n        const context = React.useContext(ServerContext);\n        return /*#__PURE__*/React.createElement(\"span\", null, context);\n      }\n      const Bar = moduleReference(ClientBar);\n      function Foo() {\n        return /*#__PURE__*/React.createElement(ServerContext.Provider, {\n          value: \"hi this is server\"\n        }, /*#__PURE__*/React.createElement(Bar, null));\n      }\n      const model = {\n        foo: /*#__PURE__*/React.createElement(Foo, null)\n      };\n      const transport = ReactNoopFlightServer.render(model);\n      expect(Scheduler).toHaveYielded([]);\n      await act(async () => {\n        ServerContext._currentRenderer = null;\n        ServerContext._currentRenderer2 = null;\n        const flightModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render(flightModel.foo);\n      });\n      expect(Scheduler).toHaveYielded(['ClientBar']);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"hi this is server\"));\n      expect(() => {\n        React.createServerContext('ServerContext', 'default');\n      }).toThrow('ServerContext: ServerContext already defined');\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1335,11 +1447,11 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 697,
+                "line": 849,
                 "column": 68,
-                "index": 28481
+                "index": 35659
             },
-            "line": 697,
+            "line": 849,
             "code": "    it('takes ServerContext from the client for refetching use cases', async () => {\n      const ServerContext = React.createServerContext('ServerContext', 'default');\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"span\", null, React.useContext(ServerContext));\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(Bar, null), {\n        context: [['ServerContext', 'Override']]\n      });\n      await act(async () => {\n        const flightModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render(flightModel);\n      });\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(\"span\", null, \"Override\"));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
@@ -1352,12 +1464,12 @@
                 "ServerContext"
             ],
             "updatePoint": {
-                "line": 713,
+                "line": 865,
                 "column": 74,
-                "index": 29244
+                "index": 36422
             },
-            "line": 713,
-            "code": "    it('sets default initial value when defined lazily on server or client', async () => {\n      let ServerContext;\n      function inlineLazyServerContextInitialization() {\n        if (!ServerContext) {\n          ServerContext = React.createServerContext('ServerContext', 'default');\n        }\n        return ServerContext;\n      }\n      let ClientContext;\n      function inlineContextInitialization() {\n        if (!ClientContext) {\n          ClientContext = React.createServerContext('ServerContext', 'default');\n        }\n        return ClientContext;\n      }\n      function ClientBaz() {\n        const context = inlineContextInitialization();\n        const value = React.useContext(context);\n        return /*#__PURE__*/React.createElement(\"div\", null, value);\n      }\n      const Baz = moduleReference(ClientBaz);\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, React.useContext(inlineLazyServerContextInitialization())), /*#__PURE__*/React.createElement(Baz, null));\n      }\n      function ServerApp() {\n        const Context = inlineLazyServerContextInitialization();\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Context.Provider, {\n          value: \"test\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n      function ClientApp({\n        serverModel\n      }) {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, serverModel, /*#__PURE__*/React.createElement(ClientBaz, null));\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(ServerApp, null));\n      expect(ClientContext).toBe(undefined);\n\n      // Reset all modules, except flight-modules which keeps the registry of client components\n      const flightModules = require('react-noop-renderer/flight-modules');\n      jest.resetModules();\n      jest.mock('react-noop-renderer/flight-modules', () => flightModules);\n      React = require('react');\n      ReactNoop = require('react-noop-renderer');\n      ReactNoopFlightServer = require('react-noop-renderer/flight-server');\n      ReactNoopFlightClient = require('react-noop-renderer/flight-client');\n      act = require('jest-react').act;\n      Scheduler = require('scheduler');\n      await act(async () => {\n        const serverModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render( /*#__PURE__*/React.createElement(ClientApp, {\n          serverModel: serverModel\n        }));\n      });\n      expect(ClientContext).not.toBe(ServerContext);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"test\"), /*#__PURE__*/React.createElement(\"div\", null, \"test\")), /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"default\"), /*#__PURE__*/React.createElement(\"div\", null, \"default\")), /*#__PURE__*/React.createElement(\"div\", null, \"default\")));\n    });",
+            "line": 865,
+            "code": "    it('sets default initial value when defined lazily on server or client', async () => {\n      let ServerContext;\n      function inlineLazyServerContextInitialization() {\n        if (!ServerContext) {\n          ServerContext = React.createServerContext('ServerContext', 'default');\n        }\n        return ServerContext;\n      }\n      let ClientContext;\n      function inlineContextInitialization() {\n        if (!ClientContext) {\n          ClientContext = React.createServerContext('ServerContext', 'default');\n        }\n        return ClientContext;\n      }\n      function ClientBaz() {\n        const context = inlineContextInitialization();\n        const value = React.useContext(context);\n        return /*#__PURE__*/React.createElement(\"div\", null, value);\n      }\n      const Baz = moduleReference(ClientBaz);\n      function Bar() {\n        return /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, React.useContext(inlineLazyServerContextInitialization())), /*#__PURE__*/React.createElement(Baz, null));\n      }\n      function ServerApp() {\n        const Context = inlineLazyServerContextInitialization();\n        return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Context.Provider, {\n          value: \"test\"\n        }, /*#__PURE__*/React.createElement(Bar, null)), /*#__PURE__*/React.createElement(Bar, null));\n      }\n      function ClientApp({\n        serverModel\n      }) {\n        return /*#__PURE__*/React.createElement(React.Fragment, null, serverModel, /*#__PURE__*/React.createElement(ClientBaz, null));\n      }\n      const transport = ReactNoopFlightServer.render( /*#__PURE__*/React.createElement(ServerApp, null));\n      expect(ClientContext).toBe(undefined);\n\n      // Reset all modules, except flight-modules which keeps the registry of Client Components\n      const flightModules = require('react-noop-renderer/flight-modules');\n      jest.resetModules();\n      jest.mock('react-noop-renderer/flight-modules', () => flightModules);\n      React = require('react');\n      ReactNoop = require('react-noop-renderer');\n      ReactNoopFlightServer = require('react-noop-renderer/flight-server');\n      ReactNoopFlightClient = require('react-noop-renderer/flight-client');\n      act = require('jest-react').act;\n      Scheduler = require('scheduler');\n      await act(async () => {\n        const serverModel = await ReactNoopFlightClient.read(transport);\n        ReactNoop.render( /*#__PURE__*/React.createElement(ClientApp, {\n          serverModel: serverModel\n        }));\n      });\n      expect(ClientContext).not.toBe(ServerContext);\n      expect(ReactNoop).toMatchRenderedOutput( /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"test\"), /*#__PURE__*/React.createElement(\"div\", null, \"test\")), /*#__PURE__*/React.createElement(\"article\", null, /*#__PURE__*/React.createElement(\"div\", null, \"default\"), /*#__PURE__*/React.createElement(\"div\", null, \"default\")), /*#__PURE__*/React.createElement(\"div\", null, \"default\")));\n    });",
             "file": "ReactFlight-test.js",
             "skipped": false,
             "dir": "packages/react-client/src/__tests__"
