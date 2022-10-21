@@ -506,7 +506,7 @@
                 "index": 10209
             },
             "line": 290,
-            "code": "  test('postcss-import is supported by default in watch mode', async () => {\n    cleanupFile('src/test.css');\n    await writeInputFile('index.html', html`<div class=\"md:something-cool\"></div>`);\n    await writeInputFile('test.css', css`\n        @import 'tailwindcss/base';\n        @import 'tailwindcss/components';\n        @import 'tailwindcss/utilities';\n        @import './imported.css';\n      `);\n    let runningProcess = $(`${EXECUTABLE} --watch --input ./src/test.css --content ./src/index.html --output ./dist/main.css`);\n    await waitForOutputFileCreation('main.css');\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        @media (min-width: 768px) {\n          .md\\:something-cool {\n            color: red;\n          }\n        }\n      `);\n    return runningProcess.stop();\n  });",
+            "code": "  test('postcss-import is supported by default in watch mode', async () => {\n    cleanupFile('src/test.css');\n    await writeInputFile('index.html', html`<div class=\"md:something-cool\"></div>`);\n    await writeInputFile('test.css', css`\n        @import 'tailwindcss/base';\n        @import 'tailwindcss/components';\n        @import 'tailwindcss/utilities';\n        @import './imported.css';\n      `);\n    let runningProcess = $(`${EXECUTABLE} --watch --input ./src/test.css --content ./src/index.html --output ./dist/main.css`);\n    await waitForOutputFileCreation('main.css');\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        @media (min-width: 768px) {\n          .md\\:something-cool {\n            color: red;\n          }\n        }\n      `);\n    await writeInputFile('imported.css', css`\n        @layer utilities {\n          .something-cool {\n            color: blue;\n          }\n        }\n      `);\n    await runningProcess.onStderr(function ready(message) {\n      return message.includes('Done in');\n    });\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        @media (min-width: 768px) {\n          .md\\:something-cool {\n            color: blue;\n          }\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "cli.test.js",
             "skipped": false,
             "dir": "integrations/tailwindcss-cli/tests"
@@ -517,11 +517,11 @@
                 "Build command"
             ],
             "updatePoint": {
-                "line": 310,
+                "line": 327,
                 "column": 76,
-                "index": 11029
+                "index": 11485
             },
-            "line": 310,
+            "line": 327,
             "code": "  test('postcss-import is included when using a custom postcss configuration', async () => {\n    cleanupFile('src/test.css');\n    await writeInputFile('index.html', html`<div class=\"md:something-cool\"></div>`);\n    await writeInputFile('test.css', css`\n        @import 'tailwindcss/base';\n        @import 'tailwindcss/components';\n        @import 'tailwindcss/utilities';\n        @import './imported.css';\n      `);\n    await $(`${EXECUTABLE} --input ./src/test.css --content ./src/index.html --output ./dist/main.css --postcss`);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        @import './imported.css';\n      `);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -533,11 +533,11 @@
                 "Build command"
             ],
             "updatePoint": {
-                "line": 324,
+                "line": 341,
                 "column": 14,
-                "index": 11611
+                "index": 12067
             },
-            "line": 324,
+            "line": 341,
             "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss build [options]\n\n        Options:\n           -i, --input              Input file\n           -o, --output             Output file\n           -w, --watch              Watch for changes and rebuild as needed\n           -p, --poll               Use polling instead of filesystem events when watching\n               --content            Content paths to use for removing unused classes\n               --postcss            Load custom PostCSS configuration\n           -m, --minify             Minify the output\n           -c, --config             Path to a custom config file\n               --no-autoprefixer    Disable autoprefixer\n           -h, --help               Display usage information\n      `));\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -549,11 +549,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 349,
+                "line": 366,
                 "column": 14,
-                "index": 12568
+                "index": 13024
             },
-            "line": 349,
+            "line": 366,
             "code": "  test('--full', async () => {\n    cleanupFile('full.config.js');\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init full.config.js --full`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: full.config.js\n      \"\n    `);\n\n    // Not a clean way to test this. We could require the file and verify that\n    // multiple keys in `theme` exists. However it loads `tailwindcss/colors`\n    // which doesn't exists in this context.\n    expect((await readOutputFile('../full.config.js')).split('\\n').length).toBeGreaterThan(50);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -565,11 +565,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 365,
+                "line": 382,
                 "column": 17,
-                "index": 13152
+                "index": 13608
             },
-            "line": 365,
+            "line": 382,
             "code": "  test('--postcss', async () => {\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    await removeFile('postcss.config.js');\n    expect(await fileExists('postcss.config.js')).toBe(false);\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --postcss`);\n    expect(await fileExists('postcss.config.js')).toBe(true);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      tailwind.config.js already exists.\n      Created PostCSS config file: postcss.config.js\n      \"\n    `);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -581,11 +581,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 380,
+                "line": 397,
                 "column": 14,
-                "index": 13656
+                "index": 14112
             },
-            "line": 380,
+            "line": 397,
             "code": "  test('--help', async () => {\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.js\\` file\n           -p, --postcss            Initialize a \\`postcss.config.js\\` file\n           -h, --help               Display usage information\n      `));\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -597,11 +597,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 396,
+                "line": 413,
                 "column": 29,
-                "index": 14160
+                "index": 14616
             },
-            "line": 396,
+            "line": 413,
             "code": "  test('--help in ESM package', async () => {\n    let pkg = await readOutputFile('../package.json');\n    await writeInputFile('../package.json', JSON.stringify({\n      ...JSON.parse(pkg),\n      type: 'module'\n    }));\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init --help`);\n    expect(dedent(combined)).toEqual(dedent(`\n        tailwindcss v${version}\n\n        Usage:\n           tailwindcss init [options]\n\n        Options:\n           -f, --full               Initialize a full \\`tailwind.config.cjs\\` file\n           -p, --postcss            Initialize a \\`postcss.config.cjs\\` file\n           -h, --help               Display usage information\n      `));\n    await writeInputFile('../package.json', pkg);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -613,11 +613,11 @@
                 "Init command"
             ],
             "updatePoint": {
-                "line": 418,
+                "line": 435,
                 "column": 46,
-                "index": 14905
+                "index": 15361
             },
-            "line": 418,
+            "line": 435,
             "code": "  test('cjs config created when in ESM package', async () => {\n    cleanupFile('tailwind.config.cjs');\n    let pkg = await readOutputFile('../package.json');\n    await writeInputFile('../package.json', JSON.stringify({\n      ...JSON.parse(pkg),\n      type: 'module'\n    }));\n    let {\n      combined\n    } = await $(`${EXECUTABLE} init`);\n    expect(combined).toMatchInlineSnapshot(`\n      \"\n      Created Tailwind CSS config file: tailwind.config.cjs\n      \"\n    `);\n    expect(await fileExists('./tailwind.config.cjs')).toBe(true);\n\n    // Not a clean way to test this.\n    expect(await readOutputFile('../tailwind.config.cjs')).toContain('module.exports =');\n    await writeInputFile('../package.json', pkg);\n  });",
             "file": "cli.test.js",
             "skipped": false,
@@ -795,6 +795,22 @@
             },
             "line": 386,
             "code": "  test('listens for changes to the @config directive', async () => {\n    await writeInputFile('index.html', html`<div class=\"bg-yellow\"></div>`);\n    await writeInputFile('index.css', css`\n        @config \"./tailwind.config.js\";\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await writeInputFile('tailwind.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#ff0',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    await writeInputFile('tailwind.2.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#ff7',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 0 / var(--tw-bg-opacity));\n        }\n      `);\n    await writeInputFile('index.css', css`\n        @config \"./tailwind.2.config.js\";\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 119 / var(--tw-bg-opacity));\n        }\n      `);\n    await writeInputFile('tailwind.2.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#fff',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 255 / var(--tw-bg-opacity));\n        }\n      `);\n    return runningProcess.stop();\n  });",
+            "file": "integration.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
+            "name": "classes are generated (and kept) when the index.html file changes (and removed when css/config files are changed)",
+            "suites": [
+                "watcher"
+            ],
+            "updatePoint": {
+                "line": 478,
+                "column": 121,
+                "index": 14283
+            },
+            "line": 478,
+            "code": "  test('classes are generated (and kept) when the index.html file changes (and removed when css/config files are changed)', async () => {\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n\n    // Start with a simple single class\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Add another class\n    await writeInputFile('index.html', html`<div class=\"flex font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Remove a class, because of performance reasons both classes will still be in the css file\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Save the index.css file, this should trigger a fresh context\n    await writeInputFile('index.css', css`\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await runningProcess.onStderr(ready);\n\n    // Only 1 class should stay, because we started from scratch\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Add another class\n    await writeInputFile('index.html', html`<div class=\"flex font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Remove a class, because of performance reasons both classes will still be in the css file\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n\n    // If everything goes right, then both classes should still be here (because of the performance\n    // improvement). If we didn't solve the bug where from now on every save is a fresh context\n    // then this only has 1 class. So let's hope there are 2!\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
             "dir": "integrations/tailwindcss-cli/tests"

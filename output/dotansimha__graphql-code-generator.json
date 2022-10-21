@@ -12520,7 +12520,7 @@
                 "column": 23
             },
             "line": 24,
-            "code": "  it('support v4 syntax', async () => {\n    const config = {\n      useTypeImports: true,\n      legacyMode: false,\n      addInfiniteQuery: true,\n    };\n\n    const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n    expect(out.prepend).toEqual([\n      `import { useQuery, useInfiniteQuery, useMutation, type UseQueryOptions, type UseInfiniteQueryOptions, type UseMutationOptions } from '@tanstack/react-query';`,\n      `\nfunction fetcher<TData, TVariables>(endpoint: string, requestInit: RequestInit, query: string, variables?: TVariables) {\n  return async (): Promise<TData> => {\n    const res = await fetch(endpoint, {\n      method: 'POST',\n      ...requestInit,\n      body: JSON.stringify({ query, variables }),\n    });\n\n    const json = await res.json();\n\n    if (json.errors) {\n      const { message } = json.errors[0];\n\n      throw new Error(message);\n    }\n\n    return json.data;\n  }\n}`,\n    ]);\n    expect(out.content).toEqual(`\nexport const TestDocument = \\`\n    query test {\n  feed {\n    id\n    commentCount\n    repository {\n      full_name\n      html_url\n      owner {\n        avatar_url\n      }\n    }\n  }\n}\n    \\`;\nexport const useTestQuery = <\n      TData = TestQuery,\n      TError = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      variables?: TestQueryVariables,\n      options?: UseQueryOptions<TestQuery, TError, TData>\n    ) =>\n    useQuery<TestQuery, TError, TData>(\n      variables === undefined ? ['test'] : ['test', variables],\n      fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables),\n      options\n    );\nexport const useInfiniteTestQuery = <\n      TData = TestQuery,\n      TError = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      _pageParamKey: keyof TestQueryVariables,\n      variables?: TestQueryVariables,\n      options?: UseInfiniteQueryOptions<TestQuery, TError, TData>\n    ) =>\n    useInfiniteQuery<TestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, {...variables, ...(metaData.pageParam ?? {})})(),\n      options\n    );\n\nexport const TestDocument = \\`\n    mutation test($name: String) {\n  submitRepository(repoFullName: $name) {\n    id\n  }\n}\n    \\`;\nexport const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      options?: UseMutationOptions<TestMutation, TError, TestMutationVariables, TContext>\n    ) =>\n    useMutation<TestMutation, TError, TestMutationVariables, TContext>(\n      ['test'],\n      (variables?: TestMutationVariables) => fetcher<TestMutation, TestMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables)(),\n      options\n    );`);\n  });",
+            "code": "  it('support v4 syntax', async () => {\n    const config = {\n      useTypeImports: true,\n      legacyMode: false,\n      addInfiniteQuery: true,\n    };\n\n    const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n    expect(out.prepend).toEqual([\n      `import { useQuery, useInfiniteQuery, useMutation, type UseQueryOptions, type UseInfiniteQueryOptions, type UseMutationOptions } from '@tanstack/react-query';`,\n      `\nfunction fetcher<TData, TVariables>(endpoint: string, requestInit: RequestInit, query: string, variables?: TVariables) {\n  return async (): Promise<TData> => {\n    const res = await fetch(endpoint, {\n      method: 'POST',\n      ...requestInit,\n      body: JSON.stringify({ query, variables }),\n    });\n\n    const json = await res.json();\n\n    if (json.errors) {\n      const { message } = json.errors[0];\n\n      throw new Error(message);\n    }\n\n    return json.data;\n  }\n}`,\n    ]);\n    expect(out.content).toEqual(`\nexport const TestDocument = \\`\n    query test {\n  feed {\n    id\n    commentCount\n    repository {\n      full_name\n      html_url\n      owner {\n        avatar_url\n      }\n    }\n  }\n}\n    \\`;\nexport const useTestQuery = <\n      TData = TestQuery,\n      TError = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      variables?: TestQueryVariables,\n      options?: UseQueryOptions<TestQuery, TError, TData>\n    ) =>\n    useQuery<TestQuery, TError, TData>(\n      variables === undefined ? ['test'] : ['test', variables],\n      fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables),\n      options\n    );\nexport const useInfiniteTestQuery = <\n      TData = TestQuery,\n      TError = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      pageParamKey: keyof TestQueryVariables,\n      variables?: TestQueryVariables,\n      options?: UseInfiniteQueryOptions<TestQuery, TError, TData>\n    ) =>\n    useInfiniteQuery<TestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, {...variables, [pageParamKey]: metaData.pageParam })(),\n      options\n    );\n\nexport const TestDocument = \\`\n    mutation test($name: String) {\n  submitRepository(repoFullName: $name) {\n    id\n  }\n}\n    \\`;\nexport const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(\n      dataSource: { endpoint: string, fetchParams?: RequestInit },\n      options?: UseMutationOptions<TestMutation, TError, TestMutationVariables, TContext>\n    ) =>\n    useMutation<TestMutation, TError, TestMutationVariables, TContext>(\n      ['test'],\n      (variables?: TestMutationVariables) => fetcher<TestMutation, TestMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables)(),\n      options\n    );`);\n  });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12566,7 +12566,7 @@
                 "column": 60
             },
             "line": 234,
-            "code": "    it('Should generate query correctly with external mapper', async () => {\n      const config = {\n        fetcher: './my-file#myCustomFetcher',\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n\n      expect(out.prepend).toContain(`import { myCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n    return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, {...variables, ...(metaData.pageParam ?? {})})(),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "code": "    it('Should generate query correctly with external mapper', async () => {\n      const config = {\n        fetcher: './my-file#myCustomFetcher',\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n\n      expect(out.prepend).toContain(`import { myCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      pageParamKey: keyof TTestQueryVariables,\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n    return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, {...variables, [pageParamKey]: metaData.pageParam })(),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12578,10 +12578,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 288,
+                "line": 289,
                 "column": 60
             },
-            "line": 288,
+            "line": 289,
             "code": "    it('Should generate query correctly with internal mapper', async () => {\n      const config = {\n        fetcher: 'myCustomFetcher',\n        typesPrefix: 'T',\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        myCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => myCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12594,11 +12594,11 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 327,
+                "line": 328,
                 "column": 62
             },
-            "line": 327,
-            "code": "    it('Should generate mutation correctly with lazy variables', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { useCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument).bind(null, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n      const query = useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument)\n      return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => query({...variables, ...(metaData.pageParam ?? {})}),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        useCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
+            "line": 328,
+            "code": "    it('Should generate mutation correctly with lazy variables', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        typesPrefix: 'T',\n        addInfiniteQuery: true,\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useInfiniteQuery, useMutation, UseQueryOptions, UseInfiniteQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { useCustomFetcher } from './my-file';`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n          TData = TTestQuery,\n          TError = unknown\n        >(\n          variables?: TTestQueryVariables,\n          options?: UseQueryOptions<TTestQuery, TError, TData>\n        ) =>\n        useQuery<TTestQuery, TError, TData>(\n          variables === undefined ? ['test'] : ['test', variables],\n          useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument).bind(null, variables),\n          options\n        );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useInfiniteTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      pageParamKey: keyof TTestQueryVariables,\n      variables?: TTestQueryVariables,\n      options?: UseInfiniteQueryOptions<TTestQuery, TError, TData>\n    ) =>{\n      const query = useCustomFetcher<TTestQuery, TTestQueryVariables>(TestDocument)\n      return useInfiniteQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test.infinite'] : ['test.infinite', variables],\n      (metaData) => query({...variables, [pageParamKey]: metaData.pageParam }),\n      options\n    )};`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        useCustomFetcher<TTestMutation, TTestMutationVariables>(TestDocument),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/react-query/tests"
@@ -12610,10 +12610,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 384,
+                "line": 386,
                 "column": 37
             },
-            "line": 384,
+            "line": 386,
             "code": "    it('Should support useTypeImports', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#customFetcher',\n        },\n        useTypeImports: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(`import type { customFetcher } from './my-file';`);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12626,10 +12626,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 397,
+                "line": 399,
                 "column": 99
             },
-            "line": 397,
+            "line": 399,
             "code": "    it(\"Should generate fetcher field when exposeFetcher is true and the fetcher isn't a react hook\", async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#customFetcher',\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (variables?: TestQueryVariables, options?: RequestInit['headers']) => customFetcher<TestQuery, TestQueryVariables>(TestDocument, variables, options);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12642,10 +12642,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 411,
+                "line": 413,
                 "column": 100
             },
-            "line": 411,
+            "line": 413,
             "code": "    it('Should NOT generate fetcher field when exposeFetcher is true and the fetcher IS a react hook', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).not.toBeSimilarStringTo(`useTestQuery.fetcher`);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12658,10 +12658,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 424,
+                "line": 426,
                 "column": 108
             },
-            "line": 424,
+            "line": 426,
             "code": "    it(\"Should generate mutation fetcher field when exposeFetcher is true and the fetcher isn't a react hook\", async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#customFetcher',\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestMutation.fetcher = (variables?: TestMutationVariables, options?: RequestInit['headers']) => customFetcher<TestMutation, TestMutationVariables>(TestDocument, variables, options);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12674,10 +12674,10 @@
                 "fetcher: custom-mapper"
             ],
             "updatePoint": {
-                "line": 438,
+                "line": 440,
                 "column": 109
             },
-            "line": 438,
+            "line": 440,
             "code": "    it('Should NOT generate mutation fetcher field when exposeFetcher is true and the fetcher IS a react hook', async () => {\n      const config = {\n        fetcher: {\n          func: './my-file#useCustomFetcher',\n          isReactHook: true,\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).not.toBeSimilarStringTo(`useTestMutation.fetcher`);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12691,10 +12691,10 @@
                 "exposeMutationKeys: true"
             ],
             "updatePoint": {
-                "line": 452,
+                "line": 454,
                 "column": 50
             },
-            "line": 452,
+            "line": 454,
             "code": "      it('Should generate getKey for each mutation', async () => {\n        const config = {\n          fetcher: 'fetch',\n          exposeMutationKeys: true,\n        };\n        const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n        expect(out.content).toBeSimilarStringTo(`useTestMutation.getKey = () => ['test']\\n`);\n      });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12708,10 +12708,10 @@
                 "exposeMutationKeys: true"
             ],
             "updatePoint": {
-                "line": 462,
+                "line": 464,
                 "column": 39
             },
-            "line": 462,
+            "line": 464,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: 'myCustomFetcher',\n        typesPrefix: 'T',\n        outputFile: '',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12724,10 +12724,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 570,
+                "line": 572,
                 "column": 51
             },
-            "line": 570,
+            "line": 572,
             "code": "    it('Should generate query correctly with client', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        typesPrefix: 'T',\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend).toContain(`import { GraphQLClient } from 'graphql-request';`);\n      expect(out.prepend).toContain(`import { RequestInit } from 'graphql-request/dist/types.dom';`);\n      expect(out.prepend[3])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(client: GraphQLClient, query: string, variables?: TVariables, headers?: RequestInit['headers']) {\n          return async (): Promise<TData> => client.request<TData, TVariables>(query, variables, headers);\n        }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n      TData = TTestQuery,\n      TError = unknown\n    >(\n      client: GraphQLClient,\n      variables?: TTestQueryVariables,\n      options?: UseQueryOptions<TTestQuery, TError, TData>,\n      headers?: RequestInit['headers']\n    ) =>\n    useQuery<TTestQuery, TError, TData>(\n      variables === undefined ? ['test'] : ['test', variables],\n      fetcher<TTestQuery, TTestQueryVariables>(client, TestDocument, variables, headers),\n      options\n    );`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n      TError = unknown,\n      TContext = unknown\n    >(\n      client: GraphQLClient,\n      options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>,\n      headers?: RequestInit['headers']\n    ) =>\n    useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n      ['test'],\n      (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(client, TestDocument, variables, headers)(),\n      options\n    );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12740,10 +12740,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 619,
+                "line": 621,
                 "column": 37
             },
-            "line": 619,
+            "line": 621,
             "code": "    it('Should support useTypeImports', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        useTypeImports: true,\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(`import type { GraphQLClient } from 'graphql-request';`);\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from 'react-query';`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12756,10 +12756,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 633,
+                "line": 635,
                 "column": 64
             },
-            "line": 633,
+            "line": 635,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        fetcher: 'graphql-request',\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (client: GraphQLClient, variables?: TestQueryVariables, headers?: RequestInit['headers']) => fetcher<TestQuery, TestQueryVariables>(client, TestDocument, variables, headers);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12772,10 +12772,10 @@
                 "fetcher: graphql-request"
             ],
             "updatePoint": {
-                "line": 644,
+                "line": 646,
                 "column": 39
             },
-            "line": 644,
+            "line": 646,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: 'graphql-request',\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12788,10 +12788,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 751,
+                "line": 753,
                 "column": 63
             },
-            "line": 751,
+            "line": 753,
             "code": "    it('Should generate query correctly with hardcoded endpoint', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n        },\n        typesPrefix: 'T',\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(\"http://localhost:3000/graphql\", {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n        TError = unknown,\n        TContext = unknown\n      >(options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>) =>\n      useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n        ['test'],\n        (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(TestDocument, variables)(),\n        options\n      );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12804,10 +12804,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 811,
+                "line": 813,
                 "column": 57
             },
-            "line": 811,
+            "line": 813,
             "code": "    it('Should generate query correctly with fetch config', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n          fetchParams: JSON.stringify({\n            headers: {\n              Authorization: 'Bearer XYZ',\n            },\n          }),\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1]).toMatchInlineSnapshot(`\n        \"\n        function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n          return async (): Promise<TData> => {\n            const res = await fetch(\"http://localhost:3000/graphql\", {\n            method: \"POST\",\n            ...({\"headers\":{\"Authorization\":\"Bearer XYZ\"}}),\n              body: JSON.stringify({ query, variables }),\n            });\n\n            const json = await res.json();\n\n            if (json.errors) {\n              const { message } = json.errors[0];\n\n              throw new Error(message);\n            }\n\n            return json.data;\n          }\n        }\"\n      `);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12820,10 +12820,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 853,
+                "line": 855,
                 "column": 80
             },
-            "line": 853,
+            "line": 855,
             "code": "    it('Should generate query correctly with fetch config and fetchParams object', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n          fetchParams: {\n            headers: {\n              Authorization: 'Bearer XYZ',\n            },\n          },\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1]).toMatchInlineSnapshot(`\n        \"\n        function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n          return async (): Promise<TData> => {\n            const res = await fetch(\"http://localhost:3000/graphql\", {\n            method: \"POST\",\n            ...({\"headers\":{\"Authorization\":\"Bearer XYZ\"}}),\n              body: JSON.stringify({ query, variables }),\n            });\n\n            const json = await res.json();\n\n            if (json.errors) {\n              const { message } = json.errors[0];\n\n              throw new Error(message);\n            }\n\n            return json.data;\n          }\n        }\"\n      `);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12836,10 +12836,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 895,
+                "line": 897,
                 "column": 76
             },
-            "line": 895,
+            "line": 897,
             "code": "    it('Should generate query correctly with hardcoded endpoint from env var', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'process.env.ENDPOINT_URL',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(process.env.ENDPOINT_URL as string, {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12852,10 +12852,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 929,
+                "line": 931,
                 "column": 84
             },
-            "line": 929,
+            "line": 931,
             "code": "    it('Should generate query correctly with hardcoded endpoint from just identifier', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'myEndpoint',\n        },\n        typesPrefix: 'T',\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend[1])\n        .toBeSimilarStringTo(`    function fetcher<TData, TVariables>(query: string, variables?: TVariables) {\n        return async (): Promise<TData> => {\n          const res = await fetch(myEndpoint as string, {\n            method: \"POST\",\n            body: JSON.stringify({ query, variables }),\n          });\n\n          const json = await res.json();\n\n          if (json.errors) {\n            const { message } = json.errors[0];\n\n            throw new Error(message);\n          }\n\n          return json.data;\n        }\n      }`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12868,10 +12868,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 963,
+                "line": 965,
                 "column": 64
             },
-            "line": 963,
+            "line": 965,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        fetcher: {\n          endpoint: 'myEndpoint',\n        },\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (variables?: TestQueryVariables) => fetcher<TestQuery, TestQueryVariables>(TestDocument, variables);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12884,10 +12884,10 @@
                 "fetcher: hardcoded-fetch"
             ],
             "updatePoint": {
-                "line": 977,
+                "line": 979,
                 "column": 39
             },
-            "line": 977,
+            "line": 979,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: {\n          endpoint: 'http://localhost:3000/graphql',\n        },\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12900,10 +12900,10 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 1086,
+                "line": 1088,
                 "column": 52
             },
-            "line": 1086,
+            "line": 1088,
             "code": "    it('Should generate query and mutation correctly', async () => {\n      const config = {\n        fetcher: 'fetch',\n        typesPrefix: 'T',\n        legacyMode: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n\n      expect(out.prepend).toContain(\n        `import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from 'react-query';`\n      );\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestQuery = <\n        TData = TTestQuery,\n        TError = unknown\n      >(\n        dataSource: { endpoint: string, fetchParams?: RequestInit },\n        variables?: TTestQueryVariables,\n        options?: UseQueryOptions<TTestQuery, TError, TData>\n      ) =>\n      useQuery<TTestQuery, TError, TData>(\n        variables === undefined ? ['test'] : ['test', variables],\n        fetcher<TTestQuery, TTestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables),\n        options\n      );`);\n\n      expect(out.content).toBeSimilarStringTo(`export const useTestMutation = <\n          TError = unknown,\n          TContext = unknown\n        >(\n          dataSource: { endpoint: string, fetchParams?: RequestInit },\n          options?: UseMutationOptions<TTestMutation, TError, TTestMutationVariables, TContext>\n        ) =>\n        useMutation<TTestMutation, TError, TTestMutationVariables, TContext>(\n          ['test'],\n          (variables?: TTestMutationVariables) => fetcher<TTestMutation, TTestMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables)(),\n          options\n        );`);\n\n      expect(out.content).toMatchSnapshot();\n      await validateTypeScript(mergeOutputs(out), schema, docs, config);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12916,10 +12916,10 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 1130,
+                "line": 1132,
                 "column": 64
             },
-            "line": 1130,
+            "line": 1132,
             "code": "    it('Should generate fetcher field when exposeFetcher is true', async () => {\n      const config = {\n        exposeFetcher: true,\n      };\n\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables?: TestQueryVariables) => fetcher<TestQuery, TestQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, TestDocument, variables);`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12932,10 +12932,10 @@
                 "fetcher: fetch"
             ],
             "updatePoint": {
-                "line": 1141,
+                "line": 1143,
                 "column": 39
             },
-            "line": 1141,
+            "line": 1143,
             "code": "    it(`tests for dedupeOperationSuffix`, async () => {\n      const ast = parse(/* GraphQL */ `\n        query notificationsQuery {\n          notifications {\n            id\n          }\n        }\n      `);\n      const ast2 = parse(/* GraphQL */ `\n        query notifications {\n          notifications {\n            id\n          }\n        }\n      `);\n      const config = {\n        fetcher: 'fetch',\n        typesPrefix: 'T',\n      };\n\n      expect(\n        ((await plugin(schema, [{ location: 'test-file.ts', document: ast }], {}, config)) as any).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQueryQuery, NotificationsQueryQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQueryQuery = ');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: true },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('fetcher<NotificationsQuery, NotificationsQueryVariables>');\n      expect(\n        (\n          (await plugin(\n            schema,\n            [{ location: 'test-file.ts', document: ast2 }],\n            { dedupeOperationSuffix: false },\n            config\n          )) as any\n        ).content\n      ).toContain('export const useNotificationsQuery =');\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12948,10 +12948,10 @@
                 "exposeDocument: true"
             ],
             "updatePoint": {
-                "line": 1248,
+                "line": 1250,
                 "column": 53
             },
-            "line": 1248,
+            "line": 1250,
             "code": "    it('Should generate document field for each query', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeDocument: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(`useTestQuery.document = TestDocument;`);\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12964,10 +12964,10 @@
                 "exposeQueryKeys: true"
             ],
             "updatePoint": {
-                "line": 1259,
+                "line": 1261,
                 "column": 45
             },
-            "line": 1259,
+            "line": 1261,
             "code": "    it('Should generate getKey for each query', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeQueryKeys: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test'] : ['test', variables];`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12980,10 +12980,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1272,
+                "line": 1274,
                 "column": 69
             },
-            "line": 1272,
+            "line": 1274,
             "code": "    it('Should generate getKey for each query - also infinite queries', async () => {\n      const config = {\n        fetcher: 'fetch',\n        exposeQueryKeys: true,\n        addInfiniteQuery: true,\n      };\n      const out = (await plugin(schema, docs, config)) as Types.ComplexPluginOutput;\n      expect(out.content).toBeSimilarStringTo(\n        `useTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test'] : ['test', variables];`\n      );\n      expect(out.content).toBeSimilarStringTo(\n        `useInfiniteTestQuery.getKey = (variables?: TestQueryVariables) => variables === undefined ? ['test.infinite'] : ['test.infinite', variables];`\n      );\n    });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -12996,10 +12996,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1288,
+                "line": 1290,
                 "column": 60
             },
-            "line": 1288,
+            "line": 1290,
             "code": "  it('Should not generate fetcher if there are no operations', async () => {\n    const out = (await plugin(schema, notOperationDocs, {})) as Types.ComplexPluginOutput;\n    expect(out.prepend).not.toBeSimilarStringTo(`function fetcher<TData, TVariables>(`);\n\n    const config = {\n      fetcher: 'graphql-request',\n    };\n\n    const outGraphqlRequest = (await plugin(schema, notOperationDocs, config)) as Types.ComplexPluginOutput;\n    expect(outGraphqlRequest.prepend).not.toContain(`import { GraphQLClient } from 'graphql-request';`);\n  });",
             "file": "react-query.spec.ts",
             "skipped": false,
@@ -13012,10 +13012,10 @@
                 "exposeQueryKeys: true, addInfiniteQuery: true"
             ],
             "updatePoint": {
-                "line": 1300,
+                "line": 1302,
                 "column": 44
             },
-            "line": 1300,
+            "line": 1302,
             "code": "  it('Parses process.env variables correctly', async () => {\n    const outGraphqlRequest = (await plugin(schema, docs, {\n      fetcher: {\n        endpoint: 'process.env.ENDPOINT',\n        fetchParams: `\n          {\n            headers: {\n              apiKey: process.env.APIKEY as string,\n              somethingElse: process.env.SOMETHING as string\n            },\n          }`,\n      },\n    })) as Types.ComplexPluginOutput;\n\n    expect(outGraphqlRequest.prepend).toBeSimilarStringTo(`\n    const res = await fetch(process.env.ENDPOINT as string, {\n      method: \"POST\", ...(\n                {\n                  headers: {\n                    apiKey: process.env.APIKEY as string,\n                    somethingElse: process.env.SOMETHING as string\n                  },\n                }),\n            body: JSON.stringify({ query, variables }),\n          });\n    `);\n  });",
             "file": "react-query.spec.ts",
             "skipped": false,
