@@ -6388,12 +6388,12 @@
                 "Block"
             ],
             "updatePoint": {
-                "line": 19,
+                "line": 21,
                 "column": 28,
-                "index": 501
+                "index": 556
             },
-            "line": 19,
-            "code": "  it('有一个空的占位元素，并且 slot 能够使用', async () => {\n    class App extends React.Component {\n      render() {\n        return /*#__PURE__*/React.createElement(Block, null, /*#__PURE__*/React.createElement(\"div\", null), /*#__PURE__*/React.createElement(\"div\", null));\n      }\n    }\n    ReactDOM.render( /*#__PURE__*/React.createElement(App, null), scratch);\n    expect(scratch.childNodes.length).toBe(2);\n  });",
+            "line": 21,
+            "code": "  it('有一个空的占位元素，并且 slot 能够使用', async () => {\n    class App extends React.Component {\n      render() {\n        return /*#__PURE__*/React.createElement(Block, null, /*#__PURE__*/React.createElement(\"div\", null), /*#__PURE__*/React.createElement(\"div\", null));\n      }\n    }\n    ReactDOMClient.createRoot(scratch).render( /*#__PURE__*/React.createElement(App, null));\n    await waitForChange(scratch);\n    expect(scratch.childNodes.length).toBe(2);\n  });",
             "file": "block.spec.js",
             "skipped": false,
             "dir": "packages/taro-components/__tests__"
@@ -6409,7 +6409,7 @@
                 "index": 749
             },
             "line": 28,
-            "code": "  it('props', async () => {\n    const size = 'mini';\n    const plain = true;\n    const loading = true;\n    const disabled = false;\n    class App extends React.Component {\n      state = {\n        size,\n        plain,\n        loading,\n        disabled\n      };\n      render() {\n        const {\n          size,\n          plain,\n          loading,\n          disabled\n        } = this.state;\n        return /*#__PURE__*/React.createElement(Button, {\n          size: size,\n          plain: plain,\n          loading: loading,\n          disabled: disabled\n        }, \"button\");\n      }\n    }\n    const wrapper = await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n    const node = wrapper.node;\n    assert(!node.type); /** local: '', ci: undefined */\n    assert(node.plain === true);\n    assert(node.loading === true);\n    assert(node.size === 'mini');\n    assert(node.disabled === false);\n    await delay(3000);\n    const icon = node.getElementsByTagName('i')[0];\n    assert(icon.className === 'weui-loading');\n    assert(node.textContent === 'button');\n    wrapper.setState({\n      plain: false\n    });\n    assert(node.plain === false);\n    wrapper.setState({\n      loading: false\n    });\n    await waitForChange(icon);\n    assert(node.loading === false);\n    assert(icon.parentNode === null);\n    wrapper.setState({\n      disabled: true\n    });\n    assert(node.disabled === true);\n    wrapper.setState({\n      size: 'big'\n    });\n    assert(node.size === 'big');\n  });",
+            "code": "  it('props', async () => {\n    const size = 'mini';\n    const plain = true;\n    const loading = true;\n    const disabled = false;\n    class App extends React.Component {\n      state = {\n        size,\n        plain,\n        loading,\n        disabled\n      };\n      render() {\n        const {\n          size,\n          plain,\n          loading,\n          disabled\n        } = this.state;\n        return /*#__PURE__*/React.createElement(Button, {\n          size: size,\n          plain: plain,\n          loading: loading,\n          disabled: disabled\n        }, \"button\");\n      }\n    }\n    const wrapper = await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n    const node = wrapper.node;\n    assert(!node.type); /** local: '', ci: undefined */\n    assert(node.plain === true);\n    assert(node.loading === true);\n    assert(node.size === 'mini');\n    assert(node.disabled === false);\n    await delay(3000);\n    const icon = node.getElementsByTagName('i')[0];\n    assert(icon.className === 'weui-loading');\n    assert(node.textContent === 'button');\n    wrapper.setState({\n      plain: false\n    });\n    await waitForChange(node);\n    assert(node.plain === false);\n    wrapper.setState({\n      loading: false\n    });\n    await waitForChange(icon);\n    assert(node.loading === false);\n    assert(icon.parentNode === null);\n    wrapper.setState({\n      disabled: true\n    });\n    await waitForChange(node);\n    assert(node.disabled === true);\n    wrapper.setState({\n      size: 'big'\n    });\n    await waitForChange(node);\n    assert(node.size === 'big');\n  });",
             "file": "button.spec.js",
             "skipped": false,
             "dir": "packages/taro-components/__tests__"
@@ -6420,11 +6420,11 @@
                 "Button"
             ],
             "updatePoint": {
-                "line": 85,
+                "line": 88,
                 "column": 11,
-                "index": 2229
+                "index": 2322
             },
-            "line": 85,
+            "line": 88,
             "code": "  it('event', async () => {\n    const clickSpy = sinon.spy();\n    const touchStartSpy = sinon.spy();\n    const touchEndSpy = sinon.spy();\n    const hoverStartTime = 50;\n    const hoverStayTime = 100;\n    class App extends React.Component {\n      state = {\n        hoverStartTime,\n        hoverStayTime\n      };\n      render() {\n        const {\n          hoverStartTime,\n          hoverStayTime\n        } = this.state;\n        return /*#__PURE__*/React.createElement(Button, {\n          size: \"fork\",\n          hoverStartTime: hoverStartTime,\n          hoverStayTime: hoverStayTime,\n          onClick: () => clickSpy(),\n          onTouchStart: () => touchStartSpy(),\n          onTouchEnd: () => touchEndSpy()\n        }, \"button\");\n      }\n    }\n    const {\n      node\n    } = await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n    assert(node.hoverStartTime === hoverStartTime);\n    assert(node.hoverStayTime === hoverStayTime);\n    assert(node.hoverClass === 'button-hover');\n    node.click();\n    assert(clickSpy.callCount === 1);\n    fireTouchEvent(node, 'touchstart');\n    assert(touchStartSpy.callCount === 1);\n    await delay(hoverStartTime + 10);\n    assert(node.classList.contains('button-hover'));\n    fireTouchEvent(node, 'touchend');\n    assert(touchEndSpy.callCount === 1);\n    await delay(hoverStayTime + 10);\n    assert(node.classList.contains('button-hover') === false);\n  });",
             "file": "button.spec.js",
             "skipped": false,
@@ -6694,10 +6694,10 @@
             "updatePoint": {
                 "line": 24,
                 "column": 11,
-                "index": 648
+                "index": 652
             },
             "line": 24,
-            "code": "  it('props', async () => {\n    const ref = /*#__PURE__*/React.createRef();\n    const maxLength = 10;\n    const disabled = false;\n    const value = '';\n    const placeholder = 'placeholder';\n    const autoFocus = true;\n    const focusSpy = sinon.spy();\n\n    /**\n     * @type {import('react').ReactInstance}\n     */\n    let instance;\n    class App extends React.Component {\n      state = {\n        maxLength,\n        disabled,\n        value,\n        placeholder,\n        autoFocus,\n        type: 'text'\n      };\n      constructor(props) {\n        super(props);\n        // eslint-disable-next-line @typescript-eslint/no-this-alias\n        instance = this;\n      }\n      render() {\n        const {\n          maxLength,\n          disabled,\n          value,\n          placeholder,\n          type,\n          autoFocus\n        } = this.state;\n        return /*#__PURE__*/React.createElement(Input, {\n          ref: ref,\n          maxlength: maxLength,\n          disabled: disabled,\n          value: value,\n          placeholder: placeholder,\n          type: type,\n          autoFocus: autoFocus,\n          onFocus: () => {\n            focusSpy();\n          }\n        });\n      }\n    }\n    ReactDOM.render( /*#__PURE__*/React.createElement(App, null), scratch);\n\n    /**\n     * @type {HTMLElement}\n     */\n    const node = ref.current;\n    await waitForChange(node);\n\n    /**\n     * @type {HTMLInputElement}\n     */\n    const input = node.children[0];\n    assert(input.classList.contains('weui-input'));\n    assert(input.getAttribute('maxlength') === maxLength.toString());\n    assert(input.getAttribute('placeholder') === placeholder);\n    assert(input.type === 'text');\n    input.focus();\n    assert(focusSpy.callCount === 1);\n    // assert($(input).is(':focus'))\n    // assert(document.activeElement === input)\n\n    instance.setState({\n      value: 'test',\n      maxLength: 4,\n      type: 'password'\n    });\n    await waitForChange(input);\n    assert(input.value === 'test');\n    assert(input.type === 'password');\n  });",
+            "code": "  it('props', async () => {\n    const ref = /*#__PURE__*/React.createRef();\n    const maxLength = 10;\n    const disabled = false;\n    const value = '';\n    const placeholder = 'placeholder';\n    const autoFocus = true;\n    const focusSpy = sinon.spy();\n\n    /**\n     * @type {import('react').ReactInstance}\n     */\n    let instance;\n    class App extends React.Component {\n      state = {\n        maxLength,\n        disabled,\n        value,\n        placeholder,\n        autoFocus,\n        type: 'text'\n      };\n      constructor(props) {\n        super(props);\n        // eslint-disable-next-line @typescript-eslint/no-this-alias\n        instance = this;\n      }\n      render() {\n        const {\n          maxLength,\n          disabled,\n          value,\n          placeholder,\n          type,\n          autoFocus\n        } = this.state;\n        return /*#__PURE__*/React.createElement(Input, {\n          ref: ref,\n          maxlength: maxLength,\n          disabled: disabled,\n          value: value,\n          placeholder: placeholder,\n          type: type,\n          autoFocus: autoFocus,\n          onFocus: () => {\n            focusSpy();\n          }\n        });\n      }\n    }\n    await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n\n    /**\n     * @type {HTMLElement}\n     */\n    const node = ref.current;\n    await waitForChange(node);\n\n    /**\n     * @type {HTMLInputElement}\n     */\n    const input = node.children[0];\n    assert(input.classList.contains('weui-input'));\n    assert(input.getAttribute('maxlength') === maxLength.toString());\n    assert(input.getAttribute('placeholder') === placeholder);\n    assert(input.type === 'text');\n    input.focus();\n    assert(focusSpy.callCount === 1);\n    // assert($(input).is(':focus'))\n    // assert(document.activeElement === input)\n\n    instance.setState({\n      value: 'test',\n      maxLength: 4,\n      type: 'password'\n    });\n    await waitForChange(input);\n    assert(input.value === 'test');\n    assert(input.type === 'password');\n  });",
             "file": "input.spec.js",
             "skipped": false,
             "dir": "packages/taro-components/__tests__"
@@ -6713,7 +6713,7 @@
                 "index": 2664
             },
             "line": 104,
-            "code": "  it('event', async () => {\n    const ref = /*#__PURE__*/React.createRef();\n    const focusSpy = sinon.spy();\n    const blurSpy = sinon.spy();\n    const confirm = sinon.spy();\n    const inputSpy = sinon.spy();\n    const keydownSpy = sinon.spy();\n    const value = 'value';\n    class App extends React.Component {\n      state = {\n        value: ''\n      };\n      render() {\n        return /*#__PURE__*/React.createElement(Input, {\n          ref: ref,\n          onFocus: e => {\n            focusSpy(e.detail.value);\n          },\n          maxLength: 4,\n          value: value,\n          onBlur: e => blurSpy(e.detail.value),\n          onKeyDown: e => keydownSpy(e.detail.value),\n          onConfirm: () => confirm(),\n          onInput: e => {\n            inputSpy(e.detail.value);\n          }\n        });\n      }\n    }\n    ReactDOM.render( /*#__PURE__*/React.createElement(App, null), scratch);\n\n    /**\n     * @type {HTMLElement}\n     */\n    const node = ref.current;\n    await waitForChange(node);\n    const input = $(node.children[0]);\n    input.focus();\n    assert(focusSpy.calledOnce);\n    assert(focusSpy.calledWith(value));\n    input.blur();\n    assert(blurSpy.calledOnce);\n    assert(focusSpy.calledWith(value));\n    simulant.fire(input[0], 'keydown');\n    assert(keydownSpy.callCount === 1);\n    assert(keydownSpy.calledWith(value));\n    simulant.fire(input[0], 'keydown');\n    assert(keydownSpy.callCount === 2);\n    assert(keydownSpy.calledWith(value));\n    assert(confirm.callCount === 0);\n    simulant.fire(input[0], 'keydown', {\n      keyCode: 13\n    });\n    assert(confirm.callCount === 1);\n    simulant.fire(input[0], 'input', {\n      data: 'a',\n      inputType: 'insertText'\n    });\n    assert(inputSpy.callCount === 1);\n  });",
+            "code": "  it('event', async () => {\n    const ref = /*#__PURE__*/React.createRef();\n    const focusSpy = sinon.spy();\n    const blurSpy = sinon.spy();\n    const confirm = sinon.spy();\n    const inputSpy = sinon.spy();\n    const keydownSpy = sinon.spy();\n    const value = 'value';\n    class App extends React.Component {\n      state = {\n        value: ''\n      };\n      render() {\n        return /*#__PURE__*/React.createElement(Input, {\n          ref: ref,\n          onFocus: e => {\n            focusSpy(e.detail.value);\n          },\n          maxLength: 4,\n          value: value,\n          onBlur: e => blurSpy(e.detail.value),\n          onKeyDown: e => keydownSpy(e.detail.value),\n          onConfirm: () => confirm(),\n          onInput: e => {\n            inputSpy(e.detail.value);\n          }\n        });\n      }\n    }\n    await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n\n    /**\n     * @type {HTMLElement}\n     */\n    const node = ref.current;\n    await waitForChange(node);\n    const input = $(node.children[0]);\n    input.focus();\n    assert(focusSpy.calledOnce);\n    assert(focusSpy.calledWith(value));\n    input.blur();\n    assert(blurSpy.calledOnce);\n    assert(focusSpy.calledWith(value));\n    simulant.fire(input[0], 'keydown');\n    assert(keydownSpy.callCount === 1);\n    assert(keydownSpy.calledWith(value));\n    simulant.fire(input[0], 'keydown');\n    assert(keydownSpy.callCount === 2);\n    assert(keydownSpy.calledWith(value));\n    assert(confirm.callCount === 0);\n    simulant.fire(input[0], 'keydown', {\n      keyCode: 13\n    });\n    assert(confirm.callCount === 1);\n    simulant.fire(input[0], 'input', {\n      data: 'a',\n      inputType: 'insertText'\n    });\n    assert(inputSpy.callCount === 1);\n  });",
             "file": "input.spec.js",
             "skipped": false,
             "dir": "packages/taro-components/__tests__"
@@ -6758,10 +6758,10 @@
             "updatePoint": {
                 "line": 22,
                 "column": 17,
-                "index": 602
+                "index": 606
             },
             "line": 22,
-            "code": "  it('props valid', async () => {\n    // const onChange = sinon.spy()\n    const domRef = /*#__PURE__*/React.createRef();\n    const onChangeValue = sinon.spy();\n    class App extends React.Component {\n      constructor() {\n        super(...arguments);\n        const date = new Date();\n        const years = [];\n        for (let i = 1990; i <= date.getFullYear(); i++) {\n          years.push(i);\n        }\n        this.state = {\n          years: years,\n          year: date.getFullYear(),\n          value: [20, 0, 0]\n        };\n      }\n      render() {\n        return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(View, null, this.state.year, \"\\u5E74\", this.state.month, \"\\u6708\", this.state.day, \"\\u65E5\"), /*#__PURE__*/React.createElement(PickerView, {\n          ref: domRef,\n          indicatorStyle: \"height: 60px;\",\n          indicatorClass: \"test_indicatorClass\",\n          style: \"width: 100%; height: 300px; position: absolute; bottom: 0px;\",\n          value: this.state.value,\n          onChange: e => {\n            onChangeValue(e);\n          }\n          // onPickStart={this.onPickStart}\n          ,\n          maskClass: \"test_maskClass\",\n          maskStyle: \"background-color: rgba(33, 33, 33, 0.5);\",\n          onPickEnd: this.onPickEnd\n        }, /*#__PURE__*/React.createElement(PickerViewColumn, null, this.state.years.map(item => {\n          return /*#__PURE__*/React.createElement(View, {\n            style: \"height: 60px; line-height: 60px; text-align: center;\",\n            key: item\n          }, item, \"\\u5E74\");\n        }))));\n      }\n    }\n    ReactDOM.render( /*#__PURE__*/React.createElement(App, null), scratch);\n    const node = domRef.current;\n    await waitForChange(node);\n    const indicatorEle = document.querySelector('.taro-picker-view-mask-indicator');\n    const indicatorEleClassName = indicatorEle.className;\n    assert(indicatorEleClassName.indexOf('test_indicatorClass') > -1);\n    const maskTopEle = document.querySelector('.taro-picker-view-mask-top');\n    const maskTopEleClassName = maskTopEle.className;\n    assert(maskTopEleClassName.indexOf('test_maskClass') > -1);\n    const maskBottomEle = document.querySelector('.taro-picker-view-mask-bottom');\n    const maskBottomEleClassName = maskBottomEle.className;\n    assert(maskBottomEleClassName.indexOf('test_maskClass') > -1);\n    const pickerViewColumnEle = document.querySelector('.taro-picker-view-column-container');\n\n    // 模拟滑动\n    const startY = 0;\n    const endY = 200;\n    simulant.fire(pickerViewColumnEle, 'mousedown', new MouseEvent(pickerViewColumnEle, {\n      clientY: startY\n    }));\n    simulant.fire(pickerViewColumnEle, 'mousemove', new MouseEvent(pickerViewColumnEle, {\n      clientY: endY\n    }));\n  });",
+            "code": "  it('props valid', async () => {\n    // const onChange = sinon.spy()\n    const domRef = /*#__PURE__*/React.createRef();\n    const onChangeValue = sinon.spy();\n    class App extends React.Component {\n      constructor() {\n        super(...arguments);\n        const date = new Date();\n        const years = [];\n        for (let i = 1990; i <= date.getFullYear(); i++) {\n          years.push(i);\n        }\n        this.state = {\n          years: years,\n          year: date.getFullYear(),\n          value: [20, 0, 0]\n        };\n      }\n      render() {\n        return /*#__PURE__*/React.createElement(View, null, /*#__PURE__*/React.createElement(View, null, this.state.year, \"\\u5E74\", this.state.month, \"\\u6708\", this.state.day, \"\\u65E5\"), /*#__PURE__*/React.createElement(PickerView, {\n          ref: domRef,\n          indicatorStyle: \"height: 60px;\",\n          indicatorClass: \"test_indicatorClass\",\n          style: \"width: 100%; height: 300px; position: absolute; bottom: 0px;\",\n          value: this.state.value,\n          onChange: e => {\n            onChangeValue(e);\n          }\n          // onPickStart={this.onPickStart}\n          ,\n          maskClass: \"test_maskClass\",\n          maskStyle: \"background-color: rgba(33, 33, 33, 0.5);\",\n          onPickEnd: this.onPickEnd\n        }, /*#__PURE__*/React.createElement(PickerViewColumn, null, this.state.years.map(item => {\n          return /*#__PURE__*/React.createElement(View, {\n            style: \"height: 60px; line-height: 60px; text-align: center;\",\n            key: item\n          }, item, \"\\u5E74\");\n        }))));\n      }\n    }\n    await mount( /*#__PURE__*/React.createElement(App, null), scratch);\n    const node = domRef.current;\n    await waitForChange(node);\n    const indicatorEle = document.querySelector('.taro-picker-view-mask-indicator');\n    const indicatorEleClassName = indicatorEle.className;\n    assert(indicatorEleClassName.indexOf('test_indicatorClass') > -1);\n    const maskTopEle = document.querySelector('.taro-picker-view-mask-top');\n    const maskTopEleClassName = maskTopEle.className;\n    assert(maskTopEleClassName.indexOf('test_maskClass') > -1);\n    const maskBottomEle = document.querySelector('.taro-picker-view-mask-bottom');\n    const maskBottomEleClassName = maskBottomEle.className;\n    assert(maskBottomEleClassName.indexOf('test_maskClass') > -1);\n    const pickerViewColumnEle = document.querySelector('.taro-picker-view-column-container');\n\n    // 模拟滑动\n    const startY = 0;\n    const endY = 200;\n    simulant.fire(pickerViewColumnEle, 'mousedown', new MouseEvent(pickerViewColumnEle, {\n      clientY: startY\n    }));\n    simulant.fire(pickerViewColumnEle, 'mousemove', new MouseEvent(pickerViewColumnEle, {\n      clientY: endY\n    }));\n  });",
             "file": "picker-view.spec.js",
             "skipped": false,
             "dir": "packages/taro-components/__tests__"
@@ -7428,11 +7428,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 64,
+                "line": 58,
                 "column": 8,
-                "index": 1925
+                "index": 1727
             },
-            "line": 64,
+            "line": 58,
             "code": "  it('Ad', async () => {\n    await testComponent(Ad);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7444,11 +7444,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 67,
+                "line": 61,
                 "column": 14,
-                "index": 1991
+                "index": 1793
             },
-            "line": 67,
+            "line": 61,
             "code": "  it('AdCustom', async () => {\n    await testComponent(AdCustom);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7460,11 +7460,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 70,
+                "line": 64,
                 "column": 12,
-                "index": 2061
+                "index": 1863
             },
-            "line": 70,
+            "line": 64,
             "code": "  it('Camera', async () => {\n    await testComponent(Camera);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7476,11 +7476,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 73,
+                "line": 67,
                 "column": 12,
-                "index": 2129
+                "index": 1931
             },
-            "line": 73,
+            "line": 67,
             "code": "  it('Editor', async () => {\n    await testComponent(Editor);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7492,11 +7492,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 76,
+                "line": 70,
                 "column": 29,
-                "index": 2214
+                "index": 2016
             },
-            "line": 76,
+            "line": 70,
             "code": "  it('FunctionalPageNavigator', async () => {\n    await testComponent(FunctionalPageNavigator);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7508,11 +7508,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 79,
+                "line": 73,
                 "column": 23,
-                "index": 2310
+                "index": 2112
             },
-            "line": 79,
+            "line": 73,
             "code": "  it('KeyboardAccessory', async () => {\n    await testComponent(KeyboardAccessory);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7524,11 +7524,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 82,
+                "line": 76,
                 "column": 16,
-                "index": 2393
+                "index": 2195
             },
-            "line": 82,
+            "line": 76,
             "code": "  it('LivePlayer', async () => {\n    await testComponent(LivePlayer);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7540,11 +7540,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 85,
+                "line": 79,
                 "column": 16,
-                "index": 2469
+                "index": 2271
             },
-            "line": 85,
+            "line": 79,
             "code": "  it('LivePusher', async () => {\n    await testComponent(LivePusher);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7556,11 +7556,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 88,
+                "line": 82,
                 "column": 9,
-                "index": 2538
+                "index": 2340
             },
-            "line": 88,
+            "line": 82,
             "code": "  it('Map', async () => {\n    await testComponent(Map);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7572,11 +7572,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 91,
+                "line": 85,
                 "column": 16,
-                "index": 2607
+                "index": 2409
             },
-            "line": 91,
+            "line": 85,
             "code": "  it('MatchMedia', async () => {\n    await testComponent(MatchMedia);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7588,11 +7588,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 94,
+                "line": 88,
                 "column": 19,
-                "index": 2686
+                "index": 2488
             },
-            "line": 94,
+            "line": 88,
             "code": "  it('NavigationBar', async () => {\n    await testComponent(NavigationBar);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7604,11 +7604,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 97,
+                "line": 91,
                 "column": 21,
-                "index": 2770
+                "index": 2572
             },
-            "line": 97,
+            "line": 91,
             "code": "  it('OfficialAccount', async () => {\n    await testComponent(OfficialAccount);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7620,11 +7620,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 100,
+                "line": 94,
                 "column": 14,
-                "index": 2849
+                "index": 2651
             },
-            "line": 100,
+            "line": 94,
             "code": "  it('OpenData', async () => {\n    await testComponent(OpenData);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7636,11 +7636,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 103,
+                "line": 97,
                 "column": 19,
-                "index": 2926
+                "index": 2728
             },
-            "line": 103,
+            "line": 97,
             "code": "  it('PageContainer', async () => {\n    await testComponent(PageContainer);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7652,11 +7652,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 106,
+                "line": 100,
                 "column": 14,
-                "index": 3003
+                "index": 2805
             },
-            "line": 106,
+            "line": 100,
             "code": "  it('PageMeta', async () => {\n    await testComponent(PageMeta);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7668,11 +7668,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 109,
+                "line": 103,
                 "column": 16,
-                "index": 3077
+                "index": 2879
             },
-            "line": 109,
+            "line": 103,
             "code": "  it('RootPortal', async () => {\n    await testComponent(RootPortal);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7684,11 +7684,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 112,
+                "line": 106,
                 "column": 18,
-                "index": 3155
+                "index": 2957
             },
-            "line": 112,
+            "line": 106,
             "code": "  it('ShareElement', async () => {\n    await testComponent(ShareElement);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
@@ -7700,11 +7700,11 @@
                 "unimplemented"
             ],
             "updatePoint": {
-                "line": 115,
+                "line": 109,
                 "column": 14,
-                "index": 3231
+                "index": 3033
             },
-            "line": 115,
+            "line": 109,
             "code": "  it('VoipRoom', async () => {\n    await testComponent(VoipRoom);\n  });",
             "file": "unimplemented.spec.js",
             "skipped": false,
