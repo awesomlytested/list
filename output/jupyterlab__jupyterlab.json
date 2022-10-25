@@ -413,7 +413,7 @@
                 "index": 439
             },
             "line": 15,
-            "code": "  test('Kernel capability', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    expect(await page.screenshot({\n      clip: {\n        x: 1050,\n        y: 62,\n        width: 190,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_kernel.png');\n  });",
+            "code": "  test('Kernel capability', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n\n    // Wait for kernel to settle on idle\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    await page.waitForSelector('#jp-main-statusbar >> text=Busy');\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    expect(await page.screenshot({\n      clip: {\n        x: 1050,\n        y: 62,\n        width: 190,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_kernel.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -422,11 +422,11 @@
             "name": "Activate",
             "suites": [],
             "updatePoint": {
-                "line": 30,
+                "line": 35,
                 "column": 16,
-                "index": 753
+                "index": 996
             },
-            "line": 30,
+            "line": 35,
             "code": "  test('Activate', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 800,\n        width: 190,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_activate.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -436,11 +436,11 @@
             "name": "Set breakpoint",
             "suites": [],
             "updatePoint": {
-                "line": 48,
+                "line": 53,
                 "column": 22,
-                "index": 1220
+                "index": 1463
             },
-            "line": 48,
+            "line": 53,
             "code": "  test('Set breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Wait for breakpoint to finish appearing\n    await page.waitForTimeout(150);\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_breakpoint.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -450,11 +450,11 @@
             "name": "Highlight run cell button",
             "suites": [],
             "updatePoint": {
-                "line": 70,
+                "line": 75,
                 "column": 33,
-                "index": 1816
+                "index": 2059
             },
-            "line": 70,
+            "line": 75,
             "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [positionMouse({\n      x: 446,\n      y: 80\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -464,11 +464,11 @@
             "name": "Stop on breakpoint",
             "suites": [],
             "updatePoint": {
-                "line": 93,
+                "line": 98,
                 "column": 26,
-                "index": 2324
+                "index": 2567
             },
-            "line": 93,
+            "line": 98,
             "code": "  test('Stop on breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_breakpoint.png');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -478,11 +478,11 @@
             "name": "Debugger sidebar",
             "suites": [],
             "updatePoint": {
-                "line": 119,
+                "line": 124,
                 "column": 24,
-                "index": 3049
+                "index": 3292
             },
-            "line": 119,
+            "line": 124,
             "code": "  test('Debugger sidebar', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.click('[data-id=\"jp-debugger-sidebar\"]');\n    await setSidebarWidth(page, 251, 'right');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [positionMouse({\n      x: 1240,\n      y: 115\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 22,\n        x: 1200,\n        width: 85,\n        height: 160\n      }\n    })).toMatchSnapshot('debugger_sidebar.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -492,11 +492,11 @@
             "name": "Variables panel",
             "suites": [],
             "updatePoint": {
-                "line": 144,
+                "line": 149,
                 "column": 23,
-                "index": 3665
+                "index": 3908
             },
-            "line": 144,
+            "line": 149,
             "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -506,11 +506,11 @@
             "name": "Call Stack panel",
             "suites": [],
             "updatePoint": {
-                "line": 170,
+                "line": 175,
                 "column": 24,
-                "index": 4381
+                "index": 4624
             },
-            "line": 170,
+            "line": 175,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -520,11 +520,11 @@
             "name": "Breakpoints panel",
             "suites": [],
             "updatePoint": {
-                "line": 201,
+                "line": 206,
                 "column": 25,
-                "index": 5316
+                "index": 5559
             },
-            "line": 201,
+            "line": 206,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/2114632017.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -534,11 +534,11 @@
             "name": "Source panel",
             "suites": [],
             "updatePoint": {
-                "line": 233,
+                "line": 238,
                 "column": 20,
-                "index": 6303
+                "index": 6546
             },
-            "line": 233,
+            "line": 238,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -3046,118 +3046,6 @@
             "dir": "galata/test"
         },
         {
-            "name": "should reset the workspace",
-            "suites": [],
-            "updatePoint": {
-                "line": 39,
-                "column": 34,
-                "index": 1172
-            },
-            "line": 39,
-            "code": "  test('should reset the workspace', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto();\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n    await page.goto('?reset');\n    const launcher = page.locator('div.jp-Launcher-sectionHeader');\n    expect(await launcher.first().screenshot()).toMatchSnapshot('workspace-reset.png');\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should open a file from `tree` url",
-            "suites": [],
-            "updatePoint": {
-                "line": 49,
-                "column": 42,
-                "index": 1534
-            },
-            "line": 49,
-            "code": "  test('should open a file from `tree` url', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}/${mdFile}`);\n    await expect(page.locator('[role=\"main\"] >> text=Title').first()).toBeVisible();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should open a file from `tree` url if workspace is not empty",
-            "suites": [],
-            "updatePoint": {
-                "line": 56,
-                "column": 68,
-                "index": 1787
-            },
-            "line": 56,
-            "code": "  test('should open a file from `tree` url if workspace is not empty', async ({\n    page,\n    tmpPath\n  }) => {\n    await Promise.all([\n    // Wait for the workspace to be saved\n    page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().data[`editor:${tmpPath}/${mdFile}`]), page.goto(`tree/${tmpPath}/${mdFile}`)]);\n    await expect(page.locator('[role=\"main\"] >> text=Title').first()).toBeVisible();\n    await page.goto(`tree/${tmpPath}/${nbFile}`);\n    await expect(page.locator(`[role=\"main\"] >> text=${mdFile}`).first()).toBeVisible();\n    await expect(page.locator('[role=\"main\"] >> text=Test Notebook¶').first()).toBeVisible();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should reset the workspace in simple mode",
-            "suites": [],
-            "updatePoint": {
-                "line": 68,
-                "column": 49,
-                "index": 2514
-            },
-            "line": 68,
-            "code": "  test('should reset the workspace in simple mode', async ({\n    baseURL,\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`${baseURL}/doc/tree/${tmpPath}`);\n    await page.sidebar.open('left');\n    await page.dblclick(`text=${nbFile}`);\n    await page.goto('?reset');\n    const launcher = page.locator('div.jp-Launcher-sectionHeader');\n    expect(await launcher.first().screenshot()).toMatchSnapshot('workspace-simple-reset.png');\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should open a file in simple mode from `tree` url",
-            "suites": [],
-            "updatePoint": {
-                "line": 80,
-                "column": 57,
-                "index": 2963
-            },
-            "line": 80,
-            "code": "  test('should open a file in simple mode from `tree` url', async ({\n    baseURL,\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`${baseURL}/doc/tree/${tmpPath}/${mdFile}`);\n    await expect(page.locator('[role=\"main\"] >> text=Title').first()).toBeVisible();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should open a new file in simple mode from `tree` url",
-            "suites": [],
-            "updatePoint": {
-                "line": 88,
-                "column": 61,
-                "index": 3237
-            },
-            "line": 88,
-            "code": "  test('should open a new file in simple mode from `tree` url', async ({\n    baseURL,\n    page,\n    tmpPath\n  }) => {\n    await Promise.all([\n    // Wait for the workspace to be saved\n    page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().data[`editor:${tmpPath}/${mdFile}`]), page.goto(`${baseURL}/doc/tree/${tmpPath}/${mdFile}`)]);\n    await expect(page.locator('[role=\"main\"] >> text=Title').first()).toBeVisible();\n    await page.goto(`${baseURL}/doc/tree/${tmpPath}/${nbFile}`);\n    await expect(page.locator('[role=\"main\"] >> text=Test Notebook¶').first()).toBeVisible();\n\n    // Wait for the kernel to be ready so it does not unfocus the menu\n    await page.waitForSelector('text= | Idle');\n    await expect(page.menu.getMenuItem(`Tabs>${mdFile}`)).toBeDefined();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should clone the default workspace",
-            "suites": [],
-            "updatePoint": {
-                "line": 104,
-                "column": 42,
-                "index": 4104
-            },
-            "line": 104,
-            "code": "  test('should clone the default workspace', async ({\n    page,\n    tmpPath\n  }) => {\n    // Given\n    await page.goto();\n    await page.filebrowser.open(`${tmpPath}/${nbFile}`);\n    await page.filebrowser.open(`${tmpPath}/${mdFile}`);\n    await Promise.all([page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().data['terminal:1']), page.waitForSelector('[role=\"main\"] >> .jp-Terminal'), page.menu.clickMenuItem('File>New>Terminal')]);\n\n    // When\n    await Promise.all([\n    // Wait for the workspace to be saved\n    page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().metadata['id'] === 'foo'), page.goto('workspaces/foo?clone')]);\n    await expect(page.locator('[role=\"main\"] >> .lm-TabBar-tab')).toHaveCount(3);\n    await expect(page.locator(`[role=\"main\"] >> text=${mdFile}`)).toBeVisible();\n    await expect(page.locator(`[role=\"main\"] >> text=${nbFile}`)).toBeVisible();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
-            "name": "should clone the current workspace",
-            "suites": [],
-            "updatePoint": {
-                "line": 122,
-                "column": 42,
-                "index": 5204
-            },
-            "line": 122,
-            "code": "  test('should clone the current workspace', async ({\n    page,\n    tmpPath\n  }) => {\n    // Given\n    await page.goto('workspaces/foo');\n    await page.filebrowser.open(`${tmpPath}/${nbFile}`);\n    await page.filebrowser.open(`${tmpPath}/${mdFile}`);\n    await Promise.all([page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().data['terminal:1']), page.waitForSelector('[role=\"main\"] >> .jp-Terminal'), page.menu.clickMenuItem('File>New>Terminal')]);\n\n    // When\n    await Promise.all([\n    // Wait for the workspace to be saved\n    page.waitForResponse(response => response.request().method() === 'PUT' && /api\\/workspaces/.test(response.request().url()) && response.request().postDataJSON().metadata['id'] === 'bar'), page.goto('workspaces/bar?clone')]);\n\n    // Then\n    await expect(page.locator('[role=\"main\"] >> .lm-TabBar-tab')).toHaveCount(3);\n    await expect(page.locator(`[role=\"main\"] >> text=${mdFile}`)).toBeVisible();\n    await expect(page.locator(`[role=\"main\"] >> text=${nbFile}`)).toBeVisible();\n  });",
-            "file": "jupyterlab/workspace.test.ts",
-            "skipped": false,
-            "dir": "galata/test"
-        },
-        {
             "name": "should construct a new layout restorer",
             "suites": [
                 "apputils",
@@ -3500,10 +3388,10 @@
                 "#constructor()"
             ],
             "updatePoint": {
-                "line": 37,
+                "line": 39,
                 "column": 41
             },
-            "line": 37,
+            "line": 39,
             "code": "    it('should create a LabShell instance', () => {\n      expect(shell).toBeInstanceOf(LabShell);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3516,10 +3404,10 @@
                 "#leftCollapsed"
             ],
             "updatePoint": {
-                "line": 43,
+                "line": 45,
                 "column": 56
             },
-            "line": 43,
+            "line": 45,
             "code": "    it('should return whether the left area is collapsed', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left');\n      expect(shell.leftCollapsed).toBe(true);\n      shell.activateById('foo');\n      expect(shell.leftCollapsed).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3532,10 +3420,10 @@
                 "#rightCollapsed"
             ],
             "updatePoint": {
-                "line": 54,
+                "line": 56,
                 "column": 57
             },
-            "line": 54,
+            "line": 56,
             "code": "    it('should return whether the right area is collapsed', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right');\n      expect(shell.rightCollapsed).toBe(true);\n      shell.activateById('foo');\n      expect(shell.rightCollapsed).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3548,10 +3436,10 @@
                 "#currentWidget"
             ],
             "updatePoint": {
-                "line": 65,
+                "line": 67,
                 "column": 59
             },
-            "line": 65,
+            "line": 67,
             "code": "    it('should be the current widget in the shell main area', () => {\n      expect(shell.currentWidget).toBe(null);\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'main');\n      expect(shell.currentWidget).toBe(null);\n      simulate(widget.node, 'focus');\n      expect(shell.currentWidget).toBe(widget);\n      widget.parent = null;\n      expect(shell.currentWidget).toBe(null);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3564,10 +3452,10 @@
                 "#isEmpty()"
             ],
             "updatePoint": {
-                "line": 79,
+                "line": 81,
                 "column": 50
             },
-            "line": 79,
+            "line": 81,
             "code": "    it('should test whether the main area is empty', () => {\n      expect(shell.isEmpty('main')).toBe(true);\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'main');\n      expect(shell.isEmpty('main')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3580,10 +3468,10 @@
                 "#isEmpty()"
             ],
             "updatePoint": {
-                "line": 87,
+                "line": 89,
                 "column": 49
             },
-            "line": 87,
+            "line": 89,
             "code": "    it('should test whether the top area is empty', () => {\n      // top-level menu area is added by default\n      expect(shell.isEmpty('top')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3596,10 +3484,10 @@
                 "#isEmpty()"
             ],
             "updatePoint": {
-                "line": 92,
+                "line": 94,
                 "column": 50
             },
-            "line": 92,
+            "line": 94,
             "code": "    it('should test whether the menu area is empty', () => {\n      expect(shell.isEmpty('menu')).toBe(true);\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'menu');\n      expect(shell.isEmpty('menu')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3612,10 +3500,10 @@
                 "#isEmpty()"
             ],
             "updatePoint": {
-                "line": 100,
+                "line": 102,
                 "column": 50
             },
-            "line": 100,
+            "line": 102,
             "code": "    it('should test whether the left area is empty', () => {\n      expect(shell.isEmpty('left')).toBe(true);\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left');\n      expect(shell.isEmpty('left')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3628,10 +3516,10 @@
                 "#isEmpty()"
             ],
             "updatePoint": {
-                "line": 108,
+                "line": 110,
                 "column": 51
             },
-            "line": 108,
+            "line": 110,
             "code": "    it('should test whether the right area is empty', () => {\n      expect(shell.isEmpty('right')).toBe(true);\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right');\n      expect(shell.isEmpty('right')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3644,11 +3532,11 @@
                 "#restored"
             ],
             "updatePoint": {
-                "line": 118,
+                "line": 120,
                 "column": 66
             },
-            "line": 118,
-            "code": "    it('should resolve when the app is restored for the first time', async () => {\n      const state = shell.saveLayout();\n      const mode: DockPanel.Mode = 'multiple-document';\n      shell.restoreLayout(mode, state);\n      await expect(shell.restored).resolves.not.toThrow();\n    });",
+            "line": 120,
+            "code": "    it('should resolve when the app is restored for the first time', async () => {\n      const restorer = new LayoutRestorer({\n        connector: new StateDB(),\n        first: Promise.resolve<void>(void 0),\n        registry: new CommandRegistry()\n      });\n      const mode: DockPanel.Mode = 'multiple-document';\n      await shell.restoreLayout(mode, restorer);\n      await expect(shell.restored).resolves.not.toThrow();\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
             "dir": "packages/application/test"
@@ -3660,10 +3548,10 @@
                 "#add(widget, \"header\")"
             ],
             "updatePoint": {
-                "line": 127,
+                "line": 133,
                 "column": 41
             },
-            "line": 127,
+            "line": 133,
             "code": "    it('should add a widget to the header', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'header');\n      expect(shell.isEmpty('header')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3676,10 +3564,10 @@
                 "#add(widget, \"header\")"
             ],
             "updatePoint": {
-                "line": 134,
+                "line": 140,
                 "column": 49
             },
-            "line": 134,
+            "line": 140,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'header');\n      expect(shell.isEmpty('header')).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3692,10 +3580,10 @@
                 "#add(widget, \"header\")"
             ],
             "updatePoint": {
-                "line": 140,
+                "line": 146,
                 "column": 29
             },
-            "line": 140,
+            "line": 146,
             "code": "    it('should accept options', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'header', { rank: 10 });\n      expect(shell.isEmpty('header')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3708,10 +3596,10 @@
                 "#add(widget, \"menu\")"
             ],
             "updatePoint": {
-                "line": 149,
+                "line": 155,
                 "column": 39
             },
-            "line": 149,
+            "line": 155,
             "code": "    it('should add a widget to the menu', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'menu');\n      expect(shell.isEmpty('menu')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3724,10 +3612,10 @@
                 "#add(widget, \"menu\")"
             ],
             "updatePoint": {
-                "line": 156,
+                "line": 162,
                 "column": 49
             },
-            "line": 156,
+            "line": 162,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'menu');\n      expect(shell.isEmpty('menu')).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3740,10 +3628,10 @@
                 "#add(widget, \"menu\")"
             ],
             "updatePoint": {
-                "line": 162,
+                "line": 168,
                 "column": 29
             },
-            "line": 162,
+            "line": 168,
             "code": "    it('should accept options', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'menu', { rank: 10 });\n      expect(shell.isEmpty('menu')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3756,10 +3644,10 @@
                 "#add(widget, \"top\")"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 177,
                 "column": 43
             },
-            "line": 171,
+            "line": 177,
             "code": "    it('should add a widget to the top area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'top');\n      // top-level title and menu area are added by default\n      expect(Array.from(shell.widgets('top')).length).toEqual(3);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3772,10 +3660,10 @@
                 "#add(widget, \"top\")"
             ],
             "updatePoint": {
-                "line": 179,
+                "line": 185,
                 "column": 49
             },
-            "line": 179,
+            "line": 185,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'top');\n      // top-level title and menu area are added by default\n      expect(Array.from(shell.widgets('top')).length).toEqual(2);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3788,10 +3676,10 @@
                 "#add(widget, \"top\")"
             ],
             "updatePoint": {
-                "line": 186,
+                "line": 192,
                 "column": 29
             },
-            "line": 186,
+            "line": 192,
             "code": "    it('should accept options', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'top', { rank: 10 });\n      // top-level title and menu area are added by default\n      expect(Array.from(shell.widgets('top')).length).toEqual(3);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3804,10 +3692,10 @@
                 "#add(widget, \"top\")"
             ],
             "updatePoint": {
-                "line": 194,
+                "line": 200,
                 "column": 51
             },
-            "line": 194,
+            "line": 200,
             "code": "    it('should add widgets according to their ranks', () => {\n      const foo = new Widget();\n      const bar = new Widget();\n      foo.id = 'foo';\n      bar.id = 'bar';\n      shell.add(foo, 'top', { rank: 10001 });\n      shell.add(bar, 'top', { rank: 10000 });\n      expect(\n        Array.from(shell.widgets('top'))\n          .slice(-2)\n          .map(v => v.id)\n      ).toEqual(['bar', 'foo']);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3820,10 +3708,10 @@
                 "#add(widget, \"left\")"
             ],
             "updatePoint": {
-                "line": 210,
+                "line": 216,
                 "column": 44
             },
-            "line": 210,
+            "line": 216,
             "code": "    it('should add a widget to the left area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left');\n      expect(shell.isEmpty('left')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3836,10 +3724,10 @@
                 "#add(widget, \"left\")"
             ],
             "updatePoint": {
-                "line": 217,
+                "line": 223,
                 "column": 49
             },
-            "line": 217,
+            "line": 223,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'left');\n      expect(shell.isEmpty('left')).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3852,10 +3740,10 @@
                 "#add(widget, \"left\")"
             ],
             "updatePoint": {
-                "line": 223,
+                "line": 229,
                 "column": 29
             },
-            "line": 223,
+            "line": 229,
             "code": "    it('should accept options', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left', { rank: 10 });\n      expect(shell.isEmpty('left')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3868,10 +3756,10 @@
                 "#add(widget, \"right\")"
             ],
             "updatePoint": {
-                "line": 232,
+                "line": 238,
                 "column": 45
             },
-            "line": 232,
+            "line": 238,
             "code": "    it('should add a widget to the right area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right');\n      expect(shell.isEmpty('right')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3884,10 +3772,10 @@
                 "#add(widget, \"right\")"
             ],
             "updatePoint": {
-                "line": 239,
+                "line": 245,
                 "column": 49
             },
-            "line": 239,
+            "line": 245,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'right');\n      expect(shell.isEmpty('right')).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3900,10 +3788,10 @@
                 "#add(widget, \"right\")"
             ],
             "updatePoint": {
-                "line": 245,
+                "line": 251,
                 "column": 29
             },
-            "line": 245,
+            "line": 251,
             "code": "    it('should accept options', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right', { rank: 10 });\n      expect(shell.isEmpty('right')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3916,10 +3804,10 @@
                 "#add(widget, \"main\")"
             ],
             "updatePoint": {
-                "line": 254,
+                "line": 260,
                 "column": 44
             },
-            "line": 254,
+            "line": 260,
             "code": "    it('should add a widget to the main area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'main');\n      expect(shell.isEmpty('main')).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3932,10 +3820,10 @@
                 "#add(widget, \"main\")"
             ],
             "updatePoint": {
-                "line": 261,
+                "line": 267,
                 "column": 49
             },
-            "line": 261,
+            "line": 267,
             "code": "    it('should be a no-op if the widget has no id', () => {\n      const widget = new Widget();\n      shell.add(widget, 'main');\n      expect(shell.isEmpty('main')).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3948,10 +3836,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 269,
+                "line": 275,
                 "column": 49
             },
-            "line": 269,
+            "line": 275,
             "code": "    it('should activate a widget in the left area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left');\n      expect(widget.isVisible).toBe(false);\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3964,10 +3852,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 284,
                 "column": 63
             },
-            "line": 278,
+            "line": 284,
             "code": "    it('should be a no-op if the widget is not in the left area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      expect(widget.isVisible).toBe(false);\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3980,10 +3868,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 286,
+                "line": 292,
                 "column": 50
             },
-            "line": 286,
+            "line": 292,
             "code": "    it('should activate a widget in the right area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right');\n      expect(widget.isVisible).toBe(false);\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -3996,10 +3884,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 295,
+                "line": 301,
                 "column": 64
             },
-            "line": 295,
+            "line": 301,
             "code": "    it('should be a no-op if the widget is not in the right area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      expect(widget.isVisible).toBe(false);\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4012,10 +3900,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 303,
+                "line": 309,
                 "column": 49
             },
-            "line": 303,
+            "line": 309,
             "code": "    it('should activate a widget in the main area', async () => {\n      const widget = new ContentWidget();\n      widget.id = 'foo';\n      shell.add(widget, 'main');\n      shell.activateById('foo');\n      await framePromise();\n      expect(widget.activated).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4028,10 +3916,10 @@
                 "#activateById()"
             ],
             "updatePoint": {
-                "line": 312,
+                "line": 318,
                 "column": 63
             },
-            "line": 312,
+            "line": 318,
             "code": "    it('should be a no-op if the widget is not in the main area', async () => {\n      const widget = new ContentWidget();\n      widget.id = 'foo';\n      shell.activateById('foo');\n      await framePromise();\n      expect(widget.activated).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4044,10 +3932,10 @@
                 "#collapseLeft()"
             ],
             "updatePoint": {
-                "line": 322,
+                "line": 328,
                 "column": 52
             },
-            "line": 322,
+            "line": 328,
             "code": "    it('should collapse all widgets in the left area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'left');\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(true);\n      shell.collapseLeft();\n      expect(widget.isVisible).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4060,10 +3948,10 @@
                 "#collapseRight()"
             ],
             "updatePoint": {
-                "line": 334,
+                "line": 340,
                 "column": 53
             },
-            "line": 334,
+            "line": 340,
             "code": "    it('should collapse all widgets in the right area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right');\n      shell.activateById('foo');\n      expect(widget.isVisible).toBe(true);\n      shell.collapseRight();\n      expect(widget.isVisible).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4076,10 +3964,10 @@
                 "#expandLeft()"
             ],
             "updatePoint": {
-                "line": 346,
+                "line": 352,
                 "column": 51
             },
-            "line": 346,
+            "line": 352,
             "code": "    it('should expand the most recently used widget', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      const widget2 = new Widget();\n      widget2.id = 'bar';\n      shell.add(widget, 'left', { rank: 10 });\n      shell.add(widget2, 'left', { rank: 1 });\n      shell.activateById('foo');\n      shell.collapseLeft();\n      expect(widget.isVisible).toBe(false);\n      shell.expandLeft();\n      expect(widget.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4092,10 +3980,10 @@
                 "#expandLeft()"
             ],
             "updatePoint": {
-                "line": 360,
+                "line": 366,
                 "column": 66
             },
-            "line": 360,
+            "line": 366,
             "code": "    it('should expand the first widget if none have been activated', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      const widget2 = new Widget();\n      widget2.id = 'bar';\n      shell.add(widget, 'left', { rank: 10 });\n      shell.add(widget2, 'left', { rank: 1 });\n      expect(widget2.isVisible).toBe(false);\n      shell.expandLeft();\n      expect(widget2.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4108,10 +3996,10 @@
                 "#expandRight()"
             ],
             "updatePoint": {
-                "line": 374,
+                "line": 380,
                 "column": 51
             },
-            "line": 374,
+            "line": 380,
             "code": "    it('should expand the most recently used widget', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      const widget2 = new Widget();\n      widget2.id = 'bar';\n      shell.add(widget, 'right', { rank: 10 });\n      shell.add(widget2, 'right', { rank: 1 });\n      shell.activateById('foo');\n      shell.collapseRight();\n      expect(widget.isVisible).toBe(false);\n      shell.expandRight();\n      expect(widget.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4124,10 +4012,10 @@
                 "#expandRight()"
             ],
             "updatePoint": {
-                "line": 388,
+                "line": 394,
                 "column": 66
             },
-            "line": 388,
+            "line": 394,
             "code": "    it('should expand the first widget if none have been activated', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      const widget2 = new Widget();\n      widget2.id = 'bar';\n      shell.add(widget, 'right', { rank: 10 });\n      shell.add(widget2, 'right', { rank: 1 });\n      expect(widget2.isVisible).toBe(false);\n      shell.expandRight();\n      expect(widget2.isVisible).toBe(true);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4140,10 +4028,10 @@
                 "#closeAll()"
             ],
             "updatePoint": {
-                "line": 402,
+                "line": 408,
                 "column": 56
             },
-            "line": 402,
+            "line": 408,
             "code": "    it('should close all of the widgets in the main area', () => {\n      const foo = new Widget();\n      foo.id = 'foo';\n      shell.add(foo, 'main');\n      const bar = new Widget();\n      bar.id = 'bar';\n      shell.add(bar, 'main');\n      shell.closeAll();\n      expect(foo.parent).toBe(null);\n      expect(bar.parent).toBe(null);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4156,10 +4044,10 @@
                 "#saveLayout"
             ],
             "updatePoint": {
-                "line": 416,
+                "line": 422,
                 "column": 43
             },
-            "line": 416,
+            "line": 422,
             "code": "    it('should save the layout of the shell', () => {\n      const foo = new Widget();\n      foo.id = 'foo';\n      shell.add(foo, 'main');\n      const state = shell.saveLayout();\n      shell.activateById('foo');\n      expect(shell.mode).toBe('multiple-document');\n      expect(state.mainArea?.currentWidget).toBe(null);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4172,11 +4060,11 @@
                 "#restoreLayout"
             ],
             "updatePoint": {
-                "line": 428,
+                "line": 434,
                 "column": 46
             },
-            "line": 428,
-            "code": "    it('should restore the layout of the shell', () => {\n      const state = shell.saveLayout();\n      const mode: DockPanel.Mode = 'multiple-document';\n      shell.mode = 'single-document';\n      shell.restoreLayout(mode, state);\n      expect(shell.mode).toBe('multiple-document');\n    });",
+            "line": 434,
+            "code": "    it('should restore the layout of the shell', async () => {\n      const restorer = new LayoutRestorer({\n        connector: new StateDB(),\n        first: Promise.resolve<void>(void 0),\n        registry: new CommandRegistry()\n      });\n      const mode: DockPanel.Mode = 'multiple-document';\n      shell.mode = 'single-document';\n      await shell.restoreLayout(mode, restorer);\n      expect(shell.mode).toBe('multiple-document');\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
             "dir": "packages/application/test"
@@ -4188,10 +4076,10 @@
                 "#widgets"
             ],
             "updatePoint": {
-                "line": 438,
+                "line": 448,
                 "column": 40
             },
-            "line": 438,
+            "line": 448,
             "code": "    it('should list widgets in each area', () => {\n      let widget: Widget;\n\n      widget = new Widget();\n      widget.id = 'header';\n      shell.add(widget, 'header');\n\n      widget = new Widget();\n      widget.id = 'top';\n      shell.add(widget, 'top');\n\n      widget = new Widget();\n      widget.id = 'menu';\n      shell.add(widget, 'menu');\n\n      widget = new Widget();\n      widget.id = 'left';\n      shell.add(widget, 'left');\n\n      widget = new Widget();\n      widget.id = 'right';\n      shell.add(widget, 'right');\n\n      widget = new Widget();\n      widget.id = 'main';\n      shell.add(widget, 'main');\n\n      expect(Array.from(shell.widgets('header')).map(v => v.id)).toEqual([\n        'header'\n      ]);\n      expect(\n        Array.from(shell.widgets('top'))\n          .slice(-1)\n          .map(v => v.id)\n      ).toEqual(['top']);\n      expect(Array.from(shell.widgets('menu')).map(v => v.id)).toEqual([\n        'menu'\n      ]);\n      expect(Array.from(shell.widgets('left')).map(v => v.id)).toEqual([\n        'left'\n      ]);\n      expect(Array.from(shell.widgets('right')).map(v => v.id)).toEqual([\n        'right'\n      ]);\n      expect(Array.from(shell.widgets('main')).map(v => v.id)).toEqual([\n        'main'\n      ]);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4204,10 +4092,10 @@
                 "#widgets"
             ],
             "updatePoint": {
-                "line": 487,
+                "line": 497,
                 "column": 35
             },
-            "line": 487,
+            "line": 497,
             "code": "    it('should default to main area', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'main');\n      expect(Array.from(shell.widgets()).map(v => v.id)).toEqual(['foo']);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4220,10 +4108,10 @@
                 "#widgets"
             ],
             "updatePoint": {
-                "line": 494,
+                "line": 504,
                 "column": 64
             },
-            "line": 494,
+            "line": 504,
             "code": "    it('should throw an error when an unrecognized area is given', () => {\n      expect(() => shell.widgets('foo' as any)).toThrowError(/Invalid area/);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
@@ -4236,10 +4124,10 @@
                 "#titlePanel"
             ],
             "updatePoint": {
-                "line": 500,
+                "line": 510,
                 "column": 86
             },
-            "line": 500,
+            "line": 510,
             "code": "    it('should be hidden in multiple document mode and visible in single document mode', () => {\n      const widget = new Widget();\n      widget.id = 'foo';\n      shell.add(widget, 'right', { rank: 10 });\n      shell.mode = 'multiple-document';\n      expect(widget.isVisible).toBe(false);\n      shell.mode = 'single-document';\n      expect(widget.isVisible).toBe(false);\n    });",
             "file": "shell.spec.ts",
             "skipped": false,
