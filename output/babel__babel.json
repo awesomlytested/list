@@ -7162,16 +7162,67 @@
             "dir": "packages/babel-generator/test"
         },
         {
+            "name": "atomic node",
+            "suites": [
+                "programmatic generation",
+                "should print inner comments even if there are no suitable inner locations"
+            ],
+            "updatePoint": {
+                "line": 941,
+                "column": 19,
+                "index": 33386
+            },
+            "line": 941,
+            "code": "    it(\"atomic node\", () => {\n      const id = t.identifier(\"foo\");\n      id.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }];\n      expect(generate(id).code).toMatchInlineSnapshot(`\"foo /*foo*/\"`);\n    });",
+            "file": "index.js",
+            "skipped": false,
+            "dir": "packages/babel-generator/test"
+        },
+        {
+            "name": "node without inner locations",
+            "suites": [
+                "programmatic generation",
+                "should print inner comments even if there are no suitable inner locations"
+            ],
+            "updatePoint": {
+                "line": 949,
+                "column": 36,
+                "index": 33640
+            },
+            "line": 949,
+            "code": "    it(\"node without inner locations\", () => {\n      const expr = t.binaryExpression(\"+\", t.numericLiteral(1), t.numericLiteral(2));\n      expr.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }];\n      expect(generate(expr).code).toMatchInlineSnapshot(`\"1 + 2 /*foo*/\"`);\n    });",
+            "file": "index.js",
+            "skipped": false,
+            "dir": "packages/babel-generator/test"
+        },
+        {
+            "name": "comment skipped because of newlines",
+            "suites": [
+                "programmatic generation",
+                "should print inner comments even if there are no suitable inner locations"
+            ],
+            "updatePoint": {
+                "line": 957,
+                "column": 43,
+                "index": 33955
+            },
+            "line": 957,
+            "code": "    it(\"comment skipped because of newlines\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }, {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\n        \"(x, y) /*foo*/ => z\n        /*new\n        line*/\"\n      `);\n    });",
+            "file": "index.js",
+            "skipped": false,
+            "dir": "packages/babel-generator/test"
+        },
+        {
             "name": "generate",
             "suites": [
                 "CodeGenerator"
             ],
             "updatePoint": {
-                "line": 942,
+                "line": 975,
                 "column": 14,
-                "index": 33329
+                "index": 34432
             },
-            "line": 942,
+            "line": 975,
             "code": "  it(\"generate\", function () {\n    const codeGen = new CodeGenerator(t.numericLiteral(123));\n    const code = codeGen.generate().code;\n    expect(parse(code).program.body[0].expression.value).toBe(123);\n  });",
             "file": "index.js",
             "skipped": false,
