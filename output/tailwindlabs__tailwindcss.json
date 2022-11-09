@@ -704,16 +704,32 @@
             "dir": "integrations/tailwindcss-cli/tests"
         },
         {
+            "name": "should work with raw content",
+            "suites": [
+                "static build"
+            ],
+            "updatePoint": {
+                "line": 168,
+                "column": 34,
+                "index": 4741
+            },
+            "line": 168,
+            "code": "  it('should work with raw content', async () => {\n    await writeInputFile('../tailwind.config.js', javascript`\n        module.exports = {\n          content: {\n            files: [{ raw: 'bg-red-500'}],\n          },\n          theme: {\n            extend: {\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n          plugins: [],\n        }\n      `);\n    await $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css', {\n      env: {\n        NODE_ENV: 'production'\n      }\n    });\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-red-500 {\n          --tw-bg-opacity: 1;\n          background-color: rgb(239 68 68 / var(--tw-bg-opacity));\n        }\n      `);\n  });",
+            "file": "integration.test.js",
+            "skipped": false,
+            "dir": "integrations/tailwindcss-cli/tests"
+        },
+        {
             "name": "classes are generated when the html file changes",
             "suites": [
                 "watcher"
             ],
             "updatePoint": {
-                "line": 170,
+                "line": 198,
                 "column": 56,
-                "index": 4795
+                "index": 5537
             },
-            "line": 170,
+            "line": 198,
             "code": "  test('classes are generated when the html file changes', async () => {\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    await appendToInputFile('index.html', html`<div class=\"font-normal\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n        .font-normal {\n          font-weight: 400;\n        }\n      `);\n    await appendToInputFile('index.html', html`<div class=\"bg-red-500\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-red-500 {\n          --tw-bg-opacity: 1;\n          background-color: rgb(239 68 68 / var(--tw-bg-opacity));\n        }\n        .font-bold {\n          font-weight: 700;\n        }\n        .font-normal {\n          font-weight: 400;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -725,11 +741,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 205,
+                "line": 233,
                 "column": 55,
-                "index": 6014
+                "index": 6756
             },
-            "line": 205,
+            "line": 233,
             "code": "  test('classes are generated when globbed files change', async () => {\n    await writeInputFile('glob/index.html', html`<div class=\"font-bold\"></div>`);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    await appendToInputFile('glob/index.html', html`<div class=\"font-normal\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n        .font-normal {\n          font-weight: 400;\n        }\n      `);\n    await appendToInputFile('glob/index.html', html`<div class=\"bg-red-500\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-red-500 {\n          --tw-bg-opacity: 1;\n          background-color: rgb(239 68 68 / var(--tw-bg-opacity));\n        }\n        .font-bold {\n          font-weight: 700;\n        }\n        .font-normal {\n          font-weight: 400;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -741,11 +757,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 268,
                 "column": 67,
-                "index": 7260
+                "index": 8002
             },
-            "line": 240,
+            "line": 268,
             "code": "  test('@layers are replaced and cleaned when the html file changes', async () => {\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await writeInputFile('index.css', css`\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n\n        @layer base {\n          html {\n            scroll-behavior: smooth;\n          }\n        }\n      `);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    await appendToInputFile('index.html', html`<div class=\"font-normal\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).not.toIncludeCss(css`\n      @layer base {\n        html {\n          scroll-behavior: smooth;\n        }\n      }\n    `);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n        .font-normal {\n          font-weight: 400;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -757,11 +773,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 279,
+                "line": 307,
                 "column": 70,
-                "index": 8447
+                "index": 9189
             },
-            "line": 279,
+            "line": 307,
             "code": "  test('classes are generated when the tailwind.config.js file changes', async () => {\n    await writeInputFile('index.html', html`<div class=\"font-bold md:font-medium\"></div>`);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n        @media (min-width: 768px) {\n          .md\\:font-medium {\n            font-weight: 500;\n          }\n        }\n      `);\n    await writeInputFile('../tailwind.config.js', javascript`\n          module.exports = {\n            content: ['./src/index.html'],\n            theme: {\n              extend: {\n                screens: {\n                  md: '800px'\n                },\n                fontWeight: {\n                  bold: 'bold'\n                }\n              },\n            },\n            corePlugins: {\n              preflight: false,\n            },\n            plugins: [],\n          }\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: bold;\n        }\n        @media (min-width: 800px) {\n          .md\\:font-medium {\n            font-weight: 500;\n          }\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -773,11 +789,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 325,
+                "line": 353,
                 "column": 61,
-                "index": 9821
+                "index": 10563
             },
-            "line": 325,
+            "line": 353,
             "code": "  test('classes are generated when the index.css file changes', async () => {\n    await writeInputFile('index.html', html`<div class=\"btn font-bold\"></div>`);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    await writeInputFile('index.css', css`\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n\n        @layer components {\n          .btn {\n            @apply rounded px-2 py-1;\n          }\n        }\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .btn {\n          border-radius: 0.25rem;\n          padding-left: 0.5rem;\n          padding-right: 0.5rem;\n          padding-top: 0.25rem;\n          padding-bottom: 0.25rem;\n        }\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    await writeInputFile('index.css', css`\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n\n        @layer components {\n          .btn {\n            @apply rounded bg-red-500 px-2 py-1;\n          }\n        }\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .btn {\n          border-radius: 0.25rem;\n          --tw-bg-opacity: 1;\n          background-color: rgb(239 68 68 / var(--tw-bg-opacity));\n          padding-left: 0.5rem;\n          padding-right: 0.5rem;\n          padding-top: 0.25rem;\n          padding-bottom: 0.25rem;\n        }\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -789,11 +805,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 386,
+                "line": 414,
                 "column": 52,
-                "index": 11601
+                "index": 12343
             },
-            "line": 386,
+            "line": 414,
             "code": "  test('listens for changes to the @config directive', async () => {\n    await writeInputFile('index.html', html`<div class=\"bg-yellow\"></div>`);\n    await writeInputFile('index.css', css`\n        @config \"./tailwind.config.js\";\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await writeInputFile('tailwind.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#ff0',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    await writeInputFile('tailwind.2.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#ff7',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 0 / var(--tw-bg-opacity));\n        }\n      `);\n    await writeInputFile('index.css', css`\n        @config \"./tailwind.2.config.js\";\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 119 / var(--tw-bg-opacity));\n        }\n      `);\n    await writeInputFile('tailwind.2.config.js', javascript`\n        module.exports = {\n          content: {\n            relative: true,\n            files: ['./index.html'],\n          },\n          theme: {\n            extend: {\n              colors: {\n                yellow: '#fff',\n              }\n            },\n          },\n          corePlugins: {\n            preflight: false,\n          },\n        }\n      `);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .bg-yellow {\n          --tw-bg-opacity: 1;\n          background-color: rgb(255 255 255 / var(--tw-bg-opacity));\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,
@@ -805,11 +821,11 @@
                 "watcher"
             ],
             "updatePoint": {
-                "line": 478,
+                "line": 506,
                 "column": 121,
-                "index": 14283
+                "index": 15025
             },
-            "line": 478,
+            "line": 506,
             "code": "  test('classes are generated (and kept) when the index.html file changes (and removed when css/config files are changed)', async () => {\n    let runningProcess = $('node ../../lib/cli.js -i ./src/index.css -o ./dist/main.css -w');\n\n    // Start with a simple single class\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Add another class\n    await writeInputFile('index.html', html`<div class=\"flex font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Remove a class, because of performance reasons both classes will still be in the css file\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Save the index.css file, this should trigger a fresh context\n    await writeInputFile('index.css', css`\n        @tailwind base;\n        @tailwind components;\n        @tailwind utilities;\n      `);\n    await runningProcess.onStderr(ready);\n\n    // Only 1 class should stay, because we started from scratch\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Add another class\n    await writeInputFile('index.html', html`<div class=\"flex font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n\n    // Remove a class, because of performance reasons both classes will still be in the css file\n    await writeInputFile('index.html', html`<div class=\"font-bold\"></div>`);\n    await runningProcess.onStderr(ready);\n\n    // If everything goes right, then both classes should still be here (because of the performance\n    // improvement). If we didn't solve the bug where from now on every save is a fresh context\n    // then this only has 1 class. So let's hope there are 2!\n    expect(await readOutputFile('main.css')).toIncludeCss(css`\n        .flex {\n          display: flex;\n        }\n\n        .font-bold {\n          font-weight: 700;\n        }\n      `);\n    return runningProcess.stop();\n  });",
             "file": "integration.test.js",
             "skipped": false,

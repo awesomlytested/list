@@ -7196,18 +7196,35 @@
             "dir": "packages/babel-generator/test"
         },
         {
-            "name": "comment skipped because of newlines",
+            "name": "comment skipped in arrow function because of newlines",
             "suites": [
                 "programmatic generation",
                 "should print inner comments even if there are no suitable inner locations"
             ],
             "updatePoint": {
                 "line": 957,
-                "column": 43,
-                "index": 33955
+                "column": 61,
+                "index": 33973
             },
             "line": 957,
-            "code": "    it(\"comment skipped because of newlines\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }, {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\n        \"(x, y) /*foo*/ => z\n        /*new\n        line*/\"\n      `);\n    });",
+            "code": "    it(\"comment skipped in arrow function because of newlines\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }, {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\n        \"(x, y) /*foo*/ => z\n        /*new\n        line*/\"\n      `);\n    });",
+            "file": "index.js",
+            "skipped": false,
+            "dir": "packages/babel-generator/test"
+        },
+        {
+            "name": "comment in arrow function with return type",
+            "suites": [
+                "programmatic generation",
+                "should print inner comments even if there are no suitable inner locations"
+            ],
+            "updatePoint": {
+                "line": 972,
+                "column": 50,
+                "index": 34436
+            },
+            "line": 972,
+            "code": "    it(\"comment in arrow function with return type\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.returnType = t.tsTypeAnnotation(t.tsAnyKeyword());\n      arrow.returnType.trailingComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      },\n      // This comment is dropped. There is no way to safely print it\n      // as a trailingComment of the return type.\n      {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\"(x, y): any /*foo*/ => z\"`);\n    });",
             "file": "index.js",
             "skipped": false,
             "dir": "packages/babel-generator/test"
@@ -7218,11 +7235,11 @@
                 "CodeGenerator"
             ],
             "updatePoint": {
-                "line": 975,
+                "line": 990,
                 "column": 14,
-                "index": 34432
+                "index": 35075
             },
-            "line": 975,
+            "line": 990,
             "code": "  it(\"generate\", function () {\n    const codeGen = new CodeGenerator(t.numericLiteral(123));\n    const code = codeGen.generate().code;\n    expect(parse(code).program.body[0].expression.value).toBe(123);\n  });",
             "file": "index.js",
             "skipped": false,
