@@ -2985,6 +2985,38 @@
             "dir": "packages/core/tests"
         },
         {
+            "name": "image state changing",
+            "suites": [
+                "graph node states"
+            ],
+            "updatePoint": {
+                "line": 15,
+                "column": 26,
+                "index": 360
+            },
+            "line": 15,
+            "code": "  it('image state changing', done => {\n    const graph = new Graph({\n      container: div,\n      width: 500,\n      height: 500,\n      fitCenter: true,\n      defaultNode: {\n        type: 'image',\n        img: 'https://gw.alipayobjects.com/mdn/rms_f8c6a0/afts/img/A*eD7nT6tmYgAAAAAAAAAAAABkARQnAQ',\n        size: 24,\n        labelCfg: {\n          position: 'bottom',\n          style: {\n            fill: '#e80a0a',\n            fontSize: 10\n          }\n        }\n      },\n      nodeStateStyles: {\n        hover: {\n          img: 'https://gw.alipayobjects.com/zos/bmw-prod/5d015065-8505-4e7a-baec-976f81e3c41d.svg'\n        }\n      }\n    });\n    graph.data(data);\n    graph.render();\n    const node = graph.getNodes()[0];\n    graph.setItemState(node, 'hover', true);\n    expect(node.getKeyShape().attr('img')).toBe('https://gw.alipayobjects.com/zos/bmw-prod/5d015065-8505-4e7a-baec-976f81e3c41d.svg');\n    graph.setItemState(node, 'hover', false);\n    expect(node.getKeyShape().attr('img')).toBe('https://gw.alipayobjects.com/mdn/rms_f8c6a0/afts/img/A*eD7nT6tmYgAAAAAAAAAAAABkARQnAQ');\n    graph.destroy();\n    done();\n  });",
+            "file": "unit/state/image-state-spec.ts",
+            "skipped": false,
+            "dir": "packages/core/tests"
+        },
+        {
+            "name": "custom node with image and state changing",
+            "suites": [
+                "graph node states"
+            ],
+            "updatePoint": {
+                "line": 49,
+                "column": 47,
+                "index": 1501
+            },
+            "line": 49,
+            "code": "  it('custom node with image and state changing', done => {\n    G6.registerNode('item-node', {\n      options: {\n        stateStyles: {\n          highlight: {\n            'image-shape': {\n              opacity: 0.2\n            }\n          }\n        }\n      },\n      // @ts-ignore\n      draw(cfg, group) {\n        // @ts-ignore\n        const styles = {\n          width: 50,\n          height: 40\n        };\n        const {\n          labelCfg = {}\n        } = cfg || {};\n        const w = styles.width;\n        const h = styles.height;\n        const keyShape = group.addShape('rect', {\n          attrs: {\n            ...styles,\n            fill: '#0ff',\n            x: -w / 2,\n            y: -h / 2,\n            width: styles.width + 10\n          }\n        });\n        group.addShape('image', {\n          attrs: {\n            width: 20,\n            height: 20,\n            img: 'https://gw.alipayobjects.com/mdn/rms_f8c6a0/afts/img/A*eD7nT6tmYgAAAAAAAAAAAABkARQnAQ',\n            x: -w / 2,\n            y: -20 / 2\n          },\n          name: 'image-shape'\n        });\n        group.addShape('text', {\n          attrs: {\n            fontSize: 12,\n            fill: '#000',\n            text: 'test',\n            x: -w / 2 + 20 + 4,\n            y: 6\n          },\n          name: 'text-shape'\n        });\n        return keyShape;\n      }\n    }, 'rect');\n    const graph = new Graph({\n      container: div,\n      width: 500,\n      height: 500,\n      fitCenter: true,\n      defaultNode: {\n        type: 'item-node'\n      }\n    });\n    graph.data({\n      nodes: [{\n        id: 'node1',\n        x: 100,\n        y: 100\n      }]\n    });\n    graph.render();\n    const node = graph.getNodes()[0];\n    graph.setItemState(node, 'highlight', true);\n    expect(node.getContainer().find(e => e.get('name') === 'image-shape').attr('opacity')).toBe(0.2);\n    setTimeout(() => {\n      graph.setItemState(node, 'highlight', false);\n      console.log(node);\n    }, 500);\n\n    // graph.destroy();\n    done();\n  });",
+            "file": "unit/state/image-state-spec.ts",
+            "skipped": false,
+            "dir": "packages/core/tests"
+        },
+        {
             "name": "global nodeStateStyles and defaultNode, state change with opacity changed",
             "suites": [
                 "graph node states"
