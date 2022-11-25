@@ -1535,7 +1535,7 @@
                 "column": 78
             },
             "line": 48,
-            "code": "  test('allow to specify overwrite for specific output (should not write file)', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    // forces file to exist\n    const fileExistsSpy = jest.spyOn(fs, 'fileExists');\n    fileExistsSpy.mockImplementation(async file => file === filename);\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        overwrite: true,\n        generates: {\n          [filename]: {\n            overwrite: false,\n            schema: `\n            type OtherType { a: String }\n          `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it checks if file is there\n    expect(fileExistsSpy).toHaveBeenCalledWith(filename);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).not.toHaveBeenCalled();\n  });",
+            "code": "  test('allow to specify overwrite for specific output (should not write file)', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    // forces file to exist\n    const fileReadSpy = jest.spyOn(fs, 'readFile');\n    fileReadSpy.mockImplementation(async () => '');\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        overwrite: true,\n        generates: {\n          [filename]: {\n            overwrite: false,\n            schema: `\n            type OtherType { a: String }\n          `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it checks if file is there\n    expect(fileReadSpy).toHaveBeenCalledWith(filename);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).not.toHaveBeenCalled();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
             "dir": "packages/graphql-codegen-cli/tests"
@@ -1565,7 +1565,7 @@
                 "column": 63
             },
             "line": 104,
-            "code": "  test('should use global overwrite option and not write a file', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    // forces file to exist\n    const fileExistsSpy = jest.spyOn(fs, 'fileExists');\n    fileExistsSpy.mockImplementation(async file => file === filename);\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        overwrite: false,\n        generates: {\n          [filename]: {\n            schema: `\n            type OtherType { a: String }\n          `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it checks if file is there\n    expect(fileExistsSpy).toHaveBeenCalledWith(filename);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).not.toHaveBeenCalled();\n  });",
+            "code": "  test('should use global overwrite option and not write a file', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    // forces file to exist\n    const fileReadSpy = jest.spyOn(fs, 'readFile');\n    fileReadSpy.mockImplementation(async () => '');\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        overwrite: false,\n        generates: {\n          [filename]: {\n            schema: `\n            type OtherType { a: String }\n          `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it checks if file is there\n    expect(fileReadSpy).toHaveBeenCalledWith(filename);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).not.toHaveBeenCalled();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
             "dir": "packages/graphql-codegen-cli/tests"
@@ -1580,7 +1580,7 @@
                 "column": 42
             },
             "line": 134,
-            "code": "  test('should overwrite a file by default', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    const readSpy = jest.spyOn(fs, 'readFile').mockImplementation();\n    readSpy.mockImplementation(async _f => '');\n    // forces file to exist\n    const fileExistsSpy = jest.spyOn(fs, 'fileExists');\n    fileExistsSpy.mockImplementation(async file => file === filename);\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        generates: {\n          [filename]: {\n            schema: /* GraphQL */ `\n              type OtherType {\n                a: String\n              }\n            `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).toHaveBeenCalled();\n  });",
+            "code": "  test('should overwrite a file by default', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n    const readSpy = jest.spyOn(fs, 'readFile').mockImplementation();\n    readSpy.mockImplementation(async _f => '');\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        generates: {\n          [filename]: {\n            schema: /* GraphQL */ `\n              type OtherType {\n                a: String\n              }\n            `,\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    // makes sure it doesn't write a new file\n    expect(writeSpy).toHaveBeenCalled();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
             "dir": "packages/graphql-codegen-cli/tests"
@@ -1591,10 +1591,10 @@
                 "generate-and-save"
             ],
             "updatePoint": {
-                "line": 165,
+                "line": 162,
                 "column": 39
             },
-            "line": 165,
+            "line": 162,
             "code": "  test('should override generated files', async () => {\n    jest.unmock('fs');\n    const fs = await import('fs');\n\n    makeDir.sync(dirname(outputFile));\n    if (fs.existsSync(outputFile)) {\n      fs.unlinkSync(outputFile);\n    }\n    fs.writeFileSync(\n      inputFile,\n      `\n    import gql from 'graphql-tag';\n    const MyQuery = gql\\`query MyQuery { f }\\`;\n  `,\n      {}\n    );\n    const generateOnce: () => Promise<Types.FileOutput[]> = () =>\n      generate(\n        {\n          schema: SIMPLE_TEST_SCHEMA,\n          documents: inputFile,\n          generates: {\n            [outputFile]: {\n              plugins: ['typescript', 'typescript-operations', 'typescript-react-apollo'],\n            },\n          },\n        },\n        true\n      );\n    const [firstOutput] = await generateOnce();\n    fs.writeFileSync(firstOutput.filename, firstOutput.content);\n    await generateOnce();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
@@ -1606,10 +1606,10 @@
                 "generate-and-save"
             ],
             "updatePoint": {
-                "line": 198,
+                "line": 195,
                 "column": 80
             },
-            "line": 198,
+            "line": 195,
             "code": "  test('should extract a document from the gql tag (imported from apollo-server)', async () => {\n    const filename = 'overwrite.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n\n    const output = await generate(\n      {\n        schema: `./tests/test-files/schema-dir/gatsby-and-custom-parsers/apollo-server.ts`,\n        generates: {\n          [filename]: {\n            plugins: ['typescript'],\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    expect(output[0].content).toMatch('Used apollo-server');\n    // makes sure it doesn't write a new file\n    expect(writeSpy).toHaveBeenCalled();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
