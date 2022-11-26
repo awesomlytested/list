@@ -268,11 +268,11 @@
             "name": "measure  - ",
             "suites": [],
             "updatePoint": {
-                "line": 43,
+                "line": 48,
                 "column": 41,
-                "index": 3434
+                "index": 3557
             },
-            "line": 43,
+            "line": 48,
             "code": "    test(`measure ${file} - ${sample + 1}`, async ({\n      baseURL,\n      browserName,\n      page\n    }, testInfo) => {\n      const attachmentCommon = {\n        nSamples: benchmark.nSamples,\n        browser: browserName,\n        file: path.basename(file, '.ipynb'),\n        project: testInfo.project.name\n      };\n      const perf = galata.newPerformanceHelper(page);\n      await page.goto(baseURL + '?reset');\n      await page.click('#filebrowser >> .jp-BreadCrumbs-home');\n      await page.dblclick(`#filebrowser >> text=${tmpPath}`);\n      const openTime = await perf.measure(async () => {\n        // Open the notebook and wait for the spinner\n        await Promise.all([page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent'), page.dblclick(`#filebrowser >> text=${file}`)]);\n\n        // Wait for spinner to be hidden\n        await page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent', {\n          state: 'hidden'\n        });\n      });\n\n      // Check the notebook is correctly opened\n      let panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      let document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'open',\n        time: openTime\n      }));\n\n      // Shutdown the kernel to be sure it does not get in our way (especially for the close action)\n      await page.click('li[role=\"menuitem\"]:has-text(\"Kernel\")');\n      await page.click('ul[role=\"menu\"] >> text=Shut Down All Kernels…');\n      await page.click('button:has-text(\"Shut Down All\") >> nth=-1'); // Click on the last matched button.\n\n      // Open text file\n      const fromTime = await perf.measure(async () => {\n        await page.dblclick(`#filebrowser >> text=${textFile}`);\n        await page.waitForSelector(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${path.basename(textFile)}`);\n      });\n      let editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-from',\n        time: fromTime\n      }));\n\n      // Switch back\n      const toTime = await perf.measure(async () => {\n        await page.click(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${file}`);\n      });\n\n      // Check the notebook is correctly opened\n      panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-to',\n        time: toTime\n      }));\n\n      // Close notebook\n      await page.click('li[role=\"menuitem\"]:has-text(\"File\")');\n      const closeTime = await perf.measure(async () => {\n        await page.click('ul[role=\"menu\"] >> text=Close Tab');\n        // Revert changes so we don't measure saving\n        const dimissButton = page.locator('button:has-text(\"Discard\")');\n        if (await dimissButton.isVisible({\n          timeout: 50\n        })) {\n          await dimissButton.click();\n        }\n      });\n      editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'close',\n        time: closeTime\n      }));\n    });",
             "file": "benchmark/notebook.spec.ts",
             "skipped": false,
@@ -1299,11 +1299,11 @@
             "name": "Show Collapser Unselected; no_showHCB",
             "suites": [],
             "updatePoint": {
-                "line": 68,
+                "line": 69,
                 "column": 45,
-                "index": 2397
+                "index": 2475
             },
-            "line": 68,
+            "line": 69,
             "code": "  test('Show Collapser Unselected; no_showHCB', async ({\n    page\n  }) => {\n    expect(await (await page.notebook.getCell(0)).screenshot()).toMatchSnapshot('no_showHCB_heading_unselected.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1313,11 +1313,11 @@
             "name": "Show Collapser Selected; no_showHCB",
             "suites": [],
             "updatePoint": {
-                "line": 73,
+                "line": 74,
                 "column": 43,
-                "index": 2595
+                "index": 2673
             },
-            "line": 73,
+            "line": 74,
             "code": "  test('Show Collapser Selected; no_showHCB', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(0);\n    expect(await (await page.notebook.getCell(0)).screenshot()).toMatchSnapshot('no_showHCB_heading_selected.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1327,11 +1327,11 @@
             "name": "Collapse Heading; no_showHCB",
             "suites": [],
             "updatePoint": {
-                "line": 79,
+                "line": 80,
                 "column": 36,
-                "index": 2824
+                "index": 2902
             },
-            "line": 79,
+            "line": 80,
             "code": "  test('Collapse Heading; no_showHCB', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(0);\n    await page.click('text=# Heading 1Heading 1¶ >> button');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('no_showHCB_collapse_heading.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1341,11 +1341,11 @@
             "name": "Expand Heading via Collapser Button; no_showHCB",
             "suites": [],
             "updatePoint": {
-                "line": 86,
+                "line": 87,
                 "column": 55,
-                "index": 3144
+                "index": 3222
             },
-            "line": 86,
+            "line": 87,
             "code": "  test('Expand Heading via Collapser Button; no_showHCB', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(0);\n    await page.click('text=# Heading 1Heading 1¶ >> button');\n    await page.click('text=# Heading 1Heading 1¶ >> button');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('no_showHCB_expand_heading_via_collapser.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1355,11 +1355,11 @@
             "name": "Jump to Previous Header",
             "suites": [],
             "updatePoint": {
-                "line": 113,
+                "line": 114,
                 "column": 31,
-                "index": 4199
+                "index": 4277
             },
-            "line": 113,
+            "line": 114,
             "code": "  test('Jump to Previous Header', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('jump_previous_header.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1369,11 +1369,11 @@
             "name": "Collapse Previous Header",
             "suites": [],
             "updatePoint": {
-                "line": 120,
+                "line": 121,
                 "column": 32,
-                "index": 4471
+                "index": 4549
             },
-            "line": 120,
+            "line": 121,
             "code": "  test('Collapse Previous Header', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('collapse_previous_header.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1383,11 +1383,11 @@
             "name": "Collapse Previous Headers",
             "suites": [],
             "updatePoint": {
-                "line": 128,
+                "line": 129,
                 "column": 33,
-                "index": 4792
+                "index": 4870
             },
-            "line": 128,
+            "line": 129,
             "code": "  test('Collapse Previous Headers', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('collapse_previous_headers.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1397,11 +1397,11 @@
             "name": "ReExpand Headers 01",
             "suites": [],
             "updatePoint": {
-                "line": 138,
+                "line": 139,
                 "column": 27,
-                "index": 5196
+                "index": 5274
             },
-            "line": 138,
+            "line": 139,
             "code": "  test('ReExpand Headers 01', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('a');\n    await page.keyboard.press('ArrowRight');\n    await page.keyboard.press('ArrowRight');\n    await page.keyboard.press('ArrowRight');\n    await page.keyboard.press('ArrowLeft');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('reexpand_headers_01.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1411,11 +1411,11 @@
             "name": "ReExpand Headers 02",
             "suites": [],
             "updatePoint": {
-                "line": 153,
+                "line": 154,
                 "column": 27,
-                "index": 5809
+                "index": 5887
             },
-            "line": 153,
+            "line": 154,
             "code": "  test('ReExpand Headers 02', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowDown');\n    await page.keyboard.press('ArrowRight');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('reexpand_headers_02.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1425,11 +1425,11 @@
             "name": "ReExpand Headers 03",
             "suites": [],
             "updatePoint": {
-                "line": 165,
+                "line": 166,
                 "column": 27,
-                "index": 6296
+                "index": 6374
             },
-            "line": 165,
+            "line": 166,
             "code": "  test('ReExpand Headers 03', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowUp');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('reexpand_headers_03a.png');\n    await page.keyboard.press('ArrowRight');\n    await page.keyboard.press('ArrowRight');\n    await page.keyboard.press('ArrowRight');\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('reexpand_headers_03b.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1439,11 +1439,11 @@
             "name": "Add Header Below 01",
             "suites": [],
             "updatePoint": {
-                "line": 182,
+                "line": 183,
                 "column": 27,
-                "index": 7079
+                "index": 7157
             },
-            "line": 182,
+            "line": 183,
             "code": "  test('Add Header Below 01', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('Shift+B');\n    await page.waitForTimeout(200);\n    await page.keyboard.type('Heading 3');\n    await page.keyboard.press('Shift+Enter');\n    await page.notebook.selectCells(2);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_below_01.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1453,11 +1453,11 @@
             "name": "Add Header Below 02",
             "suites": [],
             "updatePoint": {
-                "line": 197,
+                "line": 198,
                 "column": 27,
-                "index": 7675
+                "index": 7753
             },
-            "line": 197,
+            "line": 198,
             "code": "  test('Add Header Below 02', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('Shift+B');\n    await page.waitForTimeout(200);\n    await page.keyboard.type('Heading 3');\n    await page.keyboard.press('Shift+Enter');\n    await page.notebook.selectCells(0);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_below_02.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1467,11 +1467,11 @@
             "name": "Add Header Below 03",
             "suites": [],
             "updatePoint": {
-                "line": 212,
+                "line": 213,
                 "column": 27,
-                "index": 8280
+                "index": 8358
             },
-            "line": 212,
+            "line": 213,
             "code": "  test('Add Header Below 03', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('ArrowUp');\n    await page.keyboard.press('ArrowLeft');\n    await page.keyboard.press('Shift+B');\n    await page.waitForTimeout(200);\n    await page.keyboard.type('Heading 1.2');\n    await page.keyboard.press('Shift+Enter');\n    await page.notebook.selectCells(2);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_below_03.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1481,11 +1481,11 @@
             "name": "Add Header Above 01",
             "suites": [],
             "updatePoint": {
-                "line": 229,
+                "line": 230,
                 "column": 27,
-                "index": 8966
+                "index": 9044
             },
-            "line": 229,
+            "line": 230,
             "code": "  test('Add Header Above 01', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(6);\n    await page.keyboard.press('Shift+A');\n    await page.waitForTimeout(200);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_above_01.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1495,11 +1495,11 @@
             "name": "Add Header Above 02",
             "suites": [],
             "updatePoint": {
-                "line": 239,
+                "line": 240,
                 "column": 27,
-                "index": 9347
+                "index": 9425
             },
-            "line": 239,
+            "line": 240,
             "code": "  test('Add Header Above 02', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(4);\n    await page.keyboard.press('Shift+A');\n    await page.waitForTimeout(200);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_above_02.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -1509,11 +1509,11 @@
             "name": "Add Header Above 03",
             "suites": [],
             "updatePoint": {
-                "line": 249,
+                "line": 250,
                 "column": 27,
-                "index": 9728
+                "index": 9806
             },
-            "line": 249,
+            "line": 250,
             "code": "  test('Add Header Above 03', async ({\n    page\n  }) => {\n    await page.notebook.selectCells(3);\n    await page.keyboard.press('Shift+A');\n    await page.waitForTimeout(200);\n    expect(await (await page.notebook.getNotebookInPanel()).screenshot()).toMatchSnapshot('add_header_above_03.png');\n  });",
             "file": "jupyterlab/collapsible-headings.test.ts",
             "skipped": false,
@@ -18125,10 +18125,10 @@
                 "#constructor()"
             ],
             "updatePoint": {
-                "line": 87,
+                "line": 91,
                 "column": 53
             },
-            "line": 87,
+            "line": 91,
             "code": "      it('should create a new document widget manager', () => {\n        expect(manager).toBeInstanceOf(DocumentWidgetManager);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18142,10 +18142,10 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 93,
+                "line": 97,
                 "column": 53
             },
-            "line": 93,
+            "line": 97,
             "code": "      it('should test whether the manager is disposed', () => {\n        expect(manager.isDisposed).toBe(false);\n        manager.dispose();\n        expect(manager.isDisposed).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18159,10 +18159,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 101,
+                "line": 105,
                 "column": 61
             },
-            "line": 101,
+            "line": 105,
             "code": "      it('should dispose of the resources used by the manager', () => {\n        expect(manager.isDisposed).toBe(false);\n        manager.dispose();\n        expect(manager.isDisposed).toBe(true);\n        manager.dispose();\n        expect(manager.isDisposed).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18176,10 +18176,10 @@
                 "#createWidget()"
             ],
             "updatePoint": {
-                "line": 111,
+                "line": 115,
                 "column": 32
             },
-            "line": 111,
+            "line": 115,
             "code": "      it('should create a widget', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n\n        expect(widget).toBeInstanceOf(Widget);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18193,10 +18193,10 @@
                 "#createWidget()"
             ],
             "updatePoint": {
-                "line": 117,
+                "line": 121,
                 "column": 46
             },
-            "line": 117,
+            "line": 121,
             "code": "      it('should emit the widgetCreated signal', () => {\n        let called = false;\n\n        widgetFactory.widgetCreated.connect(() => {\n          called = true;\n        });\n        manager.createWidget(widgetFactory, context);\n        expect(called).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18210,10 +18210,10 @@
                 "#adoptWidget()"
             ],
             "updatePoint": {
-                "line": 129,
+                "line": 133,
                 "column": 39
             },
-            "line": 129,
+            "line": 133,
             "code": "      it('should install a message hook', () => {\n        const content = new Widget();\n        const widget = new DocumentWidget({ content, context });\n\n        manager.adoptWidget(context, widget);\n        MessageLoop.sendMessage(widget, new Message('foo'));\n        expect(manager.methods).toEqual(\n          expect.arrayContaining(['messageHook'])\n        );\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18227,10 +18227,10 @@
                 "#adoptWidget()"
             ],
             "updatePoint": {
-                "line": 140,
+                "line": 144,
                 "column": 39
             },
-            "line": 140,
+            "line": 144,
             "code": "      it('should add the document class', () => {\n        const content = new Widget();\n        const widget = new DocumentWidget({ content, context });\n\n        manager.adoptWidget(context, widget);\n        expect(widget.hasClass('jp-Document')).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18244,10 +18244,10 @@
                 "#adoptWidget()"
             ],
             "updatePoint": {
-                "line": 148,
+                "line": 152,
                 "column": 31
             },
-            "line": 148,
+            "line": 152,
             "code": "      it('should be retrievable', () => {\n        const content = new Widget();\n        const widget = new DocumentWidget({ content, context });\n\n        manager.adoptWidget(context, widget);\n        expect(manager.contextForWidget(widget)).toBe(context);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18261,10 +18261,10 @@
                 "#findWidget()"
             ],
             "updatePoint": {
-                "line": 158,
+                "line": 162,
                 "column": 41
             },
-            "line": 158,
+            "line": 162,
             "code": "      it('should find a registered widget', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n\n        expect(manager.findWidget(context, 'test')).toBe(widget);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18278,10 +18278,10 @@
                 "#findWidget()"
             ],
             "updatePoint": {
-                "line": 164,
+                "line": 168,
                 "column": 46
             },
-            "line": 164,
+            "line": 168,
             "code": "      it('should return undefined if not found', () => {\n        expect(manager.findWidget(context, 'test')).toBeUndefined();\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18295,10 +18295,10 @@
                 "#contextForWidget()"
             ],
             "updatePoint": {
-                "line": 170,
+                "line": 174,
                 "column": 48
             },
-            "line": 170,
+            "line": 174,
             "code": "      it('should return the context for a widget', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n\n        expect(manager.contextForWidget(widget)).toBe(context);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18312,10 +18312,10 @@
                 "#contextForWidget()"
             ],
             "updatePoint": {
-                "line": 176,
+                "line": 180,
                 "column": 48
             },
-            "line": 176,
+            "line": 180,
             "code": "      it('should return undefined if not tracked', () => {\n        expect(manager.contextForWidget(new Widget())).toBeUndefined();\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18329,10 +18329,10 @@
                 "#cloneWidget()"
             ],
             "updatePoint": {
-                "line": 182,
+                "line": 186,
                 "column": 81
             },
-            "line": 182,
+            "line": 186,
             "code": "      it('should create a new widget with the same context using the same factory', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n        const clone = manager.cloneWidget(widget)!;\n\n        expect(clone.hasClass('WidgetFactory')).toBe(true);\n        expect(clone.hasClass('jp-Document')).toBe(true);\n        expect(manager.contextForWidget(clone)).toBe(context);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18346,10 +18346,10 @@
                 "#cloneWidget()"
             ],
             "updatePoint": {
-                "line": 191,
+                "line": 195,
                 "column": 69
             },
-            "line": 191,
+            "line": 195,
             "code": "      it('should return undefined if the source widget is not managed', () => {\n        expect(manager.cloneWidget(new Widget())).toBeUndefined();\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18363,10 +18363,10 @@
                 "#closeWidgets()"
             ],
             "updatePoint": {
-                "line": 197,
+                "line": 201,
                 "column": 67
             },
-            "line": 197,
+            "line": 201,
             "code": "      it('should close all of the widgets associated with a context', async () => {\n        const widget = manager.createWidget(widgetFactory, context);\n        const clone = manager.cloneWidget(widget)!;\n\n        await manager.closeWidgets(context);\n        expect(widget.isDisposed).toBe(true);\n        expect(clone.isDisposed).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18380,10 +18380,10 @@
                 "#messageHook()"
             ],
             "updatePoint": {
-                "line": 208,
+                "line": 212,
                 "column": 60
             },
-            "line": 208,
+            "line": 212,
             "code": "      it('should be called for a message to a tracked widget', () => {\n        const content = new Widget();\n        const widget = new DocumentWidget({ content, context });\n\n        manager.adoptWidget(context, widget);\n        MessageLoop.sendMessage(widget, new Message('foo'));\n        expect(manager.methods).toEqual(\n          expect.arrayContaining(['messageHook'])\n        );\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18397,10 +18397,10 @@
                 "#messageHook()"
             ],
             "updatePoint": {
-                "line": 219,
+                "line": 223,
                 "column": 56
             },
-            "line": 219,
+            "line": 223,
             "code": "      it('should return false for close-request messages', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n        const msg = new Message('close-request');\n\n        expect(manager.messageHook(widget, msg)).toBe(false);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18414,10 +18414,10 @@
                 "#messageHook()"
             ],
             "updatePoint": {
-                "line": 226,
+                "line": 230,
                 "column": 47
             },
-            "line": 226,
+            "line": 230,
             "code": "      it('should return true for other messages', () => {\n        const widget = manager.createWidget(widgetFactory, context);\n        const msg = new Message('foo');\n\n        expect(manager.messageHook(widget, msg)).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18431,10 +18431,10 @@
                 "#setCaption()"
             ],
             "updatePoint": {
-                "line": 235,
+                "line": 239,
                 "column": 44
             },
-            "line": 235,
+            "line": 239,
             "code": "      it('should set the title of the widget', async () => {\n        await context.initialize(true);\n\n        const widget = manager.createWidget(widgetFactory, context);\n        const delegate = new PromiseDelegate();\n\n        widget.title.changed.connect(async () => {\n          expect(manager.methods).toEqual(\n            expect.arrayContaining(['setCaption'])\n          );\n          expect(widget.title.caption).toContain('Last Checkpoint');\n          await dismissDialog();\n          delegate.resolve(undefined);\n        });\n        await delegate.promise;\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18448,11 +18448,45 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 254,
+                "line": 258,
                 "column": 50
             },
-            "line": 254,
+            "line": 258,
             "code": "      it('should be called when a widget is closed', async () => {\n        const widget = manager.createWidget(widgetFactory, context);\n        const delegate = new PromiseDelegate();\n\n        widget.disposed.connect(async () => {\n          expect(manager.methods).toEqual(expect.arrayContaining(['onClose']));\n          await dismissDialog();\n          delegate.resolve(undefined);\n        });\n        widget.close();\n        await delegate.promise;\n      });",
+            "file": "widgetmanager.spec.ts",
+            "skipped": false,
+            "dir": "packages/docmanager/test"
+        },
+        {
+            "name": "should ask confirmation when a widget is closing",
+            "suites": [
+                "@jupyterlab/docmanager",
+                "DocumentWidgetManager",
+                "#onClose()"
+            ],
+            "updatePoint": {
+                "line": 271,
+                "column": 58
+            },
+            "line": 271,
+            "code": "      it('should ask confirmation when a widget is closing', async () => {\n        manager.confirmClosingDocument = true;\n        const widget = manager.createWidget(widgetFactory, context);\n\n        widget.close();\n        await dismissDialog();\n\n        expect(widget.isDisposed).toEqual(false);\n        widget.dispose();\n      });",
+            "file": "widgetmanager.spec.ts",
+            "skipped": false,
+            "dir": "packages/docmanager/test"
+        },
+        {
+            "name": "should confirm widget close action",
+            "suites": [
+                "@jupyterlab/docmanager",
+                "DocumentWidgetManager",
+                "#onClose()"
+            ],
+            "updatePoint": {
+                "line": 282,
+                "column": 44
+            },
+            "line": 282,
+            "code": "      it('should confirm widget close action', async () => {\n        manager.confirmClosingDocument = true;\n        const widget = manager.createWidget(widgetFactory, context);\n        const delegate = new PromiseDelegate();\n\n        widget.close();\n        await acceptDialog();\n\n        widget.disposed.connect(async () => {\n          expect(manager.methods).toEqual(expect.arrayContaining(['onClose']));\n          delegate.resolve(undefined);\n        });\n        await delegate.promise;\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
             "dir": "packages/docmanager/test"
@@ -18465,11 +18499,28 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 267,
+                "line": 297,
                 "column": 47
             },
-            "line": 267,
+            "line": 297,
             "code": "      it('should prompt the user before closing', async () => {\n        // Populate the model with content.\n        context.model.fromString('foo');\n\n        const widget = manager.createWidget(widgetFactory, context);\n        const closed = manager.onClose(widget);\n\n        await Promise.all([dangerDialog(), closed]);\n\n        expect(widget.isDisposed).toBe(true);\n      });",
+            "file": "widgetmanager.spec.ts",
+            "skipped": false,
+            "dir": "packages/docmanager/test"
+        },
+        {
+            "name": "should ask confirmation when a dirty widget is closing",
+            "suites": [
+                "@jupyterlab/docmanager",
+                "DocumentWidgetManager",
+                "#onClose()"
+            ],
+            "updatePoint": {
+                "line": 309,
+                "column": 64
+            },
+            "line": 309,
+            "code": "      it('should ask confirmation when a dirty widget is closing', async () => {\n        manager.confirmClosingDocument = true;\n        context.model.fromString('foo');\n\n        const widget = manager.createWidget(widgetFactory, context);\n        const closed = manager.onClose(widget);\n\n        await Promise.all([dangerDialog(), closed]);\n\n        expect(widget.isDisposed).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
             "dir": "packages/docmanager/test"
@@ -18482,10 +18533,10 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 279,
+                "line": 321,
                 "column": 54
             },
-            "line": 279,
+            "line": 321,
             "code": "      it('should not prompt if the factory is readonly', async () => {\n        const readonly = manager.createWidget(readOnlyFactory, context);\n\n        await manager.onClose(readonly);\n\n        expect(readonly.isDisposed).toBe(true);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18499,10 +18550,10 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 287,
+                "line": 329,
                 "column": 59
             },
-            "line": 287,
+            "line": 329,
             "code": "      it('should not prompt if the other widget is writable', async () => {\n        // Populate the model with content.\n        context.model.fromString('foo');\n\n        const one = manager.createWidget(widgetFactory, context);\n        const two = manager.createWidget(widgetFactory, context);\n\n        await manager.onClose(one);\n\n        expect(one.isDisposed).toBe(true);\n        expect(two.isDisposed).toBe(false);\n        two.dispose();\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18516,10 +18567,10 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 301,
+                "line": 343,
                 "column": 71
             },
-            "line": 301,
+            "line": 343,
             "code": "      it('should prompt if the only other widget has a readonly factory', async () => {\n        // Populate the model with content.\n        context.model.fromString('foo');\n\n        const writable = manager.createWidget(widgetFactory, context);\n        const readonly = manager.createWidget(readOnlyFactory, context);\n        const closed = manager.onClose(writable);\n\n        await dangerDialog();\n        await closed;\n\n        expect(writable.isDisposed).toBe(true);\n        expect(readonly.isDisposed).toBe(false);\n        readonly.dispose();\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
@@ -18533,10 +18584,10 @@
                 "#onClose()"
             ],
             "updatePoint": {
-                "line": 317,
+                "line": 359,
                 "column": 33
             },
-            "line": 317,
+            "line": 359,
             "code": "      it('should close the widget', async () => {\n        context.model.fromString('foo');\n        const widget = manager.createWidget(widgetFactory, context);\n        const promise = manager.onClose(widget);\n        await dismissDialog();\n        await promise;\n        expect(widget.isDisposed).toBe(false);\n      });",
             "file": "widgetmanager.spec.ts",
             "skipped": false,
