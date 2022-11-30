@@ -6391,16 +6391,32 @@
             "dir": "packages/babel-generator/test"
         },
         {
-            "name": "comments without node.loc",
+            "name": "comments without loc3",
             "suites": [
                 "generation"
             ],
             "updatePoint": {
                 "line": 612,
-                "column": 31,
-                "index": 18354
+                "column": 27,
+                "index": 18350
             },
             "line": 612,
+            "code": "  it(\"comments without loc3\", () => {\n    const ast = parse(`\n        /** This describes how the endpoint is implemented when the lease is deployed */\n        export enum Endpoint_Kind {\n          /** SHARED_HTTP - Describes an endpoint that becomes a Kubernetes Ingress */\n          SHARED_HTTP = 0,\n          /** RANDOM_PORT - Describes an endpoint that becomes a Kubernetes NodePort */\n          RANDOM_PORT = 1,\n          UNRECOGNIZED = -1,\n        }\n      `, {\n      sourceType: \"module\",\n      plugins: [\"typescript\"]\n    });\n    for (const comment of ast.comments) {\n      comment.loc = undefined;\n    }\n    expect(generate(ast).code).toMatchInlineSnapshot(`\n      \"/** This describes how the endpoint is implemented when the lease is deployed */\n      export enum Endpoint_Kind {\n        /** SHARED_HTTP - Describes an endpoint that becomes a Kubernetes Ingress */\n        SHARED_HTTP = 0,\n        /** RANDOM_PORT - Describes an endpoint that becomes a Kubernetes NodePort */\n        RANDOM_PORT = 1,\n        UNRECOGNIZED = -1,\n      }\"\n    `);\n  });",
+            "file": "index.js",
+            "skipped": false,
+            "dir": "packages/babel-generator/test"
+        },
+        {
+            "name": "comments without node.loc",
+            "suites": [
+                "generation"
+            ],
+            "updatePoint": {
+                "line": 640,
+                "column": 31,
+                "index": 19413
+            },
+            "line": 640,
             "code": "  it(\"comments without node.loc\", () => {\n    const ast = parse(`\n        (function (_templateFactory) {\n            \"use strict\";\n\n            const template = (0, _templateFactory.createTemplateFactory)(\n            /*{{somevalue}}*/\n            {\n                \"id\": null,\n                \"block\": \"[[[1,[34,0]]],[],false,[\\\\\"somevalue\\\\\"]]\",\n                \"moduleName\": \"(unknown template module)\",\n                \"isStrictMode\": false\n            });\n        });\n\n        const template = (0, _templateFactory.createTemplateFactory)(\n        /*\n          {{somevalue}}\n        */\n        {\n            \"id\": null,\n            \"block\": \"[[[1,[34,0]]],[],false,[\\\\\"somevalue\\\\\"]]\",\n            \"moduleName\": \"(unknown template module)\",\n            \"isStrictMode\": false\n        });\n      `, {\n      sourceType: \"module\"\n    });\n    const ast2 = t.cloneNode(ast, true, true);\n    for (let i = 0; i < ast.comments.length; i++) {\n      ast2.comments[i].loc = ast.comments[i].loc;\n    }\n    expect(generate(ast2).code).toMatchInlineSnapshot(`\n      \"(function (_templateFactory) {\n        \\\\\"use strict\\\\\";\n\n        const template = (0, _templateFactory.createTemplateFactory)(\n        /*{{somevalue}}*/\n        {\n          \\\\\"id\\\\\": null,\n          \\\\\"block\\\\\": \\\\\"[[[1,[34,0]]],[],false,[\\\\\\\\\\\\\"somevalue\\\\\\\\\\\\\"]]\\\\\",\n          \\\\\"moduleName\\\\\": \\\\\"(unknown template module)\\\\\",\n          \\\\\"isStrictMode\\\\\": false\n        });\n      });\n      const template = (0, _templateFactory.createTemplateFactory)(\n      /*\n        {{somevalue}}\n      */\n      {\n        \\\\\"id\\\\\": null,\n        \\\\\"block\\\\\": \\\\\"[[[1,[34,0]]],[],false,[\\\\\\\\\\\\\"somevalue\\\\\\\\\\\\\"]]\\\\\",\n        \\\\\"moduleName\\\\\": \\\\\"(unknown template module)\\\\\",\n        \\\\\"isStrictMode\\\\\": false\n      });\"\n    `);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6412,11 +6428,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 671,
+                "line": 699,
                 "column": 73,
-                "index": 20230
+                "index": 21289
             },
-            "line": 671,
+            "line": 699,
             "code": "  it(\"should add parenthesis when NullishCoalescing is used along with ||\", function () {\n    // https://github.com/babel/babel/issues/10260\n    const nullishCoalesc = t.logicalExpression(\"??\", t.logicalExpression(\"||\", t.identifier(\"a\"), t.identifier(\"b\")), t.identifier(\"c\"));\n    const output = generate(nullishCoalesc).code;\n    expect(output).toBe(`(a || b) ?? c`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6428,11 +6444,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 677,
+                "line": 705,
                 "column": 66,
-                "index": 20600
+                "index": 21659
             },
-            "line": 677,
+            "line": 705,
             "code": "  it(\"should add parenthesis when NullishCoalesing is used with &&\", function () {\n    const nullishCoalesc = t.logicalExpression(\"??\", t.identifier(\"a\"), t.logicalExpression(\"&&\", t.identifier(\"b\"), t.logicalExpression(\"&&\", t.identifier(\"c\"), t.identifier(\"d\"))));\n    const output = generate(nullishCoalesc).code;\n    expect(output).toBe(`a ?? (b && c && d)`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6444,11 +6460,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 682,
+                "line": 710,
                 "column": 31,
-                "index": 20935
+                "index": 21994
             },
-            "line": 682,
+            "line": 710,
             "code": "  it(\"numeric member expression\", function () {\n    // Should not generate `0.foo`\n    const mem = t.memberExpression(t.numericLiteral(60702), t.identifier(\"foo\"));\n    new Function(generate(mem).code);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6460,11 +6476,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 687,
+                "line": 715,
                 "column": 38,
-                "index": 21151
+                "index": 22210
             },
-            "line": 687,
+            "line": 715,
             "code": "  it(\"nested if statements needs block\", function () {\n    const ifStatement = t.ifStatement(t.stringLiteral(\"top cond\"), t.whileStatement(t.stringLiteral(\"while cond\"), t.ifStatement(t.stringLiteral(\"nested\"), t.expressionStatement(t.numericLiteral(1)))), t.expressionStatement(t.stringLiteral(\"alt\")));\n    const ast = parse(generate(ifStatement).code);\n    expect(ast.program.body[0].consequent.type).toBe(\"BlockStatement\");\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6476,11 +6492,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 692,
+                "line": 720,
                 "column": 48,
-                "index": 21595
+                "index": 22654
             },
-            "line": 692,
+            "line": 720,
             "code": "  it(\"prints directives in block with empty body\", function () {\n    const blockStatement = t.blockStatement([], [t.directive(t.directiveLiteral(\"use strict\"))]);\n    const output = generate(blockStatement).code;\n    expect(output).toBe(`{\n  \"use strict\";\n}`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6492,11 +6508,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 699,
+                "line": 727,
                 "column": 29,
-                "index": 21843
+                "index": 22902
             },
-            "line": 699,
+            "line": 727,
             "code": "  it(\"flow object indentation\", function () {\n    const objectStatement = t.objectTypeAnnotation([t.objectTypeProperty(t.identifier(\"bar\"), t.stringTypeAnnotation())]);\n    const output = generate(objectStatement).code;\n    expect(output).toBe(`{\n  bar: string\n}`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6508,11 +6524,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 706,
+                "line": 734,
                 "column": 23,
-                "index": 22109
+                "index": 23168
             },
-            "line": 706,
+            "line": 734,
             "code": "  it(\"flow object exact\", function () {\n    const objectStatement = t.objectTypeAnnotation([t.objectTypeProperty(t.identifier(\"bar\"), t.stringTypeAnnotation())], undefined, undefined, undefined, true);\n    const output = generate(objectStatement).code;\n    expect(output).toBe(`{|\n  bar: string\n|}`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6524,11 +6540,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 713,
+                "line": 741,
                 "column": 67,
-                "index": 22460
+                "index": 23519
             },
-            "line": 713,
+            "line": 741,
             "code": "  it(\"flow object indentation with empty leading ObjectTypeProperty\", function () {\n    const objectStatement = t.objectTypeAnnotation([], [t.objectTypeIndexer(t.identifier(\"key\"), t.anyTypeAnnotation(), t.numberTypeAnnotation())]);\n    const output = generate(objectStatement).code;\n    expect(output).toBe(`{\n  [key: any]: number\n}`);\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6540,11 +6556,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 720,
+                "line": 748,
                 "column": 41,
-                "index": 22777
+                "index": 23836
             },
-            "line": 720,
+            "line": 748,
             "code": "  it(\"flow interface with nullish extends\", () => {\n    const interfaceDeclaration = t.interfaceDeclaration(t.identifier(\"A\"), undefined, undefined, t.objectTypeAnnotation([]));\n    const output = generate(interfaceDeclaration).code;\n    expect(output).toBe(\"interface A {}\");\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6556,11 +6572,11 @@
                 "programmatic generation"
             ],
             "updatePoint": {
-                "line": 725,
+                "line": 753,
                 "column": 50,
-                "index": 23069
+                "index": 24128
             },
-            "line": 725,
+            "line": 753,
             "code": "  it(\"flow function type annotation with no parent\", () => {\n    const functionTypeAnnotation = t.functionTypeAnnotation(null, [], null, t.voidTypeAnnotation());\n    const output = generate(functionTypeAnnotation).code;\n    expect(output).toBe(\"() => void\");\n  });",
             "file": "index.js",
             "skipped": false,
@@ -6573,11 +6589,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 731,
+                "line": 759,
                 "column": 25,
-                "index": 23348
+                "index": 24407
             },
-            "line": 731,
+            "line": 759,
             "code": "    it(\"preserves escapes\", function () {\n      const directive = t.directive(t.directiveLiteral(String.raw`us\\x65 strict`));\n      const output = generate(directive).code;\n      expect(output).toBe(String.raw`\"us\\x65 strict\";`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6590,11 +6606,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 736,
+                "line": 764,
                 "column": 44,
-                "index": 23605
+                "index": 24664
             },
-            "line": 736,
+            "line": 764,
             "code": "    it(\"preserves escapes in minified output\", function () {\n      // https://github.com/babel/babel/issues/4767\n\n      const directive = t.directive(t.directiveLiteral(String.raw`foo\\n\\t\\r`));\n      const output = generate(directive, {\n        minified: true\n      }).code;\n      expect(output).toBe(String.raw`\"foo\\n\\t\\r\";`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6607,11 +6623,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 745,
+                "line": 773,
                 "column": 30,
-                "index": 23927
+                "index": 24986
             },
-            "line": 745,
+            "line": 773,
             "code": "    it(\"unescaped single quote\", function () {\n      const directive = t.directive(t.directiveLiteral(String.raw`'\\'\\\"`));\n      const output = generate(directive).code;\n      expect(output).toBe(String.raw`\"'\\'\\\"\";`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6624,11 +6640,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 750,
+                "line": 778,
                 "column": 30,
-                "index": 24154
+                "index": 25213
             },
-            "line": 750,
+            "line": 778,
             "code": "    it(\"unescaped double quote\", function () {\n      const directive = t.directive(t.directiveLiteral(String.raw`\"\\'\\\"`));\n      const output = generate(directive).code;\n      expect(output).toBe(String.raw`'\"\\'\\\"';`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6641,11 +6657,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 755,
+                "line": 783,
                 "column": 57,
-                "index": 24408
+                "index": 25467
             },
-            "line": 755,
+            "line": 783,
             "code": "    it(\"unescaped single and double quotes together throw\", function () {\n      const directive = t.directive(t.directiveLiteral(String.raw`'\"`));\n      expect(() => {\n        generate(directive);\n      }).toThrow();\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6658,11 +6674,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 761,
+                "line": 789,
                 "column": 47,
-                "index": 24623
+                "index": 25682
             },
-            "line": 761,
+            "line": 789,
             "code": "    it(\"preserves single quotes if not minified\", function () {\n      const directive = parse(\"'use strict';\").program.directives[0];\n      const output = generate(directive).code;\n      expect(output).toBe(\"'use strict';\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6675,11 +6691,11 @@
                 "directives"
             ],
             "updatePoint": {
-                "line": 766,
+                "line": 794,
                 "column": 59,
-                "index": 24868
+                "index": 25927
             },
-            "line": 766,
+            "line": 794,
             "code": "    it(\"converts single quotes to double quotes if minified\", function () {\n      const directive = parse(\"'use strict';\").program.directives[0];\n      const output = generate(directive, {\n        minified: true\n      }).code;\n      expect(output).toBe('\"use strict\";');\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6692,11 +6708,11 @@
                 "typescript generate parentheses if necessary"
             ],
             "updatePoint": {
-                "line": 775,
+                "line": 803,
                 "column": 36,
-                "index": 25203
+                "index": 26262
             },
-            "line": 775,
+            "line": 803,
             "code": "    it(\"wraps around union for array\", () => {\n      const typeStatement = t.tsArrayType(t.tsUnionType([t.tsIntersectionType([t.tsNumberKeyword(), t.tsBooleanKeyword()]), t.tsNullKeyword()]));\n      const output = generate(typeStatement).code;\n      expect(output).toBe(\"((number & boolean) | null)[]\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6709,11 +6725,11 @@
                 "typescript generate parentheses if necessary"
             ],
             "updatePoint": {
-                "line": 780,
+                "line": 808,
                 "column": 43,
-                "index": 25522
+                "index": 26581
             },
-            "line": 780,
+            "line": 808,
             "code": "    it(\"wraps around intersection for array\", () => {\n      const typeStatement = t.tsArrayType(t.tsIntersectionType([t.tsNumberKeyword(), t.tsBooleanKeyword()]));\n      const output = generate(typeStatement).code;\n      expect(output).toBe(\"(number & boolean)[]\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6726,11 +6742,11 @@
                 "typescript generate parentheses if necessary"
             ],
             "updatePoint": {
-                "line": 785,
+                "line": 813,
                 "column": 25,
-                "index": 25778
+                "index": 26837
             },
-            "line": 785,
+            "line": 813,
             "code": "    it(\"wraps around rest\", () => {\n      const typeStatement = t.tsRestType(t.tsIntersectionType([t.tsNumberKeyword(), t.tsBooleanKeyword()]));\n      const output = generate(typeStatement).code;\n      expect(output).toBe(\"...(number & boolean)\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6743,11 +6759,11 @@
                 "typescript generate parentheses if necessary"
             ],
             "updatePoint": {
-                "line": 790,
+                "line": 818,
                 "column": 34,
-                "index": 26043
+                "index": 27102
             },
-            "line": 790,
+            "line": 818,
             "code": "    it(\"wraps around optional type\", () => {\n      const typeStatement = t.tsOptionalType(t.tsIntersectionType([t.tsNumberKeyword(), t.tsBooleanKeyword()]));\n      const output = generate(typeStatement).code;\n      expect(output).toBe(\"(number & boolean)?\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6760,11 +6776,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 797,
+                "line": 825,
                 "column": 50,
-                "index": 26373
+                "index": 27432
             },
-            "line": 797,
+            "line": 825,
             "code": "    it(\"not wrapped in parentheses when standalone\", () => {\n      const objectExpression = t.objectExpression([]);\n      const output = generate(objectExpression).code;\n      expect(output).toBe(\"{}\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6777,11 +6793,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 802,
+                "line": 830,
                 "column": 54,
-                "index": 26588
+                "index": 27647
             },
-            "line": 802,
+            "line": 830,
             "code": "    it(\"wrapped in parentheses in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.objectExpression([]));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"({});\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6794,11 +6810,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 807,
+                "line": 835,
                 "column": 48,
-                "index": 26829
+                "index": 27888
             },
-            "line": 807,
+            "line": 835,
             "code": "    it(\"wrapped in parentheses in arrow function\", () => {\n      const arrowFunctionExpression = t.arrowFunctionExpression([], t.objectExpression([]));\n      const output = generate(arrowFunctionExpression).code;\n      expect(output).toBe(\"() => ({})\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6811,11 +6827,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 812,
+                "line": 840,
                 "column": 49,
-                "index": 27092
+                "index": 28151
             },
-            "line": 812,
+            "line": 840,
             "code": "    it(\"not wrapped in parentheses in conditional\", () => {\n      const conditionalExpression = t.conditionalExpression(t.objectExpression([]), t.booleanLiteral(true), t.booleanLiteral(false));\n      const output = generate(conditionalExpression).code;\n      expect(output).toBe(\"{} ? true : false\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6828,11 +6844,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 817,
+                "line": 845,
                 "column": 69,
-                "index": 27421
+                "index": 28480
             },
-            "line": 817,
+            "line": 845,
             "code": "    it(\"wrapped in parentheses in conditional in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.conditionalExpression(t.objectExpression([]), t.booleanLiteral(true), t.booleanLiteral(false)));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"({}) ? true : false;\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6845,11 +6861,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 822,
+                "line": 850,
                 "column": 63,
-                "index": 27766
+                "index": 28825
             },
-            "line": 822,
+            "line": 850,
             "code": "    it(\"wrapped in parentheses in conditional in arrow function\", () => {\n      const arrowFunctionExpression = t.arrowFunctionExpression([], t.conditionalExpression(t.objectExpression([]), t.booleanLiteral(true), t.booleanLiteral(false)));\n      const output = generate(arrowFunctionExpression).code;\n      expect(output).toBe(\"() => ({}) ? true : false\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6862,11 +6878,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 827,
+                "line": 855,
                 "column": 55,
-                "index": 28124
+                "index": 29183
             },
-            "line": 827,
+            "line": 855,
             "code": "    it(\"not wrapped in parentheses in binary expression\", () => {\n      const binaryExpression = t.binaryExpression(\"+\", t.objectExpression([]), t.numericLiteral(1));\n      const output = generate(binaryExpression).code;\n      expect(output).toBe(\"{} + 1\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6879,11 +6895,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 832,
+                "line": 860,
                 "column": 75,
-                "index": 28410
+                "index": 29469
             },
-            "line": 832,
+            "line": 860,
             "code": "    it(\"wrapped in parentheses in binary expression in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.binaryExpression(\"+\", t.objectExpression([]), t.numericLiteral(1)));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"({}) + 1;\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6896,11 +6912,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 837,
+                "line": 865,
                 "column": 69,
-                "index": 28722
+                "index": 29781
             },
-            "line": 837,
+            "line": 865,
             "code": "    it(\"wrapped in parentheses in binary expression in arrow function\", () => {\n      const arrowFunctionExpression = t.arrowFunctionExpression([], t.binaryExpression(\"+\", t.objectExpression([]), t.numericLiteral(1)));\n      const output = generate(arrowFunctionExpression).code;\n      expect(output).toBe(\"() => ({}) + 1\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6913,11 +6929,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 842,
+                "line": 870,
                 "column": 57,
-                "index": 29043
+                "index": 30102
             },
-            "line": 842,
+            "line": 870,
             "code": "    it(\"not wrapped in parentheses in sequence expression\", () => {\n      const sequenceExpression = t.sequenceExpression([t.objectExpression([]), t.numericLiteral(1)]);\n      const output = generate(sequenceExpression).code;\n      expect(output).toBe(\"{}, 1\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6930,11 +6946,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 847,
+                "line": 875,
                 "column": 77,
-                "index": 29333
+                "index": 30392
             },
-            "line": 847,
+            "line": 875,
             "code": "    it(\"wrapped in parentheses in sequence expression in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.sequenceExpression([t.objectExpression([]), t.numericLiteral(1)]));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"({}), 1;\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6947,11 +6963,11 @@
                 "object expressions"
             ],
             "updatePoint": {
-                "line": 852,
+                "line": 880,
                 "column": 71,
-                "index": 29645
+                "index": 30704
             },
-            "line": 852,
+            "line": 880,
             "code": "    it(\"wrapped in parentheses in sequence expression in arrow function\", () => {\n      const arrowFunctionExpression = t.arrowFunctionExpression([], t.sequenceExpression([t.objectExpression([]), t.numericLiteral(1)]));\n      const output = generate(arrowFunctionExpression).code;\n      expect(output).toBe(\"() => (({}), 1)\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6964,11 +6980,11 @@
                 "function expressions"
             ],
             "updatePoint": {
-                "line": 859,
+                "line": 887,
                 "column": 50,
-                "index": 30008
+                "index": 31067
             },
-            "line": 859,
+            "line": 887,
             "code": "    it(\"not wrapped in parentheses when standalone\", () => {\n      const functionExpression = t.functionExpression(null, [], t.blockStatement([]));\n      const output = generate(functionExpression).code;\n      expect(output).toBe(\"function () {}\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6981,11 +6997,11 @@
                 "function expressions"
             ],
             "updatePoint": {
-                "line": 864,
+                "line": 892,
                 "column": 54,
-                "index": 30269
+                "index": 31328
             },
-            "line": 864,
+            "line": 892,
             "code": "    it(\"wrapped in parentheses in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.functionExpression(null, [], t.blockStatement([])));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"(function () {});\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -6998,11 +7014,11 @@
                 "function expressions"
             ],
             "updatePoint": {
-                "line": 869,
+                "line": 897,
                 "column": 60,
-                "index": 30564
+                "index": 31623
             },
-            "line": 869,
+            "line": 897,
             "code": "    it(\"wrapped in parentheses in export default declaration\", () => {\n      const exportDefaultDeclaration = t.exportDefaultDeclaration(t.functionExpression(null, [], t.blockStatement([])));\n      const output = generate(exportDefaultDeclaration).code;\n      expect(output).toBe(\"export default (function () {});\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7015,11 +7031,11 @@
                 "class expressions"
             ],
             "updatePoint": {
-                "line": 876,
+                "line": 904,
                 "column": 50,
-                "index": 30925
+                "index": 31984
             },
-            "line": 876,
+            "line": 904,
             "code": "    it(\"not wrapped in parentheses when standalone\", () => {\n      const classExpression = t.classExpression(null, null, t.classBody([]));\n      const output = generate(classExpression).code;\n      expect(output).toBe(\"class {}\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7032,11 +7048,11 @@
                 "class expressions"
             ],
             "updatePoint": {
-                "line": 881,
+                "line": 909,
                 "column": 54,
-                "index": 31168
+                "index": 32227
             },
-            "line": 881,
+            "line": 909,
             "code": "    it(\"wrapped in parentheses in expression statement\", () => {\n      const expressionStatement = t.expressionStatement(t.classExpression(null, null, t.classBody([])));\n      const output = generate(expressionStatement).code;\n      expect(output).toBe(\"(class {});\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7049,11 +7065,11 @@
                 "class expressions"
             ],
             "updatePoint": {
-                "line": 886,
+                "line": 914,
                 "column": 60,
-                "index": 31451
+                "index": 32510
             },
-            "line": 886,
+            "line": 914,
             "code": "    it(\"wrapped in parentheses in export default declaration\", () => {\n      const exportDefaultDeclaration = t.exportDefaultDeclaration(t.classExpression(null, null, t.classBody([])));\n      const output = generate(exportDefaultDeclaration).code;\n      expect(output).toBe(\"export default (class {});\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7066,11 +7082,11 @@
                 "jsescOption.minimal"
             ],
             "updatePoint": {
-                "line": 894,
+                "line": 922,
                 "column": 12,
-                "index": 31829
+                "index": 32888
             },
-            "line": 894,
+            "line": 922,
             "code": "    it(\"true\", () => {\n      const output = generate(string, {\n        jsescOption: {\n          minimal: true\n        }\n      }).code;\n      expect(output).toBe(`\"表格_副本\"`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7083,11 +7099,11 @@
                 "jsescOption.minimal"
             ],
             "updatePoint": {
-                "line": 902,
+                "line": 930,
                 "column": 13,
-                "index": 32011
+                "index": 33070
             },
-            "line": 902,
+            "line": 930,
             "code": "    it(\"false\", () => {\n      const output = generate(string, {\n        jsescOption: {\n          minimal: false\n        }\n      }).code;\n      expect(output).toBe(`\"\\\\u8868\\\\u683C_\\\\u526F\\\\u672C\"`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7100,11 +7116,11 @@
                 "jsescOption.minimal"
             ],
             "updatePoint": {
-                "line": 911,
+                "line": 939,
                 "column": 17,
-                "index": 32262
+                "index": 33321
             },
-            "line": 911,
+            "line": 939,
             "code": "      it(\"default\", () => {\n        const output = generate(string).code;\n        expect(output).toBe(`\"表格_副本\"`);\n      });",
             "file": "index.js",
             "skipped": false,
@@ -7117,11 +7133,11 @@
                 "jsescOption.minimal"
             ],
             "updatePoint": {
-                "line": 916,
+                "line": 944,
                 "column": 28,
-                "index": 32410
+                "index": 33469
             },
-            "line": 916,
+            "line": 944,
             "code": "      it(\"default in Babel 7\", () => {\n        const output = generate(string).code;\n        expect(output).toBe(`\"\\\\u8868\\\\u683C_\\\\u526F\\\\u672C\"`);\n      });",
             "file": "index.js",
             "skipped": false,
@@ -7134,11 +7150,11 @@
                 "typescript interface declaration"
             ],
             "updatePoint": {
-                "line": 923,
+                "line": 951,
                 "column": 27,
-                "index": 32635
+                "index": 33694
             },
-            "line": 923,
+            "line": 951,
             "code": "    it(\"empty extends array\", () => {\n      const tsInterfaceDeclaration = t.tsInterfaceDeclaration(t.identifier(\"A\"), undefined, [], t.tsInterfaceBody([]));\n      const output = generate(tsInterfaceDeclaration).code;\n      expect(output).toBe(\"interface A {}\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7151,11 +7167,11 @@
                 "identifier let"
             ],
             "updatePoint": {
-                "line": 930,
+                "line": 958,
                 "column": 71,
-                "index": 32993
+                "index": 34052
             },
-            "line": 930,
+            "line": 958,
             "code": "    it(\"detects open bracket from non-optional OptionalMemberExpression\", () => {\n      const ast = parse(`for (let?.[x];;);`, {\n        sourceType: \"script\",\n        strictMode: \"false\"\n      });\n      ast.program.body[0].init.optional = false;\n      const output = generate(ast).code;\n      expect(output).toBe(\"for ((let)[x];;);\");\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7168,11 +7184,11 @@
                 "should print inner comments even if there are no suitable inner locations"
             ],
             "updatePoint": {
-                "line": 941,
+                "line": 969,
                 "column": 19,
-                "index": 33386
+                "index": 34445
             },
-            "line": 941,
+            "line": 969,
             "code": "    it(\"atomic node\", () => {\n      const id = t.identifier(\"foo\");\n      id.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }];\n      expect(generate(id).code).toMatchInlineSnapshot(`\"foo /*foo*/\"`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7185,11 +7201,11 @@
                 "should print inner comments even if there are no suitable inner locations"
             ],
             "updatePoint": {
-                "line": 949,
+                "line": 977,
                 "column": 36,
-                "index": 33640
+                "index": 34699
             },
-            "line": 949,
+            "line": 977,
             "code": "    it(\"node without inner locations\", () => {\n      const expr = t.binaryExpression(\"+\", t.numericLiteral(1), t.numericLiteral(2));\n      expr.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }];\n      expect(generate(expr).code).toMatchInlineSnapshot(`\"1 + 2 /*foo*/\"`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7202,11 +7218,11 @@
                 "should print inner comments even if there are no suitable inner locations"
             ],
             "updatePoint": {
-                "line": 957,
+                "line": 985,
                 "column": 61,
-                "index": 33973
+                "index": 35032
             },
-            "line": 957,
+            "line": 985,
             "code": "    it(\"comment skipped in arrow function because of newlines\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.innerComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      }, {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\n        \"(x, y) /*foo*/ => z\n        /*new\n        line*/\"\n      `);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7219,11 +7235,11 @@
                 "should print inner comments even if there are no suitable inner locations"
             ],
             "updatePoint": {
-                "line": 972,
+                "line": 1000,
                 "column": 50,
-                "index": 34436
+                "index": 35495
             },
-            "line": 972,
+            "line": 1000,
             "code": "    it(\"comment in arrow function with return type\", () => {\n      const arrow = t.arrowFunctionExpression([t.identifier(\"x\"), t.identifier(\"y\")], t.identifier(\"z\"));\n      arrow.returnType = t.tsTypeAnnotation(t.tsAnyKeyword());\n      arrow.returnType.trailingComments = [{\n        type: \"CommentBlock\",\n        value: \"foo\"\n      },\n      // This comment is dropped. There is no way to safely print it\n      // as a trailingComment of the return type.\n      {\n        type: \"CommentBlock\",\n        value: \"new\\nline\"\n      }];\n      expect(generate(arrow).code).toMatchInlineSnapshot(`\"(x, y): any /*foo*/ => z\"`);\n    });",
             "file": "index.js",
             "skipped": false,
@@ -7235,11 +7251,11 @@
                 "CodeGenerator"
             ],
             "updatePoint": {
-                "line": 990,
+                "line": 1018,
                 "column": 14,
-                "index": 35075
+                "index": 36134
             },
-            "line": 990,
+            "line": 1018,
             "code": "  it(\"generate\", function () {\n    const codeGen = new CodeGenerator(t.numericLiteral(123));\n    const code = codeGen.generate().code;\n    expect(parse(code).program.body[0].expression.value).toBe(123);\n  });",
             "file": "index.js",
             "skipped": false,
