@@ -1534,14 +1534,28 @@
             "dir": "galata/test"
         },
         {
-            "name": "Filter notebook completer suggestions by typing",
+            "name": "Token completions show up without running the cell when in the same cell",
             "suites": [],
             "updatePoint": {
                 "line": 37,
-                "column": 57,
-                "index": 1524
+                "column": 82,
+                "index": 1549
             },
             "line": 37,
+            "code": "    test('Token completions show up without running the cell when in the same cell', async ({\n      page\n    }) => {\n      await page.notebook.setCell(0, 'code', 'option_1 = 1\\n' + 'option_2 = lambda x: x\\n' + 'option_3 = int\\n' + 'option');\n      await page.notebook.enterCellEditingMode(0);\n      // move to the end of cell\n      await page.keyboard.press('PageDown');\n      await page.keyboard.press('End');\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'token-completer.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
+            "file": "jupyterlab/completer.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Filter notebook completer suggestions by typing",
+            "suites": [],
+            "updatePoint": {
+                "line": 60,
+                "column": 57,
+                "index": 2563
+            },
+            "line": 60,
             "code": "    test('Filter notebook completer suggestions by typing', async ({\n      page\n    }) => {\n      // test against https://github.com/jupyterlab/jupyterlab/issues/11377\n\n      // `getopt` did not change much in many years, it should be stable\n      await page.notebook.setCell(0, 'code', 'import getopt');\n      await page.notebook.runCell(0, true);\n      await page.notebook.addCell('code', 'getopt.');\n      await page.notebook.enterCellEditingMode(1);\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.type('g', {\n        delay: 50\n      });\n      const imageName = 'completer-filter.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -1551,11 +1565,11 @@
             "name": "Open completer on console",
             "suites": [],
             "updatePoint": {
-                "line": 79,
+                "line": 102,
                 "column": 35,
-                "index": 3202
+                "index": 4241
             },
-            "line": 79,
+            "line": 102,
             "code": "    test('Open completer on console', async ({\n      page\n    }) => {\n      const completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'completer-console.png';\n      // TODO: on first trigger types are not properly displayed, reference image will need updating\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -1565,11 +1579,11 @@
             "name": "Filter console completer suggestions by typing",
             "suites": [],
             "updatePoint": {
-                "line": 88,
+                "line": 111,
                 "column": 56,
-                "index": 3613
+                "index": 4652
             },
-            "line": 88,
+            "line": 111,
             "code": "    test('Filter console completer suggestions by typing', async ({\n      page\n    }) => {\n      const completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.type('g', {\n        delay: 10\n      });\n      const imageName = 'completer-console-filter.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -11130,6 +11144,38 @@
             "dir": "packages/codemirror/test"
         },
         {
+            "name": "should return innermost token",
+            "suites": [
+                "CodeMirrorEditor",
+                "#getTokenAt()"
+            ],
+            "updatePoint": {
+                "line": 441,
+                "column": 37
+            },
+            "line": 441,
+            "code": "    it('should return innermost token', () => {\n      editor.setOption('mode', 'text/x-python');\n      model.sharedModel.setSource('foo = \"a\"\\nbar = 1');\n      expect(editor.getTokenAt(1)).toStrictEqual({\n        offset: 0,\n        type: 'VariableName',\n        value: 'foo'\n      });\n\n      expect(editor.getTokenAt(11)).toStrictEqual({\n        offset: 10,\n        type: 'VariableName',\n        value: 'bar'\n      });\n    });",
+            "file": "editor.spec.ts",
+            "skipped": false,
+            "dir": "packages/codemirror/test"
+        },
+        {
+            "name": "should get a list of tokens",
+            "suites": [
+                "CodeMirrorEditor",
+                "#getTokens()"
+            ],
+            "updatePoint": {
+                "line": 459,
+                "column": 35
+            },
+            "line": 459,
+            "code": "    it('should get a list of tokens', () => {\n      editor.setOption('mode', 'text/x-python');\n      model.sharedModel.setSource('foo = \"a\"\\nbar = 1');\n      expect(editor.getTokens()).toStrictEqual([\n        {\n          offset: 0,\n          type: 'VariableName',\n          value: 'foo'\n        },\n        {\n          offset: 4,\n          type: 'AssignOp',\n          value: '='\n        },\n        {\n          offset: 6,\n          type: 'String',\n          value: '\"a\"'\n        },\n        {\n          offset: 10,\n          type: 'VariableName',\n          value: 'bar'\n        },\n        {\n          offset: 14,\n          type: 'AssignOp',\n          value: '='\n        },\n        {\n          offset: 16,\n          type: 'Number',\n          value: '1'\n        }\n      ]);\n    });",
+            "file": "editor.spec.ts",
+            "skipped": false,
+            "dir": "packages/codemirror/test"
+        },
+        {
             "name": "should create a CodeMirrorEditorFactory",
             "suites": [
                 "CodeMirrorEditorFactory",
@@ -11370,91 +11416,6 @@
             "dir": "packages/codemirror/test"
         },
         {
-            "name": "should create a connector proxy",
-            "suites": [
-                "completer/connectorproxy",
-                "ConnectorProxy",
-                "#constructor()"
-            ],
-            "updatePoint": {
-                "line": 67,
-                "column": 41
-            },
-            "line": 67,
-            "code": "      it('should create a connector proxy', () => {\n        const connector = new ConnectorProxy({ widget }, [], 0);\n        expect(connector).toBeInstanceOf(ConnectorProxy);\n      });",
-            "file": "connectorproxy.spec.ts",
-            "skipped": false,
-            "dir": "packages/completer/test"
-        },
-        {
-            "name": "should call `fetch` of all providers",
-            "suites": [
-                "completer/connectorproxy",
-                "ConnectorProxy",
-                "#fetch()"
-            ],
-            "updatePoint": {
-                "line": 73,
-                "column": 46
-            },
-            "line": 73,
-            "code": "      it('should call `fetch` of all providers', async () => {\n        const mock = jest.fn();\n        mock.mockResolvedValue({ items: [] });\n        const fooProvider1 = new FooCompletionProvider();\n        fooProvider1.fetch = mock;\n        const fooProvider2 = new FooCompletionProvider();\n        fooProvider2.fetch = mock;\n        const connector = new ConnectorProxy(\n          { widget },\n          [fooProvider1, fooProvider2],\n          1000\n        );\n        void connector.fetch({ offset: 0, text: '' });\n        expect(fooProvider1.fetch).toBeCalled();\n        expect(fooProvider2.fetch).toBeCalled();\n      });",
-            "file": "connectorproxy.spec.ts",
-            "skipped": false,
-            "dir": "packages/completer/test"
-        },
-        {
-            "name": "should include `resolve` to reply items",
-            "suites": [
-                "completer/connectorproxy",
-                "ConnectorProxy",
-                "#fetch()"
-            ],
-            "updatePoint": {
-                "line": 89,
-                "column": 49
-            },
-            "line": 89,
-            "code": "      it('should include `resolve` to reply items', async () => {\n        const fooProvider1 = new FooCompletionProvider();\n        const connector = new ConnectorProxy({ widget }, [fooProvider1], 1000);\n        const res = await connector.fetch({ offset: 0, text: '' });\n        expect(res).toHaveLength(1);\n        expect(res[0]!['items']).toEqual([\n          { label: 'fooModule', resolve: undefined, type: 'module' },\n          { label: 'barFunction', resolve: undefined, type: 'function' }\n        ]);\n      });",
-            "file": "connectorproxy.spec.ts",
-            "skipped": false,
-            "dir": "packages/completer/test"
-        },
-        {
-            "name": "should reject slow fetch request",
-            "suites": [
-                "completer/connectorproxy",
-                "ConnectorProxy",
-                "#fetch()"
-            ],
-            "updatePoint": {
-                "line": 99,
-                "column": 42
-            },
-            "line": 99,
-            "code": "      it('should reject slow fetch request', async () => {\n        const fooProvider1 = new FooCompletionProvider();\n        const connector = new ConnectorProxy({ widget }, [fooProvider1], 200);\n        const res = await connector.fetch({ offset: 0, text: '' });\n        expect(res).toEqual([null]);\n      });",
-            "file": "connectorproxy.spec.ts",
-            "skipped": false,
-            "dir": "packages/completer/test"
-        },
-        {
-            "name": "should check the `shouldShowContinuousHint` of the first provider",
-            "suites": [
-                "completer/connectorproxy",
-                "ConnectorProxy",
-                "#fetch()"
-            ],
-            "updatePoint": {
-                "line": 105,
-                "column": 75
-            },
-            "line": 105,
-            "code": "      it('should check the `shouldShowContinuousHint` of the first provider', async () => {\n        const fooProvider1 = new FooCompletionProvider();\n        fooProvider1.shouldShowContinuousHint = jest.fn();\n        const fooProvider2 = new FooCompletionProvider();\n        fooProvider2.shouldShowContinuousHint = jest.fn();\n        const connector = new ConnectorProxy(\n          { widget },\n          [fooProvider1, fooProvider1],\n          200\n        );\n        connector.shouldShowContinuousHint(true, null as any);\n        expect(fooProvider1.shouldShowContinuousHint).toBeCalledTimes(1);\n        expect(fooProvider2.shouldShowContinuousHint).toBeCalledTimes(0);\n      });",
-            "file": "connectorproxy.spec.ts",
-            "skipped": false,
-            "dir": "packages/completer/test"
-        },
-        {
             "name": "should create a completer handler",
             "suites": [
                 "@jupyterlab/completer",
@@ -11462,11 +11423,11 @@
                 "#constructor()"
             ],
             "updatePoint": {
-                "line": 66,
+                "line": 70,
                 "column": 43
             },
-            "line": 66,
-            "code": "      it('should create a completer handler', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler).toBeInstanceOf(CompletionHandler);\n      });",
+            "line": 70,
+            "code": "      it('should create a completer handler', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler).toBeInstanceOf(CompletionHandler);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11479,11 +11440,11 @@
                 "#editor"
             ],
             "updatePoint": {
-                "line": 76,
+                "line": 80,
                 "column": 32
             },
-            "line": 76,
-            "code": "      it('should default to null', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.editor).toBeNull();\n      });",
+            "line": 80,
+            "code": "      it('should default to null', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.editor).toBeNull();\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11496,11 +11457,11 @@
                 "#editor"
             ],
             "updatePoint": {
-                "line": 84,
+                "line": 88,
                 "column": 28
             },
-            "line": 84,
-            "code": "      it('should be settable', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        const widget = createEditorWidget();\n        expect(handler.editor).toBeNull();\n        handler.editor = widget.editor;\n        expect(handler.editor).toBe(widget.editor);\n      });",
+            "line": 88,
+            "code": "      it('should be settable', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        const widget = createEditorWidget();\n        expect(handler.editor).toBeNull();\n        handler.editor = widget.editor;\n        expect(handler.editor).toBe(widget.editor);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11513,11 +11474,11 @@
                 "#editor"
             ],
             "updatePoint": {
-                "line": 95,
+                "line": 99,
                 "column": 30
             },
-            "line": 95,
-            "code": "      it('should be resettable', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        const one = createEditorWidget();\n        const two = createEditorWidget();\n        expect(handler.editor).toBeNull();\n        handler.editor = one.editor;\n        expect(handler.editor).toBe(one.editor);\n        handler.editor = two.editor;\n        expect(handler.editor).toBe(two.editor);\n      });",
+            "line": 99,
+            "code": "      it('should be resettable', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        const one = createEditorWidget();\n        const two = createEditorWidget();\n        expect(handler.editor).toBeNull();\n        handler.editor = one.editor;\n        expect(handler.editor).toBe(one.editor);\n        handler.editor = two.editor;\n        expect(handler.editor).toBe(two.editor);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11530,11 +11491,11 @@
                 "#editor"
             ],
             "updatePoint": {
-                "line": 109,
+                "line": 113,
                 "column": 82
             },
-            "line": 109,
-            "code": "      it('should remove the completer active and enabled classes of the old editor', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        const widget = createEditorWidget();\n        handler.editor = widget.editor;\n        widget.toggleClass('jp-mod-completer-enabled');\n        widget.toggleClass('jp-mod-completer-active');\n        handler.editor = null;\n        expect(widget.hasClass('jp-mod-completer-enabled')).toBe(false);\n        expect(widget.hasClass('jp-mod-completer-active')).toBe(false);\n      });",
+            "line": 113,
+            "code": "      it('should remove the completer active and enabled classes of the old editor', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        const widget = createEditorWidget();\n        handler.editor = widget.editor;\n        widget.toggleClass('jp-mod-completer-enabled');\n        widget.toggleClass('jp-mod-completer-active');\n        handler.editor = null;\n        expect(widget.hasClass('jp-mod-completer-enabled')).toBe(false);\n        expect(widget.hasClass('jp-mod-completer-active')).toBe(false);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11547,11 +11508,11 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 125,
+                "line": 129,
                 "column": 53
             },
-            "line": 125,
-            "code": "      it('should be true if handler has been disposed', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
+            "line": 129,
+            "code": "      it('should be true if handler has been disposed', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11564,11 +11525,11 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 137,
+                "line": 141,
                 "column": 49
             },
-            "line": 137,
-            "code": "      it('should dispose of the handler resources', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
+            "line": 141,
+            "code": "      it('should dispose of the handler resources', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11581,11 +11542,11 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 147,
+                "line": 151,
                 "column": 47
             },
-            "line": 147,
-            "code": "      it('should be safe to call multiple times', () => {\n        const handler = new CompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
+            "line": 151,
+            "code": "      it('should be safe to call multiple times', () => {\n        const handler = new CompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        expect(handler.isDisposed).toBe(false);\n        handler.dispose();\n        handler.dispose();\n        expect(handler.isDisposed).toBe(true);\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11598,11 +11559,11 @@
                 "#onTextChanged()"
             ],
             "updatePoint": {
-                "line": 160,
+                "line": 164,
                 "column": 64
             },
-            "line": 160,
-            "code": "      it('should fire when the active editor emits a text change', () => {\n        const handler = new TestCompletionHandler({\n          connector,\n          completer: new Completer({ editor: null })\n        });\n        handler.editor = createEditorWidget().editor;\n        expect(handler.methods).toEqual(\n          expect.not.arrayContaining(['onTextChanged'])\n        );\n        handler.editor.model.sharedModel.setSource('foo');\n        expect(handler.methods).toEqual(\n          expect.arrayContaining(['onTextChanged'])\n        );\n      });",
+            "line": 164,
+            "code": "      it('should fire when the active editor emits a text change', () => {\n        const handler = new TestCompletionHandler({\n          reconciliator,\n          completer: new Completer({ editor: null })\n        });\n        handler.editor = createEditorWidget().editor;\n        expect(handler.methods).toEqual(\n          expect.not.arrayContaining(['onTextChanged'])\n        );\n        handler.editor.model.sharedModel.setSource('foo');\n        expect(handler.methods).toEqual(\n          expect.arrayContaining(['onTextChanged'])\n        );\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11615,11 +11576,11 @@
                 "#onTextChanged()"
             ],
             "updatePoint": {
-                "line": 175,
+                "line": 179,
                 "column": 58
             },
-            "line": 175,
-            "code": "      it('should call model change handler if model exists', () => {\n        const completer = new Completer({\n          editor: null,\n          model: new TestCompleterModel()\n        });\n        const handler = new TestCompletionHandler({ completer, connector });\n        const editor = createEditorWidget().editor;\n        const model = completer.model as TestCompleterModel;\n\n        handler.editor = editor;\n        expect(model.methods).toEqual(\n          expect.not.arrayContaining(['handleTextChange'])\n        );\n        editor.model.sharedModel.setSource('bar');\n        editor.setCursorPosition({ line: 0, column: 2 });\n        // This signal is emitted (again) because the cursor position that\n        // a natural user would create need to be recreated here.\n        // (editor.model.value.changed as any).emit({ type: 'set', value: 'bar' }); @todo remove?\n        (editor.model.sharedModel.changed as any).emit([]);\n        expect(model.methods).toEqual(\n          expect.arrayContaining(['handleTextChange'])\n        );\n      });",
+            "line": 179,
+            "code": "      it('should call model change handler if model exists', () => {\n        const completer = new Completer({\n          editor: null,\n          model: new TestCompleterModel()\n        });\n        const handler = new TestCompletionHandler({ completer, reconciliator });\n        const editor = createEditorWidget().editor;\n        const model = completer.model as TestCompleterModel;\n\n        handler.editor = editor;\n        expect(model.methods).toEqual(\n          expect.not.arrayContaining(['handleTextChange'])\n        );\n        editor.model.sharedModel.setSource('bar');\n        editor.setCursorPosition({ line: 0, column: 2 });\n        // This signal is emitted (again) because the cursor position that\n        // a natural user would create need to be recreated here.\n        // (editor.model.value.changed as any).emit({ type: 'set', value: 'bar' }); @todo remove?\n        (editor.model.sharedModel.changed as any).emit([]);\n        expect(model.methods).toEqual(\n          expect.arrayContaining(['handleTextChange'])\n        );\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11632,11 +11593,11 @@
                 "#onCompletionSelected()"
             ],
             "updatePoint": {
-                "line": 201,
+                "line": 205,
                 "column": 62
             },
-            "line": 201,
-            "code": "      it('should fire when the completer widget emits a signal', () => {\n        const completer = new Completer({ editor: null });\n        const handler = new TestCompletionHandler({ completer, connector });\n\n        expect(handler.methods).toEqual(\n          expect.not.arrayContaining(['onCompletionSelected'])\n        );\n        (completer.selected as any).emit('foo');\n        expect(handler.methods).toEqual(\n          expect.arrayContaining(['onCompletionSelected'])\n        );\n      });",
+            "line": 205,
+            "code": "      it('should fire when the completer widget emits a signal', () => {\n        const completer = new Completer({ editor: null });\n        const handler = new TestCompletionHandler({ completer, reconciliator });\n\n        expect(handler.methods).toEqual(\n          expect.not.arrayContaining(['onCompletionSelected'])\n        );\n        (completer.selected as any).emit('foo');\n        expect(handler.methods).toEqual(\n          expect.arrayContaining(['onCompletionSelected'])\n        );\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11649,11 +11610,11 @@
                 "#onCompletionSelected()"
             ],
             "updatePoint": {
-                "line": 214,
+                "line": 218,
                 "column": 63
             },
-            "line": 214,
-            "code": "      it('should call model create patch method if model exists', () => {\n        const completer = new Completer({\n          editor: null,\n          model: new TestCompleterModel()\n        });\n        const handler = new TestCompletionHandler({ completer, connector });\n        const model = completer.model as TestCompleterModel;\n\n        handler.editor = createEditorWidget().editor;\n        expect(model.methods).toEqual(\n          expect.not.arrayContaining(['createPatch'])\n        );\n        (completer.selected as any).emit('foo');\n        expect(model.methods).toEqual(expect.arrayContaining(['createPatch']));\n      });",
+            "line": 218,
+            "code": "      it('should call model create patch method if model exists', () => {\n        const completer = new Completer({\n          editor: null,\n          model: new TestCompleterModel()\n        });\n        const handler = new TestCompletionHandler({ completer, reconciliator });\n        const model = completer.model as TestCompleterModel;\n\n        handler.editor = createEditorWidget().editor;\n        expect(model.methods).toEqual(\n          expect.not.arrayContaining(['createPatch'])\n        );\n        (completer.selected as any).emit('foo');\n        expect(model.methods).toEqual(expect.arrayContaining(['createPatch']));\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11666,11 +11627,11 @@
                 "#onCompletionSelected()"
             ],
             "updatePoint": {
-                "line": 230,
+                "line": 234,
                 "column": 44
             },
-            "line": 230,
-            "code": "      it('should update cell if patch exists', () => {\n        const model = new CompleterModel();\n        const patch = 'foobar';\n        const completer = new Completer({ editor: null, model });\n        const handler = new TestCompletionHandler({ completer, connector });\n        const editor = createEditorWidget().editor;\n        const text = 'eggs\\nfoo # comment\\nbaz';\n        const want = 'eggs\\nfoobar # comment\\nbaz';\n        const line = 1;\n        const column = 5; // this sets the cursor after the \"#\" sign - not in the mid of the replaced word\n        const request: Completer.ITextState = {\n          column,\n          line,\n          lineHeight: 0,\n          charWidth: 0,\n          coords: null,\n          text\n        };\n\n        handler.editor = editor;\n        handler.editor.model.sharedModel.setSource(text);\n        handler.editor.setCursorPosition({ line, column: column + 3 });\n        model.original = request;\n        model.cursor = { start: column, end: column + 3 };\n        (completer.selected as any).emit(patch);\n        expect(handler.editor.model.sharedModel.getSource()).toBe(want);\n        expect(handler.editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n      });",
+            "line": 234,
+            "code": "      it('should update cell if patch exists', () => {\n        const model = new CompleterModel();\n        const patch = 'foobar';\n        const completer = new Completer({ editor: null, model });\n        const handler = new TestCompletionHandler({ completer, reconciliator });\n        const editor = createEditorWidget().editor;\n        const text = 'eggs\\nfoo # comment\\nbaz';\n        const want = 'eggs\\nfoobar # comment\\nbaz';\n        const line = 1;\n        const column = 5; // this sets the cursor after the \"#\" sign - not in the mid of the replaced word\n        const request: Completer.ITextState = {\n          column,\n          line,\n          lineHeight: 0,\n          charWidth: 0,\n          coords: null,\n          text\n        };\n\n        handler.editor = editor;\n        handler.editor.model.sharedModel.setSource(text);\n        handler.editor.setCursorPosition({ line, column: column + 3 });\n        model.original = request;\n        model.cursor = { start: column, end: column + 3 };\n        (completer.selected as any).emit(patch);\n        expect(handler.editor.model.sharedModel.getSource()).toBe(want);\n        expect(handler.editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11683,11 +11644,11 @@
                 "#onCompletionSelected()"
             ],
             "updatePoint": {
-                "line": 262,
+                "line": 266,
                 "column": 41
             },
-            "line": 262,
-            "code": "      it('should be undoable and redoable', () => {\n        const model = new CompleterModel();\n        const patch = 'foobar';\n        const completer = new Completer({ editor: null, model });\n        const handler = new TestCompletionHandler({ completer, connector });\n        const editor = createEditorWidget().editor;\n        const text = 'eggs\\nfoo # comment\\nbaz';\n        const want = 'eggs\\nfoobar # comment\\nbaz';\n        const line = 1;\n        const column = 5;\n        const request: Completer.ITextState = {\n          column,\n          line,\n          lineHeight: 0,\n          charWidth: 0,\n          coords: null,\n          text\n        };\n\n        handler.editor = editor;\n        handler.editor.model.sharedModel.setSource(text);\n        handler.editor.model.sharedModel.clearUndoHistory();\n        handler.editor.setCursorPosition({ line, column: column + 3 });\n        model.original = request;\n        model.cursor = { start: column, end: column + 3 };\n        // Make the completion, check its value and cursor position.\n        (completer.selected as any).emit(patch);\n        expect(editor.model.sharedModel.getSource()).toBe(want);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n        // Undo the completion, check its value and cursor position.\n        editor.undo();\n        expect(editor.model.sharedModel.getSource()).toBe(text);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 3\n        });\n        // Redo the completion, check its value and cursor position.\n        editor.redo();\n        expect(editor.model.sharedModel.getSource()).toBe(want);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n      });",
+            "line": 266,
+            "code": "      it('should be undoable and redoable', () => {\n        const model = new CompleterModel();\n        const patch = 'foobar';\n        const completer = new Completer({ editor: null, model });\n        const handler = new TestCompletionHandler({ completer, reconciliator });\n        const editor = createEditorWidget().editor;\n        const text = 'eggs\\nfoo # comment\\nbaz';\n        const want = 'eggs\\nfoobar # comment\\nbaz';\n        const line = 1;\n        const column = 5;\n        const request: Completer.ITextState = {\n          column,\n          line,\n          lineHeight: 0,\n          charWidth: 0,\n          coords: null,\n          text\n        };\n\n        handler.editor = editor;\n        handler.editor.model.sharedModel.setSource(text);\n        handler.editor.model.sharedModel.clearUndoHistory();\n        handler.editor.setCursorPosition({ line, column: column + 3 });\n        model.original = request;\n        model.cursor = { start: column, end: column + 3 };\n        // Make the completion, check its value and cursor position.\n        (completer.selected as any).emit(patch);\n        expect(editor.model.sharedModel.getSource()).toBe(want);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n        // Undo the completion, check its value and cursor position.\n        editor.undo();\n        expect(editor.model.sharedModel.getSource()).toBe(text);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 3\n        });\n        // Redo the completion, check its value and cursor position.\n        editor.redo();\n        expect(editor.model.sharedModel.getSource()).toBe(want);\n        expect(editor.getCursorPosition()).toEqual({\n          line,\n          column: column + 6\n        });\n      });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11700,11 +11661,11 @@
                 "#onCompletionSelected()"
             ],
             "updatePoint": {
-                "line": 311,
+                "line": 315,
                 "column": 70
             },
-            "line": 311,
-            "code": "    it('should update cursor position after autocomplete on empty word', () => {\n      const model = new CompleterModel();\n      const patch = 'foobar';\n      const completer = new Completer({ editor: null, model });\n      const handler = new TestCompletionHandler({ completer, connector });\n      const editor = createEditorWidget().editor;\n      const text = 'eggs\\n  # comment\\nbaz';\n      const want = 'eggs\\n foobar # comment\\nbaz';\n      const line = 1;\n      const column = 1;\n      const request: Completer.ITextState = {\n        column: column,\n        line,\n        lineHeight: 0,\n        charWidth: 0,\n        coords: null,\n        text\n      };\n\n      handler.editor = editor;\n      handler.editor.model.sharedModel.setSource(text);\n      handler.editor.model.sharedModel.clearUndoHistory();\n      handler.editor.setCursorPosition({ line, column });\n      model.original = request;\n      const offset = handler.editor.getOffsetAt({ line, column });\n      model.cursor = { start: offset, end: offset };\n      // Make the completion, check its value and cursor position.\n      (completer.selected as any).emit(patch);\n      expect(editor.model.sharedModel.getSource()).toBe(want);\n      expect(editor.getCursorPosition()).toEqual({\n        line,\n        column: column + 6\n      });\n    });",
+            "line": 315,
+            "code": "    it('should update cursor position after autocomplete on empty word', () => {\n      const model = new CompleterModel();\n      const patch = 'foobar';\n      const completer = new Completer({ editor: null, model });\n      const handler = new TestCompletionHandler({ completer, reconciliator });\n      const editor = createEditorWidget().editor;\n      const text = 'eggs\\n  # comment\\nbaz';\n      const want = 'eggs\\n foobar # comment\\nbaz';\n      const line = 1;\n      const column = 1;\n      const request: Completer.ITextState = {\n        column: column,\n        line,\n        lineHeight: 0,\n        charWidth: 0,\n        coords: null,\n        text\n      };\n\n      handler.editor = editor;\n      handler.editor.model.sharedModel.setSource(text);\n      handler.editor.model.sharedModel.clearUndoHistory();\n      handler.editor.setCursorPosition({ line, column });\n      model.original = request;\n      const offset = handler.editor.getOffsetAt({ line, column });\n      model.cursor = { start: offset, end: offset };\n      // Make the completion, check its value and cursor position.\n      (completer.selected as any).emit(patch);\n      expect(editor.model.sharedModel.getSource()).toBe(want);\n      expect(editor.getCursorPosition()).toEqual({\n        line,\n        column: column + 6\n      });\n    });",
             "file": "handler.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11727,18 +11688,18 @@
             "dir": "packages/completer/test"
         },
         {
-            "name": "should create a ConnectorProxy",
+            "name": "should create a ProviderReconciliator",
             "suites": [
                 "completer/manager",
                 "CompletionProviderManager",
-                "#generateConnectorProxy()"
+                "#generateReconciliator()"
             ],
             "updatePoint": {
                 "line": 104,
-                "column": 40
+                "column": 47
             },
             "line": 104,
-            "code": "      it('should create a ConnectorProxy', async () => {\n        const connectorProxy = await manager['generateConnectorProxy']({\n          session: sessionContext.session,\n          editor: null\n        });\n        expect(connectorProxy).toBeInstanceOf(ConnectorProxy);\n        expect(connectorProxy['_providers'].length).toBe(1);\n      });",
+            "code": "      it('should create a ProviderReconciliator', async () => {\n        const reconciliator = await manager['generateReconciliator']({\n          session: sessionContext.session,\n          editor: null\n        });\n        expect(reconciliator).toBeInstanceOf(ProviderReconciliator);\n        expect(reconciliator['_providers'].length).toBe(1);\n      });",
             "file": "manager.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -12641,6 +12602,159 @@
             "line": 527,
             "code": "      it('should resolve missing fields and remove the `resolve` function itself', async () => {\n        const model = new CompleterModel();\n        const item = {\n          label: 'foo',\n          resolve: () =>\n            Promise.resolve({ label: 'foo', documentation: 'Foo docs' })\n        };\n        model.setCompletionItems!([item]);\n        const resolved = await model.resolveItem(0);\n        expect(resolved).toEqual({ label: 'foo', documentation: 'Foo docs' });\n        expect(item).toEqual({\n          label: 'foo',\n          documentation: 'Foo docs',\n          resolve: undefined\n        });\n      });",
             "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should create a provider reconciliator",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#constructor()"
+            ],
+            "updatePoint": {
+                "line": 87,
+                "column": 48
+            },
+            "line": 87,
+            "code": "      it('should create a provider reconciliator', () => {\n        const reconciliator = new ProviderReconciliator({\n          context: { widget },\n          providers: [],\n          timeout: 0\n        });\n        expect(reconciliator).toBeInstanceOf(ProviderReconciliator);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should call `fetch` of all providers",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 97,
+                "column": 46
+            },
+            "line": 97,
+            "code": "      it('should call `fetch` of all providers', async () => {\n        const mock = jest.fn();\n        mock.mockResolvedValue({ items: [] });\n        const fooProvider1 = new FooCompletionProvider();\n        fooProvider1.fetch = mock;\n        const fooProvider2 = new FooCompletionProvider();\n        fooProvider2.fetch = mock;\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [fooProvider1, fooProvider2]\n        });\n        void reconciliator.fetch({ offset: 0, text: '' });\n        expect(fooProvider1.fetch).toBeCalled();\n        expect(fooProvider2.fetch).toBeCalled();\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should de-duplicate completions from multiple providers",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 112,
+                "column": 65
+            },
+            "line": 112,
+            "code": "      it('should de-duplicate completions from multiple providers', async () => {\n        const provider1 = new FooCompletionProvider();\n        const provider2 = new FooCompletionProvider();\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [provider1, provider2]\n        });\n        const result = await reconciliator.fetch({ offset: 0, text: '' });\n        expect(result).toEqual(DEFAULT_REPLY);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should de-duplicate by insert text if labels differ",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 122,
+                "column": 61
+            },
+            "line": 122,
+            "code": "      it('should de-duplicate by insert text if labels differ', async () => {\n        const reply1 = {\n          start: 3,\n          end: 3,\n          items: [\n            { label: 'function1()', insertText: 'function1' },\n            { label: 'function2()', insertText: 'function2' }\n          ]\n        };\n        const reply2 = {\n          start: 3,\n          end: 3,\n          items: [\n            { label: 'function1', insertText: 'function1' },\n            { label: 'function2', insertText: 'function2' }\n          ]\n        };\n        const provider1 = new FooCompletionProvider({ reply: reply1 });\n        const provider2 = new FooCompletionProvider({ reply: reply2 });\n        let reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [provider1, provider2]\n        });\n        const request = { offset: 0, text: '' };\n        let result = await reconciliator.fetch(request);\n        expect(result).toEqual(reply1);\n        reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [provider2, provider1]\n        });\n        result = await reconciliator.fetch(request);\n        expect(result).toEqual(reply2);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should ignore flanking whitespaces for de-duplication",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 155,
+                "column": 63
+            },
+            "line": 155,
+            "code": "      it('should ignore flanking whitespaces for de-duplication', async () => {\n        const replyWithSpace = {\n          start: 3,\n          end: 3,\n          items: [{ label: 'import', insertText: 'import ' }]\n        };\n        const replyWithoutSpace = {\n          start: 3,\n          end: 3,\n          items: [{ label: 'import', insertText: 'import' }]\n        };\n        const provider1 = new FooCompletionProvider({ reply: replyWithSpace });\n        const provider2 = new FooCompletionProvider({\n          reply: replyWithoutSpace\n        });\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [provider1, provider2]\n        });\n        const result = await reconciliator.fetch({ offset: 0, text: '' });\n        expect(result).toEqual(replyWithSpace);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should return completions even if one of providers fails",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 177,
+                "column": 66
+            },
+            "line": 177,
+            "code": "      it('should return completions even if one of providers fails', async () => {\n        const provider1 = new FooCompletionProvider();\n        const provider2 = new FooCompletionProvider({ reject: true });\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [provider1, provider2]\n        });\n        const result = await reconciliator.fetch({ offset: 0, text: '' });\n        expect(result).toEqual(DEFAULT_REPLY);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should include `resolve` in reply items",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 187,
+                "column": 49
+            },
+            "line": 187,
+            "code": "      it('should include `resolve` in reply items', async () => {\n        const fooProvider1 = new FooCompletionProvider();\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [fooProvider1]\n        });\n        const res = await reconciliator.fetch({ offset: 0, text: '' });\n        expect(res!['items']).toEqual([\n          { label: 'fooModule', resolve: undefined, type: 'module' },\n          { label: 'barFunction', resolve: undefined, type: 'function' }\n        ]);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should reject slow fetch request",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 199,
+                "column": 42
+            },
+            "line": 199,
+            "code": "      it('should reject slow fetch request', async () => {\n        const fooProvider1 = new FooCompletionProvider({ delay: 500 });\n        const reconciliator = new ProviderReconciliator({\n          context: { widget },\n          providers: [fooProvider1],\n          timeout: 200\n        });\n        const res = await reconciliator.fetch({ offset: 0, text: '' });\n        expect(res).toEqual(null);\n      });",
+            "file": "reconciliator.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should check the `shouldShowContinuousHint` of the first provider",
+            "suites": [
+                "completer/reconciliator",
+                "ProviderReconciliator",
+                "#shouldShowContinuousHint()"
+            ],
+            "updatePoint": {
+                "line": 211,
+                "column": 75
+            },
+            "line": 211,
+            "code": "      it('should check the `shouldShowContinuousHint` of the first provider', async () => {\n        const fooProvider1 = new FooCompletionProvider();\n        fooProvider1.shouldShowContinuousHint = jest.fn();\n        const fooProvider2 = new FooCompletionProvider();\n        fooProvider2.shouldShowContinuousHint = jest.fn();\n        const reconciliator = new ProviderReconciliator({\n          ...defaultOptions,\n          providers: [fooProvider1, fooProvider1]\n        });\n        reconciliator.shouldShowContinuousHint(true, null as any);\n        expect(fooProvider1.shouldShowContinuousHint).toBeCalledTimes(1);\n        expect(fooProvider2.shouldShowContinuousHint).toBeCalledTimes(0);\n      });",
+            "file": "reconciliator.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
         },
@@ -38642,6 +38756,108 @@
             "line": 43,
             "code": "    it('should fail on incorrect data', () => {\n      const model = { id: 1, last_modified: '1' };\n      expect(() => validateCheckpointModel(model as any)).toThrowError();\n    });",
             "file": "contents/validate.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should accept no options",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#constructor()"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 34
+            },
+            "line": 37,
+            "code": "      it('should accept no options', () => {\n        const manager = new EventManager();\n        expect(manager).toBeInstanceOf(EventManager);\n      });",
+            "file": "event/manager.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should accept options",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#constructor()"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 31
+            },
+            "line": 42,
+            "code": "      it('should accept options', () => {\n        const manager = new EventManager({\n          serverSettings: ServerConnection.makeSettings()\n        });\n        expect(manager).toBeInstanceOf(EventManager);\n      });",
+            "file": "event/manager.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should be the server settings",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#serverSettings"
+            ],
+            "updatePoint": {
+                "line": 51,
+                "column": 39
+            },
+            "line": 51,
+            "code": "      it('should be the server settings', () => {\n        const baseUrl = 'http://localhost/foo';\n        const serverSettings = ServerConnection.makeSettings({ baseUrl });\n        const manager = new EventManager({ serverSettings });\n        expect(manager.serverSettings.baseUrl).toBe(baseUrl);\n      });",
+            "file": "event/manager.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should yield an event",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#stream[Symbol.asyncIterator]()"
+            ],
+            "updatePoint": {
+                "line": 60,
+                "column": 31
+            },
+            "line": 60,
+            "code": "      it('should yield an event', async () => {\n        const delegate = new PromiseDelegate<void>();\n        const expected = `#stream[Symbol.asyncIterator]() test`;\n        let received = '';\n        setTimeout(async () => {\n          for await (const emission of manager.stream) {\n            received = (emission.path as string) || '';\n            if (received === expected) {\n              break;\n            }\n          }\n          expect(received).toEqual(expected);\n          delegate.resolve();\n        });\n        setTimeout(() => {\n          void manager.emit({\n            // eslint-disable-next-line camelcase\n            schema_id:\n              'https://events.jupyter.org/jupyter_server/contents_service/v1',\n            data: { action: 'get', path: expected },\n            version: '1'\n          });\n        }, 500);\n        return delegate.promise;\n      });",
+            "file": "event/manager.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should yield an event",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#stream.connect()"
+            ],
+            "updatePoint": {
+                "line": 88,
+                "column": 31
+            },
+            "line": 88,
+            "code": "      it('should yield an event', async () => {\n        const delegate = new PromiseDelegate<void>();\n        const expected = `#stream.connect() test`;\n        let received = '';\n        manager.stream.connect((_, emission) => {\n          received = (emission.path as string) || '';\n          if (received !== expected) {\n            return;\n          }\n          expect(received).toEqual(expected);\n          delegate.resolve();\n        });\n        void manager.emit({\n          // eslint-disable-next-line camelcase\n          schema_id:\n            'https://events.jupyter.org/jupyter_server/contents_service/v1',\n          data: { action: 'get', path: expected },\n          version: '1'\n        });\n        return delegate.promise;\n      });",
+            "file": "event/manager.spec.ts",
+            "skipped": false,
+            "dir": "packages/services/test"
+        },
+        {
+            "name": "should emit an event",
+            "suites": [
+                "setting",
+                "EventManager",
+                "#emit()"
+            ],
+            "updatePoint": {
+                "line": 112,
+                "column": 30
+            },
+            "line": 112,
+            "code": "      it('should emit an event', async () => {\n        const delegate = new PromiseDelegate<void>();\n        const expected = `#emit() test`;\n        let received = '';\n        setTimeout(async () => {\n          for await (const emission of manager.stream) {\n            received = (emission.path as string) || '';\n            if (received === expected) {\n              break;\n            }\n          }\n          expect(received).toEqual(expected);\n          delegate.resolve();\n        });\n        setTimeout(() => {\n          void manager.emit({\n            // eslint-disable-next-line camelcase\n            schema_id:\n              'https://events.jupyter.org/jupyter_server/contents_service/v1',\n            data: { action: 'get', path: expected },\n            version: '1'\n          });\n        }, 500);\n        return delegate.promise;\n      });",
+            "file": "event/manager.spec.ts",
             "skipped": false,
             "dir": "packages/services/test"
         },
