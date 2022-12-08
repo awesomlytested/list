@@ -1616,6 +1616,21 @@
             "dir": "packages/graphql-codegen-cli/tests"
         },
         {
+            "name": "should allow to alter the content with the beforeOneFileWrite hook",
+            "suites": [
+                "generate-and-save"
+            ],
+            "updatePoint": {
+                "line": 216,
+                "column": 74
+            },
+            "line": 216,
+            "code": "  test('should allow to alter the content with the beforeOneFileWrite hook', async () => {\n    const filename = 'modify.ts';\n    const writeSpy = jest.spyOn(fs, 'writeFile').mockImplementation();\n\n    const output = await generate(\n      {\n        schema: SIMPLE_TEST_SCHEMA,\n        generates: {\n          [filename]: {\n            plugins: ['typescript'],\n            hooks: {\n              beforeOneFileWrite: [() => 'new content'],\n            },\n          },\n        },\n      },\n      true\n    );\n\n    expect(output.length).toBe(1);\n    expect(output[0].content).toMatch('new content');\n    // makes sure it doesn't write a new file\n    expect(writeSpy).toHaveBeenCalled();\n  });",
+            "file": "generate-and-save.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
             "name": "should guess angular projects",
             "suites": [
                 "init",
@@ -2230,7 +2245,7 @@
                 "column": 65
             },
             "line": 12,
-            "code": "    it('Should enforce graphql extension when its the only plugin', async () => {\n      const fileName = 'output.ts';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n\n        throw new Error(SHOULD_THROW_ERROR);\n      } catch (e) {\n        expect(e.message).not.toBe(SHOULD_THROW_ERROR);\n        expect(e.message).toBe('Plugin \"schema-ast\" requires extension to be \".graphql\"!');\n      }\n    });",
+            "code": "    it('Should enforce graphql extension when its the only plugin', async () => {\n      const fileName = 'output.ts';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n\n        throw new Error(SHOULD_THROW_ERROR);\n      } catch (e) {\n        expect(e.message).not.toBe(SHOULD_THROW_ERROR);\n        expect(e.message).toBe('Plugin \"schema-ast\" requires extension to be \".graphql\" or \".gql\"!');\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/other/schema-ast/tests"
@@ -2252,17 +2267,33 @@
             "dir": "packages/plugins/other/schema-ast/tests"
         },
         {
-            "name": "Should allow graphql extension when its the only plugin",
+            "name": "Should allow .graphql extension when its the only plugin",
             "suites": [
                 "Schema AST",
                 "Validation"
             ],
             "updatePoint": {
                 "line": 48,
-                "column": 63
+                "column": 64
             },
             "line": 48,
-            "code": "    it('Should allow graphql extension when its the only plugin', async () => {\n      const fileName = 'output.graphql';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
+            "code": "    it('Should allow .graphql extension when its the only plugin', async () => {\n      const fileName = 'output.graphql';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
+            "file": "schema-ast.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/other/schema-ast/tests"
+        },
+        {
+            "name": "Should allow .gql extension when its the only plugin",
+            "suites": [
+                "Schema AST",
+                "Validation"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 60
+            },
+            "line": 63,
+            "code": "    it('Should allow .gql extension when its the only plugin', async () => {\n      const fileName = 'output.gql';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/other/schema-ast/tests"
@@ -2274,10 +2305,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 77,
+                "line": 92,
                 "column": 80
             },
-            "line": 77,
+            "line": 92,
             "code": "    it('Should print schema without directives when \"includeDirectives\" is unset', async () => {\n      const content = await plugin(schema, [], { includeDirectives: false });\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2290,10 +2321,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 87,
+                "line": 102,
                 "column": 58
             },
-            "line": 87,
+            "line": 102,
             "code": "    it('Should print schema with as \"\"\" comment as default', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          \"\"\"\n          test\n          \"\"\"\n          fieldTest: String\n        }\n      `);\n      const content = await plugin(testSchema, [], { includeDirectives: false });\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          \"\"\"test\"\"\"\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2306,10 +2337,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 107,
+                "line": 122,
                 "column": 69
             },
-            "line": 107,
+            "line": 122,
             "code": "      it('Should print schema with as # when commentDescriptions=true', async () => {\n        const testSchema = buildSchema(/* GraphQL */ `\n          type Query {\n            \"\"\"\n            test\n            \"\"\"\n            fieldTest: String\n          }\n        `);\n        const content = await plugin(testSchema, [], { commentDescriptions: true, includeDirectives: false });\n\n        expect(content).toBeSimilarStringTo(`\n        type Query {\n          #  test\n          fieldTest: String\n        }\n      `);\n      });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2322,10 +2353,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 127,
+                "line": 142,
                 "column": 75
             },
-            "line": 127,
+            "line": 142,
             "code": "    it('Should print schema with directives when \"includeDirectives\" is set', async () => {\n      const content = await plugin(schema, [], { includeDirectives: true });\n\n      expect(content).toBeSimilarStringTo(`\n        directive @modify(limit: Int) on FIELD_DEFINITION\n      `);\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String @modify(limit: 1)\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2338,10 +2369,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 140,
+                "line": 155,
                 "column": 86
             },
-            "line": 140,
+            "line": 155,
             "code": "    it('Should print schema with introspection when \"includeIntrospectionTypes\" is set', async () => {\n      const content = await plugin(schema, [], { includeIntrospectionTypes: true });\n\n      expect(content).toBeSimilarStringTo(`\n        type __Schema\n      `);\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n          __schema: __Schema!\n          __type(name: String!): __Type\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2354,10 +2385,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 156,
+                "line": 171,
                 "column": 91
             },
-            "line": 156,
+            "line": 171,
             "code": "    it('Should print schema without introspection when \"includeIntrospectionTypes\" is unset', async () => {\n      const content = await plugin(schema, [], { includeIntrospectionTypes: false });\n\n      expect(content).not.toBeSimilarStringTo(`\n        type __Schema\n      `);\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2370,10 +2401,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 170,
+                "line": 185,
                 "column": 40
             },
-            "line": 170,
+            "line": 185,
             "code": "    it('should support Apollo Federation', async () => {\n      const federatedSchema = parse(/* GraphQL */ `\n        type Character @key(fields: \"id\") {\n          id: ID\n          name: String\n        }\n\n        type Jedi @key(fields: \"id\") {\n          id: ID\n          side: String\n        }\n\n        type Droid @key(fields: \"id\") {\n          id: ID\n          model: String\n        }\n\n        union People = Character | Jedi | Droid\n\n        type Query {\n          allPeople: [People]\n        }\n      `);\n\n      const content = await codegen({\n        filename: 'foo.graphql',\n        schema: federatedSchema,\n        documents: [],\n        plugins: [\n          {\n            'schema-ast': {},\n          },\n        ],\n        config: {\n          federation: true,\n        },\n        pluginMap: {\n          'schema-ast': {\n            plugin,\n            validate,\n          },\n        },\n      });\n\n      expect(content).not.toContain(`scalar _Any`);\n      expect(content).not.toContain(`union _Entity`);\n      expect(content).not.toContain(`type _Service`);\n\n      expect(content).toBeSimilarStringTo(`\n        type Character {\n          id: ID\n          name: String\n        }\n\n        type Jedi {\n          id: ID\n          side: String\n        }\n\n        type Droid {\n          id: ID\n          model: String\n        }\n\n        union People = Character | Jedi | Droid\n\n        type Query {\n          allPeople: [People]\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
