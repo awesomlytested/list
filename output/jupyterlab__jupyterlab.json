@@ -1385,14 +1385,28 @@
             "dir": "galata/test"
         },
         {
-            "name": "Start debug session (Script)",
+            "name": "Rich variables inspector",
             "suites": [],
             "updatePoint": {
                 "line": 55,
-                "column": 36,
-                "index": 2349
+                "column": 32,
+                "index": 2345
             },
             "line": 55,
+            "code": "  test('Rich variables inspector', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.contents.uploadFile(path.resolve(__dirname, './notebooks/WidgetArch.png'), `${tmpPath}/WidgetArch.png`);\n    const notebookName = 'image_notebook.ipynb';\n    const globalVar = 'global_img';\n    const localVar = 'local_img';\n    await openNotebook(page, tmpPath, notebookName);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await page.notebook.waitForCellGutter(0);\n    await page.notebook.clickCellGutter(0, 5);\n    await page.notebook.clickCellGutter(0, 6);\n\n    // don't add await, run will be blocked by the breakpoint\n    void page.notebook.run().then();\n    await page.debugger.waitForCallStack();\n    await page.debugger.waitForVariables();\n    const variablesPanel = await page.debugger.getVariablesPanel();\n    expect(await variablesPanel.screenshot()).toMatchSnapshot('image-debug-session-global-variables.png');\n    await page.debugger.renderVariable(globalVar);\n    let richVariableTab = await page.activity.getPanel(`${globalVar} - ${notebookName}`);\n    expect(await richVariableTab.screenshot()).toMatchSnapshot('image-debug-session-global-rich-variable.png');\n    await page.activity.closePanel(`${globalVar} - ${notebookName}`);\n    await page.locator('button[title=\"Continue (F9)\"]').click();\n    await expect(variablesPanel).not.toContain('ul');\n    await page.debugger.waitForVariables();\n    await page.debugger.renderVariable(localVar);\n    richVariableTab = await page.activity.getPanel(`${localVar} - ${notebookName}`);\n    expect(await richVariableTab.screenshot()).toMatchSnapshot('image-debug-session-local-rich-variable.png');\n  });",
+            "file": "jupyterlab/debugger.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Start debug session (Script)",
+            "suites": [],
+            "updatePoint": {
+                "line": 87,
+                "column": 36,
+                "index": 4057
+            },
+            "line": 87,
             "code": "  test('Start debug session (Script)', async ({\n    page,\n    tmpPath\n  }) => {\n    await openNotebook(page, tmpPath, 'code_script.py');\n    await page.click('div.jp-FileEditor', {\n      button: 'right'\n    });\n    const menu = await page.menu.getOpenMenu();\n    await (await menu.$('[data-command=\"fileeditor:create-console\"]')).click();\n    await page.waitForSelector('.jp-Dialog-body');\n    const select = await page.$('.jp-Dialog-body >> select');\n    const option = await select.$('option:has-text(\"ipykernel\")');\n    await select.selectOption(option);\n    await page.click('div.jp-Dialog-content >> button:has-text(\"Select\")');\n\n    // activate the script tab\n    await page.click('.jp-FileEditor');\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await page.notebook.waitForCodeGutter();\n    await page.notebook.clickCodeGutter(2);\n    await page.debugger.waitForBreakPoints();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel/);\n    const callStackPanel = await page.debugger.getCallStackPanel();\n    expect(await callStackPanel.innerText()).toBe('');\n\n    // don't add await, run will be blocked by the breakpoint\n    await page.menu.clickMenuItem('Run>Run All Code');\n    await page.debugger.waitForCallStack();\n    expect(await callStackPanel.innerText()).toMatch(/ipykernel/);\n    await page.debugger.waitForVariables();\n    const variablesPanel = await page.debugger.getVariablesPanel();\n    expect(await variablesPanel.screenshot()).toMatchSnapshot('start-debug-session-script-variables.png');\n    await page.debugger.waitForSources();\n    const sourcesPanel = await page.debugger.getSourcePanel();\n    expect(await sourcesPanel.screenshot()).toMatchSnapshot('start-debug-session-script-sources.png');\n  });",
             "file": "jupyterlab/debugger.test.ts",
             "skipped": false,
