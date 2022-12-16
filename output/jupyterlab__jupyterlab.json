@@ -2256,11 +2256,11 @@
             "name": "should display a  notification",
             "suites": [],
             "updatePoint": {
-                "line": 10,
+                "line": 11,
                 "column": 47,
-                "index": 376
+                "index": 443
             },
-            "line": 10,
+            "line": 11,
             "code": "    test(`should display a ${type} notification`, async ({\n      page\n    }) => {\n      await page.evaluate(kind => {\n        return window.jupyterapp.commands.execute('apputils:notify', {\n          message: 'This is a test message',\n          type: kind,\n          options: {\n            autoClose: false\n          }\n        });\n      }, type);\n      await page.waitForSelector('.Toastify__toast');\n      expect(await page.locator('.Toastify__toast').screenshot({\n        // Ensure consistency for in progress case\n        animations: 'disabled'\n      })).toMatchSnapshot({\n        name: `notification-${type}.png`\n      });\n    });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
@@ -2270,26 +2270,40 @@
             "name": "should display a notification with actions",
             "suites": [],
             "updatePoint": {
-                "line": 31,
+                "line": 32,
                 "column": 50,
-                "index": 1017
+                "index": 1084
             },
-            "line": 31,
+            "line": 32,
             "code": "  test('should display a notification with actions', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false,\n          actions: [{\n            label: 'Button 1',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 1 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }, {\n            label: 'Button 2',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 2 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }]\n        }\n      });\n    });\n    const handle = await page.waitForSelector('.Toastify__toast');\n    expect(await handle.screenshot({\n      animations: 'disabled'\n    })).toMatchSnapshot({\n      name: `notification-with-actions.png`\n    });\n    await Promise.all([handle.waitForElementState('hidden'), page.click('.Toastify__toast >> text=Button 2')]);\n    await expect(page.locator('.Toastify__toast').last()).toHaveText('Button 2 was clicked');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
             "dir": "galata/test"
         },
         {
-            "name": "should display a markdown notification",
+            "name": "should display a notification with action ",
             "suites": [],
             "updatePoint": {
-                "line": 72,
-                "column": 46,
-                "index": 2304
+                "line": 74,
+                "column": 66,
+                "index": 2442
             },
-            "line": 72,
-            "code": "  test('should display a markdown notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This _is_ a **Markdown** [message](https://jupyter.org).\\n\\n- Item 1\\n- Item 2',\n        options: {\n          autoClose: false\n        }\n      });\n    });\n    await page.waitForSelector('.Toastify__toast');\n    expect(await page.locator('.Toastify__toast').screenshot({\n      // Ensure consistency\n      animations: 'disabled'\n    })).toMatchSnapshot({\n      name: `notification-markdown.png`\n    });\n  });",
+            "line": 74,
+            "code": "    test(`should display a notification with action ${displayType}`, async ({\n      page\n    }) => {\n      await page.evaluate(displayType => {\n        return window.jupyterapp.commands.execute('apputils:notify', {\n          message: 'This is a test message',\n          options: {\n            autoClose: false,\n            actions: [{\n              label: 'Button 1',\n              commandId: 'apputils:notify',\n              args: {\n                message: 'Button 1 was clicked',\n                type: 'success',\n                options: {\n                  autoClose: false\n                }\n              },\n              displayType\n            }]\n          }\n        });\n      }, displayType);\n      const handle = await page.waitForSelector('.Toastify__toast');\n      expect(await handle.screenshot({\n        animations: 'disabled'\n      })).toMatchSnapshot({\n        name: `notification-${displayType}-action.png`\n      });\n    });",
+            "file": "jupyterlab/notification.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should display as truncated text content the notification",
+            "suites": [],
+            "updatePoint": {
+                "line": 105,
+                "column": 65,
+                "index": 3386
+            },
+            "line": 105,
+            "code": "  test('should display as truncated text content the notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: '<style>.jp-dummy {\\n  color: pink;\\n}\\n</style>\\n<script>alert(\"I\\'m in\");</script>\\n\\n## Title\\n\\nThis _is_ a **Markdown** message.\\n\\n![logo](https://jupyter.org/assets/logos/rectanglelogo-greytext-orangebody-greymoons.svg)\\n\\n<p style=\"color:pink;\">Pink text</p>\\n\\n- Item 1\\n- Item 2',\n        options: {\n          autoClose: false\n        }\n      });\n    });\n    await page.waitForSelector('.Toastify__toast');\n    expect(await page.locator('.Toastify__toast-body').innerHTML()).toMatchSnapshot({\n      name: 'text-content-notification.txt'\n    });\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2298,11 +2312,11 @@
             "name": "should update a notification",
             "suites": [],
             "updatePoint": {
-                "line": 91,
+                "line": 121,
                 "column": 36,
-                "index": 2897
+                "index": 4132
             },
-            "line": 91,
+            "line": 121,
             "code": "  test('should update a notification', async ({\n    page\n  }) => {\n    const id = await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note',\n        options: {\n          autoClose: false\n        }\n      });\n    });\n    await page.waitForSelector('.Toastify__toast >> text=Simple note');\n    await page.evaluate(id => {\n      return window.jupyterapp.commands.execute('apputils:update-notification', {\n        id,\n        message: 'Updated message',\n        type: 'success'\n      });\n    }, id);\n    await expect(page.locator('.Toastify__toast')).toHaveText('Updated message');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
@@ -2312,11 +2326,11 @@
             "name": "should dismiss a notification",
             "suites": [],
             "updatePoint": {
-                "line": 112,
+                "line": 142,
                 "column": 37,
-                "index": 3551
+                "index": 4786
             },
-            "line": 112,
+            "line": 142,
             "code": "  test('should dismiss a notification', async ({\n    page\n  }) => {\n    const id = await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note',\n        options: {\n          autoClose: false\n        }\n      });\n    });\n    await page.waitForSelector('.Toastify__toast >> text=Simple note');\n    await Promise.all([page.waitForSelector('.Toastify__toast >> text=Simple note', {\n      state: 'detached'\n    }), page.evaluate(id => {\n      return window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n        id\n      });\n    }, id)]);\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
@@ -2326,11 +2340,11 @@
             "name": "should display no notification by default",
             "suites": [],
             "updatePoint": {
-                "line": 134,
+                "line": 164,
                 "column": 49,
-                "index": 4234
+                "index": 5469
             },
-            "line": 134,
+            "line": 164,
             "code": "  test('should display no notification by default', async ({\n    page\n  }) => {\n    const status = page.locator('.jp-Notification-Status');\n    expect(await status.getAttribute('class')).not.toMatch(/\\s?jp-mod-selected\\s?/);\n    await expect(status).toHaveText('0');\n    await status.click();\n    await expect(page.locator('.jp-Notification-Header')).toHaveText('No notifications');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
@@ -2340,26 +2354,26 @@
             "name": "should be highlighted for silent notification",
             "suites": [],
             "updatePoint": {
-                "line": 143,
+                "line": 173,
                 "column": 53,
-                "index": 4627
+                "index": 5862
             },
-            "line": 143,
+            "line": 173,
             "code": "  test('should be highlighted for silent notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note'\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    expect(await status.getAttribute('class')).toMatch(/\\s?jp-mod-selected\\s?/);\n    await expect(status).toHaveText('1');\n    await status.click();\n    await expect(page.locator('.jp-Notification-Header')).toHaveText('1 notification');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
             "dir": "galata/test"
         },
         {
-            "name": "should be stop highlight once the center is closed",
+            "name": "should stop the highlight once the center is closed",
             "suites": [],
             "updatePoint": {
-                "line": 157,
-                "column": 58,
-                "index": 5169
+                "line": 187,
+                "column": 59,
+                "index": 6405
             },
-            "line": 157,
-            "code": "  test('should be stop highlight once the center is closed', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note'\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    await status.click();\n    await expect(page.locator('.jp-Notification-Header')).toHaveText('1 notification');\n    await page.locator('.jp-Notification-Header >> button[title=\"Hide notifications\"]').click();\n    expect(await status.getAttribute('class')).not.toMatch(/\\s?jp-mod-selected\\s?/);\n    await expect(status).toHaveText('1');\n  });",
+            "line": 187,
+            "code": "  test('should stop the highlight once the center is closed', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note'\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    await status.click();\n    await expect(page.locator('.jp-Notification-Header')).toHaveText('1 notification');\n    await page.locator('.jp-Notification-Header >> button[title=\"Hide notifications\"]').click();\n    expect(await status.getAttribute('class')).not.toMatch(/\\s?jp-mod-selected\\s?/);\n    await expect(status).toHaveText('1');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2368,11 +2382,11 @@
             "name": "should forget dismissed notification",
             "suites": [],
             "updatePoint": {
-                "line": 172,
+                "line": 202,
                 "column": 44,
-                "index": 5798
+                "index": 7034
             },
-            "line": 172,
+            "line": 202,
             "code": "  test('should forget dismissed notification', async ({\n    page\n  }) => {\n    await page.evaluate(async () => {\n      await window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note 1'\n      });\n      await window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'Simple note 2'\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    await expect(status).toHaveText('2');\n    await status.click();\n    await expect(page.locator('.jp-Notification-Header')).toHaveText('2 notifications');\n    await page.locator('.jp-Notification-List >> li >> [title=\"Dismiss notification\"]').first().click();\n    await expect(status).toHaveText('1');\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
@@ -2382,12 +2396,12 @@
             "name": "should display all kinds of notification",
             "suites": [],
             "updatePoint": {
-                "line": 190,
+                "line": 220,
                 "column": 48,
-                "index": 6515
+                "index": 7751
             },
-            "line": 190,
-            "code": "  test(`should display all kinds of notification`, async ({\n    page\n  }) => {\n    for (const type of NOTIFICATION_TYPE) {\n      await page.evaluate(kind => {\n        return window.jupyterapp.commands.execute('apputils:notify', {\n          message: 'This is a _test_ [message](http://jupyter.org)',\n          type: kind\n        });\n      }, type);\n    }\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false,\n          actions: [{\n            label: 'Button 1',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 1 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }, {\n            label: 'Button 2',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 2 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }]\n        }\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    await expect(status).toHaveText('7');\n    await status.click();\n    expect(await page.locator('.jp-Notification-Center').screenshot({\n      // Ensure consistency for in progress case\n      animations: 'disabled'\n    })).toMatchSnapshot({\n      name: `notification-center.png`\n    });\n  });",
+            "line": 220,
+            "code": "  test(`should display all kinds of notification`, async ({\n    page\n  }) => {\n    for (const type of NOTIFICATION_TYPE) {\n      await page.evaluate(kind => {\n        return window.jupyterapp.commands.execute('apputils:notify', {\n          message: 'This is a test message',\n          type: kind\n        });\n      }, type);\n    }\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false,\n          actions: [{\n            label: 'Button 1',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 1 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }, {\n            label: 'Button 2',\n            commandId: 'apputils:notify',\n            args: {\n              message: 'Button 2 was clicked',\n              type: 'success',\n              options: {\n                autoClose: false\n              }\n            }\n          }]\n        }\n      });\n    });\n    const status = page.locator('.jp-Notification-Status');\n    await expect(status).toHaveText('7');\n    await status.click();\n    expect(await page.locator('.jp-Notification-Center').screenshot({\n      // Ensure consistency for in progress case\n      animations: 'disabled'\n    })).toMatchSnapshot({\n      name: `notification-center.png`\n    });\n  });",
             "file": "jupyterlab/notification.test.ts",
             "skipped": false,
             "dir": "galata/test"
