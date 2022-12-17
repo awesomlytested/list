@@ -4222,18 +4222,146 @@
             "dir": "packages/analytics/__tests__"
         },
         {
-            "name": "record happy case",
+            "name": "record with immediate transmission",
             "suites": [
                 "kinesis firehose provider test",
                 "record test"
             ],
             "updatePoint": {
                 "line": 77,
-                "column": 25
+                "column": 42
             },
             "line": 77,
+            "code": "\t\ttest('record with immediate transmission', async () => {\n\t\t\tconst kinesisProvider = new KinesisFirehoseProvider();\n\t\t\tconst putRecordBatchCommandSpy = jest.spyOn(\n\t\t\t\tPutRecordBatchCommand.prototype,\n\t\t\t\t'constructor'\n\t\t\t);\n\n\t\t\tjest.spyOn(Credentials, 'get').mockImplementationOnce(() => {\n\t\t\t\treturn Promise.resolve(credentials);\n\t\t\t});\n\n\t\t\tawait expect(\n\t\t\t\tkinesisProvider.record({\n\t\t\t\t\tevent: {\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\td: 1,\n\t\t\t\t\t\t},\n\t\t\t\t\t\tstreamName: 'testStream',\n\t\t\t\t\t\timmediate: true,\n\t\t\t\t\t},\n\t\t\t\t\tconfig: {},\n\t\t\t\t})\n\t\t\t).resolves.toBe(true);\n\n\t\t\t// Ensure PutRecord was constructed as expected\n\t\t\texpect(putRecordBatchCommandSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(putRecordBatchCommandSpy).toHaveBeenCalledWith({\n\t\t\t\tDeliveryStreamName: 'testStream',\n\t\t\t\tRecords: [\n\t\t\t\t\t{\n\t\t\t\t\t\tData: new Uint8Array([123, 34, 100, 34, 58, 49, 125]), // Encoded data payload\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t});\n\n\t\t\texpect(FirehoseClient.prototype.send).toHaveBeenCalledTimes(1);\n\t\t});",
+            "file": "Providers/AWSKinesisFirehoseProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "record happy case",
+            "suites": [
+                "kinesis firehose provider test",
+                "record test"
+            ],
+            "updatePoint": {
+                "line": 115,
+                "column": 25
+            },
+            "line": 115,
             "code": "\t\ttest('record happy case', async () => {\n\t\t\tconst analytics = new KinesisFirehoseProvider();\n\t\t\tanalytics.configure({ region: 'region1' });\n\n\t\t\tconst spyon = jest.spyOn(FirehoseClient.prototype, 'send');\n\n\t\t\tjest.spyOn(Credentials, 'get').mockImplementationOnce(() => {\n\t\t\t\treturn Promise.resolve(credentials);\n\t\t\t});\n\n\t\t\tawait analytics.record({\n\t\t\t\tevent: {\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tdata: 'data',\n\t\t\t\t\t},\n\t\t\t\t\tstreamName: 'stream',\n\t\t\t\t},\n\t\t\t\tconfig: {},\n\t\t\t});\n\n\t\t\tjest.advanceTimersByTime(6000);\n\n\t\t\texpect(spyon).toBeCalled();\n\n\t\t\tspyon.mockRestore();\n\t\t});",
             "file": "Providers/AWSKinesisFirehoseProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "happy case",
+            "suites": [
+                "kinesis provider test",
+                "getCategory test"
+            ],
+            "updatePoint": {
+                "line": 31,
+                "column": 18
+            },
+            "line": 31,
+            "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new KinesisProvider();\n\n\t\t\texpect(analytics.getCategory()).toBe('Analytics');\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "happy case",
+            "suites": [
+                "kinesis provider test",
+                "getProviderName test"
+            ],
+            "updatePoint": {
+                "line": 39,
+                "column": 18
+            },
+            "line": 39,
+            "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new KinesisProvider();\n\n\t\t\texpect(analytics.getProviderName()).toBe('AWSKinesis');\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "happy case",
+            "suites": [
+                "kinesis provider test",
+                "configure test"
+            ],
+            "updatePoint": {
+                "line": 47,
+                "column": 18
+            },
+            "line": 47,
+            "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new KinesisProvider();\n\n\t\t\texpect(analytics.configure({ region: 'region1' })).toEqual({\n\t\t\t\tbufferSize: 1000,\n\t\t\t\tflushInterval: 5000,\n\t\t\t\tflushSize: 100,\n\t\t\t\tregion: 'region1',\n\t\t\t\tresendLimit: 5,\n\t\t\t});\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "record without credentials",
+            "suites": [
+                "kinesis provider test",
+                "record test"
+            ],
+            "updatePoint": {
+                "line": 61,
+                "column": 34
+            },
+            "line": 61,
+            "code": "\t\ttest('record without credentials', async () => {\n\t\t\tconst analytics = new KinesisProvider();\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.reject('err');\n\t\t\t\t});\n\n\t\t\texpect(await analytics.record('params')).toBe(false);\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "record with immediate transmission",
+            "suites": [
+                "kinesis provider test",
+                "record test"
+            ],
+            "updatePoint": {
+                "line": 73,
+                "column": 42
+            },
+            "line": 73,
+            "code": "\t\ttest('record with immediate transmission', async () => {\n\t\t\tconst kinesisProvider = new KinesisProvider();\n\t\t\tconst putRecordCommandSpy = jest.spyOn(\n\t\t\t\tPutRecordsCommand.prototype,\n\t\t\t\t'constructor'\n\t\t\t);\n\n\t\t\tjest.spyOn(Credentials, 'get').mockImplementationOnce(() => {\n\t\t\t\treturn Promise.resolve(credentials);\n\t\t\t});\n\n\t\t\tawait expect(\n\t\t\t\tkinesisProvider.record({\n\t\t\t\t\tevent: {\n\t\t\t\t\t\tdata: {\n\t\t\t\t\t\t\td: 1,\n\t\t\t\t\t\t},\n\t\t\t\t\t\tstreamName: 'testStream',\n\t\t\t\t\t\timmediate: true,\n\t\t\t\t\t},\n\t\t\t\t\tconfig: {},\n\t\t\t\t})\n\t\t\t).resolves.toBe(true);\n\n\t\t\t// Ensure PutRecord was constructed as expected\n\t\t\texpect(putRecordCommandSpy).toHaveBeenCalledTimes(1);\n\t\t\texpect(putRecordCommandSpy).toHaveBeenCalledWith({\n\t\t\t\tRecords: [\n\t\t\t\t\t{\n\t\t\t\t\t\tData: new Uint8Array([123, 34, 100, 34, 58, 49, 125]), // Encoded data payload\n\t\t\t\t\t\tPartitionKey: 'partition-identityId',\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t\tStreamName: 'testStream',\n\t\t\t});\n\n\t\t\texpect(KinesisClient.prototype.send).toHaveBeenCalledTimes(1);\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "record happy case",
+            "suites": [
+                "kinesis provider test",
+                "record test"
+            ],
+            "updatePoint": {
+                "line": 112,
+                "column": 25
+            },
+            "line": 112,
+            "code": "\t\ttest('record happy case', async () => {\n\t\t\tconst analytics = new KinesisProvider();\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn Promise.resolve(credentials);\n\t\t\t\t});\n\n\t\t\tawait analytics.record({\n\t\t\t\tevent: {\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tdata: 'data',\n\t\t\t\t\t},\n\t\t\t\t\tstreamName: 'stream',\n\t\t\t\t},\n\t\t\t\tconfig: {},\n\t\t\t});\n\n\t\t\tjest.advanceTimersByTime(6000);\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "happy case",
+            "suites": [
+                "kinesis provider test",
+                "passing parameters to KinesisClient"
+            ],
+            "updatePoint": {
+                "line": 136,
+                "column": 18
+            },
+            "line": 136,
+            "code": "\t\ttest('happy case', async () => {\n\t\t\tconst config = {\n\t\t\t\tregion: 'region1',\n\t\t\t\tendpoint: 'endpoint1',\n\t\t\t};\n\n\t\t\tconst analytics = new KinesisProvider({ ...config });\n\n\t\t\tjest.spyOn(Credentials, 'get').mockImplementationOnce(() => {\n\t\t\t\treturn Promise.resolve(credentials);\n\t\t\t});\n\n\t\t\tawait analytics.record({\n\t\t\t\tevent: {\n\t\t\t\t\tdata: {\n\t\t\t\t\t\tdata: 'data',\n\t\t\t\t\t},\n\t\t\t\t\tstreamName: 'stream',\n\t\t\t\t},\n\t\t\t\tconfig: {},\n\t\t\t});\n\n\t\t\tjest.advanceTimersByTime(6000);\n\n\t\t\texpect(KinesisClient).toHaveBeenCalledWith(\n\t\t\t\texpect.objectContaining(config)\n\t\t\t);\n\t\t});",
+            "file": "Providers/AWSKinesisProvider.test.ts",
             "skipped": false,
             "dir": "packages/analytics/__tests__"
         },
