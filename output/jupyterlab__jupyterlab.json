@@ -497,7 +497,7 @@
                 "index": 4090
             },
             "line": 148,
-            "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n    await page.click('button[title^=Continue]');\n  });",
+            "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n\n    // Wait for the locals variables to be displayed\n    await expect(page.locator('.jp-DebuggerVariables-toolbar select')).toHaveValue('Locals');\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n\n    // Copy value to clipboard\n    await page.locator('.jp-DebuggerVariables-body :text(\"b\")').click({\n      button: 'right'\n    });\n    await page.locator('.lm-Menu-itemLabel:text(\"Copy to Clipboard\")').click();\n    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');\n\n    // Copy value entry is disabled for variables with empty value\n    await page.locator('.jp-DebuggerVariables-toolbar select').selectOption('Globals');\n    await page.locator('.jp-DebuggerVariables-body :text(\"special variables\")').click({\n      button: 'right'\n    });\n    await expect(page.locator('li.lm-Menu-item[data-command=\"debugger:copy-to-clipboard\"]')).toHaveAttribute('aria-disabled', 'true');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -506,11 +506,11 @@
             "name": "Call Stack panel",
             "suites": [],
             "updatePoint": {
-                "line": 174,
+                "line": 191,
                 "column": 24,
-                "index": 4806
+                "index": 5658
             },
-            "line": 174,
+            "line": 191,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -520,11 +520,11 @@
             "name": "Breakpoints panel",
             "suites": [],
             "updatePoint": {
-                "line": 205,
+                "line": 222,
                 "column": 25,
-                "index": 5741
+                "index": 6593
             },
-            "line": 205,
+            "line": 222,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/2114632017.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -534,11 +534,11 @@
             "name": "Source panel",
             "suites": [],
             "updatePoint": {
-                "line": 237,
+                "line": 254,
                 "column": 20,
-                "index": 6728
+                "index": 7580
             },
-            "line": 237,
+            "line": 254,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -2906,6 +2906,20 @@
             },
             "line": 82,
             "code": "test('Terminal should open in Launcher cwd', async ({\n  page,\n  tmpPath\n}) => {\n  await page.waitForSelector(`.jp-Launcher-cwd > h3:has-text(\"${tmpPath}\")`);\n  await page.locator('[role=\"main\"] >> p:has-text(\"Terminal\")').click();\n  const terminal = page.locator(TERMINAL_SELECTOR);\n  await terminal.waitFor();\n  await page.waitForTimeout(1000);\n  await page.keyboard.type('basename $PWD');\n  await page.keyboard.press('Enter');\n  await page.waitForTimeout(1000);\n  expect(await terminal.screenshot()).toMatchSnapshot('launcher-term.png');\n});",
+            "file": "jupyterlab/terminal.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Terminal web link",
+            "suites": [],
+            "updatePoint": {
+                "line": 96,
+                "column": 23,
+                "index": 3685
+            },
+            "line": 96,
+            "code": "test('Terminal web link', async ({\n  page,\n  tmpPath\n}) => {\n  await page.waitForSelector(`.jp-Launcher-cwd > h3:has-text(\"${tmpPath}\")`);\n  await page.locator('[role=\"main\"] >> p:has-text(\"Terminal\")').click();\n  const terminal = page.locator(TERMINAL_SELECTOR);\n  await terminal.waitFor();\n  await page.waitForTimeout(1000);\n  await page.keyboard.type('echo https://jupyter.org/');\n  await page.keyboard.press('Enter');\n  await page.waitForTimeout(1000);\n  await Promise.all([terminal.locator('.jp-Terminal-body.xterm-cursor-pointer').waitFor(), terminal.locator('canvas').last().hover({\n    position: {\n      x: 60,\n      y: 23\n    }\n  })]);\n  expect(await terminal.screenshot()).toMatchSnapshot('web-links-term.png');\n});",
             "file": "jupyterlab/terminal.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -20069,10 +20083,10 @@
                 "#constructor"
             ],
             "updatePoint": {
-                "line": 41,
+                "line": 38,
                 "column": 47
             },
-            "line": 41,
+            "line": 38,
             "code": "      it('should return new DirListing instance', () => {\n        const options = createOptionsForConstructor();\n        const dirListing = new DirListing(options);\n        expect(dirListing).toBeInstanceOf(DirListing);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20086,10 +20100,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 76,
+                "line": 73,
                 "column": 34
             },
-            "line": 76,
+            "line": 73,
             "code": "      it('check initial conditions', async () => {\n        expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        expect(Array.from(dirListing.sortedItems())).toHaveLength(2);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20103,10 +20117,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 81,
+                "line": 78,
                 "column": 50
             },
-            "line": 81,
+            "line": 78,
             "code": "      it('should be checked after item is selected', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        expect(checkbox.checked).toBe(false);\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20120,10 +20134,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 92,
+                "line": 89,
                 "column": 54
             },
-            "line": 92,
+            "line": 89,
             "code": "      it('should be unchecked after item is unselected', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n        // Selecting the next item unselects the first.\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(false);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20137,10 +20151,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 106,
+                "line": 103,
                 "column": 47
             },
-            "line": 106,
+            "line": 103,
             "code": "      it('should allow selecting multiple items', async () => {\n        const itemNodes = Array.from(\n          dirListing.contentNode.children\n        ) as HTMLElement[];\n        // JSDOM doesn't render anything, which means that all the elements have\n        // zero dimensions, so this is needed in order for the DirListing\n        // mousedown handler to believe that the mousedown event is relevant.\n        itemNodes[0].getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        itemNodes[1].getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 10,\n          bottom: 20\n        });\n        const checkboxes = itemNodes.map(node =>\n          dirListing.renderer.getCheckboxNode!(node)\n        ) as HTMLInputElement[];\n        const items = Array.from(dirListing.sortedItems());\n        expect(dirListing.isSelected(items[0].name)).toBe(false);\n        expect(dirListing.isSelected(items[1].name)).toBe(false);\n        simulate(checkboxes[0], 'mousedown', {\n          clientX: 1,\n          clientY: 1\n        });\n        simulate(checkboxes[1], 'mousedown', {\n          clientX: 1,\n          clientY: 11\n        });\n        await signalToPromise(dirListing.updated);\n        expect(dirListing.isSelected(items[0].name)).toBe(true);\n        expect(dirListing.isSelected(items[1].name)).toBe(true);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20154,10 +20168,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 144,
+                "line": 141,
                 "column": 48
             },
-            "line": 144,
+            "line": 141,
             "code": "      it('should reflect multiple items selected', async () => {\n        const itemNodes = Array.from(\n          dirListing.contentNode.children\n        ) as HTMLElement[];\n        const checkboxes = itemNodes.map(node =>\n          dirListing.renderer.getCheckboxNode!(node)\n        ) as HTMLInputElement[];\n        expect(checkboxes[0].checked).toBe(false);\n        expect(checkboxes[1].checked).toBe(false);\n        dirListing.selectNext();\n        dirListing.selectNext(true); // true = keep existing selection\n        await signalToPromise(dirListing.updated);\n        expect(checkboxes[0].checked).toBe(true);\n        expect(checkboxes[1].checked).toBe(true);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20171,10 +20185,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 162,
+                "line": 159,
                 "column": 46
             },
-            "line": 162,
+            "line": 159,
             "code": "      it('should not open item on double click', () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const wasOpened = jest.fn();\n        dirListing.onItemOpened.connect(wasOpened);\n        simulate(checkbox, 'dblclick');\n        expect(wasOpened).not.toHaveBeenCalled();\n        dirListing.onItemOpened.disconnect(wasOpened);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20188,10 +20202,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 174,
+                "line": 171,
                 "column": 73
             },
-            "line": 174,
+            "line": 171,
             "code": "      it('should not become unchecked due to right-click on selected item', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        itemNode.getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const item = dirListing.sortedItems().next();\n        await dirListing.selectItemByName(item.value.name);\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        simulate(checkbox, 'mousedown', {\n          clientX: 1,\n          clientY: 1,\n          button: 2\n        });\n        await signalToPromise(dirListing.updated);\n        // Item is still selected and checkbox is still checked after\n        // right-click.\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        expect(checkbox.checked).toBe(true);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20205,10 +20219,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 206,
+                "line": 203,
                 "column": 65
             },
-            "line": 206,
+            "line": 203,
             "code": "      it('should not get checked by the default action of a click', () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        expect(checkbox.checked).toBe(false);\n        simulate(checkbox, 'click', { bubbles: false });\n        expect(checkbox.checked).toBe(false);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20222,10 +20236,10 @@
                 "check-all checkbox"
             ],
             "updatePoint": {
-                "line": 218,
+                "line": 215,
                 "column": 65
             },
-            "line": 218,
+            "line": 215,
             "code": "      it('should be unchecked when the current directory is empty', async () => {\n        const { path } = await dirListing.model.manager.newUntitled({\n          type: 'directory'\n        });\n        await dirListing.model.cd(path);\n        await signalToPromise(dirListing.updated);\n        const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n          dirListing.headerNode\n        ) as HTMLInputElement;\n        expect(headerCheckbox.checked).toBe(false);\n        expect(headerCheckbox!.indeterminate).toBe(false);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20240,10 +20254,10 @@
                 "when previously unchecked"
             ],
             "updatePoint": {
-                "line": 232,
+                "line": 229,
                 "column": 36
             },
-            "line": 232,
+            "line": 229,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(false);\n          expect(headerCheckbox!.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20258,10 +20272,10 @@
                 "when previously unchecked"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 237,
                 "column": 28
             },
-            "line": 240,
+            "line": 237,
             "code": "        it('should check all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20276,10 +20290,10 @@
                 "when previously indeterminate"
             ],
             "updatePoint": {
-                "line": 255,
+                "line": 252,
                 "column": 36
             },
-            "line": 255,
+            "line": 252,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.indeterminate).toBe(true);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(1);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20294,10 +20308,10 @@
                 "when previously indeterminate"
             ],
             "updatePoint": {
-                "line": 262,
+                "line": 259,
                 "column": 30
             },
-            "line": 262,
+            "line": 259,
             "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20312,10 +20326,10 @@
                 "when previously checked"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 275,
                 "column": 36
             },
-            "line": 278,
+            "line": 275,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(true);\n          expect(headerCheckbox.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20330,10 +20344,10 @@
                 "when previously checked"
             ],
             "updatePoint": {
-                "line": 286,
+                "line": 283,
                 "column": 30
             },
-            "line": 286,
+            "line": 283,
             "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
