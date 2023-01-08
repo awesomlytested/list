@@ -1595,7 +1595,7 @@
                 "column": 39
             },
             "line": 162,
-            "code": "  test('should override generated files', async () => {\n    jest.unmock('fs');\n    const fs = await import('fs');\n\n    makeDir.sync(dirname(outputFile));\n    if (fs.existsSync(outputFile)) {\n      fs.unlinkSync(outputFile);\n    }\n    fs.writeFileSync(\n      inputFile,\n      `\n    import gql from 'graphql-tag';\n    const MyQuery = gql\\`query MyQuery { f }\\`;\n  `,\n      {}\n    );\n    const generateOnce: () => Promise<Types.FileOutput[]> = () =>\n      generate(\n        {\n          schema: SIMPLE_TEST_SCHEMA,\n          documents: inputFile,\n          generates: {\n            [outputFile]: {\n              plugins: ['typescript', 'typescript-operations', 'typescript-react-apollo'],\n            },\n          },\n        },\n        true\n      );\n    const [firstOutput] = await generateOnce();\n    fs.writeFileSync(firstOutput.filename, firstOutput.content);\n    await generateOnce();\n  });",
+            "code": "  test('should override generated files', async () => {\n    jest.unmock('fs');\n    const fs = await import('fs');\n\n    makeDir.sync(dirname(outputFile));\n    if (fs.existsSync(outputFile)) {\n      fs.unlinkSync(outputFile);\n    }\n    fs.writeFileSync(\n      inputFile,\n      `\n    import gql from 'graphql-tag';\n    const MyQuery = gql\\`query MyQuery { f }\\`;\n  `,\n      'utf8'\n    );\n    const generateOnce: () => Promise<Types.FileOutput[]> = () =>\n      generate(\n        {\n          schema: SIMPLE_TEST_SCHEMA,\n          documents: inputFile,\n          generates: {\n            [outputFile]: {\n              plugins: ['typescript', 'typescript-operations', 'typescript-react-apollo'],\n            },\n          },\n        },\n        true\n      );\n    const [firstOutput] = await generateOnce();\n    fs.writeFileSync(firstOutput.filename, firstOutput.content);\n    await generateOnce();\n  });",
             "file": "generate-and-save.spec.ts",
             "skipped": false,
             "dir": "packages/graphql-codegen-cli/tests"
@@ -1972,10 +1972,10 @@
                 "sortPrependValues"
             ],
             "updatePoint": {
-                "line": 3,
+                "line": 4,
                 "column": 43
             },
-            "line": 3,
+            "line": 4,
             "code": "  it('Should sort and use the correct order', () => {\n    const strings: string[] = [`import `, '/* comment */', `// This is a comment`];\n\n    const sorted = sortPrependValues(strings);\n\n    expect(sorted).toEqual(['/* comment */', `// This is a comment`, `import `]);\n  });",
             "file": "prepend.spec.ts",
             "skipped": false,
@@ -1988,10 +1988,10 @@
                 "validate"
             ],
             "updatePoint": {
-                "line": 68,
+                "line": 66,
                 "column": 80
             },
-            "line": 68,
+            "line": 66,
             "code": "    it('should not throw on tsx?, jsx?, json files, both in lower and upper case', async () => {\n      const extensions = ['.json', '.js', '.jsx', '.ts', '.tsx'];\n      const allCases = extensions.concat(extensions.map(val => val.toUpperCase()));\n\n      try {\n        await Promise.all(allCases.map(ext => validate(schema, [], {}, `foo${ext}`, [])));\n\n        throw new Error('DONE');\n      } catch (e) {\n        expect(e.message).toEqual('DONE');\n      }\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2004,10 +2004,10 @@
                 "validate"
             ],
             "updatePoint": {
-                "line": 81,
+                "line": 79,
                 "column": 37
             },
-            "line": 81,
+            "line": 79,
             "code": "    it('should throw on commonjs + ts', async () => {\n      try {\n        await validate(schema, [], { module: 'commonjs' }, 'foo.ts', []);\n\n        throw new Error('SHOULD_NOT_BE_HERE');\n      } catch (e) {\n        expect(e.message).toContain('commonjs');\n      }\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2020,10 +2020,10 @@
                 "validate"
             ],
             "updatePoint": {
-                "line": 91,
+                "line": 89,
                 "column": 45
             },
-            "line": 91,
+            "line": 89,
             "code": "    it('should throw on unsupported extension', async () => {\n      try {\n        await validate(schema, [], {}, 'foo.yml', []);\n\n        throw new Error('SHOULD_NOT_BE_HERE');\n      } catch (e) {\n        expect(e.message).toContain('extension');\n      }\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2036,10 +2036,10 @@
                 "JSON"
             ],
             "updatePoint": {
-                "line": 102,
+                "line": 100,
                 "column": 35
             },
-            "line": 102,
+            "line": 100,
             "code": "    it('should stringify the result', async () => {\n      const content = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n        },\n        {\n          outputFile: 'foo.json',\n        }\n      );\n\n      expect(content).toEqual(introspection);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2052,10 +2052,10 @@
                 "JavaScript"
             ],
             "updatePoint": {
-                "line": 119,
+                "line": 117,
                 "column": 43
             },
-            "line": 119,
+            "line": 117,
             "code": "    it('should use es2015 module by default', async () => {\n      const jsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n        },\n        {\n          outputFile: 'foo.js',\n        }\n      );\n      const jsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n        },\n        {\n          outputFile: 'foo.jsx',\n        }\n      );\n      const output = `\n        export default ${introspection}\n      `;\n\n      expect(jsContent).toBeSimilarStringTo(output);\n      expect(jsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2068,10 +2068,10 @@
                 "JavaScript"
             ],
             "updatePoint": {
-                "line": 148,
+                "line": 146,
                 "column": 38
             },
-            "line": 148,
+            "line": 146,
             "code": "    it('should be able to use commonjs', async () => {\n      const jsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n          module: 'commonjs',\n        },\n        {\n          outputFile: 'foo.js',\n        }\n      );\n      const jsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n          module: 'commonjs',\n        },\n        {\n          outputFile: 'foo.jsx',\n        }\n      );\n      const output = `\n        module.exports = ${introspection}\n      `;\n\n      expect(jsContent).toBeSimilarStringTo(output);\n      expect(jsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2084,10 +2084,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 181,
+                "line": 179,
                 "column": 43
             },
-            "line": 181,
+            "line": 179,
             "code": "    it('should use es2015 module by default', async () => {\n      const tsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n        },\n        {\n          outputFile: 'foo.ts',\n        }\n      );\n      const tsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n        },\n        {\n          outputFile: 'foo.tsx',\n        }\n      );\n      const output = `\n        export interface IntrospectionResultData {\n          __schema: {\n            types: {\n              kind: string;\n              name: string;\n              possibleTypes: {\n                name: string;\n              }[];\n            }[];\n          };\n        }\n        const result: IntrospectionResultData = ${introspection};\n        export default result;\n      `;\n\n      expect(tsContent).toBeSimilarStringTo(output);\n      expect(tsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2100,10 +2100,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 222,
+                "line": 220,
                 "column": 61
             },
-            "line": 222,
+            "line": 220,
             "code": "    it('should use es2015 module by default - apollo client 3', async () => {\n      const tsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 3,\n        },\n        {\n          outputFile: 'foo.ts',\n        }\n      );\n      const tsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 3,\n        },\n        {\n          outputFile: 'foo.tsx',\n        }\n      );\n      const output = `\n      export interface PossibleTypesResultData {\n        possibleTypes: {\n          [key: string]: string[]\n        }\n      }\n\n        const result: PossibleTypesResultData = ${apolloClient3Result};\n\n        export default result;\n      `;\n\n      expect(tsContent).toBeSimilarStringTo(output);\n      expect(tsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2116,10 +2116,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 259,
+                "line": 257,
                 "column": 59
             },
-            "line": 259,
+            "line": 257,
             "code": "    it('should use es2015 even though commonjs is requested', async () => {\n      const tsContent = await plugin(\n        schema,\n        [],\n        {\n          module: 'commonjs',\n        },\n        {\n          outputFile: 'foo.ts',\n        }\n      );\n      const tsxContent = await plugin(\n        schema,\n        [],\n        {\n          module: 'commonjs',\n        },\n        {\n          outputFile: 'foo.tsx',\n        }\n      );\n      const output = `\n        export default result;\n      `;\n\n      expect(tsContent).toBeSimilarStringTo(output);\n      expect(tsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2132,10 +2132,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 288,
+                "line": 286,
                 "column": 62
             },
-            "line": 288,
+            "line": 286,
             "code": "    it('should support exportAsConst for apolloClientVersion 2', async () => {\n      const tsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n          useExplicitTyping: true,\n        },\n        {\n          outputFile: 'foo.ts',\n        }\n      );\n      const tsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 2,\n          useExplicitTyping: true,\n        },\n        {\n          outputFile: 'foo.tsx',\n        }\n      );\n      const output = `\n        export type IntrospectionResultData = ${introspection};\n        const result: IntrospectionResultData = ${introspection};\n        export default result;\n      `;\n\n      expect(tsContent).toBeSimilarStringTo(output);\n      expect(tsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2148,10 +2148,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 321,
+                "line": 319,
                 "column": 66
             },
-            "line": 321,
+            "line": 319,
             "code": "    it('should support useExplicitTyping for apolloClientVersion 3', async () => {\n      const tsContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 3,\n          useExplicitTyping: true,\n        },\n        {\n          outputFile: 'foo.ts',\n        }\n      );\n      const tsxContent = await plugin(\n        schema,\n        [],\n        {\n          apolloClientVersion: 3,\n          useExplicitTyping: true,\n        },\n        {\n          outputFile: 'foo.tsx',\n        }\n      );\n      const output = `\n        export type PossibleTypesResultData = ${apolloClient3Result};\n        const result: PossibleTypesResultData = ${apolloClient3Result};\n        export default result;\n      `;\n\n      expect(tsContent).toBeSimilarStringTo(output);\n      expect(tsxContent).toBeSimilarStringTo(output);\n    });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2164,10 +2164,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 355,
+                "line": 353,
                 "column": 38
             },
-            "line": 355,
+            "line": 353,
             "code": "  it('should support Apollo Federation', async () => {\n    const federatedSchema = parse(/* GraphQL */ `\n      type Character @key(fields: \"id\") {\n        id: ID\n        name: String\n      }\n\n      type Jedi @key(fields: \"id\") {\n        id: ID\n        side: String\n      }\n\n      type Droid @key(fields: \"id\") {\n        id: ID\n        model: String\n      }\n\n      union People = Character | Jedi | Droid\n\n      type Query {\n        allPeople: [People]\n      }\n    `);\n    const content = await codegen({\n      filename: 'foo.json',\n      schema: federatedSchema,\n      documents: [],\n      plugins: [\n        {\n          'fragment-matcher': {},\n        },\n      ],\n      config: {\n        federation: true,\n        apolloClientVersion: 2,\n      },\n      pluginMap: {\n        'fragment-matcher': {\n          plugin,\n          validate,\n        },\n      },\n    });\n\n    expect(content).toEqual(introspection);\n  });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2180,10 +2180,10 @@
                 "TypeScript"
             ],
             "updatePoint": {
-                "line": 401,
+                "line": 399,
                 "column": 76
             },
-            "line": 401,
+            "line": 399,
             "code": "  it('should support Apollo Federation with predefined directive definitions', async () => {\n    const federatedSchema = parse(/* GraphQL */ `\n      directive @key(fields: String!) on FIELD_DEFINITION\n\n      type Character @key(fields: \"id\") {\n        id: ID\n        name: String\n      }\n\n      type Jedi @key(fields: \"id\") {\n        id: ID\n        side: String\n      }\n\n      type Droid @key(fields: \"id\") {\n        id: ID\n        model: String\n      }\n\n      union People = Character | Jedi | Droid\n\n      type Query {\n        allPeople: [People]\n      }\n    `);\n    const content = await codegen({\n      filename: 'foo.json',\n      schema: federatedSchema,\n      documents: [],\n      plugins: [\n        {\n          'fragment-matcher': {},\n        },\n      ],\n      config: {\n        apolloClientVersion: 2,\n        federation: true,\n      },\n      pluginMap: {\n        'fragment-matcher': {\n          plugin,\n          validate,\n        },\n      },\n    });\n\n    expect(content).toEqual(introspection);\n  });",
             "file": "plugin.spec.ts",
             "skipped": false,
@@ -2241,10 +2241,10 @@
                 "Validation"
             ],
             "updatePoint": {
-                "line": 12,
+                "line": 11,
                 "column": 65
             },
-            "line": 12,
+            "line": 11,
             "code": "    it('Should enforce graphql extension when its the only plugin', async () => {\n      const fileName = 'output.ts';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n\n        throw new Error(SHOULD_THROW_ERROR);\n      } catch (e) {\n        expect(e.message).not.toBe(SHOULD_THROW_ERROR);\n        expect(e.message).toBe('Plugin \"schema-ast\" requires extension to be \".graphql\" or \".gql\"!');\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2257,10 +2257,10 @@
                 "Validation"
             ],
             "updatePoint": {
-                "line": 30,
+                "line": 29,
                 "column": 73
             },
-            "line": 30,
+            "line": 29,
             "code": "    it('Should not enforce graphql extension when its not the only plugin', async () => {\n      const fileName = 'output.ts';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          add: {},\n        },\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2273,10 +2273,10 @@
                 "Validation"
             ],
             "updatePoint": {
-                "line": 48,
+                "line": 47,
                 "column": 64
             },
-            "line": 48,
+            "line": 47,
             "code": "    it('Should allow .graphql extension when its the only plugin', async () => {\n      const fileName = 'output.graphql';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2289,10 +2289,10 @@
                 "Validation"
             ],
             "updatePoint": {
-                "line": 63,
+                "line": 62,
                 "column": 60
             },
-            "line": 63,
+            "line": 62,
             "code": "    it('Should allow .gql extension when its the only plugin', async () => {\n      const fileName = 'output.gql';\n      const plugins: Types.ConfiguredPlugin[] = [\n        {\n          'schema-ast': {},\n        },\n      ];\n\n      try {\n        await validate(null, null, null, fileName, plugins);\n      } catch (e) {\n        expect(true).toBeFalsy();\n      }\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2305,10 +2305,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 92,
+                "line": 91,
                 "column": 80
             },
-            "line": 92,
+            "line": 91,
             "code": "    it('Should print schema without directives when \"includeDirectives\" is unset', async () => {\n      const content = await plugin(schema, [], { includeDirectives: false });\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2321,10 +2321,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 102,
+                "line": 101,
                 "column": 58
             },
-            "line": 102,
+            "line": 101,
             "code": "    it('Should print schema with as \"\"\" comment as default', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          \"\"\"\n          test\n          \"\"\"\n          fieldTest: String\n        }\n      `);\n      const content = await plugin(testSchema, [], { includeDirectives: false });\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          \"\"\"test\"\"\"\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2337,10 +2337,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 122,
+                "line": 121,
                 "column": 69
             },
-            "line": 122,
+            "line": 121,
             "code": "      it('Should print schema with as # when commentDescriptions=true', async () => {\n        const testSchema = buildSchema(/* GraphQL */ `\n          type Query {\n            \"\"\"\n            test\n            \"\"\"\n            fieldTest: String\n          }\n        `);\n        const content = await plugin(testSchema, [], { commentDescriptions: true, includeDirectives: false });\n\n        expect(content).toBeSimilarStringTo(`\n        type Query {\n          #  test\n          fieldTest: String\n        }\n      `);\n      });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2353,10 +2353,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 142,
+                "line": 141,
                 "column": 75
             },
-            "line": 142,
+            "line": 141,
             "code": "    it('Should print schema with directives when \"includeDirectives\" is set', async () => {\n      const content = await plugin(schema, [], { includeDirectives: true });\n\n      expect(content).toBeSimilarStringTo(`\n        directive @modify(limit: Int) on FIELD_DEFINITION\n      `);\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String @modify(limit: 1)\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2369,10 +2369,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 155,
+                "line": 154,
                 "column": 86
             },
-            "line": 155,
+            "line": 154,
             "code": "    it('Should print schema with introspection when \"includeIntrospectionTypes\" is set', async () => {\n      const content = await plugin(schema, [], { includeIntrospectionTypes: true });\n\n      expect(content).toBeSimilarStringTo(`\n        type __Schema\n      `);\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n          __schema: __Schema!\n          __type(name: String!): __Type\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2385,10 +2385,10 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 170,
                 "column": 91
             },
-            "line": 171,
+            "line": 170,
             "code": "    it('Should print schema without introspection when \"includeIntrospectionTypes\" is unset', async () => {\n      const content = await plugin(schema, [], { includeIntrospectionTypes: false });\n\n      expect(content).not.toBeSimilarStringTo(`\n        type __Schema\n      `);\n\n      expect(content).toBeSimilarStringTo(`\n        type Query {\n          fieldTest: String\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
@@ -2401,41 +2401,41 @@
                 "Output"
             ],
             "updatePoint": {
-                "line": 185,
+                "line": 184,
                 "column": 40
             },
-            "line": 185,
+            "line": 184,
             "code": "    it('should support Apollo Federation', async () => {\n      const federatedSchema = parse(/* GraphQL */ `\n        type Character @key(fields: \"id\") {\n          id: ID\n          name: String\n        }\n\n        type Jedi @key(fields: \"id\") {\n          id: ID\n          side: String\n        }\n\n        type Droid @key(fields: \"id\") {\n          id: ID\n          model: String\n        }\n\n        union People = Character | Jedi | Droid\n\n        type Query {\n          allPeople: [People]\n        }\n      `);\n\n      const content = await codegen({\n        filename: 'foo.graphql',\n        schema: federatedSchema,\n        documents: [],\n        plugins: [\n          {\n            'schema-ast': {},\n          },\n        ],\n        config: {\n          federation: true,\n        },\n        pluginMap: {\n          'schema-ast': {\n            plugin,\n            validate,\n          },\n        },\n      });\n\n      expect(content).not.toContain(`scalar _Any`);\n      expect(content).not.toContain(`union _Entity`);\n      expect(content).not.toContain(`type _Service`);\n\n      expect(content).toBeSimilarStringTo(`\n        type Character {\n          id: ID\n          name: String\n        }\n\n        type Jedi {\n          id: ID\n          side: String\n        }\n\n        type Droid {\n          id: ID\n          model: String\n        }\n\n        union People = Character | Jedi | Droid\n\n        type Query {\n          allPeople: [People]\n        }\n      `);\n    });",
             "file": "schema-ast.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/other/schema-ast/tests"
         },
         {
-            "name": "Should use default comment when extenion is unknown",
+            "name": "Should use default comment when extension is unknown",
             "suites": [
                 "Time"
             ],
             "updatePoint": {
                 "line": 4,
-                "column": 57
+                "column": 58
             },
             "line": 4,
-            "code": "  it('Should use default comment when extenion is unknown', async () => {\n    const result = await plugin(null as any, [], null, { outputFile: null });\n    expect(result).toContain('// Generated on');\n  });",
+            "code": "  it('Should use default comment when extension is unknown', async () => {\n    const result = await plugin(null as any, [], null, { outputFile: null });\n    expect(result).toContain('// Generated on');\n  });",
             "file": "time.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/other/time/tests"
         },
         {
-            "name": "Should use # prefix for comment when extenion is graphql",
+            "name": "Should use # prefix for comment when extension is graphql",
             "suites": [
                 "Time"
             ],
             "updatePoint": {
                 "line": 9,
-                "column": 62
+                "column": 63
             },
             "line": 9,
-            "code": "  it('Should use # prefix for comment when extenion is graphql', async () => {\n    const result = await plugin(null as any, [], null, { outputFile: 'schema.graphql' });\n    expect(result).toContain('# Generated on');\n  });",
+            "code": "  it('Should use # prefix for comment when extension is graphql', async () => {\n    const result = await plugin(null as any, [], null, { outputFile: 'schema.graphql' });\n    expect(result).toContain('# Generated on');\n  });",
             "file": "time.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/other/time/tests"
@@ -5447,10 +5447,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 8,
+                "line": 7,
                 "column": 66
             },
-            "line": 8,
+            "line": 7,
             "code": "  it('Should build ResolversTypes object when there are no mappers', async () => {\n    const result = await plugin(resolversTestingSchema, [], {}, { outputFile: '' });\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Child>;\n      MyOtherType: ResolverTypeWrapper<MyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5462,10 +5462,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 30,
+                "line": 29,
                 "column": 53
             },
-            "line": 30,
+            "line": 29,
             "code": "  it('Should build ResolversTypes with simple mappers', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        mappers: {\n          MyType: 'MyTypeDb',\n          String: 'number',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<MyTypeDb>;\n        String: ResolverTypeWrapper<number>;\n        Child: ResolverTypeWrapper<Omit<Child, 'bar' | 'parent'> & { bar: ResolversTypes['String'], parent?: Maybe<ResolversTypes['MyType']> }>;\n        MyOtherType: ResolverTypeWrapper<Omit<MyOtherType, 'bar'> & { bar: ResolversTypes['String'] }>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5477,10 +5477,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 63,
+                "line": 62,
                 "column": 70
             },
-            "line": 63,
+            "line": 62,
             "code": "  it('Should allow to map custom type that refers itself (issue #1770)', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Movie {\n        id: ID!\n        title: String!\n      }\n\n      type Book {\n        id: ID!\n        author: String!\n      }\n\n      union MovieLike = Movie | Book\n\n      type NonInterfaceHasNarrative {\n        narrative: MovieLike!\n        movie: Movie!\n      }\n    `);\n    const result = (await plugin(\n      testSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Movie: 'MovieEntity',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n    const content = mergeOutputs([result]);\n    expect(content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        Movie: ResolverTypeWrapper<MovieEntity>;\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Book: ResolverTypeWrapper<Book>;\n        MovieLike: ResolversTypes['Movie'] | ResolversTypes['Book'];\n        NonInterfaceHasNarrative: ResolverTypeWrapper<Omit<NonInterfaceHasNarrative, 'narrative' | 'movie'> & { narrative: ResolversTypes['MovieLike'], movie: ResolversTypes['Movie'] }>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5492,10 +5492,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 107,
+                "line": 106,
                 "column": 82
             },
-            "line": 107,
+            "line": 106,
             "code": "  it('Should allow to map custom type that refers itself (issue #1770, attempt #2)', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Movie {\n        id: ID!\n        title: String!\n      }\n\n      type Book {\n        id: ID!\n        author: String!\n      }\n\n      union MovieLike = Movie | Book\n\n      type NonInterfaceHasNarrative {\n        narrative: MovieLike!\n        movie: Movie!\n      }\n\n      type LayerOfIndirection {\n        id: ID!\n        movies: [NonInterfaceHasNarrative!]!\n      }\n\n      type AnotherLayerOfIndirection {\n        inner: LayerOfIndirection!\n      }\n    `);\n    const result = (await plugin(\n      testSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Movie: 'MovieEntity',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n    const content = mergeOutputs([result]);\n    expect(content).toBeSimilarStringTo(`export type ResolversTypes = {\n      Movie: ResolverTypeWrapper<MovieEntity>;\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Book: ResolverTypeWrapper<Book>;\n      MovieLike: ResolversTypes['Movie'] | ResolversTypes['Book'];\n      NonInterfaceHasNarrative: ResolverTypeWrapper<Omit<NonInterfaceHasNarrative, 'narrative' | 'movie'> & { narrative: ResolversTypes['MovieLike'], movie: ResolversTypes['Movie'] }>;\n      LayerOfIndirection: ResolverTypeWrapper<Omit<LayerOfIndirection, 'movies'> & { movies: Array<ResolversTypes['NonInterfaceHasNarrative']> }>;\n      AnotherLayerOfIndirection: ResolverTypeWrapper<Omit<AnotherLayerOfIndirection, 'inner'> & { inner: ResolversTypes['LayerOfIndirection'] }>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5507,10 +5507,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 160,
+                "line": 159,
                 "column": 93
             },
-            "line": 160,
+            "line": 159,
             "code": "  it('Should allow to map custom type that refers itself (issue #1770, attempt #3 - circular)', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Account {\n        id: ID!\n        name: String!\n        programs: [Program!]!\n      }\n\n      type Program {\n        id: ID!\n        name: String!\n        account: Account!\n      }\n    `);\n    const result = (await plugin(\n      testSchema,\n      [],\n      {\n        typesPrefix: 'Gql',\n        defaultMapper: 'Partial<{T}>',\n        namingConvention: {\n          typeNames: 'change-case-all#pascalCase',\n          enumValues: 'change-case-all#upperCase',\n        },\n        noSchemaStitching: true,\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n    const content = mergeOutputs([result]);\n\n    expect(content).toBeSimilarStringTo(`export type GqlResolversTypes = {\n      Account: ResolverTypeWrapper<Partial<GqlAccount>>;\n      ID: ResolverTypeWrapper<Partial<Scalars['ID']>>;\n      String: ResolverTypeWrapper<Partial<Scalars['String']>>;\n      Program: ResolverTypeWrapper<Partial<GqlProgram>>;\n      Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5522,10 +5522,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 199,
+                "line": 198,
                 "column": 73
             },
-            "line": 199,
+            "line": 198,
             "code": "  it('should map to a custom type on every level (+ actual usage in code)', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type User {\n        id: ID!\n        name: String!\n        chats: [Chat!]\n      }\n\n      type Chat {\n        id: ID!\n        owner: User!\n        members: [User!]\n      }\n\n      type Query {\n        me: User\n      }\n    `);\n    const result = (await plugin(\n      testSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          ID: 'number',\n          Chat: 'number',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    const usage = `\n      const resolvers: Resolvers = {\n        Query: {\n          me() {\n            return {\n              id: 1,\n              name: 'Foo',\n              chats: [0,1,2],\n            };\n          }\n        },\n        Chat: {\n          id(parent) {\n            const id: number = parent;\n            return id;\n          }\n        }\n      }\n    `;\n\n    await resolversTestingValidate(\n      mergeOutputs([usage, result]),\n      {\n        scalars: {\n          ID: 'number',\n        },\n      },\n      testSchema\n    );\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5537,10 +5537,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 261,
+                "line": 260,
                 "column": 66
             },
-            "line": 261,
+            "line": 260,
             "code": "  it('Should build ResolversTypes with defaultMapper set using {T}', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: 'Partial<{T}>',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<Partial<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>>;\n      String: ResolverTypeWrapper<Partial<Scalars['String']>>;\n      Child: ResolverTypeWrapper<Partial<Child>>;\n      MyOtherType: ResolverTypeWrapper<Partial<MyOtherType>>;\n      ChildUnion: Partial<ResolversTypes['Child'] | ResolversTypes['MyOtherType']>;\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Partial<Scalars['ID']>>;\n      SomeNode: ResolverTypeWrapper<Partial<SomeNode>>;\n      MyUnion: Partial<ResolversTypes['MyType'] | ResolversTypes['MyOtherType']>;\n      MyScalar: ResolverTypeWrapper<Partial<Scalars['MyScalar']>>;\n      Int: ResolverTypeWrapper<Partial<Scalars['Int']>>;\n      Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5552,10 +5552,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 291,
+                "line": 290,
                 "column": 91
             },
-            "line": 291,
+            "line": 290,
             "code": "  it('Should build ResolversTypes with defaultMapper set using {T} with external identifier', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: './my-wrapper#CustomPartial<{T}>',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { CustomPartial } from './my-wrapper';`);\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<CustomPartial<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>>;\n      String: ResolverTypeWrapper<CustomPartial<Scalars['String']>>;\n      Child: ResolverTypeWrapper<CustomPartial<Child>>;\n      MyOtherType: ResolverTypeWrapper<CustomPartial<MyOtherType>>;\n      ChildUnion: CustomPartial<ResolversTypes['Child'] | ResolversTypes['MyOtherType']>;\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<CustomPartial<Scalars['ID']>>;\n      SomeNode: ResolverTypeWrapper<CustomPartial<SomeNode>>;\n      MyUnion: CustomPartial<ResolversTypes['MyType'] | ResolversTypes['MyOtherType']>;\n      MyScalar: ResolverTypeWrapper<CustomPartial<Scalars['MyScalar']>>;\n      Int: ResolverTypeWrapper<CustomPartial<Scalars['Int']>>;\n      Boolean: ResolverTypeWrapper<CustomPartial<Scalars['Boolean']>>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5567,10 +5567,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 322,
+                "line": 321,
                 "column": 102
             },
-            "line": 322,
+            "line": 321,
             "code": "  it('Should build ResolversTypes with mapper set for concrete type using {T} with external identifier', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: './my-wrapper#CustomPartial<{T}>',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { CustomPartial } from './my-wrapper';`);\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<CustomPartial<MyType>>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5582,10 +5582,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 355,
+                "line": 354,
                 "column": 83
             },
-            "line": 355,
+            "line": 354,
             "code": "  it('Should map to a custom type on every level when {T} is used as default mapper', async () => {\n    const config = {\n      scalars: {\n        ID: 'number',\n      },\n      noSchemaStitching: true,\n      defaultMapper: 'Partial<{T}>',\n      mappers: {\n        User: 'number',\n      },\n    };\n    const testSchema = buildSchema(/* GraphQL */ `\n      type User {\n        id: ID!\n        name: String!\n        chats: [Chat!]\n      }\n\n      type Chat {\n        id: ID!\n        owner: User!\n        members: [User!]\n      }\n\n      type Query {\n        me: User\n      }\n    `);\n    const result = await plugin(testSchema, [], config, { outputFile: '' });\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        User: ResolverTypeWrapper<number>;\n        ID: ResolverTypeWrapper<Partial<Scalars['ID']>>;\n        String: ResolverTypeWrapper<Partial<Scalars['String']>>;\n        Chat: ResolverTypeWrapper<Partial<Omit<Chat, 'owner' | 'members'> & { owner: ResolversTypes['User'], members?: Maybe<Array<ResolversTypes['User']>> }>>;\n        Query: ResolverTypeWrapper<{}>;\n        Boolean: ResolverTypeWrapper<Partial<Scalars['Boolean']>>;\n      };\n    `);\n\n    const usage = `\n      const resolvers: Resolvers = {\n        Query: {\n          me() {\n            return 1;\n          }\n        },\n        Chat: {\n          id(chat) {\n            return chat.id;\n          },\n          owner(chat) {\n            const id: number = chat.owner;\n            return id;\n          },\n          members(chat) {\n            const ids: number[] = chat.members;\n            return ids;\n          }\n        },\n        User: {\n          id(parent) {\n            const id: number = parent;\n            return id;\n          }\n        }\n      }\n    `;\n\n    await resolversTestingValidate(mergeOutputs([result, usage]), config, testSchema);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5597,10 +5597,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 428,
+                "line": 427,
                 "column": 101
             },
-            "line": 428,
+            "line": 427,
             "code": "  it('Should build ResolversTypes with mapper set for concrete type using renamed external identifier', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: './my-type#MyType as DatabaseMyType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyType as DatabaseMyType } from './my-type';`);\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<DatabaseMyType>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5612,10 +5612,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 461,
+                "line": 460,
                 "column": 116
             },
-            "line": 461,
+            "line": 460,
             "code": "  it('Should build ResolversTypes with mapper set for concrete type using renamed external identifier (with default)', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-type#default as DatabaseMyOtherType',\n          MyType: './my-type#MyType as DatabaseMyType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import DatabaseMyOtherType, { MyType as DatabaseMyType } from './my-type';`);\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<DatabaseMyType>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<DatabaseMyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5627,10 +5627,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 495,
+                "line": 494,
                 "column": 132
             },
-            "line": 495,
+            "line": 494,
             "code": "  it('Should build ResolversTypes with mapper set for concrete type using renamed external identifier (with default) and type import', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-type#default as DatabaseMyOtherType',\n          MyType: './my-type#MyType as DatabaseMyType',\n        },\n        useTypeImports: true,\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(\n      `import type { default as DatabaseMyOtherType, MyType as DatabaseMyType } from './my-type';`\n    );\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<DatabaseMyType>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<DatabaseMyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5642,10 +5642,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 532,
+                "line": 531,
                 "column": 56
             },
-            "line": 532,
+            "line": 531,
             "code": "  it('Should build ResolversTypes with defaultMapper set', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: 'MyTypeDb',\n          String: 'string',\n        },\n        defaultMapper: 'any',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<MyTypeDb>;\n      String: ResolverTypeWrapper<string>;\n      Child: ResolverTypeWrapper<any>;\n      MyOtherType: ResolverTypeWrapper<any>;\n      ChildUnion: ResolverTypeWrapper<any>;\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<any>;\n      SomeNode: ResolverTypeWrapper<any>;\n      MyUnion: ResolverTypeWrapper<any>;\n      MyScalar: ResolverTypeWrapper<any>;\n      Int: ResolverTypeWrapper<any>;\n      Boolean: ResolverTypeWrapper<any>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5657,10 +5657,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 566,
+                "line": 565,
                 "column": 55
             },
-            "line": 566,
+            "line": 565,
             "code": "  it('Should build ResolversTypes with external mappers', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-module#CustomMyOtherType',\n          MyType: 'MyTypeDb',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<MyTypeDb>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<CustomMyOtherType>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5672,10 +5672,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 599,
+                "line": 598,
                 "column": 35
             },
-            "line": 599,
+            "line": 598,
             "code": "  it('Should handle {T} in a mapper', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: 'Partial<{T}>',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Partial<MyType>>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n        MyOtherType: ResolverTypeWrapper<MyOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5687,10 +5687,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 632,
+                "line": 631,
                 "column": 49
             },
-            "line": 632,
+            "line": 631,
             "code": "  it('should warn about unused mappers by default', async () => {\n    const spy = jest.spyOn(console, 'warn').mockImplementation();\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Query {\n        comments: [Comment!]!\n      }\n\n      type User {\n        id: ID!\n        name: String!\n      }\n\n      type Comment {\n        id: ID!\n        text: String!\n        author: User!\n      }\n    `);\n\n    await plugin(\n      testSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Comment: 'number',\n          Post: 'string',\n        },\n      },\n      {\n        outputFile: 'graphql.ts',\n      }\n    );\n\n    expect(spy).toHaveBeenCalledWith('Unused mappers: Post');\n    spy.mockRestore();\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5702,10 +5702,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 670,
+                "line": 669,
                 "column": 53
             },
-            "line": 670,
+            "line": 669,
             "code": "  it('should be able not to warn about unused mappers', async () => {\n    const spy = jest.spyOn(console, 'warn').mockImplementation();\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Query {\n        comments: [Comment!]!\n      }\n\n      type User {\n        id: ID!\n        name: String!\n      }\n\n      type Comment {\n        id: ID!\n        text: String!\n        author: User!\n      }\n    `);\n\n    await plugin(\n      testSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Comment: 'number',\n          Post: 'string',\n        },\n        showUnusedMappers: false,\n      },\n      {\n        outputFile: 'graphql.ts',\n      }\n    );\n\n    expect(spy).not.toHaveBeenCalled();\n    spy.mockRestore();\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5717,10 +5717,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 709,
+                "line": 708,
                 "column": 64
             },
-            "line": 709,
+            "line": 708,
             "code": "  it('Should generate basic type resolvers with external mappers', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-file#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyCustomOtherType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n          bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n          __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n        };\n      `);\n\n    expect(result.content)\n      .toBeSimilarStringTo(`export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n      name: 'MyScalar';\n        }\n      `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await resolversTestingValidate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5732,10 +5732,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 791,
+                "line": 790,
                 "column": 89
             },
-            "line": 791,
+            "line": 790,
             "code": "  it('Should generate basic type resolvers with external mappers using same imported type', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyType: './my-file#MyCustomOtherType',\n          MyOtherType: './my-file#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyCustomOtherType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n          bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n          __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n        };\n      `);\n\n    expect(result.content)\n      .toBeSimilarStringTo(`export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n      name: 'MyScalar';\n        }\n      `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await resolversTestingValidate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5747,10 +5747,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 874,
+                "line": 873,
                 "column": 82
             },
-            "line": 874,
+            "line": 873,
             "code": "  it('Should generate the correct resolvers when used with mappers with interfaces', async () => {\n    const spy = jest.spyOn(console, 'warn').mockImplementation();\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          Node: 'MyNodeType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveArgs = {\n      arg: Scalars['Int'];\n      arg2: Scalars['String'];\n      arg3: Scalars['Boolean'];\n    };\n    `);\n    expect(result.content).toBeSimilarStringTo(`\n    export type MyDirectiveDirectiveResolver<Result, Parent, ContextType = any, Args = MyDirectiveDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await resolversTestingValidate(mergeOutputs([result, `type MyNodeType = {};`]));\n\n    spy.mockRestore();\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5762,10 +5762,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 957,
+                "line": 956,
                 "column": 72
             },
-            "line": 957,
+            "line": 956,
             "code": "  it('Should generate basic type resolvers with defaultMapper set to any', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: 'any',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await resolversTestingValidate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5777,10 +5777,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1025,
+                "line": 1024,
                 "column": 88
             },
-            "line": 1025,
+            "line": 1024,
             "code": "  it('Should generate basic type resolvers with defaultMapper set to external identifier', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        defaultMapper: './my-file#MyBaseType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyBaseType } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyOtherTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyOtherType'] = ResolversParentTypes['MyOtherType']> = {\n        bar?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export interface MyScalarScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['MyScalar'], any> {\n        name: 'MyScalar';\n      }\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyTypeResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyType'] = ResolversParentTypes['MyType']> = {\n        foo?: Resolver<ResolversTypes['String'], ParentType, ContextType>;\n        otherType?: Resolver<Maybe<ResolversTypes['MyOtherType']>, ParentType, ContextType>;\n        withArgs?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MyTypeWithArgsArgs, 'arg2'>>;\n        unionChild?: Resolver<Maybe<ResolversTypes['ChildUnion']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type MyUnionResolvers<ContextType = any, ParentType extends ResolversParentTypes['MyUnion'] = ResolversParentTypes['MyUnion']> = {\n        __resolveType: TypeResolveFn<'MyType' | 'MyOtherType', ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {\n        __resolveType: TypeResolveFn<'SomeNode', ParentType, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {\n        something?: Resolver<ResolversTypes['MyType'], ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SomeNodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['SomeNode'] = ResolversParentTypes['SomeNode']> = {\n        id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {\n        somethingChanged?: SubscriptionResolver<Maybe<ResolversTypes['MyOtherType']>, \"somethingChanged\", ParentType, ContextType>;\n      };\n    `);\n    await resolversTestingValidate(result);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5792,10 +5792,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1095,
+                "line": 1094,
                 "column": 79
             },
-            "line": 1095,
+            "line": 1094,
             "code": "  it('Should replace using Omit when non-mapped type is pointing to mapped type', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: 'MyOtherTypeCustom',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversTypes['MyOtherType']>, unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherTypeCustom>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n    await resolversTestingValidate(mergeOutputs([result, 'type MyOtherTypeCustom = {};']));\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5807,10 +5807,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1128,
+                "line": 1127,
                 "column": 83
             },
-            "line": 1128,
+            "line": 1127,
             "code": "  it('Should not replace using Omit when non-mapped type is pointing to mapped type', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: 'MyOtherTypeCustom',\n          MyType: 'MyTypeCustom',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversTypes = {\n      MyType: ResolverTypeWrapper<MyTypeCustom>;\n      String: ResolverTypeWrapper<Scalars['String']>;\n      Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n      MyOtherType: ResolverTypeWrapper<MyOtherTypeCustom>;\n      ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n      Query: ResolverTypeWrapper<{}>;\n      Subscription: ResolverTypeWrapper<{}>;\n      Node: ResolversTypes['SomeNode'];\n      ID: ResolverTypeWrapper<Scalars['ID']>;\n      SomeNode: ResolverTypeWrapper<SomeNode>;\n      MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n      MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n      Int: ResolverTypeWrapper<Scalars['Int']>;\n      Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n    };`);\n    await resolversTestingValidate(mergeOutputs([result, `type MyTypeCustom = {}; type MyOtherTypeCustom = {};`]));\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5822,10 +5822,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1162,
+                "line": 1161,
                 "column": 66
             },
-            "line": 1162,
+            "line": 1161,
             "code": "  it('Should build ResolversTypes object when there are no mappers', async () => {\n    const result = await plugin(resolversTestingSchema, [], {}, { outputFile: '' });\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Child>;\n        MyOtherType: ResolverTypeWrapper<MyOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5837,10 +5837,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1185,
+                "line": 1184,
                 "column": 31
             },
-            "line": 1185,
+            "line": 1184,
             "code": "  it('should support namespaces', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        mappers: {\n          MyOtherType: './my-file#MyNamespace#MyCustomOtherType',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversTypes['MyOtherType']>, unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyCustomOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: Omit<MyType, 'otherType' | 'unionChild'> & { otherType?: Maybe<ResolversParentTypes['MyOtherType']>, unionChild?: Maybe<ResolversParentTypes['ChildUnion']> };\n      String: Scalars['String'];\n      Child: Omit<Child, 'parent'> & { parent?: Maybe<ResolversParentTypes['MyType']> };\n      MyOtherType: MyNamespace.MyCustomOtherType;\n      ChildUnion: ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType'];\n      Query: {};\n      Subscription: {};\n      Node: ResolversParentTypes['SomeNode'];\n      ID: Scalars['ID'];\n      SomeNode: SomeNode;\n      MyUnion: ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType'];\n      MyScalar: Scalars['MyScalar'];\n      Int: Scalars['Int'];\n      Boolean: Scalars['Boolean'];\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5852,10 +5852,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1239,
+                "line": 1238,
                 "column": 46
             },
-            "line": 1239,
+            "line": 1238,
             "code": "  it('should support namespaces in contextType', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        contextType: './my-file#MyNamespace#MyContextType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toContain(`<ContextType = MyNamespace.MyContextType>`);\n    expect(result.content).not.toContain(`<ContextType = MyNamespace>`);\n    expect(result.content).not.toContain(`<ContextType = MyContextType>`);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5867,10 +5867,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1257,
+                "line": 1256,
                 "column": 48
             },
-            "line": 1257,
+            "line": 1256,
             "code": "  it('should support namespaces in defaultMapper', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        defaultMapper: './my-file#MyNamespace#MyDefaultMapper',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        String: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Child: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        ChildUnion: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        SomeNode: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyUnion: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        MyScalar: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Int: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n        Boolean: ResolverTypeWrapper<MyNamespace.MyDefaultMapper>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversParentTypes = {\n        MyType: MyNamespace.MyDefaultMapper;\n        String: MyNamespace.MyDefaultMapper;\n        Child: MyNamespace.MyDefaultMapper;\n        MyOtherType: MyNamespace.MyDefaultMapper;\n        ChildUnion: MyNamespace.MyDefaultMapper;\n        Query: {};\n        Subscription: {};\n        Node: ResolversParentTypes['SomeNode'];\n        ID: MyNamespace.MyDefaultMapper;\n        SomeNode: MyNamespace.MyDefaultMapper;\n        MyUnion: MyNamespace.MyDefaultMapper;\n        MyScalar: MyNamespace.MyDefaultMapper;\n        Int: MyNamespace.MyDefaultMapper;\n        Boolean: MyNamespace.MyDefaultMapper;\n      };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5882,10 +5882,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1308,
+                "line": 1307,
                 "column": 48
             },
-            "line": 1308,
+            "line": 1307,
             "code": "  it('should support namespaces in rootValueType', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        noSchemaStitching: true,\n        rootValueType: './my-file#MyNamespace#MyRootType',\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversTypes['ChildUnion']> }>;\n        String: ResolverTypeWrapper<Scalars['String']>;\n        Child: ResolverTypeWrapper<Child>;\n        MyOtherType: ResolverTypeWrapper<MyOtherType>;\n        ChildUnion: ResolversTypes['Child'] | ResolversTypes['MyOtherType'];\n        Query: ResolverTypeWrapper<MyNamespace.MyRootType>;\n        Subscription: ResolverTypeWrapper<MyNamespace.MyRootType>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<Scalars['ID']>;\n        SomeNode: ResolverTypeWrapper<SomeNode>;\n        MyUnion: ResolversTypes['MyType'] | ResolversTypes['MyOtherType'];\n        MyScalar: ResolverTypeWrapper<Scalars['MyScalar']>;\n        Int: ResolverTypeWrapper<Scalars['Int']>;\n        Boolean: ResolverTypeWrapper<Scalars['Boolean']>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: Omit<MyType, 'unionChild'> & { unionChild?: Maybe<ResolversParentTypes['ChildUnion']> };\n      String: Scalars['String'];\n      Child: Child;\n      MyOtherType: MyOtherType;\n      ChildUnion: ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType'];\n      Query: MyNamespace.MyRootType;\n      Subscription: MyNamespace.MyRootType;\n      Node: ResolversParentTypes['SomeNode'];\n      ID: Scalars['ID'];\n      SomeNode: SomeNode;\n      MyUnion: ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType'];\n      MyScalar: Scalars['MyScalar'];\n      Int: Scalars['Int'];\n      Boolean: Scalars['Boolean'];\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -5897,10 +5897,10 @@
                 "ResolversTypes"
             ],
             "updatePoint": {
-                "line": 1360,
+                "line": 1359,
                 "column": 51
             },
-            "line": 1360,
+            "line": 1359,
             "code": "  it('should support namespaces and {T} placeholder', async () => {\n    const result = (await plugin(\n      resolversTestingSchema,\n      [],\n      {\n        defaultMapper: './my-file#MyNamespace#MyDefaultMapper<{T}>',\n        mappers: {\n          MyType: './my-file#MyNamespace#MyType<{T}>',\n        },\n      },\n      { outputFile: '' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(result.prepend).toContain(`import { MyNamespace } from './my-file';`);\n\n    expect(result.content).toBeSimilarStringTo(`\n      export type ResolversTypes = {\n        MyType: ResolverTypeWrapper<MyNamespace.MyType<MyType>>;\n        String: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['String']>>;\n        Child: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversTypes['MyType']> }>>;\n        MyOtherType: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<MyOtherType>>;\n        ChildUnion: MyNamespace.MyDefaultMapper<ResolversTypes['Child'] | ResolversTypes['MyOtherType']>;\n        Query: ResolverTypeWrapper<{}>;\n        Subscription: ResolverTypeWrapper<{}>;\n        Node: ResolversTypes['SomeNode'];\n        ID: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['ID']>>;\n        SomeNode: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<SomeNode>>;\n        MyUnion: MyNamespace.MyDefaultMapper<ResolversTypes['MyType'] | ResolversTypes['MyOtherType']>;\n        MyScalar: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['MyScalar']>>;\n        Int: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['Int']>>;\n        Boolean: ResolverTypeWrapper<MyNamespace.MyDefaultMapper<Scalars['Boolean']>>;\n      };\n    `);\n\n    expect(result.content).toBeSimilarStringTo(`\n    export type ResolversParentTypes = {\n      MyType: MyNamespace.MyType<MyType>;\n      String: MyNamespace.MyDefaultMapper<Scalars['String']>;\n      Child: MyNamespace.MyDefaultMapper<Omit<Child, 'parent'> & { parent?: Maybe<ResolversParentTypes['MyType']> }>;\n      MyOtherType: MyNamespace.MyDefaultMapper<MyOtherType>;\n      ChildUnion: MyNamespace.MyDefaultMapper<ResolversParentTypes['Child'] | ResolversParentTypes['MyOtherType']>;\n      Query: {};\n      Subscription: {};\n      Node: ResolversParentTypes['SomeNode'];\n      ID: MyNamespace.MyDefaultMapper<Scalars['ID']>;\n      SomeNode: MyNamespace.MyDefaultMapper<SomeNode>;\n      MyUnion: MyNamespace.MyDefaultMapper<ResolversParentTypes['MyType'] | ResolversParentTypes['MyOtherType']>;\n      MyScalar: MyNamespace.MyDefaultMapper<Scalars['MyScalar']>;\n      Int: MyNamespace.MyDefaultMapper<Scalars['Int']>;\n      Boolean: MyNamespace.MyDefaultMapper<Scalars['Boolean']>;\n    };\n    `);\n  });",
             "file": "mapping.spec.ts",
             "skipped": false,
@@ -9236,10 +9236,10 @@
                 "gql-tag-operations-preset"
             ],
             "updatePoint": {
-                "line": 10,
+                "line": 9,
                 "column": 50
             },
-            "line": 10,
+            "line": 9,
             "code": "  it('can generate simple examples uppercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql';\n      import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n          \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\": types.BDocument,\n          \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\": types.CFragmentDoc,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n    `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9251,10 +9251,10 @@
                 "gql-tag-operations-preset"
             ],
             "updatePoint": {
-                "line": 97,
+                "line": 96,
                 "column": 50
             },
-            "line": 97,
+            "line": 96,
             "code": "  it('can generate simple examples lowercase names', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-lowercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql';\n      import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n          \"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\": types.BDocument,\n          \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\": types.CFragmentDoc,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n  `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9266,10 +9266,10 @@
                 "gql-tag-operations-preset"
             ],
             "updatePoint": {
-                "line": 184,
+                "line": 183,
                 "column": 72
             },
-            "line": 184,
+            "line": 183,
             "code": "  it('generates \\\\n regardless of whether the source contains LF or CRLF', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/crlf-operation.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n    });\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql';\n      import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n          \"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\": types.BDocument,\n          \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\": types.CFragmentDoc,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query b {\\\\n    b\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n    `);\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9281,10 +9281,10 @@
                 "gql-tag-operations-preset"
             ],
             "updatePoint": {
-                "line": 260,
+                "line": 259,
                 "column": 36
             },
-            "line": 260,
+            "line": 259,
             "code": "  it(\"follows 'useTypeImports': true\", async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n      config: {\n        useTypeImports: true,\n      },\n    });\n\n    expect(result.length).toBe(3);\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql';\n      import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n          \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\": types.BDocument,\n          \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\": types.CFragmentDoc,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n    `);\n    const graphqlFile = result.find(file => file.filename === 'out1/graphql.ts');\n    expect(graphqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n      export type Maybe<T> = T | null;\n      export type InputMaybe<T> = Maybe<T>;\n      export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };\n      export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };\n      export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };\n      /** All built-in and custom scalars, mapped to their actual values */\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n      };\n\n      export type Query = {\n        __typename?: 'Query';\n        a?: Maybe<Scalars['String']>;\n        b?: Maybe<Scalars['String']>;\n        c?: Maybe<Scalars['String']>;\n      };\n\n      export type AQueryVariables = Exact<{ [key: string]: never; }>;\n\n\n      export type AQuery = { __typename?: 'Query', a?: string | null };\n\n      export type BQueryVariables = Exact<{ [key: string]: never; }>;\n\n\n      export type BQuery = { __typename?: 'Query', b?: string | null };\n\n      export type CFragment = { __typename?: 'Query', c?: string | null };\n\n      export const CFragmentDoc = {\"kind\":\"Document\",\"definitions\":[{\"kind\":\"FragmentDefinition\",\"name\":{\"kind\":\"Name\",\"value\":\"C\"},\"typeCondition\":{\"kind\":\"NamedType\",\"name\":{\"kind\":\"Name\",\"value\":\"Query\"}},\"selectionSet\":{\"kind\":\"SelectionSet\",\"selections\":[{\"kind\":\"Field\",\"name\":{\"kind\":\"Name\",\"value\":\"c\"}}]}}]} as unknown as DocumentNode<CFragment, unknown>;\n      export const ADocument = {\"kind\":\"Document\",\"definitions\":[{\"kind\":\"OperationDefinition\",\"operation\":\"query\",\"name\":{\"kind\":\"Name\",\"value\":\"A\"},\"selectionSet\":{\"kind\":\"SelectionSet\",\"selections\":[{\"kind\":\"Field\",\"name\":{\"kind\":\"Name\",\"value\":\"a\"}}]}}]} as unknown as DocumentNode<AQuery, AQueryVariables>;\n      export const BDocument = {\"kind\":\"Document\",\"definitions\":[{\"kind\":\"OperationDefinition\",\"operation\":\"query\",\"name\":{\"kind\":\"Name\",\"value\":\"B\"},\"selectionSet\":{\"kind\":\"SelectionSet\",\"selections\":[{\"kind\":\"Field\",\"name\":{\"kind\":\"Name\",\"value\":\"b\"}}]}}]} as unknown as DocumentNode<BQuery, BQueryVariables>;\"\n    `);\n\n    expect(graphqlFile.content).toContain(\n      \"import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core'\"\n    );\n    expect(gqlFile.content).toContain(\n      \"import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core'\"\n    );\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9296,10 +9296,10 @@
                 "gql-tag-operations-preset"
             ],
             "updatePoint": {
-                "line": 389,
+                "line": 388,
                 "column": 34
             },
-            "line": 389,
+            "line": 388,
             "code": "  it('prevent duplicate operations', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/duplicate-operation.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n      config: {\n        useTypeImports: true,\n      },\n    });\n\n    expect(result.length).toBe(3);\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql';\n      import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query a {\\\\n    a\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n    `);\n    const graphqlFile = result.find(file => file.filename === 'out1/graphql.ts');\n    expect(graphqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n      export type Maybe<T> = T | null;\n      export type InputMaybe<T> = Maybe<T>;\n      export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };\n      export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };\n      export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };\n      /** All built-in and custom scalars, mapped to their actual values */\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n      };\n\n      export type Query = {\n        __typename?: 'Query';\n        a?: Maybe<Scalars['String']>;\n      };\n\n      export type AQueryVariables = Exact<{ [key: string]: never; }>;\n\n\n      export type AQuery = { __typename?: 'Query', a?: string | null };\n\n\n      export const ADocument = {\"kind\":\"Document\",\"definitions\":[{\"kind\":\"OperationDefinition\",\"operation\":\"query\",\"name\":{\"kind\":\"Name\",\"value\":\"a\"},\"selectionSet\":{\"kind\":\"SelectionSet\",\"selections\":[{\"kind\":\"Field\",\"name\":{\"kind\":\"Name\",\"value\":\"a\"}}]}}]} as unknown as DocumentNode<AQuery, AQueryVariables>;\"\n    `);\n\n    expect(gqlFile.content.match(/query a {/g).length).toBe(3);\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9312,10 +9312,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 492,
+                "line": 491,
                 "column": 29
             },
-            "line": 492,
+            "line": 491,
             "code": "    it('fragmentMasking: true', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: true,\n            },\n          },\n        },\n      });\n\n      expect(result).toHaveLength(4);\n      const fileNames = result.map(res => res.filename);\n      expect(fileNames).toContain('out1/fragment-masking.ts');\n      expect(fileNames).toContain('out1/index.ts');\n      expect(fileNames).toContain('out1/gql.ts');\n      expect(fileNames).toContain('out1/graphql.ts');\n\n      const gqlFile = result.find(file => file.filename === 'out1/index.ts');\n      expect(gqlFile.content).toMatchInlineSnapshot(`\n        \"export * from \"./gql\"\n        export * from \"./fragment-masking\"\"\n      `);\n      const fragmentMaskingFile = result.find(file => file.filename === 'out1/fragment-masking.ts');\n      expect(fragmentMaskingFile.content).toMatchInlineSnapshot(`\n        \"import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n\n        export type FragmentType<TDocumentType extends DocumentNode<any, any>> = TDocumentType extends DocumentNode<\n          infer TType,\n          any\n        >\n          ? TType extends { ' $fragmentName'?: infer TKey }\n            ? TKey extends string\n              ? { ' $fragmentRefs'?: { [key in TKey]: TType } }\n              : never\n            : never\n          : never;\n\n        // return non-nullable if \\`fragmentType\\` is non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>>\n        ): TType;\n        // return nullable if \\`fragmentType\\` is nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n        ): TType | null | undefined;\n        // return array of non-nullable if \\`fragmentType\\` is array of non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n        ): ReadonlyArray<TType>;\n        // return array of nullable if \\`fragmentType\\` is array of nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): ReadonlyArray<TType> | null | undefined\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): TType | ReadonlyArray<TType> | null | undefined {\n          return fragmentType as any\n        }\n        \"\n      `);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9328,10 +9328,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 573,
+                "line": 572,
                 "column": 27
             },
-            "line": 573,
+            "line": 572,
             "code": "    it('fragmentMasking: {}', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: {},\n            },\n          },\n        },\n      });\n\n      expect(result).toHaveLength(4);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9344,10 +9344,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 599,
+                "line": 598,
                 "column": 42
             },
-            "line": 599,
+            "line": 598,
             "code": "    it('fragmentMasking.unmaskFunctionName', async () => {\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              a: String\n              b: String\n              c: String\n            }\n          `,\n        ],\n        documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: {\n                unmaskFunctionName: 'iLikeTurtles',\n              },\n            },\n          },\n        },\n      });\n\n      expect(result).toHaveLength(4);\n      const gqlFile = result.find(file => file.filename === 'out1/fragment-masking.ts');\n      expect(gqlFile.content).toMatchInlineSnapshot(`\n        \"import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n\n        export type FragmentType<TDocumentType extends DocumentNode<any, any>> = TDocumentType extends DocumentNode<\n          infer TType,\n          any\n        >\n          ? TType extends { ' $fragmentName'?: infer TKey }\n            ? TKey extends string\n              ? { ' $fragmentRefs'?: { [key in TKey]: TType } }\n              : never\n            : never\n          : never;\n\n        // return non-nullable if \\`fragmentType\\` is non-nullable\n        export function iLikeTurtles<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>>\n        ): TType;\n        // return nullable if \\`fragmentType\\` is nullable\n        export function iLikeTurtles<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n        ): TType | null | undefined;\n        // return array of non-nullable if \\`fragmentType\\` is array of non-nullable\n        export function iLikeTurtles<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n        ): ReadonlyArray<TType>;\n        // return array of nullable if \\`fragmentType\\` is array of nullable\n        export function iLikeTurtles<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): ReadonlyArray<TType> | null | undefined\n        export function iLikeTurtles<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): TType | ReadonlyArray<TType> | null | undefined {\n          return fragmentType as any\n        }\n        \"\n      `);\n\n      expect(gqlFile.content).toBeSimilarStringTo(`\n      export function iLikeTurtles<TType>(\n        _documentNode: DocumentNode<TType, any>,\n        fragmentType: FragmentType<DocumentNode<TType, any>>\n      ): TType;\n      `);\n      expect(gqlFile.content).toBeSimilarStringTo(`\n      export function iLikeTurtles<TType>(\n        _documentNode: DocumentNode<TType, any>,\n        fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n      ): TType | null | undefined;\n      `);\n      expect(gqlFile.content).toBeSimilarStringTo(`\n      export function iLikeTurtles<TType>(\n        _documentNode: DocumentNode<TType, any>,\n        fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n      ): ReadonlyArray<TType>;\n      `);\n      expect(gqlFile.content).toBeSimilarStringTo(`\n      export function iLikeTurtles<TType>(\n        _documentNode: DocumentNode<TType, any>,\n        fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n      ): ReadonlyArray<TType> | null | undefined\n      `);\n      expect(gqlFile.content).toBeSimilarStringTo(`\n      export function iLikeTurtles<TType>(\n        _documentNode: DocumentNode<TType, any>,\n        fragmentType: FragmentType<DocumentNode<TType, any>> | ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n      ): TType | ReadonlyArray<TType> | null | undefined {\n        return fragmentType as any\n      }\n      `);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9360,10 +9360,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 704,
+                "line": 703,
                 "column": 38
             },
-            "line": 704,
+            "line": 703,
             "code": "    it('can accept null in useFragment', async () => {\n      const docPath = path.join(__dirname, 'fixtures/with-fragment.ts');\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              foo: Foo\n              foos: [Foo]\n            }\n\n            type Foo {\n              value: String\n            }\n          `,\n        ],\n        documents: docPath,\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: true,\n            },\n          },\n        },\n      });\n\n      const content = mergeOutputs([\n        ...result,\n        readFileSync(docPath, 'utf8'),\n        `\n        function App(props: { data: FooQuery }) {\n          const fragment: FooFragment | null | undefined = useFragment(Fragment, props.data.foo);\n          return fragment == null ? \"no data\" : fragment.value;\n        }\n        `,\n      ]);\n      validateTs(content, undefined, false, true, [`Duplicate identifier 'DocumentNode'.`], true);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9376,10 +9376,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 744,
+                "line": 743,
                 "column": 38
             },
-            "line": 744,
+            "line": 743,
             "code": "    it('can accept list in useFragment', async () => {\n      const docPath = path.join(__dirname, 'fixtures/with-fragment.ts');\n      const result = await executeCodegen({\n        schema: [\n          /* GraphQL */ `\n            type Query {\n              foo: Foo\n              foos: [Foo!]\n            }\n\n            type Foo {\n              value: String\n            }\n          `,\n        ],\n        documents: docPath,\n        generates: {\n          out1: {\n            preset,\n            plugins: [],\n            presetConfig: {\n              fragmentMasking: true,\n            },\n          },\n        },\n      });\n\n      const content = mergeOutputs([\n        ...result,\n        readFileSync(docPath, 'utf8'),\n        `\n        function App(props: { data: FoosQuery }) {\n          const fragments: ReadonlyArray<FooFragment> | null | undefined = useFragment(Fragment, props.data.foos);\n          return fragments == null ? \"no data\" : fragments.map(f => f.value);\n        }\n        `,\n      ]);\n      validateTs(content, undefined, false, true, [`Duplicate identifier 'DocumentNode'.`], true);\n    });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9392,10 +9392,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 785,
+                "line": 784,
                 "column": 41
             },
-            "line": 785,
+            "line": 784,
             "code": "  it('fragmentMasking.augmentedModuleName', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n          presetConfig: {\n            fragmentMasking: {\n              augmentedModuleName: '@urql/fragment',\n            },\n          },\n        },\n      },\n    });\n\n    expect(result).toHaveLength(4);\n    const fragmentMaskingFile = result.find(file => file.filename === 'out1/fragment-masking.d.ts');\n    expect(fragmentMaskingFile).toBeDefined();\n    expect(fragmentMaskingFile.content).toMatchInlineSnapshot(`\n      \"import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      declare module \"@urql/fragment\" {\n\n        export type FragmentType<TDocumentType extends DocumentNode<any, any>> = TDocumentType extends DocumentNode<\n          infer TType,\n          any\n        >\n          ? TType extends { ' $fragmentName'?: infer TKey }\n            ? TKey extends string\n              ? { ' $fragmentRefs'?: { [key in TKey]: TType } }\n              : never\n            : never\n          : never;\n\n\n        // return non-nullable if \\`fragmentType\\` is non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>>\n        ): TType\n        // return nullable if \\`fragmentType\\` is nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: FragmentType<DocumentNode<TType, any>> | null | undefined\n        ): TType | null | undefined\n        // return array of non-nullable if \\`fragmentType\\` is array of non-nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>>\n        ): ReadonlyArray<TType>\n        // return array of nullable if \\`fragmentType\\` is array of nullable\n        export function useFragment<TType>(\n          _documentNode: DocumentNode<TType, any>,\n          fragmentType: ReadonlyArray<FragmentType<DocumentNode<TType, any>>> | null | undefined\n        ): ReadonlyArray<TType> | null | undefined\n      }\"\n    `);\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9408,10 +9408,10 @@
                 "fragment masking"
             ],
             "updatePoint": {
-                "line": 854,
+                "line": 853,
                 "column": 45
             },
-            "line": 854,
+            "line": 853,
             "code": "  it('generates correct named imports for ESM', async () => {\n    const result = await executeCodegen({\n      schema: [\n        /* GraphQL */ `\n          type Query {\n            a: String\n            b: String\n            c: String\n          }\n        `,\n      ],\n      documents: path.join(__dirname, 'fixtures/simple-uppercase-operation-name.ts'),\n      generates: {\n        out1: {\n          preset,\n          plugins: [],\n        },\n      },\n      emitLegacyCommonJSImports: false,\n    });\n\n    expect(result).toHaveLength(3);\n    // index.ts (re-exports)\n    const indexFile = result.find(file => file.filename === 'out1/index.ts');\n    expect(indexFile.content).toEqual('export * from \"./gql.js\"');\n\n    // gql.ts\n    const gqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(gqlFile.content).toMatchInlineSnapshot(`\n      \"/* eslint-disable */\n      import * as types from './graphql.js';\n      import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';\n\n      /**\n       * Map of all GraphQL operations in the project.\n       *\n       * This map has several performance disadvantages:\n       * 1. It is not tree-shakeable, so it will include all operations in the project.\n       * 2. It is not minifiable, so the string of a GraphQL query will be multiple times inside the bundle.\n       * 3. It does not support dead code elimination, so it will add unused operations.\n       *\n       * Therefore it is highly recommended to use the babel-plugin for production.\n       */\n      const documents = {\n          \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\": types.ADocument,\n          \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\": types.BDocument,\n          \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\": types.CFragmentDoc,\n      };\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       *\n       *\n       * @example\n       * \\`\\`\\`ts\n       * const query = gql(\\`query GetUser($id: ID!) { user(id: $id) { name } }\\`);\n       * \\`\\`\\`\n       *\n       * The query argument is unknown!\n       * Please regenerate the types.\n      **/\n      export function gql(source: string): unknown;\n\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query A {\\\\n    a\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  query B {\\\\n    b\\\\n  }\\\\n\"];\n      /**\n       * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.\n       */\n      export function gql(source: \"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"): (typeof documents)[\"\\\\n  fragment C on Query {\\\\n    c\\\\n  }\\\\n\"];\n\n      export function gql(source: string) {\n        return (documents as any)[source] ?? {};\n      }\n\n      export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;\"\n    `);\n\n    // graphql.ts\n    const graphqlFile = result.find(file => file.filename === 'out1/gql.ts');\n    expect(graphqlFile).toBeDefined();\n  });",
             "file": "gql-tag-operations.spec.ts",
             "skipped": false,
@@ -9648,7 +9648,7 @@
                 "column": 55
             },
             "line": 35,
-            "code": "  test('should generate a base output and 4 for modules', async () => {\n    try {\n      const output = await executeCodegen(options);\n\n      expect(output.length).toBe(5);\n      expect(normalize(output[0].filename)).toMatch(normalize(`/modules/global-types.ts`));\n      expect(normalize(output[1].filename)).toMatch(normalize(`/modules/blog/module-types.ts`));\n      expect(normalize(output[2].filename)).toMatch(normalize(`/modules/common/module-types.ts`));\n      expect(normalize(output[3].filename)).toMatch(normalize(`/modules/dotanions/module-types.ts`));\n      expect(normalize(output[4].filename)).toMatch(normalize(`/modules/users/module-types.ts`));\n    } catch (e) {\n      // eslint-disable-next-line no-console\n      console.error(e);\n      throw e;\n    }\n  });",
+            "code": "  test('should generate a base output and 4 for modules', async () => {\n    const output = await executeCodegen(options);\n\n    expect(output.length).toBe(5);\n    expect(normalize(output[0].filename)).toMatch(normalize(`/modules/global-types.ts`));\n    expect(normalize(output[1].filename)).toMatch(normalize(`/modules/blog/module-types.ts`));\n    expect(normalize(output[2].filename)).toMatch(normalize(`/modules/common/module-types.ts`));\n    expect(normalize(output[3].filename)).toMatch(normalize(`/modules/dotanions/module-types.ts`));\n    expect(normalize(output[4].filename)).toMatch(normalize(`/modules/users/module-types.ts`));\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
             "dir": "packages/presets/graphql-modules/tests"
@@ -9659,11 +9659,11 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 52,
+                "line": 46,
                 "column": 85
             },
-            "line": 52,
-            "code": "  test('should not duplicate type even if type and extend type are in the same module', async () => {\n    try {\n      const output = await executeCodegen(options);\n\n      const userResolversStr = `export type UserResolvers = Pick<Types.UserResolvers, DefinedFields['User'] | '__isTypeOf'>;`;\n      const nbOfTimeUserResolverFound = output[4].content.split(userResolversStr).length - 1;\n\n      expect(nbOfTimeUserResolverFound).toBe(1);\n    } catch (e) {\n      // eslint-disable-next-line no-console\n      console.error(e);\n      throw e;\n    }\n  });",
+            "line": 46,
+            "code": "  test('should not duplicate type even if type and extend type are in the same module', async () => {\n    const output = await executeCodegen(options);\n\n    const userResolversStr = `export type UserResolvers = Pick<Types.UserResolvers, DefinedFields['User'] | '__isTypeOf'>;`;\n    const nbOfTimeUserResolverFound = output[4].content.split(userResolversStr).length - 1;\n\n    expect(nbOfTimeUserResolverFound).toBe(1);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
             "dir": "packages/presets/graphql-modules/tests"
@@ -9674,10 +9674,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 67,
+                "line": 55,
                 "column": 62
             },
-            "line": 67,
+            "line": 55,
             "code": "  test('should allow to override importBaseTypesFrom correctly', async () => {\n    const output = await executeCodegen({\n      generates: {\n        './tests/test-files/modules': {\n          schema: './tests/test-files/modules/*/types/*.graphql',\n          plugins: ['typescript', 'typescript-resolvers'],\n          preset: 'graphql-modules',\n          presetConfig: {\n            importBaseTypesFrom: '@types',\n            baseTypesPath: 'global-types.ts',\n            filename: 'module-types.ts',\n            encapsulateModuleTypes: 'none',\n          },\n        },\n      },\n    });\n    const importStatement = `import * as Types from \"@types\";`;\n\n    expect(output.length).toBe(5);\n    expect(output[1].content).toMatch(importStatement);\n    expect(output[2].content).toMatch(importStatement);\n    expect(output[3].content).toMatch(importStatement);\n    expect(output[4].content).toMatch(importStatement);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9689,10 +9689,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 92,
+                "line": 80,
                 "column": 69
             },
-            "line": 92,
+            "line": 80,
             "code": "  test('should import with respect of useTypeImports config correctly', async () => {\n    const output = await executeCodegen({\n      generates: {\n        './tests/test-files/modules': {\n          schema: './tests/test-files/modules/*/types/*.graphql',\n          plugins: ['typescript', 'typescript-resolvers'],\n          preset: 'graphql-modules',\n          presetConfig: {\n            importBaseTypesFrom: '@types',\n            baseTypesPath: 'global-types.ts',\n            filename: 'module-types.ts',\n            encapsulateModuleTypes: 'none',\n          },\n        },\n      },\n      config: {\n        useTypeImports: true,\n      },\n    });\n\n    const importStatement = `import type * as Types from \"@types\";`;\n\n    expect(output.length).toBe(5);\n    expect(output[1].content).toMatch(importStatement);\n    expect(output[2].content).toMatch(importStatement);\n    expect(output[3].content).toMatch(importStatement);\n    expect(output[4].content).toMatch(importStatement);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9704,10 +9704,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 121,
+                "line": 109,
                 "column": 47
             },
-            "line": 121,
+            "line": 109,
             "code": "  test('should allow to disable graphql-modules', async () => {\n    const output = await executeCodegen({\n      generates: {\n        './tests/test-files/modules': {\n          schema: './tests/test-files/modules/*/types/*.graphql',\n          plugins: ['typescript', 'typescript-resolvers'],\n          preset: 'graphql-modules',\n          presetConfig: {\n            importBaseTypesFrom: '@types',\n            baseTypesPath: 'global-types.ts',\n            filename: 'module-types.ts',\n            encapsulateModuleTypes: 'none',\n            useGraphQLModules: false,\n          },\n        },\n      },\n    });\n\n    for (const record of output) {\n      expect(record).not.toContain(`graphql-modules`);\n      expect(record).not.toContain(`gm.`);\n    }\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9719,10 +9719,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 145,
+                "line": 133,
                 "column": 79
             },
-            "line": 145,
+            "line": 133,
             "code": "  test('each module-types should include a relative import to glob-types module', async () => {\n    const output = await executeCodegen(options);\n    const importStatement = `import * as Types from \"../global-types\";`;\n\n    expect(output.length).toBe(5);\n    expect(output[1].content).toMatch(importStatement);\n    expect(output[2].content).toMatch(importStatement);\n    expect(output[3].content).toMatch(importStatement);\n    expect(output[4].content).toMatch(importStatement);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9734,10 +9734,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 156,
+                "line": 144,
                 "column": 49
             },
-            "line": 156,
+            "line": 144,
             "code": "  test('each module-types should export Resolvers', async () => {\n    const output = await executeCodegen(options);\n    const exportStatemment = `export interface Resolvers `;\n\n    expect(output.length).toBe(5);\n    expect(output[1].content).toMatch(exportStatemment);\n    expect(output[2].content).toMatch(exportStatemment);\n    expect(output[3].content).toMatch(exportStatemment);\n    expect(output[4].content).toMatch(exportStatemment);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9749,10 +9749,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 167,
+                "line": 155,
                 "column": 91
             },
-            "line": 167,
+            "line": 155,
             "code": "  test('dotanions module should export DefinedFields, Schema Types with Picks and resolvers', async () => {\n    const output = await executeCodegen(options);\n\n    expect(output.length).toBe(5);\n    expect(output[3].content).toMatchSnapshot();\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9764,10 +9764,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 174,
+                "line": 162,
                 "column": 90
             },
-            "line": 174,
+            "line": 162,
             "code": "  test('should NOT produce required root-level resolvers in Resolvers interface by default', async () => {\n    const output = await executeCodegen(options);\n\n    const usersModuleOutput = output.find(o => o.filename.includes('users'))!;\n\n    expect(usersModuleOutput).toBeDefined();\n    expect(usersModuleOutput.content).toContain(\n      `export type QueryResolvers = Pick<Types.QueryResolvers, DefinedFields['Query']>;`\n    );\n    expect(usersModuleOutput.content).toContain('Query?: QueryResolvers;');\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
@@ -9779,10 +9779,10 @@
                 "Integration"
             ],
             "updatePoint": {
-                "line": 186,
+                "line": 174,
                 "column": 117
             },
-            "line": 186,
+            "line": 174,
             "code": "  test('should produce required root-level resolvers in Resolvers interface when requireRootResolvers flag is enabled', async () => {\n    const optionsCopy = Object.assign({} as any, options);\n\n    optionsCopy.generates['./tests/test-files/modules'].presetConfig = {\n      ...optionsCopy.generates['./tests/test-files/modules'].presetConfig,\n      requireRootResolvers: true,\n      useGraphQLModules: false,\n    };\n\n    const output = await executeCodegen(optionsCopy);\n\n    const usersModuleOutput = output.find(o => o.filename.includes('users'))!;\n\n    expect(usersModuleOutput).toBeDefined();\n\n    // Only Query related properties should be required\n    expect(usersModuleOutput.content).toBeSimilarStringTo(`\n      export type UserResolvers = Pick<Types.UserResolvers, DefinedFields['User'] | '__isTypeOf'>;\n      export type QueryResolvers = Required<Pick<Types.QueryResolvers, DefinedFields['Query']>>;\n    `);\n    expect(usersModuleOutput.content).toBeSimilarStringTo(`\n      export interface Resolvers {\n        User?: UserResolvers;\n        Query: QueryResolvers;\n      };\n    `);\n  });",
             "file": "integration.spec.ts",
             "skipped": false,
