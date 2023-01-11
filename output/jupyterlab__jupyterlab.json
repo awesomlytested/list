@@ -475,14 +475,28 @@
             "dir": "galata/test"
         },
         {
-            "name": "Debugger sidebar",
+            "name": "Breakpoints on exception",
             "suites": [],
             "updatePoint": {
                 "line": 123,
-                "column": 24,
-                "index": 3413
+                "column": 32,
+                "index": 3421
             },
             "line": 123,
+            "code": "  test('Breakpoints on exception', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await expect(page.locator('button.jp-PauseOnExceptions')).not.toHaveClass(/lm-mod-toggled/);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    const menu = page.locator('.jp-PauseOnExceptions-menu');\n    await expect(menu).toBeVisible();\n    await expect(menu.locator('li.lm-Menu-item')).toHaveCount(3);\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(0);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"userUnhandled\")').click();\n    await expect(page.locator('button.jp-PauseOnExceptions')).toHaveClass(/lm-mod-toggled/);\n    await page.notebook.enterCellEditingMode(0);\n    const keyboard = page.keyboard;\n    await keyboard.press('Control+A');\n    await keyboard.type('try:\\n1/0\\n', {\n      delay: 100\n    });\n    await keyboard.press('Backspace');\n    await keyboard.type('except:\\n2/0\\n', {\n      delay: 100\n    });\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_unhandled_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.notebook.waitForRun(0);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(1);\n    await expect(menu.locator('li:has(div.lm-Menu-itemLabel:text(\"userUnhandled\"))')).toHaveClass(/lm-mod-toggled/);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"raised\")').click();\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_raised_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.click('button[title^=Continue]');\n  });",
+            "file": "documentation/debugger.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Debugger sidebar",
+            "suites": [],
+            "updatePoint": {
+                "line": 183,
+                "column": 24,
+                "index": 5753
+            },
+            "line": 183,
             "code": "  test('Debugger sidebar', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const sidebar = await page.waitForSelector('[data-id=\"jp-debugger-sidebar\"]');\n    await sidebar.click();\n    await setSidebarWidth(page, 251, 'right');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(sidebar, {\n      left: 0.25\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 22,\n        x: 1200,\n        width: 85,\n        height: 160\n      }\n    })).toMatchSnapshot('debugger_sidebar.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -492,11 +506,11 @@
             "name": "Variables panel",
             "suites": [],
             "updatePoint": {
-                "line": 148,
+                "line": 208,
                 "column": 23,
-                "index": 4090
+                "index": 6430
             },
-            "line": 148,
+            "line": 208,
             "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n\n    // Wait for the locals variables to be displayed\n    await expect(page.locator('.jp-DebuggerVariables-toolbar select')).toHaveValue('Locals');\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n\n    // Copy value to clipboard\n    await page.locator('.jp-DebuggerVariables-body :text(\"b\")').click({\n      button: 'right'\n    });\n    await page.locator('.lm-Menu-itemLabel:text(\"Copy to Clipboard\")').click();\n    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');\n\n    // Copy value entry is disabled for variables with empty value\n    await page.locator('.jp-DebuggerVariables-toolbar select').selectOption('Globals');\n    await page.locator('.jp-DebuggerVariables-body :text(\"special variables\")').click({\n      button: 'right'\n    });\n    await expect(page.locator('li.lm-Menu-item[data-command=\"debugger:copy-to-clipboard\"]')).toHaveAttribute('aria-disabled', 'true');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -506,11 +520,11 @@
             "name": "Call Stack panel",
             "suites": [],
             "updatePoint": {
-                "line": 191,
+                "line": 251,
                 "column": 24,
-                "index": 5658
+                "index": 7998
             },
-            "line": 191,
+            "line": 251,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -520,11 +534,11 @@
             "name": "Breakpoints panel",
             "suites": [],
             "updatePoint": {
-                "line": 222,
+                "line": 282,
                 "column": 25,
-                "index": 6593
+                "index": 8933
             },
-            "line": 222,
+            "line": 282,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/2114632017.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -534,11 +548,11 @@
             "name": "Source panel",
             "suites": [],
             "updatePoint": {
-                "line": 254,
+                "line": 314,
                 "column": 20,
-                "index": 7580
+                "index": 9920
             },
-            "line": 254,
+            "line": 314,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -15507,11 +15521,11 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 48,
+                "line": 50,
                 "column": 52
             },
-            "line": 48,
-            "code": "    it('should return whether the object is disposed', () => {\n      const debugSession = new Debugger.Session({\n        connection\n      });\n      expect(debugSession.isDisposed).toEqual(false);\n      debugSession.dispose();\n      expect(debugSession.isDisposed).toEqual(true);\n    });",
+            "line": 50,
+            "code": "    it('should return whether the object is disposed', () => {\n      const debugSession = new Debugger.Session({\n        connection,\n        config\n      });\n      expect(debugSession.isDisposed).toEqual(false);\n      debugSession.dispose();\n      expect(debugSession.isDisposed).toEqual(true);\n    });",
             "file": "session.spec.ts",
             "skipped": false,
             "dir": "packages/debugger/test"
@@ -15523,11 +15537,11 @@
                 "#eventMessage"
             ],
             "updatePoint": {
-                "line": 59,
+                "line": 62,
                 "column": 53
             },
-            "line": 59,
-            "code": "    it('should be emitted when sending debug messages', async () => {\n      const debugSession = new Debugger.Session({\n        connection\n      });\n      let events: string[] = [];\n      debugSession.eventMessage.connect((sender, event) => {\n        events.push(event.event);\n      });\n      await debugSession.start();\n      await debugSession.stop();\n      expect(events).toEqual(\n        expect.arrayContaining(['output', 'initialized', 'process'])\n      );\n    });",
+            "line": 62,
+            "code": "    it('should be emitted when sending debug messages', async () => {\n      const debugSession = new Debugger.Session({\n        connection,\n        config\n      });\n      let events: string[] = [];\n      debugSession.eventMessage.connect((sender, event) => {\n        events.push(event.event);\n      });\n      await debugSession.start();\n      await debugSession.stop();\n      expect(events).toEqual(\n        expect.arrayContaining(['output', 'initialized', 'process'])\n      );\n    });",
             "file": "session.spec.ts",
             "skipped": false,
             "dir": "packages/debugger/test"
@@ -15539,11 +15553,11 @@
                 "#sendRequest success"
             ],
             "updatePoint": {
-                "line": 76,
+                "line": 80,
                 "column": 48
             },
-            "line": 76,
-            "code": "    it('should send debug messages to the kernel', async () => {\n      const debugSession = new Debugger.Session({\n        connection\n      });\n      await debugSession.start();\n      const code = 'i=0\\ni+=1\\ni+=1';\n      const reply = await debugSession.sendRequest('dumpCell', {\n        code\n      });\n      await debugSession.stop();\n      expect(reply.body.sourcePath).toContain('.py');\n    });",
+            "line": 80,
+            "code": "    it('should send debug messages to the kernel', async () => {\n      const debugSession = new Debugger.Session({\n        connection,\n        config\n      });\n      await debugSession.start();\n      const code = 'i=0\\ni+=1\\ni+=1';\n      const reply = await debugSession.sendRequest('dumpCell', {\n        code\n      });\n      await debugSession.stop();\n      expect(reply.body.sourcePath).toContain('.py');\n    });",
             "file": "session.spec.ts",
             "skipped": false,
             "dir": "packages/debugger/test"
@@ -15555,11 +15569,11 @@
                 "#sendRequest failure"
             ],
             "updatePoint": {
-                "line": 91,
+                "line": 96,
                 "column": 48
             },
-            "line": 91,
-            "code": "    it('should handle replies with success false', async () => {\n      const debugSession = new Debugger.Session({\n        connection\n      });\n      await debugSession.start();\n      const reply = await debugSession.sendRequest('evaluate', {\n        expression: 'a'\n      });\n      await debugSession.stop();\n      const { success, message } = reply;\n      expect(success).toBe(false);\n      expect(message).toBeTruthy();\n    });",
+            "line": 96,
+            "code": "    it('should handle replies with success false', async () => {\n      const debugSession = new Debugger.Session({\n        connection,\n        config\n      });\n      await debugSession.start();\n      const reply = await debugSession.sendRequest('evaluate', {\n        expression: 'a'\n      });\n      await debugSession.stop();\n      const { success, message } = reply;\n      expect(success).toBe(false);\n      expect(message).toBeTruthy();\n    });",
             "file": "session.spec.ts",
             "skipped": false,
             "dir": "packages/debugger/test"
@@ -15571,10 +15585,10 @@
                 "#debugInfo"
             ],
             "updatePoint": {
-                "line": 189,
+                "line": 198,
                 "column": 60
             },
-            "line": 189,
+            "line": 198,
             "code": "    it('should return the state of the current debug session', async () => {\n      const reply = await debugSession.sendRequest('debugInfo', {});\n      expect(reply.body.isStarted).toBe(true);\n\n      const breakpoints = reply.body.breakpoints;\n      // breakpoints are in the same file\n      expect(breakpoints.length).toEqual(1);\n\n      const breakpointsInfo = breakpoints[0];\n      const breakpointLines = breakpointsInfo.breakpoints.map(bp => {\n        return bp.line;\n      });\n      expect(breakpointLines).toEqual([3, 5]);\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15587,10 +15601,10 @@
                 "#stackTrace"
             ],
             "updatePoint": {
-                "line": 206,
+                "line": 215,
                 "column": 45
             },
-            "line": 206,
+            "line": 215,
             "code": "    it('should return the correct stackframes', async () => {\n      const reply = await debugSession.sendRequest('stackTrace', {\n        threadId\n      });\n      expect(reply.success).toBe(true);\n      const stackFrames = reply.body.stackFrames;\n      expect(stackFrames.length).toEqual(1);\n      const frame = stackFrames[0];\n      // first breakpoint\n      expect(frame.line).toEqual(3);\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15603,10 +15617,10 @@
                 "#scopes"
             ],
             "updatePoint": {
-                "line": 220,
+                "line": 229,
                 "column": 40
             },
-            "line": 220,
+            "line": 229,
             "code": "    it('should return the correct scopes', async () => {\n      const stackFramesReply = await debugSession.sendRequest('stackTrace', {\n        threadId\n      });\n      const frameId = stackFramesReply.body.stackFrames[0].id;\n      const scopesReply = await debugSession.sendRequest('scopes', {\n        frameId\n      });\n      const scopes = scopesReply.body.scopes;\n      expect(scopes.length).toBeGreaterThanOrEqual(1);\n\n      const locals = scopes.find(scope => scope.name === 'Locals');\n      expect(locals).toBeTruthy();\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15619,10 +15633,10 @@
                 "#variables"
             ],
             "updatePoint": {
-                "line": 258,
+                "line": 267,
                 "column": 52
             },
-            "line": 258,
+            "line": 267,
             "code": "    it('should return the variables and their values', async () => {\n      const variables = await getVariables();\n      expect(variables.length).toBeGreaterThan(0);\n      const i = find(variables, variable => variable.name === 'i');\n      expect(i).toBeDefined();\n      expect(i!.type).toEqual('int');\n      expect(i!.value).toEqual('1');\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15634,7 +15648,7 @@
                 "protocol",
                 "#variablesPagination"
             ],
-            "line": 269,
+            "line": 278,
             "code": "    it.skip('should return the amount of variables requested', async () => {",
             "file": "session.spec.ts",
             "skipped": true,
@@ -15647,10 +15661,10 @@
                 "#continue"
             ],
             "updatePoint": {
-                "line": 279,
+                "line": 288,
                 "column": 45
             },
-            "line": 279,
+            "line": 288,
             "code": "    it('should proceed to the next breakpoint', async () => {\n      const [first, second] = signalToPromises(debugSession.eventMessage, 2);\n      await debugSession.sendRequest('continue', { threadId });\n\n      // wait for debug events\n      const [, continued] = await first;\n      expect(continued.event).toEqual('continued');\n      const [, stopped] = await second;\n      expect(stopped.event).toEqual('stopped');\n\n      const variables = await getVariables();\n      const i = find(variables, variable => variable.name === 'i');\n      expect(i).toBeDefined();\n      expect(i!.type).toEqual('int');\n      expect(i!.value).toEqual('2');\n\n      const j = find(variables, variable => variable.name === 'j');\n      expect(j).toBeDefined();\n      expect(j!.type).toEqual('int');\n      expect(j!.value).toEqual('4');\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15663,10 +15677,10 @@
                 "#source"
             ],
             "updatePoint": {
-                "line": 303,
+                "line": 312,
                 "column": 58
             },
-            "line": 303,
+            "line": 312,
             "code": "    it('should retrieve the source of the dumped code cell', async () => {\n      const stackFramesReply = await debugSession.sendRequest('stackTrace', {\n        threadId\n      });\n      const frame = stackFramesReply.body.stackFrames[0];\n      const source = frame.source;\n      const reply = await debugSession.sendRequest('source', {\n        source: { path: source!.path! },\n        sourceReference: source!.sourceReference!\n      });\n      const sourceCode = reply.body.content;\n      expect(sourceCode).toEqual(code);\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15679,10 +15693,10 @@
                 "#evaluate"
             ],
             "updatePoint": {
-                "line": 319,
+                "line": 328,
                 "column": 51
             },
-            "line": 319,
+            "line": 328,
             "code": "    it('should evaluate the code sent to the kernel', async () => {\n      const stackFramesReply = await debugSession.sendRequest('stackTrace', {\n        threadId\n      });\n      const frameId = stackFramesReply.body.stackFrames[0].id;\n      const reply = await debugSession.sendRequest('evaluate', {\n        frameId,\n        context: 'repl',\n        expression: 'k = 123',\n        format: {}\n      });\n      expect(reply.success).toBe(true);\n\n      const variables = await getVariables();\n      const k = find(variables, variable => variable.name === 'k');\n      expect(k).toBeDefined();\n      expect(k!.type).toEqual('int');\n      expect(k!.value).toEqual('123');\n    });",
             "file": "session.spec.ts",
             "skipped": false,
@@ -15695,10 +15709,10 @@
                 "#setBreakpoints with condition"
             ],
             "updatePoint": {
-                "line": 341,
+                "line": 350,
                 "column": 48
             },
-            "line": 341,
+            "line": 350,
             "code": "    it('should be hit when the condition is true', async () => {\n      const reply = await debugSession.sendRequest('dumpCell', {\n        code\n      });\n      await debugSession.sendRequest('setBreakpoints', {\n        breakpoints: [{ line: 9, condition: 'i == 5' }],\n        source: { path: reply.body.sourcePath },\n        sourceModified: false\n      });\n      await debugSession.sendRequest('configurationDone', {});\n\n      // advance to the conditional breakpoint\n      await debugSession.sendRequest('continue', { threadId });\n\n      const variables = await getVariables();\n      const j = find(variables, variable => variable.name === 'j');\n      expect(j).toBeDefined();\n      expect(j!.value).toEqual('25');\n    });",
             "file": "session.spec.ts",
             "skipped": false,
