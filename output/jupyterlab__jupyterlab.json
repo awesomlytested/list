@@ -1164,12 +1164,26 @@
             "name": "Open completer on notebook",
             "suites": [],
             "updatePoint": {
-                "line": 14,
+                "line": 15,
                 "column": 36,
-                "index": 449
+                "index": 487
             },
-            "line": 14,
-            "code": "    test('Open completer on notebook', async ({\n      page\n    }) => {\n      await page.notebook.setCell(0, 'code', 'option_1 = 1\\n' + 'option_2 = lambda x: x\\n' + 'option_3 = int');\n      await page.notebook.runCell(0, true);\n      await page.notebook.addCell('code', 'option');\n      await page.notebook.enterCellEditingMode(1);\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'completer.png';\n      // TODO: on first trigger types are not properly displayed, reference image will need updating\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
+            "line": 15,
+            "code": "    test('Open completer on notebook', async ({\n      page\n    }) => {\n      await page.notebook.setCell(0, 'code', 'option_1 = 1\\n' + 'option_2 = lambda x: x\\n' + 'option_3 = int');\n      await page.notebook.runCell(0, true);\n      await page.notebook.addCell('code', 'option');\n      await page.notebook.enterCellEditingMode(1);\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'completer.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
+            "file": "jupyterlab/completer.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Show documentation panel",
+            "suites": [],
+            "updatePoint": {
+                "line": 37,
+                "column": 34,
+                "index": 1438
+            },
+            "line": 37,
+            "code": "    test('Show documentation panel', async ({\n      page,\n      tmpPath\n    }) => {\n      const scriptName = 'completer_panel.py';\n      await page.contents.uploadFile(path.resolve(__dirname, `./notebooks/${scriptName}`), `${tmpPath}/${scriptName}`);\n      await galata.Mock.mockSettings(page, [], {\n        ...galata.DEFAULT_SETTINGS,\n        '@jupyterlab/completer-extension:tracker': {\n          showDocumentationPanel: true\n        }\n      });\n      await page.notebook.save();\n      await page.goto();\n      await page.notebook.openByPath(fileName);\n      await page.notebook.setCell(0, 'code', 'from completer_panel import option_1, option_2');\n      await page.notebook.runCell(0, true);\n      await page.notebook.addCell('code', 'option');\n      await page.notebook.enterCellEditingMode(1);\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.waitForSelector('.jp-Completer-loading-bar');\n      await page.waitForSelector('.jp-Completer-loading-bar', {\n        state: 'detached'\n      });\n      const imageName = 'completer-with-doc-panel.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -1178,11 +1192,11 @@
             "name": "Token completions show up without running the cell when in the same cell",
             "suites": [],
             "updatePoint": {
-                "line": 37,
+                "line": 75,
                 "column": 82,
-                "index": 1549
+                "index": 3085
             },
-            "line": 37,
+            "line": 75,
             "code": "    test('Token completions show up without running the cell when in the same cell', async ({\n      page\n    }) => {\n      await page.notebook.setCell(0, 'code', 'option_1 = 1\\n' + 'option_2 = lambda x: x\\n' + 'option_3 = int\\n' + 'option');\n      await page.notebook.enterCellEditingMode(0);\n      // move to the end of cell\n      await page.keyboard.press('PageDown');\n      await page.keyboard.press('End');\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'token-completer.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -1192,11 +1206,11 @@
             "name": "Filter notebook completer suggestions by typing",
             "suites": [],
             "updatePoint": {
-                "line": 60,
+                "line": 98,
                 "column": 57,
-                "index": 2563
+                "index": 4099
             },
-            "line": 60,
+            "line": 98,
             "code": "    test('Filter notebook completer suggestions by typing', async ({\n      page\n    }) => {\n      // test against https://github.com/jupyterlab/jupyterlab/issues/11377\n\n      // `getopt` did not change much in many years, it should be stable\n      await page.notebook.setCell(0, 'code', 'import getopt');\n      await page.notebook.runCell(0, true);\n      await page.notebook.addCell('code', 'getopt.');\n      await page.notebook.enterCellEditingMode(1);\n\n      // we need to wait until the completer gets bound to the cell after entering it\n      await page.waitForTimeout(50);\n      await page.keyboard.press('Tab');\n      let completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.press('Escape');\n      await page.waitForTimeout(50);\n      await expect(completer).toBeHidden();\n      await page.keyboard.press('Tab');\n      completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.type('g', {\n        delay: 50\n      });\n      const imageName = 'completer-filter.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -1206,12 +1220,12 @@
             "name": "Open completer on console",
             "suites": [],
             "updatePoint": {
-                "line": 102,
+                "line": 140,
                 "column": 35,
-                "index": 4241
+                "index": 5777
             },
-            "line": 102,
-            "code": "    test('Open completer on console', async ({\n      page\n    }) => {\n      const completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'completer-console.png';\n      // TODO: on first trigger types are not properly displayed, reference image will need updating\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
+            "line": 140,
+            "code": "    test('Open completer on console', async ({\n      page\n    }) => {\n      const completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      const imageName = 'completer-console.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -1220,11 +1234,11 @@
             "name": "Filter console completer suggestions by typing",
             "suites": [],
             "updatePoint": {
-                "line": 111,
+                "line": 148,
                 "column": 56,
-                "index": 4652
+                "index": 6087
             },
-            "line": 111,
+            "line": 148,
             "code": "    test('Filter console completer suggestions by typing', async ({\n      page\n    }) => {\n      const completer = page.locator(COMPLETER_SELECTOR);\n      await completer.waitFor();\n      await page.keyboard.type('g', {\n        delay: 10\n      });\n      const imageName = 'completer-console-filter.png';\n      expect(await completer.screenshot()).toMatchSnapshot(imageName);\n    });",
             "file": "jupyterlab/completer.test.ts",
             "skipped": false,
@@ -11349,7 +11363,7 @@
                 "column": 55
             },
             "line": 47,
-            "code": "      it('should not signal when items have not changed', () => {\n        let model = new CompleterModel();\n        let called = 0;\n        let listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.setCompletionItems([{ label: 'foo' }]);\n        model.setCompletionItems([{ label: 'foo' }]);\n        expect(called).toBe(1);\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        expect(called).toBe(2);\n        model.setCompletionItems([]);\n        model.setCompletionItems([]);\n        expect(called).toBe(3);\n      });",
+            "code": "      it('should not signal when items have not changed', () => {\n        let model = new CompleterModel();\n        let called = 0;\n        let listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.setCompletionItems([{ label: 'foo' }]);\n        model.setCompletionItems([{ label: 'foo' }]);\n        expect(called).toBe(1);\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        expect(called).toBe(2);\n        model.setCompletionItems([]);\n        model.setCompletionItems([]);\n        expect(called).toBe(3);\n        const itemsWithResolve = [\n          {\n            label: 'foo',\n            resolve: async () => {\n              return { label: 'foo', documentation: 'Foo docs' };\n            }\n          }\n        ];\n        model.setCompletionItems(itemsWithResolve);\n        model.setCompletionItems(itemsWithResolve);\n        expect(called).toBe(4);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11362,10 +11376,10 @@
                 "#stateChanged"
             ],
             "updatePoint": {
-                "line": 66,
+                "line": 77,
                 "column": 53
             },
-            "line": 66,
+            "line": 77,
             "code": "      it('should signal when original request changes', () => {\n        const model = new CompleterModel();\n        let called = 0;\n        const listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.original = makeState('foo');\n        expect(called).toBe(1);\n        model.original = null;\n        expect(called).toBe(2);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11379,10 +11393,10 @@
                 "#stateChanged"
             ],
             "updatePoint": {
-                "line": 80,
+                "line": 91,
                 "column": 65
             },
-            "line": 80,
+            "line": 91,
             "code": "      it('should not signal when original request has not changed', () => {\n        const model = new CompleterModel();\n        let called = 0;\n        const listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.original = makeState('foo');\n        model.original = makeState('foo');\n        expect(called).toBe(1);\n        model.original = null;\n        model.original = null;\n        expect(called).toBe(2);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11396,10 +11410,10 @@
                 "#stateChanged"
             ],
             "updatePoint": {
-                "line": 96,
+                "line": 107,
                 "column": 49
             },
-            "line": 96,
+            "line": 107,
             "code": "      it('should signal when current text changes', () => {\n        const model = new CompleterModel();\n        let called = 0;\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        const listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.original = request;\n        expect(called).toBe(1);\n        model.cursor = cursor;\n        model.current = change;\n        expect(called).toBe(2);\n        model.current = null;\n        expect(called).toBe(3);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11413,11 +11427,79 @@
                 "#stateChanged"
             ],
             "updatePoint": {
-                "line": 118,
+                "line": 129,
                 "column": 58
             },
-            "line": 118,
+            "line": 129,
             "code": "      it('should not signal when current text is unchanged', () => {\n        const model = new CompleterModel();\n        let called = 0;\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        const listener = (sender: any, args: void) => {\n          called++;\n        };\n        model.stateChanged.connect(listener);\n        expect(called).toBe(0);\n        model.original = request;\n        expect(called).toBe(1);\n        model.cursor = cursor;\n        model.current = change;\n        model.current = change;\n        expect(called).toBe(2);\n        model.current = null;\n        model.current = null;\n        expect(called).toBe(3);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should signal when query is set via public setter",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#queryChanged"
+            ],
+            "updatePoint": {
+                "line": 155,
+                "column": 59
+            },
+            "line": 155,
+            "code": "      it('should signal when query is set via public setter', () => {\n        const model = new CompleterModel();\n        let called: Record<'setter' | 'editorUpdate' | 'reset', number> = {\n          setter: 0,\n          editorUpdate: 0,\n          reset: 0\n        };\n        const listener = (sender: any, args: Completer.IQueryChange) => {\n          called[args.origin]++;\n        };\n        model.queryChanged.connect(listener);\n        expect(called.setter).toBe(0);\n        model.query = 'foo';\n        expect(called.setter).toBe(1);\n        model.query = 'bar';\n        expect(called.setter).toBe(2);\n        expect(called.editorUpdate).toBe(0);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should signal when query gets reset",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#queryChanged"
+            ],
+            "updatePoint": {
+                "line": 174,
+                "column": 45
+            },
+            "line": 174,
+            "code": "      it('should signal when query gets reset', () => {\n        const model = new CompleterModel();\n        let called: Record<'setter' | 'editorUpdate' | 'reset', number> = {\n          setter: 0,\n          editorUpdate: 0,\n          reset: 0\n        };\n        const listener = (sender: any, args: Completer.IQueryChange) => {\n          called[args.origin]++;\n        };\n        model.queryChanged.connect(listener);\n        expect(called.reset).toBe(0);\n        model.query = 'foo';\n        expect(called.reset).toBe(0);\n        model.reset();\n        expect(called.reset).toBe(1);\n        // Should not call again (query does not change with second reset)\n        model.reset();\n        expect(called.reset).toBe(1);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should signal when current text changes",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#queryChanged"
+            ],
+            "updatePoint": {
+                "line": 195,
+                "column": 49
+            },
+            "line": 195,
+            "code": "      it('should signal when current text changes', () => {\n        const model = new CompleterModel();\n        let called: Record<'setter' | 'editorUpdate' | 'reset', number> = {\n          setter: 0,\n          editorUpdate: 0,\n          reset: 0\n        };\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        const listener = (sender: any, args: Completer.IQueryChange) => {\n          called[args.origin]++;\n        };\n        model.queryChanged.connect(listener);\n        expect(called.editorUpdate).toBe(0);\n        model.original = request;\n        model.cursor = cursor;\n        model.current = change;\n        expect(called.editorUpdate).toBe(1);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should not signal when current text is unchanged",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#queryChanged"
+            ],
+            "updatePoint": {
+                "line": 218,
+                "column": 58
+            },
+            "line": 218,
+            "code": "      it('should not signal when current text is unchanged', () => {\n        const model = new CompleterModel();\n        let called: Record<'setter' | 'editorUpdate' | 'reset', number> = {\n          setter: 0,\n          editorUpdate: 0,\n          reset: 0\n        };\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        const listener = (sender: any, args: Completer.IQueryChange) => {\n          called[args.origin]++;\n        };\n        model.queryChanged.connect(listener);\n        expect(called.editorUpdate).toBe(0);\n        model.original = request;\n        model.cursor = cursor;\n        model.current = change;\n        model.current = change;\n        expect(called.editorUpdate).toBe(1);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11430,10 +11512,10 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 144,
+                "line": 244,
                 "column": 41
             },
-            "line": 144,
+            "line": 244,
             "code": "      it('should default to { items: [] }', () => {\n        let model = new CompleterModel();\n        let want: CompletionHandler.ICompletionItems = [];\n        expect(model.completionItems()).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11447,10 +11529,10 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 150,
+                "line": 250,
                 "column": 67
             },
-            "line": 150,
+            "line": 250,
             "code": "      it('should return unmarked ICompletionItems if query is blank', () => {\n        let model = new CompleterModel();\n        let want: CompletionHandler.ICompletionItems = [\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' }\n        ];\n        model.setCompletionItems([\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' }\n        ]);\n        expect(model.completionItems()).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11464,10 +11546,10 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 165,
+                "line": 265,
                 "column": 62
             },
-            "line": 165,
+            "line": 265,
             "code": "      it('should return a marked list of items if query is set', () => {\n        let model = new CompleterModel();\n        let want = '<mark>f</mark>oo';\n        model.setCompletionItems([\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' }\n        ]);\n        model.query = 'f';\n        expect(model.completionItems().length).toEqual(1);\n        expect(model.completionItems()[0].label).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11481,10 +11563,10 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 178,
+                "line": 278,
                 "column": 42
             },
-            "line": 178,
+            "line": 278,
             "code": "      it('should order list based on score', () => {\n        const model = new CompleterModel();\n        const want: CompletionHandler.ICompletionItems = [\n          { insertText: 'qux', label: '<mark>qux</mark>' },\n          { insertText: 'quux', label: '<mark>qu</mark>u<mark>x</mark>' }\n        ];\n        model.setCompletionItems([\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' },\n          { label: 'quux' },\n          { label: 'qux' }\n        ]);\n        model.query = 'qux';\n        expect(model.completionItems()).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11498,10 +11580,10 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 195,
+                "line": 295,
                 "column": 51
             },
-            "line": 195,
+            "line": 295,
             "code": "      it('should break ties in score by locale sort', () => {\n        const model = new CompleterModel();\n        const want: CompletionHandler.ICompletionItems = [\n          { insertText: 'quux', label: '<mark>qu</mark>ux' },\n          { insertText: 'qux', label: '<mark>qu</mark>x' }\n        ];\n        model.setCompletionItems([\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' },\n          { label: 'quux' },\n          { label: 'qux' }\n        ]);\n        model.query = 'qu';\n        expect(model.completionItems()).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11515,11 +11597,45 @@
                 "#completionItems()"
             ],
             "updatePoint": {
-                "line": 212,
+                "line": 312,
                 "column": 46
             },
-            "line": 212,
+            "line": 312,
             "code": "      it('should return { items: [] } if reset', () => {\n        let model = new CompleterModel();\n        let want: CompletionHandler.ICompletionItems = [];\n        model.setCompletionItems([\n          { label: 'foo' },\n          { label: 'bar' },\n          { label: 'baz' }\n        ]);\n        model.reset();\n        expect(model.completionItems()).toEqual(want);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should escape HTML markup",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#completionItems()"
+            ],
+            "updatePoint": {
+                "line": 324,
+                "column": 35
+            },
+            "line": 324,
+            "code": "      it('should escape HTML markup', () => {\n        let model = new CompleterModel();\n        let want: CompletionHandler.ICompletionItems = [\n          {\n            label: '&lt;foo&gt;&lt;/foo&gt;',\n            insertText: '<foo></foo>'\n          }\n        ];\n        model.setCompletionItems([{ label: '<foo></foo>' }]);\n        expect(model.completionItems()).toEqual(want);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should escape HTML with matches markup",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#completionItems()"
+            ],
+            "updatePoint": {
+                "line": 336,
+                "column": 48
+            },
+            "line": 336,
+            "code": "      it('should escape HTML with matches markup', () => {\n        let model = new CompleterModel();\n        let want: CompletionHandler.ICompletionItems = [\n          {\n            label: '&lt;foo&gt;<mark>smi</mark>le&lt;/foo&gt;',\n            insertText: '<foo>smile</foo>'\n          }\n        ];\n        model.setCompletionItems([{ label: '<foo>smile</foo>' }]);\n        model.query = 'smi';\n        expect(model.completionItems()).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
@@ -11532,10 +11648,10 @@
                 "#original"
             ],
             "updatePoint": {
-                "line": 226,
+                "line": 351,
                 "column": 32
             },
-            "line": 226,
+            "line": 351,
             "code": "      it('should default to null', () => {\n        const model = new CompleterModel();\n        expect(model.original).toBeNull();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11549,10 +11665,10 @@
                 "#original"
             ],
             "updatePoint": {
-                "line": 231,
+                "line": 356,
                 "column": 44
             },
-            "line": 231,
+            "line": 356,
             "code": "      it('should return the original request', () => {\n        const model = new CompleterModel();\n        const request = makeState('foo');\n        model.original = request;\n        expect(model.original).toBe(request);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11566,10 +11682,10 @@
                 "#current"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 365,
                 "column": 32
             },
-            "line": 240,
+            "line": 365,
             "code": "      it('should default to null', () => {\n        const model = new CompleterModel();\n        expect(model.current).toBeNull();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11583,10 +11699,10 @@
                 "#current"
             ],
             "updatePoint": {
-                "line": 245,
+                "line": 370,
                 "column": 53
             },
-            "line": 245,
+            "line": 370,
             "code": "      it('should initially equal the original request', () => {\n        const model = new CompleterModel();\n        const request = makeState('foo');\n        model.original = request;\n        expect(model.current).toBe(request);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11600,10 +11716,10 @@
                 "#current"
             ],
             "updatePoint": {
-                "line": 252,
+                "line": 377,
                 "column": 59
             },
-            "line": 252,
+            "line": 377,
             "code": "      it('should not set if original request is nonexistent', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        model.current = change;\n        expect(model.current).toBeNull();\n        model.original = request;\n        model.cursor = cursor;\n        model.current = change;\n        expect(model.current).toBe(change);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11617,10 +11733,10 @@
                 "#current"
             ],
             "updatePoint": {
-                "line": 267,
+                "line": 392,
                 "column": 49
             },
-            "line": 267,
+            "line": 392,
             "code": "      it('should not set if cursor is nonexistent', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        model.original = request;\n        model.cursor = null;\n        model.current = change;\n        expect(model.current).not.toBe(change);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11634,10 +11750,10 @@
                 "#current"
             ],
             "updatePoint": {
-                "line": 279,
+                "line": 404,
                 "column": 63
             },
-            "line": 279,
+            "line": 404,
             "code": "      it('should reset model if change is shorter than original', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo';\n        const newValue = 'fo';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        model.original = request;\n        model.cursor = cursor;\n        model.current = change;\n        expect(model.current).toBeNull();\n        expect(model.original).toBeNull();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11651,10 +11767,10 @@
                 "#cursor"
             ],
             "updatePoint": {
-                "line": 295,
+                "line": 420,
                 "column": 32
             },
-            "line": 295,
+            "line": 420,
             "code": "      it('should default to null', () => {\n        const model = new CompleterModel();\n        expect(model.cursor).toBeNull();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11668,10 +11784,10 @@
                 "#cursor"
             ],
             "updatePoint": {
-                "line": 300,
+                "line": 425,
                 "column": 59
             },
-            "line": 300,
+            "line": 425,
             "code": "      it('should not set if original request is nonexistent', () => {\n        const model = new CompleterModel();\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState('foo');\n        model.cursor = cursor;\n        expect(model.cursor).toBeNull();\n        model.original = request;\n        model.cursor = cursor;\n        expect(model.cursor).toBe(cursor);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11685,10 +11801,10 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 313,
+                "line": 438,
                 "column": 51
             },
-            "line": 313,
+            "line": 438,
             "code": "      it('should be true if model has been disposed', () => {\n        const model = new CompleterModel();\n        expect(model.isDisposed).toBe(false);\n        model.dispose();\n        expect(model.isDisposed).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11702,10 +11818,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 322,
+                "line": 447,
                 "column": 47
             },
-            "line": 322,
+            "line": 447,
             "code": "      it('should dispose of the model resources', () => {\n        const model = new CompleterModel();\n        model.setCompletionItems([{ label: 'foo' }]);\n        expect(model.isDisposed).toBe(false);\n        model.dispose();\n        expect(model.isDisposed).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11719,10 +11835,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 330,
+                "line": 455,
                 "column": 47
             },
-            "line": 330,
+            "line": 455,
             "code": "      it('should be safe to call multiple times', () => {\n        const model = new CompleterModel();\n        expect(model.isDisposed).toBe(false);\n        model.dispose();\n        model.dispose();\n        expect(model.isDisposed).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11736,10 +11852,10 @@
                 "#handleTextChange()"
             ],
             "updatePoint": {
-                "line": 340,
+                "line": 465,
                 "column": 41
             },
-            "line": 340,
+            "line": 465,
             "code": "      it('should set current change value', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo';\n        const newValue = 'foob';\n        const cursor: Completer.ICursorSpan = { start: 0, end: 0 };\n        const request = makeState(currentValue);\n        const change = makeState(newValue);\n        (change as any).column = 4;\n        model.original = request;\n        model.cursor = cursor;\n        expect(model.current).toBe(request);\n        model.handleTextChange(change);\n        expect(model.current).toBe(change);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11753,10 +11869,10 @@
                 "#handleTextChange()"
             ],
             "updatePoint": {
-                "line": 355,
+                "line": 480,
                 "column": 70
             },
-            "line": 355,
+            "line": 480,
             "code": "      it('should reset if last char is whitespace && column < original', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo';\n        const newValue = 'foo ';\n        const request = makeState(currentValue);\n        (request as any).column = 3;\n        const change = makeState(newValue);\n        (change as any).column = 0;\n        model.original = request;\n        expect(model.original).toBe(request);\n        model.handleTextChange(change);\n        expect(model.original).toBeNull();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11770,10 +11886,10 @@
                 "#createPatch()"
             ],
             "updatePoint": {
-                "line": 371,
+                "line": 496,
                 "column": 37
             },
-            "line": 371,
+            "line": 496,
             "code": "      it('should return a patch value', () => {\n        const model = new CompleterModel();\n        const patch = 'foobar';\n        const want: Completer.IPatch = {\n          start: 0,\n          end: 3,\n          value: patch\n        };\n        const cursor: Completer.ICursorSpan = { start: 0, end: 3 };\n        model.original = makeState('foo');\n        model.cursor = cursor;\n        expect(model.createPatch(patch)).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11787,10 +11903,10 @@
                 "#createPatch()"
             ],
             "updatePoint": {
-                "line": 385,
+                "line": 510,
                 "column": 72
             },
-            "line": 385,
+            "line": 510,
             "code": "      it('should return undefined if original request or cursor are null', () => {\n        const model = new CompleterModel();\n        expect(model.createPatch('foo')).toBeUndefined();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11804,10 +11920,10 @@
                 "#createPatch()"
             ],
             "updatePoint": {
-                "line": 390,
+                "line": 515,
                 "column": 53
             },
-            "line": 390,
+            "line": 515,
             "code": "      it('should handle line breaks in original value', () => {\n        const model = new CompleterModel();\n        const currentValue = 'foo\\nbar';\n        const patch = 'barbaz';\n        const start = currentValue.length;\n        const end = currentValue.length;\n        const want: Completer.IPatch = {\n          start,\n          end,\n          value: patch\n        };\n        const cursor: Completer.ICursorSpan = { start, end };\n        model.original = makeState(currentValue);\n        model.cursor = cursor;\n        expect(model.createPatch(patch)).toEqual(want);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11821,10 +11937,10 @@
                 "#resolveItem()"
             ],
             "updatePoint": {
-                "line": 408,
+                "line": 533,
                 "column": 73
             },
-            "line": 408,
+            "line": 533,
             "code": "      it('should return `undefined` if the completion item list is empty.', () => {\n        const model = new CompleterModel();\n        expect(model.resolveItem(0)).toBeUndefined();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11838,10 +11954,10 @@
                 "#resolveItem()"
             ],
             "updatePoint": {
-                "line": 413,
+                "line": 538,
                 "column": 64
             },
-            "line": 413,
+            "line": 538,
             "code": "      it('should return undefined if item index is out of range.', () => {\n        const model = new CompleterModel();\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        expect(model.resolveItem(3)).toBeUndefined();\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11855,10 +11971,10 @@
                 "#resolveItem()"
             ],
             "updatePoint": {
-                "line": 418,
+                "line": 543,
                 "column": 66
             },
-            "line": 418,
+            "line": 543,
             "code": "      it('should return the original item if `resolve` is missing.', async () => {\n        const model = new CompleterModel();\n        model.setCompletionItems([{ label: 'foo' }, { label: 'bar' }]);\n        const resolved = await model.resolveItem(0);\n        expect(resolved).toEqual({ label: 'foo' });\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -11872,11 +11988,28 @@
                 "#resolveItem()"
             ],
             "updatePoint": {
-                "line": 424,
+                "line": 549,
                 "column": 80
             },
-            "line": 424,
+            "line": 549,
             "code": "      it('should resolve missing fields and remove the `resolve` function itself', async () => {\n        const model = new CompleterModel();\n        const item = {\n          label: 'foo',\n          resolve: () =>\n            Promise.resolve({ label: 'foo', documentation: 'Foo docs' })\n        };\n        model.setCompletionItems([item]);\n        const resolved = await model.resolveItem(0);\n        expect(resolved).toEqual({ label: 'foo', documentation: 'Foo docs' });\n        expect(item).toEqual({\n          label: 'foo',\n          documentation: 'Foo docs',\n          resolve: undefined\n        });\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should escape HTML markup",
+            "suites": [
+                "completer/model",
+                "CompleterModel",
+                "#resolveItem()"
+            ],
+            "updatePoint": {
+                "line": 565,
+                "column": 35
+            },
+            "line": 565,
+            "code": "      it('should escape HTML markup', async () => {\n        let model = new CompleterModel();\n        const item = {\n          label: '<foo></foo>',\n          resolve: () =>\n            Promise.resolve({ label: '<foo></foo>', documentation: 'Foo docs' })\n        };\n        model.setCompletionItems([item]);\n        const resolved = await model.resolveItem(0);\n        expect(resolved).toEqual({\n          label: '&lt;foo&gt;&lt;/foo&gt;',\n          insertText: '<foo></foo>',\n          documentation: 'Foo docs',\n          resolve: undefined\n        });\n      });",
             "file": "model.spec.ts",
             "skipped": false,
             "dir": "packages/completer/test"
