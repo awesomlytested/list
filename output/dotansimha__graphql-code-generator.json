@@ -5000,16 +5000,33 @@
             "dir": "packages/plugins/typescript/operations/tests"
         },
         {
+            "name": "#8793 selecting __typename should not be optional",
+            "suites": [
+                "TypeScript Operations Plugin",
+                "Issues",
+                "#6149 - operation fragment merging behavior"
+            ],
+            "updatePoint": {
+                "line": 5949,
+                "column": 57
+            },
+            "line": 5949,
+            "code": "    it('#8793 selecting __typename should not be optional', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        interface Animal {\n          name: String!\n        }\n        type Bat implements Animal {\n          name: String!\n          features: BatFeatures!\n        }\n        type BatFeatures {\n          color: String!\n          wingspan: Int!\n        }\n        type Snake implements Animal {\n          name: String!\n          features: SnakeFeatures!\n        }\n        type SnakeFeatures {\n          color: String!\n          length: Int!\n        }\n        type Error {\n          message: String!\n        }\n        union SnakeResult = Snake | Error\n        type Query {\n          snake: SnakeResult!\n        }\n      `);\n\n      const query = parse(/* GraphQL */ `\n        query SnakeQuery {\n          __typename\n          snake {\n            __typename\n          }\n        }\n      `);\n\n      const config = { preResolveTypes: true };\n\n      const { content } = await plugin(testSchema, [{ location: '', document: query }], config, {\n        outputFile: 'graphql.ts',\n      });\n\n      expect(content).toMatchSnapshot();\n    });",
+            "file": "ts-documents.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/operations/tests"
+        },
+        {
             "name": "fields with @skip, @include should pre resolve into optional",
             "suites": [
                 "TypeScript Operations Plugin",
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 5951,
+                "line": 5999,
                 "column": 68
             },
-            "line": 5951,
+            "line": 5999,
             "code": "    it('fields with @skip, @include should pre resolve into optional', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User!\n        }\n\n        type User {\n          name: String!\n          address: String!\n          nicknames: [String!]\n          parents: [User!]!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($showAddress: Boolean!) {\n          user {\n            name\n            address @include(if: $showAddress)\n            nicknames @include(if: $showNicknames)\n            parents @include(if: $showParents)\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        {\n          preResolveTypes: true,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n      export type UserQueryVariables = Exact<{\n        showAddress: Scalars['Boolean'];\n      }>;\n\n      export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', name: string, address?: string, nicknames?: Array<string> | null, parents?: Array<User> } };`);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5022,10 +5039,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 5995,
+                "line": 6043,
                 "column": 69
             },
-            "line": 5995,
+            "line": 6043,
             "code": "    it('objects with @skip, @include should pre resolve into optional', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User!\n        }\n\n        type User {\n          id: String!\n          name: String!\n          address: Address!\n          friends: [User!]!\n          moreFriends: [User!]!\n        }\n\n        type Address {\n          city: String!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($showAddress: Boolean!, $showName: Boolean!) {\n          user {\n            id\n            name @include(if: $showName)\n            address @include(if: $showAddress) {\n              city\n            }\n            friends @include(if: $isFriendly) {\n              id\n            }\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        {\n          preResolveTypes: true,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n      export type UserQueryVariables = Exact<{\n        showAddress: Scalars['Boolean'];\n        showName: Scalars['Boolean'];\n      }>;\n      export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, name?: string, address?: { __typename?: 'Address', city: string }, friends?: Array<{ __typename?: 'User', id: string }> } };`);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5038,10 +5055,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6048,
+                "line": 6096,
                 "column": 88
             },
-            "line": 6048,
+            "line": 6096,
             "code": "    it('fields with @skip, @include should make container resolve into MakeOptional type', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User!\n        }\n        type User {\n          id: String!\n          name: String!\n          address: Address!\n          friends: [User!]!\n        }\n        type Address {\n          city: String!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($showAddress: Boolean!, $showName: Boolean!) {\n          user {\n            id\n            name @include(if: $showName)\n            address @include(if: $showAddress) {\n              city\n            }\n            friends @include(if: $isFriendly) {\n              id\n            }\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        { preResolveTypes: false },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n      export type UserQueryVariables = Exact<{\n        showAddress: Scalars['Boolean'];\n        showName: Scalars['Boolean'];\n      }>;\n\n      export type UserQuery = (\n        { __typename?: 'Query' }\n        & { user: (\n          { __typename?: 'User' }\n          & MakeOptional<Pick<User, 'id' | 'name'>, 'name'>\n          & { address?: (\n            { __typename?: 'Address' }\n            & Pick<Address, 'city'>\n          ), friends?: Array<(\n            { __typename?: 'User' }\n            & Pick<User, 'id'>\n          )> }\n        ) }\n      );`);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5054,10 +5071,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6110,
+                "line": 6158,
                 "column": 109
             },
-            "line": 6110,
+            "line": 6158,
             "code": "    it('On avoidOptionals:true, fields with @skip, @include should make container resolve into MakeMaybe type', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user(id: ID!): User!\n        }\n\n        type User {\n          id: ID!\n          username: String!\n          email: String!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user {\n          user(id: 1) {\n            id\n            username\n            email @skip(if: true)\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        {\n          avoidOptionals: true,\n          preResolveTypes: false,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n        export type UserQueryVariables = Exact<{ [key: string]: never; }>;\n\n        export type UserQuery = (\n          { __typename?: 'Query' }\n          & { user: (\n            { __typename?: 'User' }\n            & MakeMaybe<Pick<User, 'id' | 'username' | 'email'>, 'email'>\n          ) }\n        );\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5070,10 +5087,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6158,
+                "line": 6206,
                 "column": 69
             },
-            "line": 6158,
+            "line": 6206,
             "code": "    it('Should handle \"preResolveTypes\" and \"avoidOptionals\" together', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user(id: ID!): User!\n        }\n\n        type User {\n          id: ID!\n          username: String!\n          email: String\n        }\n      `);\n      const operations = parse(/* GraphQL */ `\n        query user {\n          user(id: 1) {\n            id\n            username\n            email\n          }\n        }\n      `);\n      const config = { avoidOptionals: true, preResolveTypes: true };\n      const { content } = await plugin(schema, [{ location: '', document: operations }], config, {\n        outputFile: 'graphql.ts',\n      });\n\n      expect(content).toBeSimilarStringTo(\n        `export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, username: string, email: string | null } }`\n      );\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5086,10 +5103,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6189,
+                "line": 6237,
                 "column": 72
             },
-            "line": 6189,
+            "line": 6237,
             "code": "    it('On avoidOptionals:true, optionals (?) on types should be avoided', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          me: User!\n        }\n\n        type User {\n          messages: [Message!]!\n        }\n\n        type Message {\n          content: String!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query MyQuery($include: Boolean!) {\n          me {\n            messages @include(if: $include) {\n              content\n            }\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        {\n          avoidOptionals: true,\n          nonOptionalTypename: true,\n          preResolveTypes: false,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n        export type MyQueryQuery = (\n          { __typename: 'Query' }\n          & { me: (\n            { __typename: 'User' }\n            & { messages?: Array<(\n              { __typename: 'Message' }\n              & Pick<Message, 'content'>\n            )> }\n          ) }\n        );\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5102,10 +5119,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6241,
+                "line": 6289,
                 "column": 70
             },
-            "line": 6241,
+            "line": 6289,
             "code": "    it('inline fragment with conditional directives and avoidOptionals', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User\n          group: Group!\n        }\n\n        type User {\n          name: String\n        }\n\n        type Group {\n          id: Int!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($withUser: Boolean! = false) {\n          ... @include(if: $withUser) {\n            user {\n              name\n            }\n            group {\n              id\n            }\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        { preResolveTypes: true, avoidOptionals: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n      export type UserQuery = {\n        __typename?: 'Query',\n        user?: {\n          __typename?: 'User',\n          name: string | null\n        } | null,\n        group?: {\n          __typename?: 'Group',\n          id: number\n        }\n      };`);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5118,10 +5135,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6293,
+                "line": 6341,
                 "column": 105
             },
-            "line": 6293,
+            "line": 6341,
             "code": "    it('resolve optionals according to maybeValue together with avoidOptionals and conditional directives', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User!\n        }\n\n        type User {\n          name: String!\n          age: Int\n          address: String!\n          nicknames: [String!]\n          parents: [User!]!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($showProperty: Boolean!) {\n          user {\n            name\n            age\n            address @include(if: $showProperty)\n            nicknames @include(if: $showProperty)\n            parents @include(if: $showProperty)\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        {\n          preResolveTypes: true,\n          maybeValue: \"T | 'specialType'\",\n          avoidOptionals: true,\n        },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n      expect(content).toBeSimilarStringTo(`\n      export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', name: string, age: number | 'specialType', address?: string, nicknames?: Array<string> | 'specialType', parents?: Array<User> } };\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5134,10 +5151,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6337,
+                "line": 6385,
                 "column": 95
             },
-            "line": 6337,
+            "line": 6385,
             "code": "    it('inline fragment with conditional directives and avoidOptionals, without preResolveTypes', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type Query {\n          user: User\n          group: Group!\n        }\n\n        type User {\n          name: String\n        }\n\n        type Group {\n          id: Int!\n        }\n      `);\n\n      const fragment = parse(/* GraphQL */ `\n        query user($withUser: Boolean! = false) {\n          ... @include(if: $withUser) {\n            user {\n              name\n            }\n            group {\n              id\n            }\n          }\n        }\n      `);\n\n      const { content } = await plugin(\n        schema,\n        [{ location: '', document: fragment }],\n        { preResolveTypes: false, avoidOptionals: true },\n        {\n          outputFile: 'graphql.ts',\n        }\n      );\n\n      expect(content).toBeSimilarStringTo(`\n      export type UserQuery = (\n        { __typename?: 'Query' }\n        & { user?: Maybe<(\n          { __typename?: 'User' }\n          & Pick<User, 'name'>\n        )>, group?: (\n          { __typename?: 'Group' }\n          & Pick<Group, 'id'>\n        ) }\n      );`);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5150,10 +5167,10 @@
                 "conditional directives handling"
             ],
             "updatePoint": {
-                "line": 6389,
+                "line": 6437,
                 "column": 29
             },
-            "line": 6389,
+            "line": 6437,
             "code": "  it('handles unnamed queries', async () => {\n    const ast = parse(/* GraphQL */ `\n      query {\n        notifications {\n          id\n        }\n      }\n    `);\n\n    const result = await plugin(\n      schema,\n      [{ location: 'test-file.ts', document: ast }],\n      { preResolveTypes: false },\n      { outputFile: '' }\n    );\n    expect(result.content).toBeSimilarStringTo(`\n      export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n      export type Unnamed_1_Query = (\n          { __typename?: 'Query' }\n        & { notifications: Array<(\n            { __typename?: 'TextNotification' }\n          & Pick<TextNotification, 'id'>\n        ) | (\n            { __typename?: 'ImageNotification' }\n          & Pick<ImageNotification, 'id'>\n        )> }\n      );\n    `);\n  });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5166,10 +5183,10 @@
                 "inlineFragmentTypes option"
             ],
             "updatePoint": {
-                "line": 6421,
+                "line": 6469,
                 "column": 38
             },
-            "line": 6421,
+            "line": 6469,
             "code": "    it(\"'combine' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'combine' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: (\n            { __typename?: 'User' }\n            & UserFragmentFragment\n          ) | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string };\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5182,10 +5199,10 @@
                 "inlineFragmentTypes option"
             ],
             "updatePoint": {
-                "line": 6451,
+                "line": 6499,
                 "column": 37
             },
-            "line": 6451,
+            "line": 6499,
             "code": "    it(\"'inline' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'inline' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: { __typename?: 'User', id: string } | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string };\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
@@ -5198,10 +5215,10 @@
                 "inlineFragmentTypes option"
             ],
             "updatePoint": {
-                "line": 6478,
+                "line": 6526,
                 "column": 35
             },
-            "line": 6478,
+            "line": 6526,
             "code": "    it(\"'mask' yields correct types\", async () => {\n      const ast = parse(/* GraphQL */ `\n        query {\n          me {\n            ...UserFragment\n          }\n        }\n        fragment UserFragment on User {\n          id\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [{ location: 'test-file.ts', document: ast }],\n        { inlineFragmentTypes: 'mask' },\n        { outputFile: '' }\n      );\n      expect(result.content).toBeSimilarStringTo(`\n        export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;\n\n\n        export type Unnamed_1_Query = { __typename?: 'Query', me?: (\n            { __typename?: 'User' }\n            & { ' $fragmentRefs'?: { 'UserFragmentFragment': UserFragmentFragment } }\n          ) | null };\n\n        export type UserFragmentFragment = { __typename?: 'User', id: string } & { ' $fragmentName'?: 'UserFragmentFragment' };\n      `);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
