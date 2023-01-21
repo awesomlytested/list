@@ -5475,16 +5475,32 @@
             "dir": "packages/api-graphql/__tests__"
         },
         {
+            "name": "sends cookies with request",
+            "suites": [
+                "API test",
+                "graphql test"
+            ],
+            "updatePoint": {
+                "line": 1319,
+                "column": 34
+            },
+            "line": 1319,
+            "code": "\t\ttest('sends cookies with request', async () => {\n\t\t\tconst spyonAuth = jest\n\t\t\t\t.spyOn(Credentials, 'get')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres('cred');\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst spyon = jest\n\t\t\t\t.spyOn(RestClient.prototype, 'post')\n\t\t\t\t.mockImplementationOnce((url, init) => {\n\t\t\t\t\treturn new Promise((res, rej) => {\n\t\t\t\t\t\tres({});\n\t\t\t\t\t});\n\t\t\t\t});\n\n\t\t\tconst api = new API(config);\n\t\t\tconst url = 'https://appsync.amazonaws.com',\n\t\t\t\tregion = 'us-east-2',\n\t\t\t\tapiKey = 'secret_api_key',\n\t\t\t\tvariables = { id: '809392da-ec91-4ef0-b219-5238a8f942b2' },\n\t\t\t\tuserAgentSuffix = '/DataStore';\n\t\t\tapi.configure({\n\t\t\t\taws_appsync_graphqlEndpoint: url,\n\t\t\t\taws_appsync_region: region,\n\t\t\t\taws_appsync_authenticationType: 'API_KEY',\n\t\t\t\taws_appsync_apiKey: apiKey,\n\t\t\t\twithCredentials: true,\n\t\t\t});\n\n\t\t\tconst headers = {\n\t\t\t\tAuthorization: null,\n\t\t\t\t'X-Api-Key': apiKey,\n\t\t\t\t'x-amz-user-agent': `${Constants.userAgent}${userAgentSuffix}`,\n\t\t\t};\n\n\t\t\tconst body = {\n\t\t\t\tquery: getEventQuery,\n\t\t\t\tvariables,\n\t\t\t};\n\n\t\t\tconst init = {\n\t\t\t\theaders,\n\t\t\t\tbody,\n\t\t\t\tsignerServiceInfo: {\n\t\t\t\t\tservice: 'appsync',\n\t\t\t\t\tregion,\n\t\t\t\t},\n\t\t\t\tcancellableToken: mockCancellableToken,\n\t\t\t\twithCredentials: true,\n\t\t\t};\n\t\t\tlet authToken: undefined;\n\n\t\t\tawait api.graphql(\n\t\t\t\tgraphqlOperation(GetEvent, variables, authToken, userAgentSuffix)\n\t\t\t);\n\n\t\t\texpect(spyon).toBeCalledWith(url, init);\n\t\t});",
+            "file": "GraphQLAPI-test.ts",
+            "skipped": false,
+            "dir": "packages/api-graphql/__tests__"
+        },
+        {
             "name": "without aws_project_region",
             "suites": [
                 "API test",
                 "configure test"
             ],
             "updatePoint": {
-                "line": 1321,
+                "line": 1382,
                 "column": 34
             },
-            "line": 1321,
+            "line": 1382,
             "code": "\t\ttest('without aws_project_region', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\tmyoption: 'myoption',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\tmyoption: 'myoption',\n\t\t\t});\n\t\t});",
             "file": "GraphQLAPI-test.ts",
             "skipped": false,
@@ -5497,10 +5513,10 @@
                 "configure test"
             ],
             "updatePoint": {
-                "line": 1333,
+                "line": 1394,
                 "column": 31
             },
-            "line": 1333,
+            "line": 1394,
             "code": "\t\ttest('with aws_project_region', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\taws_project_region: 'region',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\taws_project_region: 'region',\n\t\t\t\theader: {},\n\t\t\t\tregion: 'region',\n\t\t\t});\n\t\t});",
             "file": "GraphQLAPI-test.ts",
             "skipped": false,
@@ -5513,10 +5529,10 @@
                 "configure test"
             ],
             "updatePoint": {
-                "line": 1347,
+                "line": 1408,
                 "column": 24
             },
-            "line": 1347,
+            "line": 1408,
             "code": "\t\ttest('with API options', () => {\n\t\t\tconst api = new API({});\n\n\t\t\tconst options = {\n\t\t\t\tAPI: {\n\t\t\t\t\taws_project_region: 'api-region',\n\t\t\t\t},\n\t\t\t\taws_project_region: 'region',\n\t\t\t\taws_appsync_region: 'appsync-region',\n\t\t\t};\n\n\t\t\texpect(api.configure(options)).toEqual({\n\t\t\t\taws_project_region: 'api-region',\n\t\t\t\taws_appsync_region: 'appsync-region',\n\t\t\t\theader: {},\n\t\t\t\tregion: 'api-region',\n\t\t\t});\n\t\t});",
             "file": "GraphQLAPI-test.ts",
             "skipped": false,
