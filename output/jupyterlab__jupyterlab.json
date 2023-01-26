@@ -2639,7 +2639,7 @@
                 "index": 769
             },
             "line": 13,
-            "code": "test('Search with a text', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async searchText => {\n    await window.jupyterapp.commands.execute('documentsearch:start', {\n      searchText\n    });\n  }, searchText);\n  expect(await page.locator('input.jp-DocumentSearch-input').inputValue()).toEqual(searchText);\n});",
+            "code": "test('Search with a text', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async searchText => {\n    await window.jupyterapp.commands.execute('documentsearch:start', {\n      searchText\n    });\n  }, searchText);\n  expect(await page.locator('[placeholder=\"Find\"]').inputValue()).toEqual(searchText);\n});",
             "file": "jupyterlab/search.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2650,10 +2650,10 @@
             "updatePoint": {
                 "line": 27,
                 "column": 40,
-                "index": 1303
+                "index": 1294
             },
             "line": 27,
-            "code": "test('Search with a text and replacement', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  const replaceText = 'banana';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async ([searchText, replaceText]) => {\n    await window.jupyterapp.commands.execute('documentsearch:startWithReplace', {\n      searchText,\n      replaceText\n    });\n  }, [searchText, replaceText]);\n  expect(await page.locator('input.jp-DocumentSearch-input').inputValue()).toEqual(searchText);\n  expect(await page.locator('input.jp-DocumentSearch-replace-entry').inputValue()).toEqual(replaceText);\n});",
+            "code": "test('Search with a text and replacement', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  const replaceText = 'banana';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async ([searchText, replaceText]) => {\n    await window.jupyterapp.commands.execute('documentsearch:startWithReplace', {\n      searchText,\n      replaceText\n    });\n  }, [searchText, replaceText]);\n  expect(await page.locator('[placeholder=\"Find\"]').inputValue()).toEqual(searchText);\n  expect(await page.locator('[placeholder=\"Replace\"]').inputValue()).toEqual(replaceText);\n});",
             "file": "jupyterlab/search.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -18168,7 +18168,7 @@
                 "column": 55
             },
             "line": 284,
-            "code": "      it('should accept an optional language preference', () => {\n        const model = new DocumentModel('foo');\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
+            "code": "      it('should accept an optional language preference', () => {\n        const model = new DocumentModel({ languagePreference: 'foo' });\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
             "file": "default.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18406,7 +18406,7 @@
                 "column": 46
             },
             "line": 424,
-            "code": "      it('should be set by the constructor arg', () => {\n        const model = new DocumentModel('foo');\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
+            "code": "      it('should be set by the constructor arg', () => {\n        const model = new DocumentModel({ languagePreference: 'foo' });\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
             "file": "default.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18644,7 +18644,7 @@
                 "column": 45
             },
             "line": 532,
-            "code": "      it('should accept a language preference', () => {\n        const factory = new TextModelFactory();\n        const model = factory.createNew('foo');\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
+            "code": "      it('should accept a language preference', () => {\n        const factory = new TextModelFactory();\n        const model = factory.createNew({ languagePreference: 'foo' });\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
             "file": "default.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -20034,13 +20034,26 @@
             "dir": "packages/docregistry/test"
         },
         {
+            "name": "should copy case from %s to %s yielding %s",
+            "suites": [
+                "documentsearch/genericsearchprovider",
+                "GenericSearchProvider",
+                "#preserveCase()"
+            ],
+            "line": 26,
+            "code": "      it.each([\n        ['OLD_TEXT_1', 'new_text_1', 'NEW_TEXT_1'],\n        ['OLD_TEXT_1', 'NEW_TEXT_1', 'NEW_TEXT_1'],\n        ['old_text_1', 'new_text_1', 'new_text_1'],\n        ['old_text_1', 'NEW_TEXT_1', 'new_text_1'],\n        ['Old', 'new', 'New'],\n        ['Old', '𐐶ew', '𐐎ew']\n      ])(\n        'should copy case from %s to %s yielding %s',\n        (oldText, newText, expected) => {\n          const replace = GenericSearchProvider.preserveCase(oldText, newText);\n          expect(replace).toEqual(expected);\n        }\n      );",
+            "file": "documentsearchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/documentsearch/test"
+        },
+        {
             "name": "should highlight %s fragment in %s",
             "suites": [
                 "documentsearch/genericsearchprovider",
                 "GenericSearchProvider",
                 "#startQuery()"
             ],
-            "line": 26,
+            "line": 43,
             "code": "      it.each([\n        [/x/, '<pre>xyz</pre>', `<mark class=\"${MATCH_CLASSES}\">x</mark>yz`],\n        [/y/, '<pre>xyz</pre>', `x<mark class=\"${MATCH_CLASSES}\">y</mark>z`],\n        [/z/, '<pre>xyz</pre>', `xy<mark class=\"${MATCH_CLASSES}\">z</mark>`],\n        [\n          /x/,\n          '<pre><span>x</span>yz</pre>',\n          `<span><mark class=\"${MATCH_CLASSES}\">x</mark></span>yz`\n        ],\n        [\n          /y/,\n          '<pre><span>x</span>yz</pre>',\n          `<span>x</span><mark class=\"${MATCH_CLASSES}\">y</mark>z`\n        ],\n        [\n          /z/,\n          '<pre><span>x</span>yz</pre>',\n          `<span>x</span>y<mark class=\"${MATCH_CLASSES}\">z</mark>`\n        ],\n        [\n          /x/,\n          '<pre>x<span>y</span>z</pre>',\n          `<mark class=\"${MATCH_CLASSES}\">x</mark><span>y</span>z`\n        ],\n        [\n          /y/,\n          '<pre>x<span>y</span>z</pre>',\n          `x<span><mark class=\"${MATCH_CLASSES}\">y</mark></span>z`\n        ],\n        [\n          /z/,\n          '<pre>x<span>y</span>z</pre>',\n          `x<span>y</span><mark class=\"${MATCH_CLASSES}\">z</mark>`\n        ],\n        [\n          /x/,\n          '<pre>xy<span>z</span></pre>',\n          `<mark class=\"${MATCH_CLASSES}\">x</mark>y<span>z</span>`\n        ],\n        [\n          /y/,\n          '<pre>xy<span>z</span></pre>',\n          `x<mark class=\"${MATCH_CLASSES}\">y</mark><span>z</span>`\n        ],\n        [\n          /z/,\n          '<pre>xy<span>z</span></pre>',\n          `xy<span><mark class=\"${MATCH_CLASSES}\">z</mark></span>`\n        ]\n      ])(\n        'should highlight %s fragment in %s',\n        async (query, content, expected) => {\n          widget.node.innerHTML = content;\n          await provider.startQuery(query);\n          expect(widget.node.firstElementChild!.innerHTML).toEqual(expected);\n        }\n      );",
             "file": "documentsearchprovider.spec.ts",
             "skipped": false,
@@ -20053,7 +20066,7 @@
                 "GenericSearchProvider",
                 "#endQuery()"
             ],
-            "line": 86,
+            "line": 103,
             "code": "      it.each([\n        [/x/, '<pre>xyz</pre>'],\n        [/y/, '<pre>xyz</pre>'],\n        [/z/, '<pre>xyz</pre>'],\n        [/x/, '<pre><span>x</span>yz</pre>'],\n        [/y/, '<pre><span>x</span>yz</pre>'],\n        [/z/, '<pre><span>x</span>yz</pre>'],\n        [/x/, '<pre>x<span>y</span>z</pre>'],\n        [/y/, '<pre>x<span>y</span>z</pre>'],\n        [/z/, '<pre>x<span>y</span>z</pre>'],\n        [/x/, '<pre>xy<span>z</span></pre>'],\n        [/y/, '<pre>xy<span>z</span></pre>'],\n        [/z/, '<pre>xy<span>z</span></pre>']\n      ])(\n        'should restore highlighted %s fragment in %s',\n        async (query, content) => {\n          widget.node.innerHTML = content;\n          await provider.startQuery(query);\n          await provider.endQuery();\n          expect(widget.node.innerHTML).toEqual(content);\n        }\n      );",
             "file": "documentsearchprovider.spec.ts",
             "skipped": false,
@@ -27133,7 +27146,7 @@
                 "column": 45
             },
             "line": 67,
-            "code": "      it('should accept a language preference', () => {\n        const factory = new NotebookModelFactory({});\n        const model = factory.createNew('foo');\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
+            "code": "      it('should accept a language preference', () => {\n        const factory = new NotebookModelFactory({});\n        const model = factory.createNew({ languagePreference: 'foo' });\n        expect(model.defaultKernelLanguage).toBe('foo');\n      });",
             "file": "modelfactory.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -43616,6 +43629,23 @@
             "dir": "packages/settingregistry/test"
         },
         {
+            "name": "should use definition at top of the schema",
+            "suites": [
+                "@jupyterlab/settingregistry",
+                "Settings",
+                "#default()"
+            ],
+            "updatePoint": {
+                "line": 907,
+                "column": 52
+            },
+            "line": 907,
+            "code": "      it('should use definition at top of the schema', async () => {\n        const id = 'omicron';\n        const defaults = {\n          foo: [\n            { bar: 2, baz: 'zip' },\n            { bar: 0, baz: 'zip' }\n          ]\n        };\n\n        connector.schemas[id] = {\n          type: 'object',\n          properties: {\n            foo: {\n              type: 'array',\n              items: { $ref: '#/definitions/fooItem' },\n              default: [{ bar: 2 }, {}]\n            }\n          },\n          definitions: {\n            fooItem: {\n              type: 'object',\n              properties: {\n                bar: {\n                  type: 'number',\n                  default: 0\n                },\n                baz: {\n                  type: 'string',\n                  default: 'zip'\n                }\n              }\n            }\n          }\n        };\n        settings = (await registry.load(id)) as Settings;\n        expect(settings.default()).toStrictEqual(defaults);\n      });",
+            "file": "settingregistry.spec.ts",
+            "skipped": false,
+            "dir": "packages/settingregistry/test"
+        },
+        {
             "name": "should get a setting item",
             "suites": [
                 "@jupyterlab/settingregistry",
@@ -43623,10 +43653,10 @@
                 "#get()"
             ],
             "updatePoint": {
-                "line": 909,
+                "line": 947,
                 "column": 35
             },
-            "line": 909,
+            "line": 947,
             "code": "      it('should get a setting item', async () => {\n        const id = 'foo';\n        const key = 'bar';\n        const value = 'baz';\n\n        connector.schemas[id] = { type: 'object' };\n        await connector.save(id, JSON.stringify({ [key]: value }));\n        settings = (await registry.load(id)) as Settings;\n        const saved = settings.get(key);\n        expect(saved.user).toBe(value);\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43640,10 +43670,10 @@
                 "#get()"
             ],
             "updatePoint": {
-                "line": 921,
+                "line": 959,
                 "column": 62
             },
-            "line": 921,
+            "line": 959,
             "code": "      it('should use schema default if user data not available', async () => {\n        const id = 'alpha';\n        const key = 'beta';\n        const value = 'gamma';\n        const schema: ISettingRegistry.ISchema = (connector.schemas[id] = {\n          type: 'object',\n          properties: {\n            [key]: {\n              type: typeof value as ISettingRegistry.Primitive,\n              default: value\n            }\n          }\n        });\n\n        settings = (await registry.load(id)) as Settings;\n        const saved = settings.get(key);\n\n        expect(saved.composite).toBe(schema.properties![key].default);\n        expect(saved.composite).not.toBe(saved.user);\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43657,10 +43687,10 @@
                 "#get()"
             ],
             "updatePoint": {
-                "line": 942,
+                "line": 980,
                 "column": 55
             },
-            "line": 942,
+            "line": 980,
             "code": "      it('should let user value override schema default', async () => {\n        const id = 'alpha';\n        const key = 'beta';\n        const value = 'gamma';\n        const schema: ISettingRegistry.ISchema = (connector.schemas[id] = {\n          type: 'object',\n          properties: {\n            [key]: {\n              type: typeof value as ISettingRegistry.Primitive,\n              default: 'delta'\n            }\n          }\n        });\n\n        await connector.save(id, JSON.stringify({ [key]: value }));\n        settings = (await registry.load(id)) as Settings;\n        const saved = settings.get(key);\n        expect(saved.composite).toBe(value);\n        expect(saved.user).toBe(value);\n        expect(saved.composite).not.toBe(schema.properties![key].default);\n        expect(saved.user).not.toBe(schema.properties![key].default);\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43674,10 +43704,10 @@
                 "#get()"
             ],
             "updatePoint": {
-                "line": 965,
+                "line": 1003,
                 "column": 55
             },
-            "line": 965,
+            "line": 1003,
             "code": "      it('should be `undefined` if a key does not exist', async () => {\n        const id = 'foo';\n        const key = 'bar';\n\n        connector.schemas[id] = { type: 'object' };\n\n        settings = (await registry.load(id)) as Settings;\n        const saved = settings.get(key);\n        expect(saved.composite).toBeUndefined();\n        expect(saved.user).toBeUndefined();\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43691,10 +43721,10 @@
                 "#remove()"
             ],
             "updatePoint": {
-                "line": 979,
+                "line": 1017,
                 "column": 38
             },
-            "line": 979,
+            "line": 1017,
             "code": "      it('should remove a setting item', async () => {\n        const id = 'foo';\n        const key = 'bar';\n        const value = 'baz';\n\n        connector.schemas[id] = { type: 'object' };\n        await connector.save(id, JSON.stringify({ [key]: value }));\n        settings = (await registry.load(id)) as Settings;\n        let saved = settings.get(key);\n        expect(saved.user).toBe(value);\n        await settings.remove(key);\n        saved = settings.get(key);\n        expect(saved.composite).toBeUndefined();\n        expect(saved.user).toBeUndefined();\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43708,10 +43738,10 @@
                 "#save()"
             ],
             "updatePoint": {
-                "line": 997,
+                "line": 1035,
                 "column": 39
             },
-            "line": 997,
+            "line": 1035,
             "code": "      it('should save user setting data', async () => {\n        const id = 'foo';\n        const one = 'one';\n        const two = 'two';\n\n        connector.schemas[id] = { type: 'object' };\n        settings = (await registry.load(id)) as Settings;\n        await settings.save(JSON.stringify({ one, two }));\n        let saved = settings.get('one');\n        expect(saved.composite).toBe(one);\n        expect(saved.user).toBe(one);\n\n        saved = settings.get('two');\n\n        expect(saved.composite).toBe(two);\n        expect(saved.user).toBe(two);\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
@@ -43725,10 +43755,10 @@
                 "#set()"
             ],
             "updatePoint": {
-                "line": 1017,
+                "line": 1055,
                 "column": 40
             },
-            "line": 1017,
+            "line": 1055,
             "code": "      it('should set a user setting item', async () => {\n        const id = 'foo';\n        const one = 'one';\n\n        connector.schemas[id] = { type: 'object' };\n        settings = (await registry.load(id)) as Settings;\n        await settings.set('one', one);\n        const saved = settings.get('one');\n        expect(saved.composite).toBe(one);\n        expect(saved.user).toBe(one);\n      });",
             "file": "settingregistry.spec.ts",
             "skipped": false,
