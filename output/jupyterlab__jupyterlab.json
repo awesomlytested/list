@@ -2639,7 +2639,7 @@
                 "index": 769
             },
             "line": 13,
-            "code": "test('Search with a text', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async searchText => {\n    await window.jupyterapp.commands.execute('documentsearch:start', {\n      searchText\n    });\n  }, searchText);\n  expect(await page.locator('[placeholder=\"Find\"]').inputValue()).toEqual(searchText);\n});",
+            "code": "test('Search with a text', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.locator(`[role=\"main\"] >> text=${DEFAULT_NAME}`).waitFor();\n  await page.locator('[role=\"main\"] .cm-content').fill(TEST_FILE_CONTENT);\n  await page.evaluate(async searchText => {\n    await window.jupyterapp.commands.execute('documentsearch:start', {\n      searchText\n    });\n  }, searchText);\n  await expect(page.locator('[placeholder=\"Find\"]')).toHaveValue(searchText);\n});",
             "file": "jupyterlab/search.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2650,10 +2650,10 @@
             "updatePoint": {
                 "line": 27,
                 "column": 40,
-                "index": 1294
+                "index": 1309
             },
             "line": 27,
-            "code": "test('Search with a text and replacement', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  const replaceText = 'banana';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n  await page.type('.cm-content', TEST_FILE_CONTENT);\n  await page.evaluate(async ([searchText, replaceText]) => {\n    await window.jupyterapp.commands.execute('documentsearch:startWithReplace', {\n      searchText,\n      replaceText\n    });\n  }, [searchText, replaceText]);\n  expect(await page.locator('[placeholder=\"Find\"]').inputValue()).toEqual(searchText);\n  expect(await page.locator('[placeholder=\"Replace\"]').inputValue()).toEqual(replaceText);\n});",
+            "code": "test('Search with a text and replacement', async ({\n  page\n}) => {\n  const searchText = 'ipsum';\n  const replaceText = 'banana';\n  await page.menu.clickMenuItem('File>New>Text File');\n  await page.locator(`[role=\"main\"] >> text=${DEFAULT_NAME}`).waitFor();\n  await page.locator('[role=\"main\"] .cm-content').fill(TEST_FILE_CONTENT);\n  await page.evaluate(async ([searchText, replaceText]) => {\n    await window.jupyterapp.commands.execute('documentsearch:startWithReplace', {\n      searchText,\n      replaceText\n    });\n  }, [searchText, replaceText]);\n  await expect(page.locator('[placeholder=\"Find\"]')).toHaveValue(searchText);\n  await expect(page.locator('[placeholder=\"Replace\"]')).toHaveValue(replaceText);\n});",
             "file": "jupyterlab/search.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -26051,7 +26051,7 @@
                 "column": 36
             },
             "line": 45,
-            "code": "        it('should save when clicked', async () => {\n          const button = ToolbarItems.createSaveButton(panel);\n          Widget.attach(button, document.body);\n          const promise = signalToPromise(context.fileChanged);\n          await framePromise();\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await expect(promise).resolves.not.toThrow();\n          button.dispose();\n        });",
+            "code": "        it('should save when clicked', async () => {\n          const button = ToolbarItems.createSaveButton(panel);\n          Widget.attach(button, document.body);\n          const promise = signalToPromise(context.fileChanged);\n          await framePromise();\n          await button.renderPromise;\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await expect(promise).resolves.not.toThrow();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26065,10 +26065,10 @@
                 "#createSaveButton()"
             ],
             "updatePoint": {
-                "line": 55,
+                "line": 56,
                 "column": 62
             },
-            "line": 55,
+            "line": 56,
             "code": "        it(\"should add an inline svg node with the 'save' icon\", async () => {\n          const button = ToolbarItems.createSaveButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='save']\")\n          ).toBeDefined();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26083,11 +26083,11 @@
                 "#createInsertButton()"
             ],
             "updatePoint": {
-                "line": 66,
+                "line": 67,
                 "column": 44
             },
-            "line": 66,
-            "code": "        it('should insert below when clicked', async () => {\n          const button = ToolbarItems.createInsertButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.activeCellIndex).toBe(1);\n          expect(panel.content.activeCell).toBeInstanceOf(CodeCell);\n          button.dispose();\n        });",
+            "line": 67,
+            "code": "        it('should insert below when clicked', async () => {\n          const button = ToolbarItems.createInsertButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          await button.renderPromise;\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.activeCellIndex).toBe(1);\n          expect(panel.content.activeCell).toBeInstanceOf(CodeCell);\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26101,10 +26101,10 @@
                 "#createInsertButton()"
             ],
             "updatePoint": {
-                "line": 76,
+                "line": 78,
                 "column": 61
             },
-            "line": 76,
+            "line": 78,
             "code": "        it(\"should add an inline svg node with the 'add' icon\", async () => {\n          const button = ToolbarItems.createInsertButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(button.node.querySelector(\"[data-icon$='add']\")).toBeDefined();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26119,11 +26119,11 @@
                 "#createCutButton()"
             ],
             "updatePoint": {
-                "line": 86,
+                "line": 88,
                 "column": 35
             },
-            "line": 86,
-            "code": "        it('should cut when clicked', async () => {\n          const button = ToolbarItems.createCutButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.widgets.length).toBe(count - 1);\n          expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(true);\n          button.dispose();\n        });",
+            "line": 88,
+            "code": "        it('should cut when clicked', async () => {\n          const button = ToolbarItems.createCutButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          await button.renderPromise;\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.widgets.length).toBe(count - 1);\n          expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(true);\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26137,10 +26137,10 @@
                 "#createCutButton()"
             ],
             "updatePoint": {
-                "line": 97,
+                "line": 100,
                 "column": 61
             },
-            "line": 97,
+            "line": 100,
             "code": "        it(\"should add an inline svg node with the 'cut' icon\", async () => {\n          const button = ToolbarItems.createCutButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(button.node.querySelector(\"[data-icon$='cut']\")).toBeDefined();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26155,11 +26155,11 @@
                 "#createCopyButton()"
             ],
             "updatePoint": {
-                "line": 107,
+                "line": 110,
                 "column": 36
             },
-            "line": 107,
-            "code": "        it('should copy when clicked', async () => {\n          const button = ToolbarItems.createCopyButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.widgets.length).toBe(count);\n          expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(true);\n          button.dispose();\n        });",
+            "line": 110,
+            "code": "        it('should copy when clicked', async () => {\n          const button = ToolbarItems.createCopyButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          await button.renderPromise;\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          expect(panel.content.widgets.length).toBe(count);\n          expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(true);\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26173,10 +26173,10 @@
                 "#createCopyButton()"
             ],
             "updatePoint": {
-                "line": 118,
+                "line": 122,
                 "column": 62
             },
-            "line": 118,
+            "line": 122,
             "code": "        it(\"should add an inline svg node with the 'copy' icon\", async () => {\n          const button = ToolbarItems.createCopyButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='copy']\")\n          ).toBeDefined();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26191,11 +26191,11 @@
                 "#createPasteButton()"
             ],
             "updatePoint": {
-                "line": 130,
+                "line": 134,
                 "column": 37
             },
-            "line": 130,
-            "code": "        it('should paste when clicked', async () => {\n          const button = ToolbarItems.createPasteButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          NotebookActions.copy(panel.content);\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await sleep();\n          expect(panel.content.widgets.length).toBe(count + 1);\n          button.dispose();\n        });",
+            "line": 134,
+            "code": "        it('should paste when clicked', async () => {\n          const button = ToolbarItems.createPasteButton(panel);\n          const count = panel.content.widgets.length;\n          Widget.attach(button, document.body);\n          await framePromise();\n          await button.renderPromise;\n          NotebookActions.copy(panel.content);\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await sleep();\n          expect(panel.content.widgets.length).toBe(count + 1);\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26209,10 +26209,10 @@
                 "#createPasteButton()"
             ],
             "updatePoint": {
-                "line": 142,
+                "line": 147,
                 "column": 63
             },
-            "line": 142,
+            "line": 147,
             "code": "        it(\"should add an inline svg node with the 'paste' icon\", async () => {\n          const button = ToolbarItems.createPasteButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='paste']\")\n          ).toBeDefined();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26227,11 +26227,11 @@
                 "#createCellTypeItem()"
             ],
             "updatePoint": {
-                "line": 154,
+                "line": 159,
                 "column": 58
             },
-            "line": 154,
-            "code": "        it('should track the cell type of the current cell', async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.content.activeCellIndex++;\n          await framePromise();\n          expect(node.value).toBe('markdown');\n          item.dispose();\n        });",
+            "line": 159,
+            "code": "        it('should track the cell type of the current cell', async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          await item.renderPromise;\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.content.activeCellIndex++;\n          await framePromise();\n          await item.renderPromise;\n          expect(node.value).toBe('markdown');\n          item.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26245,11 +26245,11 @@
                 "#createCellTypeItem()"
             ],
             "updatePoint": {
-                "line": 168,
+                "line": 175,
                 "column": 68
             },
-            "line": 168,
-            "code": "        it(\"should display `'-'` if multiple cell types are selected\", async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.content.select(panel.content.widgets[1]);\n          await framePromise();\n          expect(node.value).toBe('-');\n          item.dispose();\n        });",
+            "line": 175,
+            "code": "        it(\"should display `'-'` if multiple cell types are selected\", async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          await item.renderPromise;\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.content.select(panel.content.widgets[1]);\n          await framePromise();\n          await item.renderPromise;\n          expect(node.value).toBe('-');\n          item.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26263,11 +26263,11 @@
                 "#createCellTypeItem()"
             ],
             "updatePoint": {
-                "line": 182,
+                "line": 191,
                 "column": 95
             },
-            "line": 182,
-            "code": "        it('should display the active cell type if multiple cells of the same type are selected', async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.model!.sharedModel.insertCell(0, { cell_type: 'code' });\n          panel.content.select(panel.content.widgets[1]);\n          await framePromise();\n          expect(node.value).toBe('code');\n          item.dispose();\n        });",
+            "line": 191,
+            "code": "        it('should display the active cell type if multiple cells of the same type are selected', async () => {\n          const item = ToolbarItems.createCellTypeItem(panel);\n          Widget.attach(item, document.body);\n          await framePromise();\n          await item.renderPromise;\n          const node = item.node.getElementsByTagName(\n            'select'\n          )[0] as HTMLSelectElement;\n          expect(node.value).toBe('code');\n          panel.model!.sharedModel.insertCell(0, { cell_type: 'code' });\n          panel.content.select(panel.content.widgets[1]);\n          await framePromise();\n          await item.renderPromise;\n          expect(node.value).toBe('code');\n          item.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26281,10 +26281,10 @@
                 "#getDefaultItems()"
             ],
             "updatePoint": {
-                "line": 199,
+                "line": 210,
                 "column": 64
             },
-            "line": 199,
+            "line": 210,
             "code": "        it('should return the default items of the panel toolbar', () => {\n          const names = ToolbarItems.getDefaultItems(panel).map(item => {\n            const name = item.name;\n            item.widget.dispose();\n            return name;\n          });\n          expect(names).toEqual([\n            'save',\n            'insert',\n            'cut',\n            'copy',\n            'paste',\n            'run',\n            'interrupt',\n            'restart',\n            'restart-and-run',\n            'cellType',\n            'spacer',\n            'kernelName'\n          ]);\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26299,11 +26299,11 @@
                 "#createRunButton()"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 251,
                 "column": 47
             },
-            "line": 240,
-            "code": "        it('should run and advance when clicked', async () => {\n          const button = ToolbarItems.createRunButton(panel);\n          const widget = panel.content;\n\n          // Clear and select the first two cells.\n          const codeCell = widget.widgets[0] as CodeCell;\n          codeCell.model.outputs.clear();\n          widget.select(codeCell);\n          const mdCell = widget.widgets[1] as MarkdownCell;\n          mdCell.rendered = false;\n          widget.select(mdCell);\n\n          Widget.attach(button, document.body);\n          await context.sessionContext.session!.kernel!.info;\n\n          const delegate = new PromiseDelegate();\n          panel.sessionContext.iopubMessage.connect((_, msg) => {\n            if (KernelMessage.isExecuteInputMsg(msg)) {\n              delegate.resolve(void 0);\n            }\n          });\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await expect(delegate.promise).resolves.not.toThrow();\n          button.dispose();\n        });",
+            "line": 251,
+            "code": "        it('should run and advance when clicked', async () => {\n          const button = ToolbarItems.createRunButton(panel);\n          const widget = panel.content;\n\n          // Clear and select the first two cells.\n          const codeCell = widget.widgets[0] as CodeCell;\n          codeCell.model.outputs.clear();\n          widget.select(codeCell);\n          const mdCell = widget.widgets[1] as MarkdownCell;\n          mdCell.rendered = false;\n          widget.select(mdCell);\n\n          Widget.attach(button, document.body);\n          await button.renderPromise;\n          await context.sessionContext.session!.kernel!.info;\n\n          const delegate = new PromiseDelegate();\n          panel.sessionContext.iopubMessage.connect((_, msg) => {\n            if (KernelMessage.isExecuteInputMsg(msg)) {\n              delegate.resolve(void 0);\n            }\n          });\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await expect(delegate.promise).resolves.not.toThrow();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26317,10 +26317,10 @@
                 "#createRunButton()"
             ],
             "updatePoint": {
-                "line": 266,
+                "line": 278,
                 "column": 61
             },
-            "line": 266,
+            "line": 278,
             "code": "        it(\"should add an inline svg node with the 'run' icon\", async () => {\n          const button = ToolbarItems.createRunButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(button.node.querySelector(\"[data-icon$='run']\")).toBeDefined();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
@@ -26335,11 +26335,11 @@
                 "#createRestartRunAllButton()"
             ],
             "updatePoint": {
-                "line": 275,
+                "line": 287,
                 "column": 51
             },
-            "line": 275,
-            "code": "        it('should restart and run all when clicked', async () => {\n          const button = ToolbarItems.createRestartRunAllButton(panel);\n          const widget = panel.content;\n\n          // Clear the first two cells.\n          const codeCell = widget.widgets[0] as CodeCell;\n          codeCell.model.outputs.clear();\n          const mdCell = widget.widgets[1] as MarkdownCell;\n          mdCell.rendered = false;\n\n          Widget.attach(button, document.body);\n          await panel.sessionContext.ready;\n          const delegate = new PromiseDelegate();\n          panel.sessionContext.iopubMessage.connect((_, msg) => {\n            if (KernelMessage.isExecuteInputMsg(msg)) {\n              delegate.resolve(void 0);\n            }\n          });\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await acceptDialog();\n          await expect(delegate.promise).resolves.not.toThrow();\n          button.dispose();\n        });",
+            "line": 287,
+            "code": "        it('should restart and run all when clicked', async () => {\n          const button = ToolbarItems.createRestartRunAllButton(panel);\n          const widget = panel.content;\n\n          // Clear the first two cells.\n          const codeCell = widget.widgets[0] as CodeCell;\n          codeCell.model.outputs.clear();\n          const mdCell = widget.widgets[1] as MarkdownCell;\n          mdCell.rendered = false;\n\n          Widget.attach(button, document.body);\n          await button.renderPromise;\n          await panel.sessionContext.ready;\n          const delegate = new PromiseDelegate();\n          panel.sessionContext.iopubMessage.connect((_, msg) => {\n            if (KernelMessage.isExecuteInputMsg(msg)) {\n              delegate.resolve(void 0);\n            }\n          });\n          simulate(button.node.firstChild as HTMLElement, 'mousedown');\n          await acceptDialog();\n          await expect(delegate.promise).resolves.not.toThrow();\n          button.dispose();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -26353,10 +26353,10 @@
                 "#createRestartRunAllButton()"
             ],
             "updatePoint": {
-                "line": 299,
+                "line": 312,
                 "column": 70
             },
-            "line": 299,
+            "line": 312,
             "code": "        it(\"should add an inline svg node with the 'fast-forward' icon\", async () => {\n          const button = ToolbarItems.createRestartRunAllButton(panel);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='fast-forward']\")\n          ).toBeDefined();\n        });",
             "file": "default-toolbar.spec.ts",
             "skipped": false,
