@@ -455,7 +455,7 @@
                 "index": 2063
             },
             "line": 75,
-            "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const runButton = await page.waitForSelector('.jp-Toolbar-item >> [data-command=\"runmenu:run\"]');\n    await runButton.hover();\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(runButton)]);\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 60\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
+            "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const runButton = await page.waitForSelector('.jp-Toolbar-item >> [data-command=\"runmenu:run\"]');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(runButton)]);\n    await runButton.focus();\n    await runButton.hover();\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 60\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -464,11 +464,11 @@
             "name": "Stop on breakpoint",
             "suites": [],
             "updatePoint": {
-                "line": 97,
+                "line": 98,
                 "column": 26,
-                "index": 2688
+                "index": 2717
             },
-            "line": 97,
+            "line": 98,
             "code": "  test('Stop on breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_breakpoint.png');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -478,11 +478,11 @@
             "name": "Breakpoints on exception",
             "suites": [],
             "updatePoint": {
-                "line": 123,
+                "line": 124,
                 "column": 32,
-                "index": 3421
+                "index": 3450
             },
-            "line": 123,
+            "line": 124,
             "code": "  test('Breakpoints on exception', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await expect(page.locator('button.jp-PauseOnExceptions')).not.toHaveClass(/lm-mod-toggled/);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    const menu = page.locator('.jp-PauseOnExceptions-menu');\n    await expect(menu).toBeVisible();\n    await expect(menu.locator('li.lm-Menu-item')).toHaveCount(3);\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(0);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"userUnhandled\")').click();\n    await expect(page.locator('button.jp-PauseOnExceptions')).toHaveClass(/lm-mod-toggled/);\n    await page.notebook.enterCellEditingMode(0);\n    const keyboard = page.keyboard;\n    await keyboard.press('Control+A');\n    await keyboard.type('try:\\n1/0\\n', {\n      delay: 100\n    });\n    await keyboard.press('Backspace');\n    await keyboard.type('except:\\n2/0\\n', {\n      delay: 100\n    });\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_unhandled_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.notebook.waitForRun(0);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(1);\n    await expect(menu.locator('li:has(div.lm-Menu-itemLabel:text(\"userUnhandled\"))')).toHaveClass(/lm-mod-toggled/);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"raised\")').click();\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_raised_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -492,11 +492,11 @@
             "name": "Debugger sidebar",
             "suites": [],
             "updatePoint": {
-                "line": 183,
+                "line": 184,
                 "column": 24,
-                "index": 5753
+                "index": 5782
             },
-            "line": 183,
+            "line": 184,
             "code": "  test('Debugger sidebar', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const sidebar = await page.waitForSelector('[data-id=\"jp-debugger-sidebar\"]');\n    await sidebar.click();\n    await setSidebarWidth(page, 251, 'right');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(sidebar, {\n      left: 0.25\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 22,\n        x: 1200,\n        width: 85,\n        height: 160\n      }\n    })).toMatchSnapshot('debugger_sidebar.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -506,11 +506,11 @@
             "name": "Variables panel",
             "suites": [],
             "updatePoint": {
-                "line": 208,
+                "line": 209,
                 "column": 23,
-                "index": 6430
+                "index": 6459
             },
-            "line": 208,
+            "line": 209,
             "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n\n    // Wait for the locals variables to be displayed\n    await expect(page.locator('.jp-DebuggerVariables-toolbar select')).toHaveValue('Locals');\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n\n    // Copy value to clipboard\n    await page.locator('.jp-DebuggerVariables-body :text(\"b\")').click({\n      button: 'right'\n    });\n    await page.locator('.lm-Menu-itemLabel:text(\"Copy to Clipboard\")').click();\n    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');\n\n    // Copy value entry is disabled for variables with empty value\n    await page.locator('.jp-DebuggerVariables-toolbar select').selectOption('Globals');\n    await page.locator('.jp-DebuggerVariables-body :text(\"special variables\")').click({\n      button: 'right'\n    });\n    await expect(page.locator('li.lm-Menu-item[data-command=\"debugger:copy-to-clipboard\"]')).toHaveAttribute('aria-disabled', 'true');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -520,11 +520,11 @@
             "name": "Call Stack panel",
             "suites": [],
             "updatePoint": {
-                "line": 251,
+                "line": 252,
                 "column": 24,
-                "index": 7998
+                "index": 8027
             },
-            "line": 251,
+            "line": 252,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -534,11 +534,11 @@
             "name": "Breakpoints panel",
             "suites": [],
             "updatePoint": {
-                "line": 282,
+                "line": 283,
                 "column": 25,
-                "index": 8933
+                "index": 8962
             },
-            "line": 282,
+            "line": 283,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/2114632017.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -548,11 +548,11 @@
             "name": "Source panel",
             "suites": [],
             "updatePoint": {
-                "line": 314,
+                "line": 315,
                 "column": 20,
-                "index": 9920
+                "index": 9949
             },
-            "line": 314,
+            "line": 315,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -27942,6 +27942,108 @@
             "line": 102,
             "code": "        it('should create a notebook widget', () => {\n          const options = {\n            contentFactory: contentFactory,\n            rendermime: utils.defaultRenderMime(),\n            mimeTypeService: utils.mimeTypeService\n          };\n          expect(contentFactory.createNotebook(options)).toBeInstanceOf(\n            Notebook\n          );\n        });",
             "file": "panel.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should return number of matches",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#matchesCount"
+            ],
+            "updatePoint": {
+                "line": 45,
+                "column": 41
+            },
+            "line": 45,
+            "code": "      it('should return number of matches', async () => {\n        await provider.startQuery(/test/, undefined);\n        expect(provider.matchesCount).toBe(3);\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should highlight next match",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#highlightNext()"
+            ],
+            "updatePoint": {
+                "line": 52,
+                "column": 37
+            },
+            "line": 52,
+            "code": "      it('should highlight next match', async () => {\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(1);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(2);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should loop back to first match",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#highlightNext()"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 41
+            },
+            "line": 63,
+            "code": "      it('should loop back to first match', async () => {\n        panel.content.activeCellIndex = 1;\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(2);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should do nothing if there are no cells",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#highlightNext()"
+            ],
+            "updatePoint": {
+                "line": 73,
+                "column": 49
+            },
+            "line": 73,
+            "code": "      it('should do nothing if there are no cells', async () => {\n        await provider.startQuery(/test/, undefined);\n        for (let _ of panel.model!.sharedModel.cells) {\n          panel.model!.sharedModel.deleteCell(0);\n        }\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(null);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should highlight previous match",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#highlightPrevious()"
+            ],
+            "updatePoint": {
+                "line": 85,
+                "column": 41
+            },
+            "line": 85,
+            "code": "      it('should highlight previous match', async () => {\n        panel.content.activeCellIndex = 1;\n        await provider.startQuery(/tes/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(2);\n        expect(panel.content.activeCellIndex).toBe(1);\n        await provider.highlightPrevious();\n        expect(panel.content.activeCellIndex).toBe(0);\n        expect(provider.currentMatchIndex).toBe(1);\n        await provider.highlightPrevious();\n        expect(panel.content.activeCellIndex).toBe(0);\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should loop back to last match",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookSearchProvider",
+                "#highlightPrevious()"
+            ],
+            "updatePoint": {
+                "line": 100,
+                "column": 40
+            },
+            "line": 100,
+            "code": "      it('should loop back to last match', async () => {\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.highlightPrevious();\n        expect(provider.currentMatchIndex).toBe(2);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
         },
