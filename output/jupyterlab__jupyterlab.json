@@ -273,7 +273,7 @@
                 "index": 3557
             },
             "line": 48,
-            "code": "    test(`measure ${file} - ${sample + 1}`, async ({\n      baseURL,\n      browserName,\n      page\n    }, testInfo) => {\n      const attachmentCommon = {\n        nSamples: benchmark.nSamples,\n        browser: browserName,\n        file: path.basename(file, '.ipynb'),\n        project: testInfo.project.name\n      };\n      const perf = galata.newPerformanceHelper(page);\n      await page.goto(baseURL + '?reset');\n      await page.click('#filebrowser >> .jp-BreadCrumbs-home');\n      await page.dblclick(`#filebrowser >> text=${tmpPath}`);\n      const openTime = await perf.measure(async () => {\n        // Open the notebook and wait for the spinner\n        await Promise.all([page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent'), page.dblclick(`#filebrowser >> text=${file}`)]);\n\n        // Wait for spinner to be hidden\n        await page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent', {\n          state: 'hidden'\n        });\n      });\n\n      // Check the notebook is correctly opened\n      let panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      let document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'open',\n        time: openTime\n      }));\n\n      // Shutdown the kernel to be sure it does not get in our way (especially for the close action)\n      await page.click('li[role=\"menuitem\"]:has-text(\"Kernel\")');\n      await page.click('ul[role=\"menu\"] >> text=Shut Down All Kernels…');\n      await page.click('button:has-text(\"Shut Down All\") >> nth=-1'); // Click on the last matched button.\n\n      // Open text file\n      const fromTime = await perf.measure(async () => {\n        await page.dblclick(`#filebrowser >> text=${textFile}`);\n        await page.waitForSelector(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${path.basename(textFile)}`);\n      });\n      let editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-from',\n        time: fromTime\n      }));\n\n      // Switch back\n      const toTime = await perf.measure(async () => {\n        await page.click(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${file}`);\n      });\n\n      // Check the notebook is correctly opened\n      panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-to',\n        time: toTime\n      }));\n\n      // Close notebook\n      await page.click('li[role=\"menuitem\"]:has-text(\"File\")');\n      const closeTime = await perf.measure(async () => {\n        await page.click('ul[role=\"menu\"] >> text=Close Tab');\n        // Revert changes so we don't measure saving\n        const dimissButton = page.locator('button:has-text(\"Discard\")');\n        if (await dimissButton.isVisible({\n          timeout: 50\n        })) {\n          await dimissButton.click();\n        }\n      });\n      editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'close',\n        time: closeTime\n      }));\n    });",
+            "code": "    test(`measure ${file} - ${sample + 1}`, async ({\n      baseURL,\n      browserName,\n      page\n    }, testInfo) => {\n      const attachmentCommon = {\n        nSamples: benchmark.nSamples,\n        browser: browserName,\n        file: path.basename(file, '.ipynb'),\n        project: testInfo.project.name\n      };\n      const perf = galata.newPerformanceHelper(page);\n      await page.goto(baseURL + '?reset');\n      await page.click('#filebrowser >> .jp-BreadCrumbs-home');\n      await page.dblclick(`#filebrowser >> text=${tmpPath}`);\n      const openTime = await perf.measure(async () => {\n        // Open the notebook and wait for the spinner\n        await Promise.all([page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent'), page.dblclick(`#filebrowser >> text=${file}`)]);\n\n        // Wait for spinner to be hidden\n        await page.waitForSelector('[role=\"main\"] >> .jp-SpinnerContent', {\n          state: 'hidden'\n        });\n      });\n\n      // Check the notebook is correctly opened\n      let panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      let document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'open',\n        time: openTime\n      }));\n\n      // Shutdown the kernel to be sure it does not get in our way (especially for the close action)\n      await page.click('li[role=\"menuitem\"]:has-text(\"Kernel\")');\n      await page.click('.lm-Menu ul[role=\"menu\"] >> text=Shut Down All Kernels…');\n      await page.click('button:has-text(\"Shut Down All\") >> nth=-1'); // Click on the last matched button.\n\n      // Open text file\n      const fromTime = await perf.measure(async () => {\n        await page.dblclick(`#filebrowser >> text=${textFile}`);\n        await page.waitForSelector(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${path.basename(textFile)}`);\n      });\n      let editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-from',\n        time: fromTime\n      }));\n\n      // Switch back\n      const toTime = await perf.measure(async () => {\n        await page.click(`div[role=\"main\"] >> .lm-DockPanel-tabBar >> text=${file}`);\n      });\n\n      // Check the notebook is correctly opened\n      panel = await page.$('[role=\"main\"] >> .jp-NotebookPanel');\n      // Get only the document node to avoid noise from kernel and debugger in the toolbar\n      document = await panel.$('.jp-Notebook');\n      expect(await document.screenshot()).toMatchSnapshot(`${file.replace('.', '-')}.png`);\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'switch-to',\n        time: toTime\n      }));\n\n      // Close notebook\n      await page.click('li[role=\"menuitem\"]:has-text(\"File\")');\n      const closeTime = await perf.measure(async () => {\n        await page.click('.lm-Menu ul[role=\"menu\"] >> text=Close Tab');\n        // Revert changes so we don't measure saving\n        const dimissButton = page.locator('button:has-text(\"Discard\")');\n        if (await dimissButton.isVisible({\n          timeout: 50\n        })) {\n          await dimissButton.click();\n        }\n      });\n      editorPanel = page.locator('div[role=\"tabpanel\"]:has-text(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin mole\")');\n      await expect(editorPanel).toBeVisible();\n      testInfo.attachments.push(benchmark.addAttachment({\n        ...attachmentCommon,\n        test: 'close',\n        time: closeTime\n      }));\n    });",
             "file": "benchmark/notebook.spec.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -315,7 +315,7 @@
                 "index": 905
             },
             "line": 30,
-            "code": "  test('should use default toolbars', async ({\n    page\n  }) => {\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('div[role=\"main\"] >> text=Lorenz.ipynb');\n\n    // Wait for kernel to settle on idle\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    await page.waitForSelector('#jp-main-statusbar >> text=Busy');\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    expect(await page.locator('div[role=\"main\"] >> .jp-NotebookPanel-toolbar').screenshot()).toMatchSnapshot('default-notebook-toolbar.png');\n  });",
+            "code": "  test('should use default toolbars', async ({\n    page\n  }) => {\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('div[role=\"main\"] >> text=Lorenz.ipynb');\n\n    // Wait for kernel to settle on idle\n    await page.locator('.jp-DebuggerBugButton[aria-disabled=\"false\"]').waitFor();\n    await page.locator('.jp-Notebook-ExecutionIndicator[data-status=\"idle\"]').waitFor();\n    expect(await page.locator('div[role=\"main\"] >> .jp-NotebookPanel-toolbar').screenshot()).toMatchSnapshot('default-notebook-toolbar.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -324,11 +324,11 @@
             "name": "should use default menu bar",
             "suites": [],
             "updatePoint": {
-                "line": 50,
+                "line": 49,
                 "column": 35,
-                "index": 1737
+                "index": 1707
             },
-            "line": 50,
+            "line": 49,
             "code": "  test('should use default menu bar', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.click('text=Tabs');\n    await page.waitForSelector('#jp-mainmenu-tabs');\n    expect(await page.screenshot({\n      clip: {\n        x: 0,\n        y: 0,\n        width: 800,\n        height: 200\n      }\n    })).toMatchSnapshot('default-menu-bar.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -338,11 +338,11 @@
             "name": "should use default context menu",
             "suites": [],
             "updatePoint": {
-                "line": 72,
+                "line": 71,
                 "column": 39,
-                "index": 2304
+                "index": 2274
             },
-            "line": 72,
+            "line": 71,
             "code": "  test('should use default context menu', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.click('text=Lorenz.ipynb', {\n      button: 'right'\n    });\n    await page.hover('ul[role=\"menu\"] >> text=New File');\n    expect(await page.screenshot({\n      clip: {\n        x: 0,\n        y: 0,\n        width: 500,\n        height: 500\n      }\n    })).toMatchSnapshot('default-context-menu.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -352,11 +352,11 @@
             "name": "should use customized layout",
             "suites": [],
             "updatePoint": {
-                "line": 182,
+                "line": 181,
                 "column": 36,
-                "index": 5270
+                "index": 5240
             },
-            "line": 182,
+            "line": 181,
             "code": "  test('should use customized layout', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.menu.clickMenuItem('File>New>Terminal');\n    await page.waitForSelector('.jp-Terminal');\n    await setSidebarWidth(page, 271, 'right');\n    expect(await page.screenshot()).toMatchSnapshot('customized-terminal-position-single.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -366,11 +366,11 @@
             "name": "should use customized toolbars",
             "suites": [],
             "updatePoint": {
-                "line": 198,
+                "line": 197,
                 "column": 38,
-                "index": 5821
+                "index": 5791
             },
-            "line": 198,
+            "line": 197,
             "code": "  test('should use customized toolbars', async ({\n    page\n  }) => {\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('div[role=\"main\"] >> text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    expect(await page.locator('div[role=\"main\"] >> .jp-NotebookPanel-toolbar').screenshot()).toMatchSnapshot('customized-notebook-toolbar.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -380,11 +380,11 @@
             "name": "should use customized menu bar",
             "suites": [],
             "updatePoint": {
-                "line": 214,
+                "line": 213,
                 "column": 38,
-                "index": 6484
+                "index": 6454
             },
-            "line": 214,
+            "line": 213,
             "code": "  test('should use customized menu bar', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.click('text=Tabs');\n    await page.waitForSelector('#jp-mainmenu-tabs');\n    expect(await page.screenshot({\n      clip: {\n        x: 0,\n        y: 0,\n        width: 800,\n        height: 200\n      }\n    })).toMatchSnapshot('customized-menu-bar.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -394,11 +394,11 @@
             "name": "should use customized context menu",
             "suites": [],
             "updatePoint": {
-                "line": 236,
+                "line": 235,
                 "column": 42,
-                "index": 7057
+                "index": 7027
             },
-            "line": 236,
+            "line": 235,
             "code": "  test('should use customized context menu', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.click('text=Lorenz.ipynb', {\n      button: 'right'\n    });\n    await page.hover('ul[role=\"menu\"] >> text=New File');\n    expect(await page.screenshot({\n      clip: {\n        x: 0,\n        y: 0,\n        width: 500,\n        height: 500\n      }\n    })).toMatchSnapshot('customized-context-menu.png');\n  });",
             "file": "documentation/customization.test.ts",
             "skipped": false,
@@ -413,7 +413,7 @@
                 "index": 443
             },
             "line": 15,
-            "code": "  test('Kernel capability', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n\n    // Wait for kernel to settle on idle\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    await page.waitForSelector('#jp-main-statusbar >> text=Busy');\n    await page.waitForSelector('#jp-main-statusbar >> text=Idle');\n    expect(await page.screenshot({\n      clip: {\n        x: 1030,\n        y: 62,\n        width: 210,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_kernel.png');\n  });",
+            "code": "  test('Kernel capability', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n\n    // Wait for kernel to settle on idle\n    await page.locator('.jp-DebuggerBugButton[aria-disabled=\"false\"]').waitFor();\n    await page.locator('.jp-Notebook-ExecutionIndicator[data-status=\"idle\"]').waitFor();\n    expect(await page.screenshot({\n      clip: {\n        x: 1030,\n        y: 62,\n        width: 210,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_kernel.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -422,11 +422,11 @@
             "name": "Activate",
             "suites": [],
             "updatePoint": {
-                "line": 35,
+                "line": 34,
                 "column": 16,
-                "index": 1000
+                "index": 970
             },
-            "line": 35,
+            "line": 34,
             "code": "  test('Activate', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 780,\n        width: 210,\n        height: 28\n      }\n    })).toMatchSnapshot('debugger_activate.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -436,11 +436,11 @@
             "name": "Set breakpoint",
             "suites": [],
             "updatePoint": {
-                "line": 53,
+                "line": 52,
                 "column": 22,
-                "index": 1467
+                "index": 1437
             },
-            "line": 53,
+            "line": 52,
             "code": "  test('Set breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Wait for breakpoint to finish appearing\n    await page.waitForTimeout(150);\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_breakpoint.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -450,11 +450,11 @@
             "name": "Highlight run cell button",
             "suites": [],
             "updatePoint": {
-                "line": 75,
+                "line": 74,
                 "column": 33,
-                "index": 2063
+                "index": 2033
             },
-            "line": 75,
+            "line": 74,
             "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const runButton = await page.waitForSelector('.jp-Toolbar-item >> [data-command=\"runmenu:run\"]');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(runButton)]);\n    await runButton.focus();\n    await runButton.hover();\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 60\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -464,11 +464,11 @@
             "name": "Stop on breakpoint",
             "suites": [],
             "updatePoint": {
-                "line": 98,
+                "line": 97,
                 "column": 26,
-                "index": 2717
+                "index": 2687
             },
-            "line": 98,
+            "line": 97,
             "code": "  test('Stop on breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_breakpoint.png');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -478,11 +478,11 @@
             "name": "Breakpoints on exception",
             "suites": [],
             "updatePoint": {
-                "line": 124,
+                "line": 123,
                 "column": 32,
-                "index": 3450
+                "index": 3420
             },
-            "line": 124,
+            "line": 123,
             "code": "  test('Breakpoints on exception', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await expect(page.locator('button.jp-PauseOnExceptions')).not.toHaveClass(/lm-mod-toggled/);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    const menu = page.locator('.jp-PauseOnExceptions-menu');\n    await expect(menu).toBeVisible();\n    await expect(menu.locator('li.lm-Menu-item')).toHaveCount(3);\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(0);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"userUnhandled\")').click();\n    await expect(page.locator('button.jp-PauseOnExceptions')).toHaveClass(/lm-mod-toggled/);\n    await page.notebook.enterCellEditingMode(0);\n    const keyboard = page.keyboard;\n    await keyboard.press('Control+A');\n    await keyboard.type('try:\\n1/0\\n', {\n      delay: 100\n    });\n    await keyboard.press('Backspace');\n    await keyboard.type('except:\\n2/0\\n', {\n      delay: 100\n    });\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_unhandled_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.notebook.waitForRun(0);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(1);\n    await expect(menu.locator('li:has(div.lm-Menu-itemLabel:text(\"userUnhandled\"))')).toHaveClass(/lm-mod-toggled/);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"raised\")').click();\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_raised_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -492,11 +492,11 @@
             "name": "Debugger sidebar",
             "suites": [],
             "updatePoint": {
-                "line": 184,
+                "line": 183,
                 "column": 24,
-                "index": 5782
+                "index": 5752
             },
-            "line": 184,
+            "line": 183,
             "code": "  test('Debugger sidebar', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const sidebar = await page.waitForSelector('[data-id=\"jp-debugger-sidebar\"]');\n    await sidebar.click();\n    await setSidebarWidth(page, 251, 'right');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(sidebar, {\n      left: 0.25\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 22,\n        x: 1200,\n        width: 85,\n        height: 160\n      }\n    })).toMatchSnapshot('debugger_sidebar.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -506,11 +506,11 @@
             "name": "Variables panel",
             "suites": [],
             "updatePoint": {
-                "line": 209,
+                "line": 208,
                 "column": 23,
-                "index": 6459
+                "index": 6429
             },
-            "line": 209,
+            "line": 208,
             "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n\n    // Wait for the locals variables to be displayed\n    await expect(page.locator('.jp-DebuggerVariables-toolbar select')).toHaveValue('Locals');\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n\n    // Copy value to clipboard\n    await page.locator('.jp-DebuggerVariables-body :text(\"b\")').click({\n      button: 'right'\n    });\n    await page.locator('.lm-Menu-itemLabel:text(\"Copy to Clipboard\")').click();\n    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2');\n\n    // Copy value entry is disabled for variables with empty value\n    await page.locator('.jp-DebuggerVariables-toolbar select').selectOption('Globals');\n    await page.locator('.jp-DebuggerVariables-body :text(\"special variables\")').click({\n      button: 'right'\n    });\n    await expect(page.locator('li.lm-Menu-item[data-command=\"debugger:copy-to-clipboard\"]')).toHaveAttribute('aria-disabled', 'true');\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -520,11 +520,11 @@
             "name": "Call Stack panel",
             "suites": [],
             "updatePoint": {
-                "line": 252,
+                "line": 251,
                 "column": 24,
-                "index": 8027
+                "index": 7997
             },
-            "line": 252,
+            "line": 251,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -534,11 +534,11 @@
             "name": "Breakpoints panel",
             "suites": [],
             "updatePoint": {
-                "line": 283,
+                "line": 282,
                 "column": 25,
-                "index": 8962
+                "index": 8932
             },
-            "line": 283,
+            "line": 282,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/2114632017.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -548,11 +548,11 @@
             "name": "Source panel",
             "suites": [],
             "updatePoint": {
-                "line": 315,
+                "line": 314,
                 "column": 20,
-                "index": 9949
+                "index": 9919
             },
-            "line": 315,
+            "line": 314,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
@@ -567,7 +567,7 @@
                 "index": 401
             },
             "line": 15,
-            "code": "  test('Export Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('text=File');\n    await page.click('ul[role=\"menu\"] >> text=Save and Export Notebook As');\n\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 0,\n        width: 700,\n        height: 700\n      }\n    })).toMatchSnapshot('exporting_menu.png');\n  });",
+            "code": "  test('Export Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('text=File');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Save and Export Notebook As');\n\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 0,\n        width: 700,\n        height: 700\n      }\n    })).toMatchSnapshot('exporting_menu.png');\n  });",
             "file": "documentation/export_notebook.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -578,7 +578,7 @@
             "updatePoint": {
                 "line": 37,
                 "column": 14,
-                "index": 1076
+                "index": 1085
             },
             "line": 37,
             "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('[title=\"Property Inspector\"]');\n    await page.click('.jp-PropertyInspector >> text=Common Tools');\n    await page.selectOption('.jp-PropertyInspector >> text=Slide Type >> select', {\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
@@ -595,7 +595,7 @@
                 "index": 399
             },
             "line": 15,
-            "code": "  test('Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.click('text=Settings');\n    await page.click('ul[role=\"menu\"] >> text=Language');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 250,\n        width: 800,\n        height: 600\n      }\n    })).toMatchSnapshot('language_settings.png');\n  });",
+            "code": "  test('Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.click('text=Settings');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Language');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 250,\n        width: 800,\n        height: 600\n      }\n    })).toMatchSnapshot('language_settings.png');\n  });",
             "file": "documentation/internationalization.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -606,10 +606,10 @@
             "updatePoint": {
                 "line": 31,
                 "column": 24,
-                "index": 790
+                "index": 799
             },
             "line": 31,
-            "code": "  test('Confirm language', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.click('text=Settings');\n    await page.click('ul[role=\"menu\"] >> text=Language');\n    await page.click('#jp-mainmenu-settings-language >> text=Chinese');\n    expect(await page.screenshot({\n      clip: {\n        y: 200,\n        x: 350,\n        width: 600,\n        height: 300\n      }\n    })).toMatchSnapshot('language_change.png');\n  });",
+            "code": "  test('Confirm language', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.click('text=Settings');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Language');\n    await page.click('#jp-mainmenu-settings-language >> text=Chinese');\n    expect(await page.screenshot({\n      clip: {\n        y: 200,\n        x: 350,\n        width: 600,\n        height: 300\n      }\n    })).toMatchSnapshot('language_change.png');\n  });",
             "file": "documentation/internationalization.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -620,10 +620,10 @@
             "updatePoint": {
                 "line": 48,
                 "column": 21,
-                "index": 1250
+                "index": 1268
             },
             "line": 48,
-            "code": "  test('UI in Chinese', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.click('text=Settings');\n    await page.click('ul[role=\"menu\"] >> text=Language');\n    await page.click('#jp-mainmenu-settings-language >> text=Chinese');\n    await Promise.all([page.waitForNavigation(), page.waitForSelector('#jupyterlab-splash'), page.click('button:has-text(\"Change and reload\")')]);\n    await page.waitForSelector('#jupyterlab-splash', {\n      state: 'detached'\n    });\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n\n    // Wait for the launcher to be loaded\n    await page.waitForSelector('text=README.md');\n    await setSidebarWidth(page);\n    expect(await page.screenshot()).toMatchSnapshot('language_chinese.png');\n  });",
+            "code": "  test('UI in Chinese', async ({\n    page\n  }) => {\n    await galata.Mock.freezeContentLastModified(page);\n    await page.goto();\n    await page.click('text=Settings');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Language');\n    await page.click('#jp-mainmenu-settings-language >> text=Chinese');\n    await Promise.all([page.waitForNavigation(), page.waitForSelector('#jupyterlab-splash'), page.click('button:has-text(\"Change and reload\")')]);\n    await page.waitForSelector('#jupyterlab-splash', {\n      state: 'detached'\n    });\n    await page.addStyleTag({\n      content: `.jp-LabShell.jp-mod-devMode {\n        border-top: none;\n      }`\n    });\n\n    // Wait for the launcher to be loaded\n    await page.waitForSelector('text=README.md');\n    await setSidebarWidth(page);\n    expect(await page.screenshot()).toMatchSnapshot('language_chinese.png');\n  });",
             "file": "documentation/internationalization.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -721,7 +721,7 @@
                 "index": 515
             },
             "line": 18,
-            "code": "test('should goto the application page and load hook', async ({\n  page\n}) => {\n  expect(await page.evaluate(() => typeof window.galataip === 'object')).toEqual(true);\n});",
+            "code": "test('should goto the application page and load hook', async ({\n  page\n}) => {\n  expect(await page.evaluate(() => typeof window.galata === 'object')).toEqual(true);\n});",
             "file": "galata/jupyterlabpage.spec.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -732,7 +732,7 @@
             "updatePoint": {
                 "line": 23,
                 "column": 54,
-                "index": 688
+                "index": 686
             },
             "line": 23,
             "code": "test('should test if the application is in simple mode', async ({\n  page\n}) => {\n  expect(await page.isInSimpleMode()).toEqual(false);\n});",
@@ -746,10 +746,10 @@
             "updatePoint": {
                 "line": 28,
                 "column": 54,
-                "index": 827
+                "index": 825
             },
             "line": 28,
-            "code": "test('should reload the application page and load hook', async ({\n  page\n}) => {\n  await page.reload();\n  expect(await page.evaluate(() => typeof window.galataip === 'object')).toEqual(true);\n});",
+            "code": "test('should reload the application page and load hook', async ({\n  page\n}) => {\n  await page.reload();\n  expect(await page.evaluate(() => typeof window.galata === 'object')).toEqual(true);\n});",
             "file": "galata/jupyterlabpage.spec.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -760,7 +760,7 @@
             "updatePoint": {
                 "line": 34,
                 "column": 25,
-                "index": 994
+                "index": 990
             },
             "line": 34,
             "code": "test('should reset the UI', async ({\n  page\n}) => {\n  await page.resetUI();\n  expect(await page.menu.isAnyOpen()).toEqual(false);\n  expect(await page.waitForSelector(page.launcherSelector)).toBeTruthy();\n  expect(await page.kernel.isAnyRunning()).toEqual(false);\n  expect(await page.statusbar.isVisible()).toEqual(true);\n  expect(await page.sidebar.isTabOpen('filebrowser')).toEqual(true);\n});",
@@ -774,10 +774,94 @@
             "updatePoint": {
                 "line": 44,
                 "column": 31,
-                "index": 1394
+                "index": 1390
             },
             "line": 44,
             "code": "test('should toggle simple mode', async ({\n  page\n}) => {\n  expect(await page.setSimpleMode(true)).toEqual(true);\n  expect(await page.isInSimpleMode()).toEqual(true);\n});",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should listen to JupyterLab dialog",
+            "suites": [],
+            "updatePoint": {
+                "line": 60,
+                "column": 42,
+                "index": 1915
+            },
+            "line": 60,
+            "code": "  test('should listen to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      window.galata.on('dialog', d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n      });\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n  });",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should stop listening to JupyterLab dialog",
+            "suites": [],
+            "updatePoint": {
+                "line": 75,
+                "column": 50,
+                "index": 2566
+            },
+            "line": 75,
+            "code": "  test('should stop listening to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n        window.galata.off('dialog', callback);\n      };\n      window.galata.on('dialog', callback);\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(1);\n  });",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should listen only once to JupyterLab dialog",
+            "suites": [],
+            "updatePoint": {
+                "line": 94,
+                "column": 52,
+                "index": 3470
+            },
+            "line": 94,
+            "code": "  test('should listen only once to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n      };\n      window.galata.once('dialog', callback);\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(1);\n  });",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should listen to JupyterLab notification",
+            "suites": [],
+            "updatePoint": {
+                "line": 112,
+                "column": 48,
+                "index": 4325
+            },
+            "line": 112,
+            "code": "  test('should listen to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      window.galata.on('notification', n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n      });\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      void window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n  });",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should stop listening to JupyterLab notification",
+            "suites": [],
+            "updatePoint": {
+                "line": 137,
+                "column": 56,
+                "index": 5194
+            },
+            "line": 137,
+            "code": "  test('should stop listening to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n        window.galata.off('notification', callback);\n      };\n      window.galata.on('notification', callback);\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(1);\n  });",
+            "file": "galata/jupyterlabpage.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "should listen only once to JupyterLab notification",
+            "suites": [],
+            "updatePoint": {
+                "line": 173,
+                "column": 58,
+                "index": 6497
+            },
+            "line": 173,
+            "code": "  test('should listen only once to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n      };\n      window.galata.once('notification', callback);\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(1);\n  });",
             "file": "galata/jupyterlabpage.spec.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -793,6 +877,104 @@
             "line": 6,
             "code": "test('should display the launcher', async ({\n  page\n}) => {\n  expect(await page.waitForSelector(page.launcherSelector)).toBeTruthy();\n});",
             "file": "galata/test.spec.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Announcements requires user agreement",
+            "suites": [],
+            "updatePoint": {
+                "line": 13,
+                "column": 43,
+                "index": 359
+            },
+            "line": 13,
+            "code": "test('Announcements requires user agreement', async ({\n  page\n}) => {\n  const notifications = await page.notifications;\n  expect(notifications).toHaveLength(1);\n  expect(notifications[0].message).toEqual('Would you like to receive official Jupyter news?\\nPlease read the privacy policy.');\n  expect(notifications[0].options.actions).toHaveLength(3);\n  expect(notifications[0].options.actions[0].label).toEqual('Open privacy policy');\n});",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should check",
+            "suites": [],
+            "updatePoint": {
+                "line": 59,
+                "column": 20,
+                "index": 1776
+            },
+            "line": 59,
+            "code": "  test('Should check', async ({\n    page\n  }) => {\n    const config = {};\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        fetchNews: 'true'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    const updates = notifications.filter(n => n.options?.data?.tags?.includes('update'));\n    expect(updates).toHaveLength(1);\n    expect(updates[0].message).toEqual(message);\n    expect(updates[0].options.actions[1].label).toEqual(actionLabel);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not check",
+            "suites": [],
+            "updatePoint": {
+                "line": 78,
+                "column": 24,
+                "index": 2438
+            },
+            "line": 78,
+            "code": "  test('Should not check', async ({\n    page\n  }) => {\n    const config = {};\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        checkForUpdates: false,\n        fetchNews: 'true'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    expect(notifications.filter(n => n.options?.data?.tags?.includes('update'))).toHaveLength(0);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not display notice",
+            "suites": [],
+            "updatePoint": {
+                "line": 95,
+                "column": 33,
+                "index": 2993
+            },
+            "line": 95,
+            "code": "  test('Should not display notice', async ({\n    page\n  }) => {\n    const config = {\n      jupyterlabapputilsextensionannouncements: {}\n    };\n    config['jupyterlabapputilsextensionannouncements'][id] = {\n      seen: true,\n      dismissed: true\n    };\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        fetchNews: 'true'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    expect(notifications.filter(n => n.options?.data?.tags?.includes('update'))).toHaveLength(0);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should fetch",
+            "suites": [],
+            "updatePoint": {
+                "line": 166,
+                "column": 20,
+                "index": 4997
+            },
+            "line": 166,
+            "code": "  test('Should fetch', async ({\n    page\n  }) => {\n    const config = {};\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        fetchNews: 'true'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    const news = notifications.filter(n => n.options?.data?.tags?.includes('news'));\n    expect(news).toHaveLength(2);\n    expect(news.filter(n => n.options.data.id === id)[0].message).toEqual(message);\n    expect(news.filter(n => n.options.data.id === id)[0].options.actions[1].label).toEqual(actionLabel);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not fetch",
+            "suites": [],
+            "updatePoint": {
+                "line": 185,
+                "column": 24,
+                "index": 5721
+            },
+            "line": 185,
+            "code": "  test('Should not fetch', async ({\n    page\n  }) => {\n    const config = {};\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        fetchNews: 'false'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    const news = notifications.filter(n => n.options?.data?.tags?.includes('news'));\n    expect(news).toHaveLength(0);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not display some news",
+            "suites": [],
+            "updatePoint": {
+                "line": 202,
+                "column": 36,
+                "index": 6269
+            },
+            "line": 202,
+            "code": "  test('Should not display some news', async ({\n    page\n  }) => {\n    const config = {\n      jupyterlabapputilsextensionannouncements: {}\n    };\n    config['jupyterlabapputilsextensionannouncements'][id] = {\n      seen: true,\n      dismissed: true\n    };\n    await galata.Mock.mockConfig(page, config);\n    const settings = [];\n    await galata.Mock.mockSettings(page, settings, {\n      ...galata.DEFAULT_SETTINGS,\n      '@jupyterlab/apputils-extension:notification': {\n        fetchNews: 'true'\n      }\n    });\n    await page.goto();\n    const notifications = await page.notifications;\n    const news = notifications.filter(n => n.options?.data?.tags?.includes('news'));\n    expect(news).toHaveLength(1);\n    expect(news[0].id).not.toEqual(id);\n  });",
+            "file": "jupyterlab/announcements.test.ts",
             "skipped": false,
             "dir": "galata/test"
         },
@@ -1295,7 +1477,7 @@
                 "index": 3221
             },
             "line": 91,
-            "code": "  test('Open file browser context submenu open with', async ({\n    page\n  }) => {\n    await page.sidebar.openTab(filebrowserId);\n    expect(await page.sidebar.isTabOpen(filebrowserId)).toBeTruthy();\n    await page.click(`.jp-DirListing-item span:has-text(\"${testFileName}\")`, {\n      button: 'right'\n    });\n    // Context menu should be available\n    expect(await page.menu.isAnyOpen()).toBe(true);\n    await page.hover('text=Open With');\n    await page.waitForSelector('li[role=\"menuitem\"]:has-text(\"Editor\")');\n    const imageName = `file-openwith.png`;\n    // Get the last menu -> will be submenu\n    const menu = await page.menu.getOpenMenu();\n    expect(await menu.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Open file browser context submenu open with', async ({\n    page\n  }) => {\n    await page.sidebar.openTab(filebrowserId);\n    expect(await page.sidebar.isTabOpen(filebrowserId)).toBeTruthy();\n    await page.click(`.jp-DirListing-item span:has-text(\"${testFileName}\")`, {\n      button: 'right'\n    });\n    // Context menu should be available\n    expect(await page.menu.isAnyOpen()).toBe(true);\n    await page.hover('text=Open With');\n    await page.waitForSelector('.lm-Menu li[role=\"menuitem\"]:has-text(\"Editor\")');\n    const imageName = `file-openwith.png`;\n    // Get the last menu -> will be submenu\n    const menu = await page.menu.getOpenMenu();\n    expect(await menu.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/contextmenu.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -1306,7 +1488,7 @@
             "updatePoint": {
                 "line": 108,
                 "column": 29,
-                "index": 3918
+                "index": 3927
             },
             "line": 108,
             "code": "  test('Open tab context menu', async ({\n    page\n  }) => {\n    await page.click('div[role=\"main\"] >> text=Launcher', {\n      button: 'right'\n    });\n    // Context menu should be available\n    expect(await page.menu.isAnyOpen()).toBe(true);\n    const imageName = `tab-launcher.png`;\n    const menu = await page.menu.getOpenMenu();\n    expect(await menu.screenshot()).toMatchSnapshot(imageName);\n  });",
@@ -1320,7 +1502,7 @@
             "updatePoint": {
                 "line": 132,
                 "column": 40,
-                "index": 4626
+                "index": 4635
             },
             "line": 132,
             "code": "    test('Open notebook tab context menu', async ({\n      page\n    }) => {\n      await page.click('div[role=\"main\"] >> text=simple_notebook.ipynb', {\n        button: 'right'\n      });\n      // Context menu should be available\n      expect(await page.menu.isAnyOpen()).toBe(true);\n      const imageName = `tab-notebook.png`;\n      const menu = await page.menu.getOpenMenu();\n      expect(await menu.screenshot()).toMatchSnapshot(imageName);\n    });",
@@ -1334,7 +1516,7 @@
             "updatePoint": {
                 "line": 144,
                 "column": 39,
-                "index": 5073
+                "index": 5082
             },
             "line": 144,
             "code": "    test('Open context on markdown cell', async ({\n      page\n    }) => {\n      await page.click('text=Test Notebook¶', {\n        button: 'right'\n      });\n      expect(await page.menu.isAnyOpen()).toBe(true);\n      const imageName = `notebook-md.png`;\n      const menu = await page.menu.getOpenMenu();\n      expect(await menu.screenshot()).toMatchSnapshot(imageName);\n    });",
@@ -1348,7 +1530,7 @@
             "updatePoint": {
                 "line": 155,
                 "column": 35,
-                "index": 5446
+                "index": 5455
             },
             "line": 155,
             "code": "    test('Open context on code cell', async ({\n      page\n    }) => {\n      await page.click('text=from IPython.display import Image', {\n        button: 'right'\n      });\n      expect(await page.menu.isAnyOpen()).toBe(true);\n      const imageName = `notebook-code.png`;\n      const menu = await page.menu.getOpenMenu();\n      expect(await menu.screenshot()).toMatchSnapshot(imageName);\n    });",
@@ -1362,7 +1544,7 @@
             "updatePoint": {
                 "line": 167,
                 "column": 37,
-                "index": 5848
+                "index": 5857
             },
             "line": 167,
             "code": "  test('Open file editor context menu', async ({\n    page\n  }) => {\n    await page.sidebar.openTab(filebrowserId);\n    expect(await page.sidebar.isTabOpen(filebrowserId)).toBeTruthy();\n    await page.dblclick(`span:has-text(\"${testFileName}\")`);\n    await page.click('text=# Title', {\n      button: 'right'\n    });\n    expect(await page.menu.isAnyOpen()).toBe(true);\n    const imageName = `fileeditor.png`;\n    const menu = await page.menu.getOpenMenu();\n    expect(await menu.screenshot()).toMatchSnapshot(imageName);\n  });",
@@ -3031,7 +3213,7 @@
                 "index": 966
             },
             "line": 21,
-            "code": "  test('should display running indicators', async ({\n    page\n  }) => {\n    const tocPanel = await page.sidebar.getContentPanel(await page.sidebar.getTabPosition('table-of-contents'));\n    const executed = page.notebook.run();\n    await page.pause();\n    await tocPanel.waitForSelector('[data-running=\"1\"]');\n    expect(await tocPanel.screenshot()).toMatchSnapshot('toc-running-indicators.png');\n    await executed;\n  });",
+            "code": "  test('should display running indicators', async ({\n    page\n  }) => {\n    const tocPanel = await page.sidebar.getContentPanel(await page.sidebar.getTabPosition('table-of-contents'));\n    const executed = page.notebook.run();\n    await tocPanel.waitForSelector('[data-running=\"1\"]');\n    expect(await tocPanel.screenshot()).toMatchSnapshot('toc-running-indicators.png');\n    await executed;\n  });",
             "file": "jupyterlab/toc-running.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -3040,11 +3222,11 @@
             "name": "should display running indicator on first visible top level",
             "suites": [],
             "updatePoint": {
-                "line": 31,
+                "line": 30,
                 "column": 67,
-                "index": 1414
+                "index": 1390
             },
-            "line": 31,
+            "line": 30,
             "code": "  test('should display running indicator on first visible top level', async ({\n    page\n  }) => {\n    const tocPanel = await page.sidebar.getContentPanel(await page.sidebar.getTabPosition('table-of-contents'));\n    await page.notebook.run();\n\n    // Collapse ToC\n    await page.click('[aria-label=\"Table of Contents section\"] >> button:left-of(:text(\"Title 1\"))');\n    const executed = page.notebook.runCell(5);\n    await tocPanel.waitForSelector('[data-running=\"1\"]');\n    expect(await tocPanel.screenshot()).toMatchSnapshot('toc-running-indicator-top-level.png');\n    await executed;\n  });",
             "file": "jupyterlab/toc-running.test.ts",
             "skipped": false,
@@ -20462,7 +20644,7 @@
                 "column": 73
             },
             "line": 206,
-            "code": "      it('should not become unchecked due to right-click on selected item', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        itemNode.getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const item = dirListing.sortedItems().next();\n        await dirListing.selectItemByName(item.value.name);\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        simulate(checkbox, 'mousedown', {\n          clientX: 1,\n          clientY: 1,\n          button: 2\n        });\n        await signalToPromise(dirListing.updated);\n        // Item is still selected and checkbox is still checked after\n        // right-click.\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        expect(checkbox.checked).toBe(true);\n      });",
+            "code": "      it('should not become unchecked due to right-click on selected item', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        itemNode.getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const item = dirListing.sortedItems().next();\n        const waitForUpdate = signalToPromise(dirListing.updated);\n        await dirListing.selectItemByName(item.value.name);\n        await waitForUpdate;\n        expect(checkbox.checked).toBe(true);\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        const waitForUpdate2 = signalToPromise(dirListing.updated);\n        simulate(checkbox, 'mousedown', {\n          clientX: 1,\n          clientY: 1,\n          button: 2\n        });\n        await waitForUpdate2;\n        // Item is still selected and checkbox is still checked after\n        // right-click.\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        expect(checkbox.checked).toBe(true);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -20475,10 +20657,10 @@
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 238,
+                "line": 240,
                 "column": 65
             },
-            "line": 238,
+            "line": 240,
             "code": "      it('should not get checked by the default action of a click', () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        expect(checkbox.checked).toBe(false);\n        simulate(checkbox, 'click', { bubbles: false });\n        expect(checkbox.checked).toBe(false);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20492,10 +20674,10 @@
                 "check-all checkbox"
             ],
             "updatePoint": {
-                "line": 250,
+                "line": 252,
                 "column": 65
             },
-            "line": 250,
+            "line": 252,
             "code": "      it('should be unchecked when the current directory is empty', async () => {\n        const { path } = await dirListing.model.manager.newUntitled({\n          type: 'directory'\n        });\n        await dirListing.model.cd(path);\n        await signalToPromise(dirListing.updated);\n        const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n          dirListing.headerNode\n        ) as HTMLInputElement;\n        expect(headerCheckbox.checked).toBe(false);\n        expect(headerCheckbox!.indeterminate).toBe(false);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20510,10 +20692,10 @@
                 "when previously unchecked"
             ],
             "updatePoint": {
-                "line": 264,
+                "line": 266,
                 "column": 36
             },
-            "line": 264,
+            "line": 266,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(false);\n          expect(headerCheckbox!.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(ariaSelectAll);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20528,10 +20710,10 @@
                 "when previously unchecked"
             ],
             "updatePoint": {
-                "line": 273,
+                "line": 275,
                 "column": 28
             },
-            "line": 273,
+            "line": 275,
             "code": "        it('should check all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(\n            ariaDeselectAll\n          );\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20546,10 +20728,10 @@
                 "when previously indeterminate"
             ],
             "updatePoint": {
-                "line": 291,
+                "line": 293,
                 "column": 36
             },
-            "line": 291,
+            "line": 293,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.indeterminate).toBe(true);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(1);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(\n            ariaDeselectAll\n          );\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20564,10 +20746,10 @@
                 "when previously indeterminate"
             ],
             "updatePoint": {
-                "line": 301,
+                "line": 303,
                 "column": 30
             },
-            "line": 301,
+            "line": 303,
             "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(ariaSelectAll);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20582,10 +20764,10 @@
                 "when previously checked"
             ],
             "updatePoint": {
-                "line": 318,
+                "line": 320,
                 "column": 36
             },
-            "line": 318,
+            "line": 320,
             "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(true);\n          expect(headerCheckbox.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
@@ -20600,10 +20782,10 @@
                 "when previously checked"
             ],
             "updatePoint": {
-                "line": 326,
+                "line": 328,
                 "column": 30
             },
-            "line": 326,
+            "line": 328,
             "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
