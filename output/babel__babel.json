@@ -1354,16 +1354,32 @@
             "dir": "packages/babel-core/test"
         },
         {
-            "name": "transformFromAst should not mutate the AST",
+            "name": "transformFromAstSync should not cause infinite recursion with circular objects",
             "suites": [
                 "api"
             ],
             "updatePoint": {
                 "line": 266,
-                "column": 48,
-                "index": 8037
+                "column": 84,
+                "index": 8073
             },
             "line": 266,
+            "code": "  it(\"transformFromAstSync should not cause infinite recursion with circular objects\", () => {\n    const program = \"const identifier = 1\";\n    const node = parseSync(program);\n    node.program.body[0].extra = {\n      parent: node.program\n    };\n    expect(transformFromAstSync(node, program, {}).code).toBe(\"const identifier = 1;\");\n  });",
+            "file": "api.js",
+            "skipped": false,
+            "dir": "packages/babel-core/test"
+        },
+        {
+            "name": "transformFromAst should not mutate the AST",
+            "suites": [
+                "api"
+            ],
+            "updatePoint": {
+                "line": 274,
+                "column": 48,
+                "index": 8376
+            },
+            "line": 274,
             "code": "  it(\"transformFromAst should not mutate the AST\", function () {\n    const program = \"const identifier = 1\";\n    const node = parseSync(program);\n    const {\n      code\n    } = transformFromAstSync(node, program, {\n      plugins: [function () {\n        return {\n          visitor: {\n            Identifier: function (path) {\n              path.node.name = \"replaced\";\n            }\n          }\n        };\n      }]\n    });\n    expect(code).toBe(\"const replaced = 1;\");\n    expect(node.program.body[0].declarations[0].id.name).toBe(\"identifier\", \"original ast should not have been mutated\");\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1375,11 +1391,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 285,
+                "line": 293,
                 "column": 76,
-                "index": 8661
+                "index": 9000
             },
-            "line": 285,
+            "line": 293,
             "code": "  it(\"transformFromAstSync should mutate the AST when cloneInputAst is false\", function () {\n    const program = \"const identifier = 1\";\n    const node = parseSync(program);\n    const {\n      code\n    } = transformFromAstSync(node, program, {\n      cloneInputAst: false,\n      plugins: [function () {\n        return {\n          visitor: {\n            Identifier: function (path) {\n              path.node.name = \"replaced\";\n            }\n          }\n        };\n      }]\n    });\n    expect(code).toBe(\"const replaced = 1;\");\n    expect(node.program.body[0].declarations[0].id.name).toBe(\"replaced\", \"original ast should have been mutated\");\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1391,11 +1407,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 305,
+                "line": 313,
                 "column": 33,
-                "index": 9264
+                "index": 9603
             },
-            "line": 305,
+            "line": 313,
             "code": "  it(\"options throw on falsy true\", function () {\n    return expect(function () {\n      transformSync(\"\", {\n        plugins: [pluginSyntaxJSX, false]\n      });\n    }).toThrow(/.plugins\\[1\\] must be a string, object, function/);\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1407,11 +1423,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 312,
+                "line": 320,
                 "column": 29,
-                "index": 9494
+                "index": 9833
             },
-            "line": 312,
+            "line": 320,
             "code": "  it(\"options merge backwards\", async function () {\n    const result = await transformAsync(\"\", {\n      cwd,\n      presets: [\"@babel/preset-env\"],\n      plugins: [\"@babel/plugin-syntax-jsx\"]\n    });\n    expect(result.options.plugins[0].manipulateOptions.toString()).toEqual(expect.stringContaining(\"jsx\"));\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1423,11 +1439,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 320,
+                "line": 328,
                 "column": 36,
-                "index": 9814
+                "index": 10153
             },
-            "line": 320,
+            "line": 328,
             "code": "  it(\"option wrapPluginVisitorMethod\", function () {\n    let calledRaw = 0;\n    let calledIntercept = 0;\n    transformSync(\"function foo() { bar(foobar); }\", {\n      wrapPluginVisitorMethod: function (pluginAlias, visitorType, callback) {\n        if (pluginAlias !== \"foobar\") {\n          return callback;\n        }\n        expect(visitorType).toBe(\"enter\");\n        return function () {\n          calledIntercept++;\n          return callback.apply(this, arguments);\n        };\n      },\n      plugins: [new Plugin({\n        name: \"foobar\",\n        visitor: {\n          \"Program|Identifier\": function () {\n            calledRaw++;\n          }\n        }\n      })]\n    });\n    expect(calledRaw).toBe(4);\n    expect(calledIntercept).toBe(4);\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1439,11 +1455,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 346,
+                "line": 354,
                 "column": 21,
-                "index": 10543
+                "index": 10882
             },
-            "line": 346,
+            "line": 354,
             "code": "  it(\"pass per preset\", function () {\n    let aliasBaseType = null;\n    function execTest(passPerPreset) {\n      return transformSync(\"type Foo = number; let x = (y): Foo => y;\", {\n        sourceType: \"script\",\n        passPerPreset: passPerPreset,\n        presets: [\n        // First preset with our plugin, \"before\"\n        function () {\n          return {\n            plugins: [new Plugin({\n              visitor: {\n                Function: function (path) {\n                  const alias = path.scope.getProgramParent().path.get(\"body\")[0].node;\n                  if (!babel.types.isTypeAlias(alias)) return;\n\n                  // In case of `passPerPreset` being `false`, the\n                  // alias node is already removed by Flow plugin.\n                  if (!alias) {\n                    return;\n                  }\n\n                  // In case of `passPerPreset` being `true`, the\n                  // alias node should still exist.\n                  aliasBaseType = alias.right.type; // NumberTypeAnnotation\n                }\n              }\n            })]\n          };\n        },\n        // env preset\n        [presetEnv, {\n          targets: {\n            browsers: \"ie 6\"\n          }\n        }],\n        // Third preset for Flow.\n        () => ({\n          plugins: [pluginSyntaxFlow, pluginFlowStripTypes]\n        })]\n      });\n    }\n\n    // 1. passPerPreset: true\n\n    let result = execTest(true);\n    expect(aliasBaseType).toBe(\"NumberTypeAnnotation\");\n    expect(result.code).toBe(\"var x = function x(y) {\\n  return y;\\n};\");\n\n    // 2. passPerPreset: false\n\n    aliasBaseType = null;\n    result = execTest(false);\n    expect(aliasBaseType).toBeNull();\n    expect(result.code).toBe(\"var x = function x(y) {\\n  return y;\\n};\");\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1455,11 +1471,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 402,
+                "line": 410,
                 "column": 40,
-                "index": 12319
+                "index": 12658
             },
-            "line": 402,
+            "line": 410,
             "code": "  it(\"complex plugin and preset ordering\", function () {\n    function pushPlugin(str) {\n      return {\n        visitor: {\n          Program(path) {\n            path.pushContainer(\"body\", babel.types.expressionStatement(babel.types.identifier(str)));\n          }\n        }\n      };\n    }\n    function pushPreset(str) {\n      return {\n        plugins: [pushPlugin(str)]\n      };\n    }\n    const oldEnv = process.env.BABEL_ENV;\n    process.env.BABEL_ENV = \"development\";\n    const result = transformSync(\"\", {\n      cwd: path.join(cwd, \"fixtures\", \"config\", \"complex-plugin-config\"),\n      filename: path.join(cwd, \"fixtures\", \"config\", \"complex-plugin-config\", \"file.js\"),\n      presets: [pushPreset(\"argone\"), pushPreset(\"argtwo\")],\n      env: {\n        development: {\n          passPerPreset: true,\n          presets: [pushPreset(\"argthree\"), pushPreset(\"argfour\")]\n        }\n      }\n    });\n    if (oldEnv === undefined) {\n      delete process.env.BABEL_ENV;\n    } else {\n      process.env.BABEL_ENV = oldEnv;\n    }\n    expect(result.code).toBe([\"thirteen;\", \"fourteen;\", \"seventeen;\", \"eighteen;\", \"one;\", \"two;\", \"eleven;\", \"twelve;\", \"argtwo;\", \"argone;\", \"five;\", \"six;\", \"twentyone;\", \"twentytwo;\", \"three;\", \"four;\", \"nineteen;\", \"twenty;\", \"fifteen;\", \"sixteen;\", \"seven;\", \"eight;\", \"nine;\", \"ten;\", \"argthree;\", \"argfour;\"].join(\"\\n\"));\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1471,11 +1487,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 437,
+                "line": 445,
                 "column": 43,
-                "index": 13675
+                "index": 14014
             },
-            "line": 437,
+            "line": 445,
             "code": "  it(\"interpreter directive backward-compat\", function () {\n    function doTransform(code, preHandler) {\n      return transformSync(code, {\n        plugins: [{\n          pre: preHandler\n        }]\n      }).code;\n    }\n\n    // Writes value properly.\n    expect(doTransform(\"\", file => {\n      file.shebang = \"env node\";\n    })).toBe(`#!env node`);\n    expect(doTransform(\"#!env node\", file => {\n      file.shebang = \"env node2\";\n    })).toBe(`#!env node2`);\n    expect(doTransform(\"\", file => {\n      file.shebang = \"\";\n    })).toBe(``);\n    expect(doTransform(\"#!env node\", file => {\n      file.shebang = \"\";\n    })).toBe(``);\n\n    // Reads value properly.\n    doTransform(\"\", file => {\n      expect(file.shebang).toBe(\"\");\n    });\n    doTransform(\"#!env node\", file => {\n      expect(file.shebang).toBe(\"env node\");\n    });\n\n    // Reads and writes properly.\n    expect(doTransform(\"#!env node\", file => {\n      expect(file.shebang).toBe(\"env node\");\n      file.shebang = \"env node2\";\n      expect(file.shebang).toBe(\"env node2\");\n      file.shebang = \"env node3\";\n    })).toBe(`#!env node3`);\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1487,11 +1503,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 476,
+                "line": 484,
                 "column": 24,
-                "index": 14757
+                "index": 15096
             },
-            "line": 476,
+            "line": 484,
             "code": "  it(\"source map merging\", function () {\n    const result = transformSync([/* eslint-disable max-len */\n    'function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }', \"\", \"let Foo = function Foo() {\", \"  _classCallCheck(this, Foo);\", \"};\", \"\", \"//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInN0ZG91dCJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztJQUFNLEdBQUcsWUFBSCxHQUFHO3dCQUFILEdBQUciLCJmaWxlIjoidW5kZWZpbmVkIiwic291cmNlc0NvbnRlbnQiOlsiY2xhc3MgRm9vIHt9XG4iXX0=\"\n    /* eslint-enable max-len */].join(\"\\n\"), {\n      sourceMap: true\n    });\n    expect([\"function _classCallCheck(instance, Constructor) {\", \"  if (!(instance instanceof Constructor)) {\", '    throw new TypeError(\"Cannot call a class as a function\");', \"  }\", \"}\", \"let Foo = function Foo() {\", \"  _classCallCheck(this, Foo);\", \"};\"].join(\"\\n\")).toBe(result.code);\n    const consumer = new TraceMap(result.map);\n    expect(originalPositionFor(consumer, {\n      line: 6,\n      column: 4\n    })).toEqual({\n      name: \"Foo\",\n      source: \"stdout\",\n      line: 1,\n      column: 6\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1503,11 +1519,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 494,
+                "line": 502,
                 "column": 33,
-                "index": 15950
+                "index": 16289
             },
-            "line": 494,
+            "line": 502,
             "code": "  it(\"default source map filename\", function () {\n    return transformAsync(\"var a = 10;\", {\n      cwd: \"/some/absolute\",\n      filename: \"/some/absolute/file/path.js\",\n      sourceMaps: true\n    }).then(function (result) {\n      expect(result.map.sources).toEqual([\"path.js\"]);\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1519,11 +1535,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 503,
+                "line": 511,
                 "column": 23,
-                "index": 16233
+                "index": 16572
             },
-            "line": 503,
+            "line": 511,
             "code": "  it(\"code option false\", function () {\n    return transformAsync(\"foo('bar');\", {\n      code: false\n    }).then(function (result) {\n      expect(result.code).toBeFalsy();\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1535,11 +1551,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 510,
+                "line": 518,
                 "column": 22,
-                "index": 16418
+                "index": 16757
             },
-            "line": 510,
+            "line": 518,
             "code": "  it(\"ast option false\", function () {\n    return transformAsync(\"foo('bar');\", {\n      ast: false\n    }).then(function (result) {\n      expect(result.ast).toBeFalsy();\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1551,11 +1567,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 517,
+                "line": 525,
                 "column": 21,
-                "index": 16600
+                "index": 16939
             },
-            "line": 517,
+            "line": 525,
             "code": "  it(\"ast option true\", function () {\n    return transformAsync(\"foo('bar');\", {\n      ast: true\n    }).then(function (result) {\n      expect(result.ast).toBeTruthy();\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1567,11 +1583,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 524,
+                "line": 532,
                 "column": 24,
-                "index": 16785
+                "index": 17124
             },
-            "line": 524,
+            "line": 532,
             "code": "  it(\"ast option default\", function () {\n    return transformAsync(\"foo('bar');\").then(function (result) {\n      expect(result.ast).toBeFalsy();\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1583,11 +1599,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 529,
+                "line": 537,
                 "column": 29,
-                "index": 16949
+                "index": 17288
             },
-            "line": 529,
+            "line": 537,
             "code": "  it(\"auxiliaryComment option\", function () {\n    return transformAsync(\"class Foo {}\", {\n      auxiliaryCommentBefore: \"before\",\n      auxiliaryCommentAfter: \"after\",\n      plugins: [function (babel) {\n        const t = babel.types;\n        return {\n          visitor: {\n            Program: function (path) {\n              path.unshiftContainer(\"body\", t.expressionStatement(t.identifier(\"start\")));\n              path.pushContainer(\"body\", t.expressionStatement(t.identifier(\"end\")));\n            }\n          }\n        };\n      }]\n    }).then(function (result) {\n      expect(result.code).toBe(\"/*before*/\\nstart;\\n/*after*/\\nclass Foo {}\\n/*before*/\\nend;\\n/*after*/\");\n    });\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1599,11 +1615,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 548,
+                "line": 556,
                 "column": 19,
-                "index": 17627
+                "index": 17966
             },
-            "line": 548,
+            "line": 556,
             "code": "  it(\"ignore option\", function () {\n    return Promise.all([transformAsync(\"\", {\n      ignore: [\"/foo\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      ignore: [\"/foo/node_modules\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      ignore: [\"/foo/node_modules/*\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      ignore: [\"/foo/**/*\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      ignore: [\"/foo/node_modules/*.bar\"],\n      filename: \"/foo/node_modules/foo.bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      ignore: [\"/foo/node_modules/*.foo\"],\n      filename: \"/foo/node_modules/foo.bar\"\n    }).then(assertNotIgnored), transformAsync(\"\", {\n      ignore: [\"/bar/**/*\"],\n      filename: \"/foo/node_modules/foo.bar\"\n    }).then(assertNotIgnored)]);\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1615,11 +1631,11 @@
                 "api"
             ],
             "updatePoint": {
-                "line": 572,
+                "line": 580,
                 "column": 17,
-                "index": 18578
+                "index": 18917
             },
-            "line": 572,
+            "line": 580,
             "code": "  it(\"only option\", function () {\n    return Promise.all([transformAsync(\"\", {\n      only: [\"/foo\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertNotIgnored), transformAsync(\"\", {\n      only: [\"/foo/*\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertNotIgnored), transformAsync(\"\", {\n      only: [\"/foo/node_modules\"],\n      filename: \"/foo/node_modules/bar\"\n    }).then(assertNotIgnored), transformAsync(\"\", {\n      only: [\"/foo/node_modules/*.bar\"],\n      filename: \"/foo/node_modules/foo.bar\"\n    }).then(assertNotIgnored), transformAsync(\"\", {\n      only: [\"/foo/node_modules\"],\n      filename: \"/foo/node_module/bar\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      only: [\"/foo/node_modules\"],\n      filename: \"/bar/node_modules/foo\"\n    }).then(assertIgnored), transformAsync(\"\", {\n      only: [\"/foo/node_modules/*.bar\"],\n      filename: \"/foo/node_modules/bar.foo\"\n    }).then(assertIgnored)]);\n  });",
             "file": "api.js",
             "skipped": false,
@@ -1632,11 +1648,11 @@
                 "env option"
             ],
             "updatePoint": {
-                "line": 609,
+                "line": 617,
                 "column": 15,
-                "index": 19998
+                "index": 20337
             },
-            "line": 609,
+            "line": 617,
             "code": "    it(\"default\", function () {\n      const result = transformSync(\"foo;\", {\n        env: {\n          development: {\n            comments: false\n          }\n        }\n      });\n      expect(result.options.comments).toBe(false);\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1649,11 +1665,11 @@
                 "env option"
             ],
             "updatePoint": {
-                "line": 619,
+                "line": 627,
                 "column": 17,
-                "index": 20236
+                "index": 20575
             },
-            "line": 619,
+            "line": 627,
             "code": "    it(\"BABEL_ENV\", function () {\n      process.env.BABEL_ENV = \"foo\";\n      const result = transformSync(\"foo;\", {\n        env: {\n          foo: {\n            comments: false\n          }\n        }\n      });\n      expect(result.options.comments).toBe(false);\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1666,11 +1682,11 @@
                 "env option"
             ],
             "updatePoint": {
-                "line": 630,
+                "line": 638,
                 "column": 16,
-                "index": 20502
+                "index": 20841
             },
-            "line": 630,
+            "line": 638,
             "code": "    it(\"NODE_ENV\", function () {\n      process.env.NODE_ENV = \"foo\";\n      const result = transformSync(\"foo;\", {\n        env: {\n          foo: {\n            comments: false\n          }\n        }\n      });\n      expect(result.options.comments).toBe(false);\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1684,11 +1700,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 644,
+                "line": 652,
                 "column": 55,
-                "index": 20903
+                "index": 21242
             },
-            "line": 644,
+            "line": 652,
             "code": "      it(\"builds external helpers in global output type\", function () {\n        babel.buildExternalHelpers(null, \"global\");\n      });",
             "file": "api.js",
             "skipped": false,
@@ -1702,11 +1718,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 647,
+                "line": 655,
                 "column": 55,
-                "index": 21037
+                "index": 21376
             },
-            "line": 647,
+            "line": 655,
             "code": "      it(\"builds external helpers in module output type\", function () {\n        babel.buildExternalHelpers(null, \"module\");\n      });",
             "file": "api.js",
             "skipped": false,
@@ -1720,11 +1736,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 650,
+                "line": 658,
                 "column": 52,
-                "index": 21168
+                "index": 21507
             },
-            "line": 650,
+            "line": 658,
             "code": "      it(\"builds external helpers in umd output type\", function () {\n        babel.buildExternalHelpers(null, \"umd\");\n      });",
             "file": "api.js",
             "skipped": false,
@@ -1738,11 +1754,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 653,
+                "line": 661,
                 "column": 52,
-                "index": 21296
+                "index": 21635
             },
-            "line": 653,
+            "line": 661,
             "code": "      it(\"builds external helpers in var output type\", function () {\n        babel.buildExternalHelpers(null, \"var\");\n      });",
             "file": "api.js",
             "skipped": false,
@@ -1756,11 +1772,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 657,
+                "line": 665,
                 "column": 11,
-                "index": 21391
+                "index": 21730
             },
-            "line": 657,
+            "line": 665,
             "code": "    it(\"all\", function () {\n      const script = babel.buildExternalHelpers();\n      expect(script).toEqual(expect.stringContaining(\"classCallCheck\"));\n      expect(script).toEqual(expect.stringContaining(\"inherits\"));\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1774,11 +1790,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 662,
+                "line": 670,
                 "column": 17,
-                "index": 21624
+                "index": 21963
             },
-            "line": 662,
+            "line": 670,
             "code": "    it(\"allowlist\", function () {\n      const script = babel.buildExternalHelpers([\"inherits\"]);\n      expect(script).not.toEqual(expect.stringContaining(\"classCallCheck\"));\n      expect(script).toEqual(expect.stringContaining(\"inherits\"));\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1792,11 +1808,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 667,
+                "line": 675,
                 "column": 23,
-                "index": 21879
+                "index": 22218
             },
-            "line": 667,
+            "line": 675,
             "code": "    it(\"empty allowlist\", function () {\n      const script = babel.buildExternalHelpers([]);\n      expect(script).not.toEqual(expect.stringContaining(\"classCallCheck\"));\n      expect(script).not.toEqual(expect.stringContaining(\"inherits\"));\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1810,11 +1826,11 @@
                 "smoke tests"
             ],
             "updatePoint": {
-                "line": 672,
+                "line": 680,
                 "column": 19,
-                "index": 22124
+                "index": 22463
             },
-            "line": 672,
+            "line": 680,
             "code": "    it(\"underscored\", function () {\n      const script = babel.buildExternalHelpers([\"typeof\"]);\n      expect(script).toEqual(expect.stringContaining(\"typeof\"));\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1827,11 +1843,11 @@
                 "handle parsing errors"
             ],
             "updatePoint": {
-                "line": 681,
+                "line": 689,
                 "column": 36,
-                "index": 22417
+                "index": 22756
             },
-            "line": 681,
+            "line": 689,
             "code": "    it(\"only syntax plugin available\", function () {\n      return new Promise(resolve => {\n        transformFile(cwd + \"/fixtures/api/parsing-errors/only-syntax/file.js\", options, function (err) {\n          expect(err.message).toMatch(\"Support for the experimental syntax 'pipelineOperator' isn't currently enabled (1:3):\");\n          expect(err.message).toMatch(\"Add @babel/plugin-proposal-pipeline-operator (https://github.com/babel/babel/tree/main/packages/babel-plugin-proposal-pipeline-operator) to the \" + \"'plugins' section of your Babel config to enable transformation.\");\n          resolve();\n        });\n      });\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1844,11 +1860,11 @@
                 "handle parsing errors"
             ],
             "updatePoint": {
-                "line": 690,
+                "line": 698,
                 "column": 50,
-                "index": 23063
+                "index": 23402
             },
-            "line": 690,
+            "line": 698,
             "code": "    it(\"both syntax and transform plugin available\", function () {\n      return new Promise(resolve => {\n        transformFile(cwd + \"/fixtures/api/parsing-errors/syntax-and-transform/file.js\", options, function (err) {\n          expect(err.message).toMatch(\"Support for the experimental syntax 'doExpressions' isn't currently enabled (1:2):\");\n          expect(err.message).toMatch(\"Add @babel/plugin-proposal-do-expressions (https://github.com/babel/babel/tree/main/packages/babel-plugin-proposal-do-expressions) to the \" + \"'plugins' section of your Babel config to enable transformation.\");\n          resolve();\n        });\n      });\n    });",
             "file": "api.js",
             "skipped": false,
@@ -1861,11 +1877,11 @@
                 "missing helpers"
             ],
             "updatePoint": {
-                "line": 701,
+                "line": 709,
                 "column": 27,
-                "index": 23736
+                "index": 24075
             },
-            "line": 701,
+            "line": 709,
             "code": "    it(\"should always throw\", function () {\n      expect(() => babel.transformSync(``, {\n        configFile: false,\n        plugins: [function () {\n          return {\n            visitor: {\n              Program(path) {\n                try {\n                  path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n                } catch {}\n                path.pushContainer(\"body\", this.addHelper(\"fooBar\"));\n              }\n            }\n          };\n        }]\n      })).toThrowErrorMatchingInlineSnapshot(`\"unknown file: Unknown helper fooBar\"`);\n    });",
             "file": "api.js",
             "skipped": false,

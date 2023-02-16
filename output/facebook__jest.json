@@ -6783,7 +6783,7 @@
             "name": "%s",
             "suites": [],
             "line": 25,
-            "code": "describe.each(['toThrowError', 'toThrow'] as const)('%s', toThrow => {\n  class Err extends CustomError {}\n  class Err2 extends CustomError {}\n\n  test('to throw or not to throw', () => {\n    jestExpect(() => {\n      throw new CustomError('apple');\n    })[toThrow]();\n    jestExpect(() => {}).not[toThrow]();\n  });\n\n  describe('substring', () => {\n    it('passes', () => {\n      jestExpect(() => {\n        throw new CustomError('apple');\n      })[toThrow]('apple');\n      jestExpect(() => {\n        throw new CustomError('banana');\n      }).not[toThrow]('apple');\n      jestExpect(() => {}).not[toThrow]('apple');\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        jestExpect(() => {})[toThrow]('apple'),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('apple');\n        })[toThrow]('banana');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw '';\n        })[toThrow]('Server Error');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    it('properly escapes strings when matching against errors', () => {\n      jestExpect(() => {\n        throw new TypeError('\"this\"? throws.');\n      })[toThrow]('\"this\"? throws.');\n    });\n\n    test('threw, but message should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('Invalid array length');\n        }).not[toThrow]('array');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (non-error truthy)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 'Internal Server Error';\n        }).not[toThrow]('Server Error');\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('regexp', () => {\n    it('passes', () => {\n      jestExpect(() => {\n        throw new CustomError('apple');\n      })[toThrow](/apple/);\n      jestExpect(() => {\n        throw new CustomError('banana');\n      }).not[toThrow](/apple/);\n      jestExpect(() => {}).not[toThrow](/apple/);\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        jestExpect(() => {})[toThrow](/apple/),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('apple');\n        })[toThrow](/banana/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 0;\n        })[toThrow](/^[123456789]\\d*/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('Invalid array length');\n        }).not[toThrow](/ array /);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (non-error truthy)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 404;\n        }).not[toThrow](/^[123456789]\\d*/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('error class', () => {\n    class SubErr extends Err {\n      constructor(message?: string) {\n        super(message);\n        // In a carefully written error subclass,\n        // name property is equal to constructor name.\n        this.name = this.constructor.name;\n      }\n    }\n\n    class SubSubErr extends SubErr {\n      constructor(message?: string) {\n        super(message);\n        // In a carefully written error subclass,\n        // name property is equal to constructor name.\n        this.name = this.constructor.name;\n      }\n    }\n\n    it('passes', () => {\n      jestExpect(() => {\n        throw new Err();\n      })[toThrow](Err);\n      jestExpect(() => {\n        throw new Err();\n      })[toThrow](CustomError);\n      jestExpect(() => {\n        throw new Err();\n      }).not[toThrow](Err2);\n      jestExpect(() => {}).not[toThrow](Err);\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        expect(() => {})[toThrow](Err),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new Err('apple');\n        })[toThrow](Err2);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw undefined;\n        })[toThrow](Err2);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new Err('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error subclass)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new SubErr('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error subsubclass)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new SubSubErr('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('error-message', () => {\n    // Received message in report if object has message property.\n    class ErrorMessage {\n      // not extending Error!\n      constructor(public message: string) {}\n    }\n    const expected = new ErrorMessage('apple');\n\n    describe('pass', () => {\n      test('isNot false', () => {\n        jestExpect(() => {\n          throw new ErrorMessage('apple');\n        })[toThrow](expected);\n      });\n\n      test('isNot true', () => {\n        jestExpect(() => {\n          throw new ErrorMessage('banana');\n        }).not[toThrow](expected);\n      });\n    });\n\n    describe('fail', () => {\n      test('isNot false', () => {\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage('banana');\n          })[toThrow](expected),\n        ).toThrowErrorMatchingSnapshot();\n      });\n\n      test('isNot true', () => {\n        const message = 'Invalid array length';\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage(message);\n          }).not[toThrow]({message}),\n        ).toThrowErrorMatchingSnapshot();\n      });\n\n      test('multiline diff highlight incorrect expected space', () => {\n        // jest/issues/2673\n        const a =\n          \"There is no route defined for key Settings. \\nMust be one of: 'Home'\";\n        const b =\n          \"There is no route defined for key Settings.\\nMust be one of: 'Home'\";\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage(b);\n          })[toThrow]({message: a}),\n        ).toThrowErrorMatchingSnapshot();\n      });\n    });\n  });\n\n  describe('asymmetric', () => {\n    describe('any-Class', () => {\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          })[toThrow](expect.any(Err));\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          }).not[toThrow](expect.any(Err2));\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            })[toThrow](expect.any(Err2)),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            }).not[toThrow](expect.any(Err)),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('anything', () => {\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](expect.anything());\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {}).not[toThrow](expect.anything());\n          jestExpect(() => {\n            // eslint-disable-next-line no-throw-literal\n            throw null;\n          }).not[toThrow](expect.anything());\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              // eslint-disable-next-line no-throw-literal\n              throw null;\n            })[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('no-symbol', () => {\n      // Test serialization of asymmetric matcher which has no property:\n      // this.$$typeof = Symbol.for('jest.asymmetricMatcher')\n      const matchError = {\n        asymmetricMatch(received: Error | null | undefined) {\n          return (\n            received !== null &&\n            received !== undefined &&\n            received.name === 'Error'\n          );\n        },\n      };\n      const matchNotError = {\n        asymmetricMatch(received: Error | null | undefined) {\n          return (\n            received !== null &&\n            received !== undefined &&\n            received.name !== 'Error'\n          );\n        },\n      };\n\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('objectContaining', () => {\n      const matchError = expect.objectContaining({\n        name: 'Error',\n      });\n      const matchNotError = expect.objectContaining({\n        name: 'NotError',\n      });\n\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n  });\n\n  describe('promise/async throws if Error-like object is returned', () => {\n    const asyncFn = async (shouldThrow?: boolean, resolve?: boolean) => {\n      let err;\n      if (shouldThrow) {\n        err = new Err('async apple');\n      }\n      if (resolve) {\n        return Promise.resolve(err || 'apple');\n      } else {\n        return Promise.reject(err || 'apple');\n      }\n    };\n\n    test('passes', async () => {\n      expect.assertions(24);\n      await jestExpect(Promise.reject(new Error())).rejects[toThrow]();\n\n      await jestExpect(asyncFn(true)).rejects[toThrow]();\n      await jestExpect(asyncFn(true)).rejects[toThrow](Err);\n      await jestExpect(asyncFn(true)).rejects[toThrow](Error);\n      await jestExpect(asyncFn(true)).rejects[toThrow]('apple');\n      await jestExpect(asyncFn(true)).rejects[toThrow](/app/);\n\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](Err2);\n      await jestExpect(asyncFn(true)).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn(true, true)).resolves[toThrow]();\n\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]();\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](Error);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('apple');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/apple/);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('banana');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn()).rejects.not[toThrow]();\n      await jestExpect(asyncFn()).rejects.not[toThrow](Error);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('apple');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/apple/);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/banana/);\n\n      // Works with nested functions inside promises\n      await jestExpect(\n        Promise.reject(() => {\n          throw new Error();\n        }),\n      ).rejects[toThrow]();\n      await jestExpect(Promise.reject(() => {})).rejects.not[toThrow]();\n    });\n\n    test('did not throw at all', async () => {\n      await expect(\n        jestExpect(asyncFn()).rejects[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects[toThrow](Err2),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but should not have', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects.not[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('expected is undefined', () => {\n    test('threw, but should not have (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw null;\n        }).not[toThrow]();\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  test('invalid arguments', () => {\n    expect(() =>\n      jestExpect(() => {}).not[toThrow](111),\n    ).toThrowErrorMatchingSnapshot();\n  });\n\n  test('invalid actual', () => {\n    expect(() =>\n      jestExpect('a string')[toThrow](),\n    ).toThrowErrorMatchingSnapshot();\n  });\n});",
+            "code": "describe.each(['toThrowError', 'toThrow'] as const)('%s', toThrow => {\n  class Err extends CustomError {}\n  class Err2 extends CustomError {}\n\n  test('to throw or not to throw', () => {\n    jestExpect(() => {\n      throw new CustomError('apple');\n    })[toThrow]();\n    jestExpect(() => {}).not[toThrow]();\n  });\n\n  describe('substring', () => {\n    it('passes', () => {\n      jestExpect(() => {\n        throw new CustomError('apple');\n      })[toThrow]('apple');\n      jestExpect(() => {\n        throw new CustomError('banana');\n      }).not[toThrow]('apple');\n      jestExpect(() => {}).not[toThrow]('apple');\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        jestExpect(() => {})[toThrow]('apple'),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('apple');\n        })[toThrow]('banana');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw '';\n        })[toThrow]('Server Error');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    it('properly escapes strings when matching against errors', () => {\n      jestExpect(() => {\n        throw new TypeError('\"this\"? throws.');\n      })[toThrow]('\"this\"? throws.');\n    });\n\n    test('threw, but message should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('Invalid array length');\n        }).not[toThrow]('array');\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (non-error truthy)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 'Internal Server Error';\n        }).not[toThrow]('Server Error');\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('regexp', () => {\n    it('passes', () => {\n      jestExpect(() => {\n        throw new CustomError('apple');\n      })[toThrow](/apple/);\n      jestExpect(() => {\n        throw new CustomError('banana');\n      }).not[toThrow](/apple/);\n      jestExpect(() => {}).not[toThrow](/apple/);\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        jestExpect(() => {})[toThrow](/apple/),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('apple');\n        })[toThrow](/banana/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 0;\n        })[toThrow](/^[123456789]\\d*/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new CustomError('Invalid array length');\n        }).not[toThrow](/ array /);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but message should not match (non-error truthy)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw 404;\n        }).not[toThrow](/^[123456789]\\d*/);\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('error class', () => {\n    class SubErr extends Err {\n      constructor(message?: string) {\n        super(message);\n        // In a carefully written error subclass,\n        // name property is equal to constructor name.\n        this.name = this.constructor.name;\n      }\n    }\n\n    class SubSubErr extends SubErr {\n      constructor(message?: string) {\n        super(message);\n        // In a carefully written error subclass,\n        // name property is equal to constructor name.\n        this.name = this.constructor.name;\n      }\n    }\n\n    it('passes', () => {\n      jestExpect(() => {\n        throw new Err();\n      })[toThrow](Err);\n      jestExpect(() => {\n        throw new Err();\n      })[toThrow](CustomError);\n      jestExpect(() => {\n        throw new Err();\n      }).not[toThrow](Err2);\n      jestExpect(() => {}).not[toThrow](Err);\n    });\n\n    test('did not throw at all', () => {\n      expect(() =>\n        expect(() => {})[toThrow](Err),\n      ).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new Err('apple');\n        })[toThrow](Err2);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw undefined;\n        })[toThrow](Err2);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new Err('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error subclass)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new SubErr('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class should not match (error subsubclass)', () => {\n      expect(() => {\n        jestExpect(() => {\n          throw new SubSubErr('apple');\n        }).not[toThrow](Err);\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('error-message', () => {\n    // Received message in report if object has message property.\n    class ErrorMessage {\n      // not extending Error!\n      constructor(public message: string) {}\n    }\n    const expected = new ErrorMessage('apple');\n\n    describe('pass', () => {\n      test('isNot false', () => {\n        jestExpect(() => {\n          throw new ErrorMessage('apple');\n        })[toThrow](expected);\n      });\n\n      test('isNot true', () => {\n        jestExpect(() => {\n          throw new ErrorMessage('banana');\n        }).not[toThrow](expected);\n      });\n    });\n\n    describe('fail', () => {\n      test('isNot false', () => {\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage('banana');\n          })[toThrow](expected),\n        ).toThrowErrorMatchingSnapshot();\n      });\n\n      test('isNot true', () => {\n        const message = 'Invalid array length';\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage(message);\n          }).not[toThrow]({message}),\n        ).toThrowErrorMatchingSnapshot();\n      });\n\n      test('multiline diff highlight incorrect expected space', () => {\n        // jest/issues/2673\n        const a =\n          \"There is no route defined for key Settings. \\nMust be one of: 'Home'\";\n        const b =\n          \"There is no route defined for key Settings.\\nMust be one of: 'Home'\";\n        expect(() =>\n          jestExpect(() => {\n            throw new ErrorMessage(b);\n          })[toThrow]({message: a}),\n        ).toThrowErrorMatchingSnapshot();\n      });\n    });\n  });\n\n  describe('error message and cause', () => {\n    const errorA = new Error('A');\n    const errorB = new Error('B', {cause: errorA});\n    const expected = new Error('good', {cause: errorB});\n\n    describe('pass', () => {\n      test('isNot false', () => {\n        jestExpect(() => {\n          throw new Error('good', {cause: errorB});\n        })[toThrow](expected);\n      });\n\n      test('isNot true, incorrect message', () => {\n        jestExpect(() => {\n          throw new Error('bad', {cause: errorB});\n        }).not[toThrow](expected);\n      });\n\n      onNodeVersions('>=16.9.0', () => {\n        test('isNot true, incorrect cause', () => {\n          jestExpect(() => {\n            throw new Error('good', {cause: errorA});\n          }).not[toThrow](expected);\n        });\n      });\n    });\n\n    describe('fail', () => {\n      onNodeVersions('>=16.9.0', () => {\n        test('isNot false, incorrect message', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Error('bad', {cause: errorB});\n            })[toThrow](expected),\n          ).toThrow(\n            /^(?=.*Expected message and cause: ).*Received message and cause: /s,\n          );\n        });\n\n        test('isNot true, incorrect cause', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Error('good', {cause: errorA});\n            })[toThrow](expected),\n          ).toThrow(\n            /^(?=.*Expected message and cause: ).*Received message and cause: /s,\n          );\n        });\n      });\n    });\n  });\n\n  describe('asymmetric', () => {\n    describe('any-Class', () => {\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          })[toThrow](expect.any(Err));\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          }).not[toThrow](expect.any(Err2));\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            })[toThrow](expect.any(Err2)),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            }).not[toThrow](expect.any(Err)),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('anything', () => {\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](expect.anything());\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {}).not[toThrow](expect.anything());\n          jestExpect(() => {\n            // eslint-disable-next-line no-throw-literal\n            throw null;\n          }).not[toThrow](expect.anything());\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              // eslint-disable-next-line no-throw-literal\n              throw null;\n            })[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('no-symbol', () => {\n      // Test serialization of asymmetric matcher which has no property:\n      // this.$$typeof = Symbol.for('jest.asymmetricMatcher')\n      const matchError = {\n        asymmetricMatch(received: Error | null | undefined) {\n          return (\n            received !== null &&\n            received !== undefined &&\n            received.name === 'Error'\n          );\n        },\n      };\n      const matchNotError = {\n        asymmetricMatch(received: Error | null | undefined) {\n          return (\n            received !== null &&\n            received !== undefined &&\n            received.name !== 'Error'\n          );\n        },\n      };\n\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n\n    describe('objectContaining', () => {\n      const matchError = expect.objectContaining({\n        name: 'Error',\n      });\n      const matchNotError = expect.objectContaining({\n        name: 'NotError',\n      });\n\n      describe('pass', () => {\n        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });\n\n        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });\n      });\n\n      describe('fail', () => {\n        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n\n        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });\n      });\n    });\n  });\n\n  describe('promise/async throws if Error-like object is returned', () => {\n    const asyncFn = async (shouldThrow?: boolean, resolve?: boolean) => {\n      let err;\n      if (shouldThrow) {\n        err = new Err('async apple');\n      }\n      if (resolve) {\n        return Promise.resolve(err || 'apple');\n      } else {\n        return Promise.reject(err || 'apple');\n      }\n    };\n\n    test('passes', async () => {\n      expect.assertions(24);\n      await jestExpect(Promise.reject(new Error())).rejects[toThrow]();\n\n      await jestExpect(asyncFn(true)).rejects[toThrow]();\n      await jestExpect(asyncFn(true)).rejects[toThrow](Err);\n      await jestExpect(asyncFn(true)).rejects[toThrow](Error);\n      await jestExpect(asyncFn(true)).rejects[toThrow]('apple');\n      await jestExpect(asyncFn(true)).rejects[toThrow](/app/);\n\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](Err2);\n      await jestExpect(asyncFn(true)).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn(true, true)).resolves[toThrow]();\n\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]();\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](Error);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('apple');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/apple/);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('banana');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn()).rejects.not[toThrow]();\n      await jestExpect(asyncFn()).rejects.not[toThrow](Error);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('apple');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/apple/);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/banana/);\n\n      // Works with nested functions inside promises\n      await jestExpect(\n        Promise.reject(() => {\n          throw new Error();\n        }),\n      ).rejects[toThrow]();\n      await jestExpect(Promise.reject(() => {})).rejects.not[toThrow]();\n    });\n\n    test('did not throw at all', async () => {\n      await expect(\n        jestExpect(asyncFn()).rejects[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but class did not match', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects[toThrow](Err2),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n\n    test('threw, but should not have', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects.not[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  describe('expected is undefined', () => {\n    test('threw, but should not have (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw null;\n        }).not[toThrow]();\n      }).toThrowErrorMatchingSnapshot();\n    });\n  });\n\n  test('invalid arguments', () => {\n    expect(() =>\n      jestExpect(() => {}).not[toThrow](111),\n    ).toThrowErrorMatchingSnapshot();\n  });\n\n  test('invalid actual', () => {\n    expect(() =>\n      jestExpect('a string')[toThrow](),\n    ).toThrowErrorMatchingSnapshot();\n  });\n});",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
             "dir": "packages/expect/src/__tests__"
@@ -7184,15 +7184,95 @@
         {
             "name": "isNot false",
             "suites": [
+                "error message and cause",
+                "pass"
+            ],
+            "updatePoint": {
+                "line": 287,
+                "column": 23
+            },
+            "line": 287,
+            "code": "      test('isNot false', () => {\n        jestExpect(() => {\n          throw new Error('good', {cause: errorB});\n        })[toThrow](expected);\n      });",
+            "file": "toThrowMatchers.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
+            "name": "isNot true, incorrect message",
+            "suites": [
+                "error message and cause",
+                "pass"
+            ],
+            "updatePoint": {
+                "line": 293,
+                "column": 41
+            },
+            "line": 293,
+            "code": "      test('isNot true, incorrect message', () => {\n        jestExpect(() => {\n          throw new Error('bad', {cause: errorB});\n        }).not[toThrow](expected);\n      });",
+            "file": "toThrowMatchers.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
+            "name": "isNot true, incorrect cause",
+            "suites": [
+                "error message and cause",
+                "pass"
+            ],
+            "updatePoint": {
+                "line": 300,
+                "column": 41
+            },
+            "line": 300,
+            "code": "        test('isNot true, incorrect cause', () => {\n          jestExpect(() => {\n            throw new Error('good', {cause: errorA});\n          }).not[toThrow](expected);\n        });",
+            "file": "toThrowMatchers.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
+            "name": "isNot false, incorrect message",
+            "suites": [
+                "error message and cause",
+                "fail"
+            ],
+            "updatePoint": {
+                "line": 310,
+                "column": 44
+            },
+            "line": 310,
+            "code": "        test('isNot false, incorrect message', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Error('bad', {cause: errorB});\n            })[toThrow](expected),\n          ).toThrow(\n            /^(?=.*Expected message and cause: ).*Received message and cause: /s,\n          );\n        });",
+            "file": "toThrowMatchers.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
+            "name": "isNot true, incorrect cause",
+            "suites": [
+                "error message and cause",
+                "fail"
+            ],
+            "updatePoint": {
+                "line": 320,
+                "column": 41
+            },
+            "line": 320,
+            "code": "        test('isNot true, incorrect cause', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Error('good', {cause: errorA});\n            })[toThrow](expected),\n          ).toThrow(\n            /^(?=.*Expected message and cause: ).*Received message and cause: /s,\n          );\n        });",
+            "file": "toThrowMatchers.test.ts",
+            "skipped": false,
+            "dir": "packages/expect/src/__tests__"
+        },
+        {
+            "name": "isNot false",
+            "suites": [
                 "asymmetric",
                 "any-Class",
                 "pass"
             ],
             "updatePoint": {
-                "line": 284,
+                "line": 336,
                 "column": 25
             },
-            "line": 284,
+            "line": 336,
             "code": "        test('isNot false', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          })[toThrow](expect.any(Err));\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7206,10 +7286,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 290,
+                "line": 342,
                 "column": 24
             },
-            "line": 290,
+            "line": 342,
             "code": "        test('isNot true', () => {\n          jestExpect(() => {\n            throw new Err('apple');\n          }).not[toThrow](expect.any(Err2));\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7223,10 +7303,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 298,
+                "line": 350,
                 "column": 25
             },
-            "line": 298,
+            "line": 350,
             "code": "        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            })[toThrow](expect.any(Err2)),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7240,10 +7320,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 306,
+                "line": 358,
                 "column": 24
             },
-            "line": 306,
+            "line": 358,
             "code": "        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new Err('apple');\n            }).not[toThrow](expect.any(Err)),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7257,10 +7337,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 318,
+                "line": 370,
                 "column": 25
             },
-            "line": 318,
+            "line": 370,
             "code": "        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](expect.anything());\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7274,10 +7354,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 324,
+                "line": 376,
                 "column": 24
             },
-            "line": 324,
+            "line": 376,
             "code": "        test('isNot true', () => {\n          jestExpect(() => {}).not[toThrow](expect.anything());\n          jestExpect(() => {\n            // eslint-disable-next-line no-throw-literal\n            throw null;\n          }).not[toThrow](expect.anything());\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7291,10 +7371,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 334,
+                "line": 386,
                 "column": 25
             },
-            "line": 334,
+            "line": 386,
             "code": "        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              // eslint-disable-next-line no-throw-literal\n              throw null;\n            })[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7308,10 +7388,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 343,
+                "line": 395,
                 "column": 24
             },
-            "line": 343,
+            "line": 395,
             "code": "        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](expect.anything()),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7325,10 +7405,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 376,
+                "line": 428,
                 "column": 25
             },
-            "line": 376,
+            "line": 428,
             "code": "        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7342,10 +7422,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 382,
+                "line": 434,
                 "column": 24
             },
-            "line": 382,
+            "line": 434,
             "code": "        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7359,10 +7439,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 390,
+                "line": 442,
                 "column": 25
             },
-            "line": 390,
+            "line": 442,
             "code": "        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7376,10 +7456,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 398,
+                "line": 450,
                 "column": 24
             },
-            "line": 398,
+            "line": 450,
             "code": "        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7393,10 +7473,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 417,
+                "line": 469,
                 "column": 25
             },
-            "line": 417,
+            "line": 469,
             "code": "        test('isNot false', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          })[toThrow](matchError);\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7410,10 +7490,10 @@
                 "pass"
             ],
             "updatePoint": {
-                "line": 423,
+                "line": 475,
                 "column": 24
             },
-            "line": 423,
+            "line": 475,
             "code": "        test('isNot true', () => {\n          jestExpect(() => {\n            throw new CustomError('apple');\n          }).not[toThrow](matchNotError);\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7427,10 +7507,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 431,
+                "line": 483,
                 "column": 25
             },
-            "line": 431,
+            "line": 483,
             "code": "        test('isNot false', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            })[toThrow](matchNotError),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7444,10 +7524,10 @@
                 "fail"
             ],
             "updatePoint": {
-                "line": 439,
+                "line": 491,
                 "column": 24
             },
-            "line": 439,
+            "line": 491,
             "code": "        test('isNot true', () => {\n          expect(() =>\n            jestExpect(() => {\n              throw new CustomError('apple');\n            }).not[toThrow](matchError),\n          ).toThrowErrorMatchingSnapshot();\n        });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7459,10 +7539,10 @@
                 "promise/async throws if Error-like object is returned"
             ],
             "updatePoint": {
-                "line": 463,
+                "line": 515,
                 "column": 16
             },
-            "line": 463,
+            "line": 515,
             "code": "    test('passes', async () => {\n      expect.assertions(24);\n      await jestExpect(Promise.reject(new Error())).rejects[toThrow]();\n\n      await jestExpect(asyncFn(true)).rejects[toThrow]();\n      await jestExpect(asyncFn(true)).rejects[toThrow](Err);\n      await jestExpect(asyncFn(true)).rejects[toThrow](Error);\n      await jestExpect(asyncFn(true)).rejects[toThrow]('apple');\n      await jestExpect(asyncFn(true)).rejects[toThrow](/app/);\n\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](Err2);\n      await jestExpect(asyncFn(true)).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn(true)).rejects.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn(true, true)).resolves[toThrow]();\n\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]();\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](Error);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('apple');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/apple/);\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow]('banana');\n      await jestExpect(asyncFn(false, true)).resolves.not[toThrow](/banana/);\n\n      await jestExpect(asyncFn()).rejects.not[toThrow]();\n      await jestExpect(asyncFn()).rejects.not[toThrow](Error);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('apple');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/apple/);\n      await jestExpect(asyncFn()).rejects.not[toThrow]('banana');\n      await jestExpect(asyncFn()).rejects.not[toThrow](/banana/);\n\n      // Works with nested functions inside promises\n      await jestExpect(\n        Promise.reject(() => {\n          throw new Error();\n        }),\n      ).rejects[toThrow]();\n      await jestExpect(Promise.reject(() => {})).rejects.not[toThrow]();\n    });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7474,10 +7554,10 @@
                 "promise/async throws if Error-like object is returned"
             ],
             "updatePoint": {
-                "line": 502,
+                "line": 554,
                 "column": 30
             },
-            "line": 502,
+            "line": 554,
             "code": "    test('did not throw at all', async () => {\n      await expect(\n        jestExpect(asyncFn()).rejects[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7489,10 +7569,10 @@
                 "promise/async throws if Error-like object is returned"
             ],
             "updatePoint": {
-                "line": 508,
+                "line": 560,
                 "column": 40
             },
-            "line": 508,
+            "line": 560,
             "code": "    test('threw, but class did not match', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects[toThrow](Err2),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7504,10 +7584,10 @@
                 "promise/async throws if Error-like object is returned"
             ],
             "updatePoint": {
-                "line": 514,
+                "line": 566,
                 "column": 36
             },
-            "line": 514,
+            "line": 566,
             "code": "    test('threw, but should not have', async () => {\n      await expect(\n        jestExpect(asyncFn(true)).rejects.not[toThrow](),\n      ).rejects.toThrowErrorMatchingSnapshot();\n    });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7519,10 +7599,10 @@
                 "expected is undefined"
             ],
             "updatePoint": {
-                "line": 522,
+                "line": 574,
                 "column": 55
             },
-            "line": 522,
+            "line": 574,
             "code": "    test('threw, but should not have (non-error falsey)', () => {\n      expect(() => {\n        jestExpect(() => {\n          // eslint-disable-next-line no-throw-literal\n          throw null;\n        }).not[toThrow]();\n      }).toThrowErrorMatchingSnapshot();\n    });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7534,10 +7614,10 @@
                 "expected is undefined"
             ],
             "updatePoint": {
-                "line": 532,
+                "line": 584,
                 "column": 25
             },
-            "line": 532,
+            "line": 584,
             "code": "  test('invalid arguments', () => {\n    expect(() =>\n      jestExpect(() => {}).not[toThrow](111),\n    ).toThrowErrorMatchingSnapshot();\n  });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -7549,10 +7629,10 @@
                 "expected is undefined"
             ],
             "updatePoint": {
-                "line": 538,
+                "line": 590,
                 "column": 22
             },
-            "line": 538,
+            "line": 590,
             "code": "  test('invalid actual', () => {\n    expect(() =>\n      jestExpect('a string')[toThrow](),\n    ).toThrowErrorMatchingSnapshot();\n  });",
             "file": "toThrowMatchers.test.ts",
             "skipped": false,
@@ -12886,7 +12966,7 @@
             "name": "shouldRunInBand() - should return $expectedResult for runInBand mode",
             "suites": [],
             "line": 25,
-            "code": "test.each`\n  tests              | timings        | detectOpenHandles | maxWorkers   | watch    | expectedResult\n  ${[getTestMock()]} | ${[500, 500]}  | ${false}          | ${undefined} | ${true}  | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${true}  | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${2}         | ${true}  | ${false}\n  ${[getTestMock()]} | ${[2000, 500]} | ${false}          | ${undefined} | ${true}  | ${false}\n  ${getTestMock()}   | ${[500, 500]}  | ${false}          | ${undefined} | ${true}  | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${false} | ${true}\n  ${getTestMock()}   | ${[2000, 500]} | ${false}          | ${2}         | ${false} | ${false}\n  ${[getTestMock()]} | ${[2000]}      | ${false}          | ${undefined} | ${false} | ${true}\n  ${getTestsMock()}  | ${[500, 500]}  | ${false}          | ${undefined} | ${false} | ${true}\n  ${new Array(45)}   | ${[500]}       | ${false}          | ${undefined} | ${false} | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${undefined} | ${false} | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${true}           | ${undefined} | ${false} | ${true}\n`(\n  'shouldRunInBand() - should return $expectedResult for runInBand mode',\n  ({tests, timings, detectOpenHandles, maxWorkers, watch, expectedResult}) => {\n    expect(\n      shouldRunInBand(tests, timings, {detectOpenHandles, maxWorkers, watch}),\n    ).toBe(expectedResult);\n  },\n);",
+            "code": "test.each`\n  tests              | timings        | detectOpenHandles | maxWorkers   | watch    | workerIdleMemoryLimit | expectedResult\n  ${[getTestMock()]} | ${[500, 500]}  | ${false}          | ${undefined} | ${true}  | ${undefined}          | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${true}  | ${undefined}          | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${2}         | ${true}  | ${undefined}          | ${false}\n  ${[getTestMock()]} | ${[2000, 500]} | ${false}          | ${undefined} | ${true}  | ${undefined}          | ${false}\n  ${getTestMock()}   | ${[500, 500]}  | ${false}          | ${undefined} | ${true}  | ${undefined}          | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${false} | ${undefined}          | ${true}\n  ${getTestMock()}   | ${[2000, 500]} | ${false}          | ${2}         | ${false} | ${undefined}          | ${false}\n  ${[getTestMock()]} | ${[2000]}      | ${false}          | ${undefined} | ${false} | ${undefined}          | ${true}\n  ${getTestsMock()}  | ${[500, 500]}  | ${false}          | ${undefined} | ${false} | ${undefined}          | ${true}\n  ${new Array(45)}   | ${[500]}       | ${false}          | ${undefined} | ${false} | ${undefined}          | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${undefined} | ${false} | ${undefined}          | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${true}           | ${undefined} | ${false} | ${undefined}          | ${true}\n  ${[getTestMock()]} | ${[500, 500]}  | ${false}          | ${undefined} | ${true}  | ${'500MB'}            | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${true}  | ${'500MB'}            | ${true}\n  ${getTestsMock()}  | ${[2000, 500]} | ${false}          | ${1}         | ${false} | ${'500MB'}            | ${false}\n  ${[getTestMock()]} | ${[2000]}      | ${false}          | ${undefined} | ${false} | ${'500MB'}            | ${false}\n  ${getTestsMock()}  | ${[500, 500]}  | ${false}          | ${undefined} | ${false} | ${'500MB'}            | ${false}\n  ${getTestsMock()}  | ${[2000, 500]} | ${true}           | ${undefined} | ${false} | ${'500MB'}            | ${true}\n`(\n  'shouldRunInBand() - should return $expectedResult for runInBand mode',\n  ({\n    tests,\n    timings,\n    detectOpenHandles,\n    maxWorkers,\n    watch,\n    workerIdleMemoryLimit,\n    expectedResult,\n  }) => {\n    expect(\n      shouldRunInBand(tests, timings, {\n        detectOpenHandles,\n        maxWorkers,\n        watch,\n        workerIdleMemoryLimit,\n      }),\n    ).toBe(expectedResult);\n  },\n);",
             "file": "testSchedulerHelper.test.js",
             "skipped": false,
             "dir": "packages/jest-core/src/__tests__"
