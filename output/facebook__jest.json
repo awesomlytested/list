@@ -8083,6 +8083,82 @@
             "dir": "packages/jest-circus/src/__tests__"
         },
         {
+            "name": "simple test",
+            "suites": [],
+            "updatePoint": {
+                "line": 10,
+                "column": 17
+            },
+            "line": 10,
+            "code": "test('simple test', () => {\n  const {stdout} = runTest(\n    `\n    describe('describe', () => {\n      beforeEach(() => {});\n      afterEach(() => {});\n      test('one', () => {});\n      test('two', () => {});\n    })\n  `,\n    {randomize: true, seed: 3},\n  );\n\n  expect(stdout).toMatchSnapshot();\n});",
+            "file": "randomizeTest.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "function descriptors",
+            "suites": [],
+            "updatePoint": {
+                "line": 26,
+                "column": 26
+            },
+            "line": 26,
+            "code": "test('function descriptors', () => {\n  const {stdout} = runTest(\n    `\n    describe(function describer() {}, () => {\n      test(class One {}, () => {});\n    })\n  `,\n    {randomize: true, seed: 3},\n  );\n\n  expect(stdout).toMatchSnapshot();\n});",
+            "file": "randomizeTest.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "failures",
+            "suites": [],
+            "updatePoint": {
+                "line": 39,
+                "column": 14
+            },
+            "line": 39,
+            "code": "test('failures', () => {\n  const {stdout} = runTest(\n    `\n    describe('describe', () => {\n      beforeEach(() => {});\n      afterEach(() => { throw new Error('banana')});\n      test('one', () => { throw new Error('kentucky')});\n      test('two', () => {});\n    })\n  `,\n    {randomize: true, seed: 3},\n  );\n\n  expect(stdout).toMatchSnapshot();\n});",
+            "file": "randomizeTest.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "creates a randomizer given seed %s",
+            "suites": [
+                "rngBuilder"
+            ],
+            "line": 13,
+            "code": "  test.each([1, 2, 4, 8, 16])('creates a randomizer given seed %s', seed => {\n    const rng = rngBuilder(seed);\n    const results = Array(10)\n      .fill(0)\n      .map(() => rng.next(0, 10));\n    expect(results).toMatchSnapshot();\n  });",
+            "file": "shuffleArray.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "empty array is shuffled",
+            "suites": [
+                "shuffleArray"
+            ],
+            "updatePoint": {
+                "line": 23,
+                "column": 31
+            },
+            "line": 23,
+            "code": "  test('empty array is shuffled', () => {\n    const shuffled = shuffleArray([], rngBuilder(seed));\n    expect(shuffled).toEqual([]);\n  });",
+            "file": "shuffleArray.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
+            "name": "shuffles list %p",
+            "suites": [
+                "shuffleArray"
+            ],
+            "line": 31,
+            "code": "  test.each([[['a']], [['a', 'b']], [['a', 'b', 'c']], [['a', 'b', 'c', 'd']]])(\n    'shuffles list %p',\n    l => {\n      expect(shuffleArray(l, rngBuilder(seed))).toMatchSnapshot();\n    },\n  );",
+            "file": "shuffleArray.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-circus/src/__tests__"
+        },
+        {
             "name": "get configuration defaults",
             "suites": [],
             "updatePoint": {
@@ -10073,7 +10149,7 @@
                 "column": 46
             },
             "line": 2147,
-            "code": "  it('throws if seed is too large or too small', async () => {\n    await expect(\n      normalize({rootDir: '/root/'}, {\n        seed: 2 ** 33,\n      } as Config.Argv),\n    ).rejects.toThrow(\n      'seed value must be between `-0x80000000` and `0x7fffffff` inclusive - is 8589934592',\n    );\n    await expect(\n      normalize({rootDir: '/root/'}, {\n        seed: -(2 ** 33),\n      } as Config.Argv),\n    ).rejects.toThrow(\n      'seed value must be between `-0x80000000` and `0x7fffffff` inclusive - is -8589934592',\n    );\n  });",
+            "code": "  it('throws if seed is too large or too small', async () => {\n    await expect(\n      normalize({rootDir: '/root/'}, {\n        seed: 2 ** 33,\n      } as Config.Argv),\n    ).rejects.toThrow(\n      'seed value must be between `-0x80000000` and `0x7fffffff` inclusive - instead it is 8589934592',\n    );\n    await expect(\n      normalize({rootDir: '/root/'}, {\n        seed: -(2 ** 33),\n      } as Config.Argv),\n    ).rejects.toThrow(\n      'seed value must be between `-0x80000000` and `0x7fffffff` inclusive - instead it is -8589934592',\n    );\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -10119,6 +10195,66 @@
             },
             "line": 2181,
             "code": "  test('showSeed is false when neither is set', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {} as Config.Argv);\n    expect(options.showSeed).toBeFalsy();\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "showSeed is true when randomize is set",
+            "suites": [
+                "showSeed"
+            ],
+            "updatePoint": {
+                "line": 2186,
+                "column": 46
+            },
+            "line": 2186,
+            "code": "  test('showSeed is true when randomize is set', async () => {\n    const {options} = await normalize(\n      {randomize: true, rootDir: '/root/'},\n      {} as Config.Argv,\n    );\n    expect(options.showSeed).toBe(true);\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "randomize is set when argv flag is set",
+            "suites": [
+                "randomize"
+            ],
+            "updatePoint": {
+                "line": 2196,
+                "column": 46
+            },
+            "line": 2196,
+            "code": "  test('randomize is set when argv flag is set', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {\n      randomize: true,\n    } as Config.Argv);\n    expect(options.randomize).toBe(true);\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "randomize is set when the config is set",
+            "suites": [
+                "randomize"
+            ],
+            "updatePoint": {
+                "line": 2203,
+                "column": 47
+            },
+            "line": 2203,
+            "code": "  test('randomize is set when the config is set', async () => {\n    const {options} = await normalize(\n      {randomize: true, rootDir: '/root/'},\n      {} as Config.Argv,\n    );\n    expect(options.randomize).toBe(true);\n  });",
+            "file": "normalize.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-config/src/__tests__"
+        },
+        {
+            "name": "randomize is false when neither is set",
+            "suites": [
+                "randomize"
+            ],
+            "updatePoint": {
+                "line": 2211,
+                "column": 46
+            },
+            "line": 2211,
+            "code": "  test('randomize is false when neither is set', async () => {\n    const {options} = await normalize({rootDir: '/root/'}, {} as Config.Argv);\n    expect(options.randomize).toBeFalsy();\n  });",
             "file": "normalize.test.ts",
             "skipped": false,
             "dir": "packages/jest-config/src/__tests__"
@@ -13461,11 +13597,24 @@
             "name": "creation of a cache key",
             "suites": [],
             "updatePoint": {
-                "line": 25,
+                "line": 28,
                 "column": 29
             },
-            "line": 25,
+            "line": 28,
             "code": "test('creation of a cache key', () => {\n  const createCacheKeyFunction = interopRequireDefault(\n    require('../index'),\n  ).default;\n  const createCacheKey = createCacheKeyFunction([], ['value']);\n  const hashA = createCacheKey('test', 'test.js', null, {\n    config: {},\n    instrument: false,\n  });\n  const hashB = createCacheKey('test code;', 'test.js', null, {\n    config: {},\n    instrument: false,\n  });\n  const hashC = createCacheKey('test', 'test.js', null, {\n    config: {},\n    instrument: true,\n  });\n\n  expect(hashA).toHaveLength(32);\n  expect(hashA).not.toEqual(hashB);\n  expect(hashA).not.toEqual(hashC);\n});",
+            "file": "index.test.ts",
+            "skipped": false,
+            "dir": "packages/jest-create-cache-key-function/src/__tests__"
+        },
+        {
+            "name": "creation of a cache key on win32",
+            "suites": [],
+            "updatePoint": {
+                "line": 51,
+                "column": 38
+            },
+            "line": 51,
+            "code": "test('creation of a cache key on win32', () => {\n  Object.defineProperty(process, 'platform', {\n    value: 'win32',\n  });\n  const createCacheKeyFunction = interopRequireDefault(\n    require('../index'),\n  ).default;\n  const createCacheKey = createCacheKeyFunction([], ['value']);\n  const hashA = createCacheKey('test', 'test.js', null, {\n    config: {},\n    instrument: false,\n  });\n\n  expect(hashA).toHaveLength(16);\n});",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/jest-create-cache-key-function/src/__tests__"

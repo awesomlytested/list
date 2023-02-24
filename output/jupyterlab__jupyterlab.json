@@ -2919,7 +2919,7 @@
                 "index": 1263
             },
             "line": 30,
-            "code": "  test('File Browser has no unused rules', async ({\n    page\n  }) => {\n    await page.sidebar.openTab('filebrowser');\n    const contextmenu = await page.menu.openContextMenu('.jp-DirListing-headerItem');\n    const item = await page.menu.getMenuItemInMenu(contextmenu, 'Show File Checkboxes');\n    await item.click();\n    await page.notebook.createNew('notebook.ipynb');\n    const unusedRules = await page.style.findUnusedStyleRules({\n      page,\n      fragments: ['jp-DirListing', 'jp-FileBrowser'],\n      exclude: [\n      // active during renaming\n      'jp-DirListing-editor',\n      // hidden files\n      '[data-is-dot]',\n      // filtering results\n      '.jp-DirListing-content mark',\n      // only added after resizing\n      'jp-DirListing-narrow']\n    });\n    expect(unusedRules.length).toEqual(0);\n  });",
+            "code": "  test('File Browser has no unused rules', async ({\n    page\n  }) => {\n    await page.sidebar.openTab('filebrowser');\n    const clickMenuItem = async command => {\n      const contextmenu = await page.menu.openContextMenu('.jp-DirListing-headerItem');\n      const item = await page.menu.getMenuItemInMenu(contextmenu, command);\n      await item.click();\n    };\n    await clickMenuItem('Show File Checkboxes');\n    await clickMenuItem('Show File Size Column');\n    await page.notebook.createNew('notebook.ipynb');\n    const unusedRules = await page.style.findUnusedStyleRules({\n      page,\n      fragments: ['jp-DirListing', 'jp-FileBrowser'],\n      exclude: [\n      // active during renaming\n      'jp-DirListing-editor',\n      // hidden files\n      '[data-is-dot]',\n      // filtering results\n      '.jp-DirListing-content mark',\n      // only added after resizing\n      'jp-DirListing-narrow']\n    });\n    expect(unusedRules.length).toEqual(0);\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2928,11 +2928,11 @@
             "name": "Left light tabbar (with text)",
             "suites": [],
             "updatePoint": {
-                "line": 53,
+                "line": 57,
                 "column": 37,
-                "index": 2070
+                "index": 2212
             },
-            "line": 53,
+            "line": 57,
             "code": "  test('Left light tabbar (with text)', async ({\n    page\n  }) => {\n    await page.theme.setLightTheme();\n    const imageName = 'left-light-tabbar-with-text.png';\n    const tabbar = await page.sidebar.getTabBar();\n    await mockLabelOnFirstTab(tabbar, 'File Browser');\n    expect(await tabbar.screenshot()).toMatchSnapshot(imageName.toLowerCase());\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -2942,11 +2942,11 @@
             "name": "Right dark tabbar (with text)",
             "suites": [],
             "updatePoint": {
-                "line": 62,
+                "line": 66,
                 "column": 37,
-                "index": 2425
+                "index": 2567
             },
-            "line": 62,
+            "line": 66,
             "code": "  test('Right dark tabbar (with text)', async ({\n    page\n  }) => {\n    await page.theme.setDarkTheme();\n    const imageName = 'right-dark-tabbar-with-text.png';\n    const tabbar = await page.sidebar.getTabBar('right');\n    await mockLabelOnFirstTab(tabbar, 'Property Inspector');\n    expect(await tabbar.screenshot()).toMatchSnapshot(imageName.toLowerCase());\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -2956,11 +2956,11 @@
             "name": "Move File Browser to right",
             "suites": [],
             "updatePoint": {
-                "line": 71,
+                "line": 75,
                 "column": 34,
-                "index": 2789
+                "index": 2931
             },
-            "line": 71,
+            "line": 75,
             "code": "  test('Move File Browser to right', async ({\n    page\n  }) => {\n    await page.sidebar.moveTabToRight('filebrowser');\n    expect(await page.sidebar.getTabPosition('filebrowser')).toBe('right');\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -2970,11 +2970,11 @@
             "name": "Open File Browser on right",
             "suites": [],
             "updatePoint": {
-                "line": 77,
+                "line": 81,
                 "column": 34,
-                "index": 2990
+                "index": 3132
             },
-            "line": 77,
+            "line": 81,
             "code": "  test('Open File Browser on right', async ({\n    page\n  }) => {\n    await page.sidebar.moveTabToRight('filebrowser');\n    await page.sidebar.openTab('filebrowser');\n    expect(await page.sidebar.isTabOpen('filebrowser')).toEqual(true);\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -2984,11 +2984,11 @@
             "name": "Open Sidebar on right",
             "suites": [],
             "updatePoint": {
-                "line": 84,
+                "line": 88,
                 "column": 29,
-                "index": 3228
+                "index": 3370
             },
-            "line": 84,
+            "line": 88,
             "code": "  test('Open Sidebar on right', async ({\n    page\n  }) => {\n    await page.sidebar.open('right');\n    expect(await page.sidebar.isOpen('right')).toEqual(true);\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -2998,11 +2998,11 @@
             "name": "Close Sidebar on right",
             "suites": [],
             "updatePoint": {
-                "line": 90,
+                "line": 94,
                 "column": 30,
-                "index": 3395
+                "index": 3537
             },
-            "line": 90,
+            "line": 94,
             "code": "  test('Close Sidebar on right', async ({\n    page\n  }) => {\n    await page.sidebar.open('right');\n    await page.menu.clickMenuItem('View>Appearance>Show Right Sidebar');\n    expect(await page.sidebar.isOpen('right')).toEqual(false);\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -3012,11 +3012,11 @@
             "name": "Capture File Browser on right",
             "suites": [],
             "updatePoint": {
-                "line": 97,
+                "line": 101,
                 "column": 37,
-                "index": 3643
+                "index": 3785
             },
-            "line": 97,
+            "line": 101,
             "code": "  test('Capture File Browser on right', async ({\n    page\n  }) => {\n    await page.sidebar.moveTabToRight('filebrowser');\n    await page.sidebar.openTab('filebrowser');\n    let imageName = 'filebrowser-right.png';\n    expect(await page.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
@@ -3026,11 +3026,11 @@
             "name": "Move Debugger to left",
             "suites": [],
             "updatePoint": {
-                "line": 105,
+                "line": 109,
                 "column": 29,
-                "index": 3919
+                "index": 4061
             },
-            "line": 105,
+            "line": 109,
             "code": "  test('Move Debugger to left', async ({\n    page\n  }) => {\n    await page.sidebar.moveTabToLeft('jp-debugger-sidebar');\n    expect(await page.sidebar.getTabPosition('jp-debugger-sidebar')).toEqual('left');\n  });",
             "file": "jupyterlab/sidebars.test.ts",
             "skipped": false,
