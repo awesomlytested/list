@@ -2799,6 +2799,34 @@
             "dir": "galata/test"
         },
         {
+            "name": "Scrolling mode",
+            "suites": [],
+            "updatePoint": {
+                "line": 24,
+                "column": 22,
+                "index": 798
+            },
+            "line": 24,
+            "code": "  test('Scrolling mode', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('notebook:enable-output-scrolling');\n    });\n    await page.notebook.selectCells(0);\n    await expect(page.locator(`${cellSelector} >> nth=0`)).toHaveClass(/jp-mod-outputsScrolled/);\n    const cell = await page.notebook.getCell(0);\n    expect(await (await cell.$('.jp-OutputArea')).screenshot()).toMatchSnapshot('cell-output-area-scrolling-mode.png');\n    await page.evaluate(() => {\n      return window.jupyterapp.commands.execute('notebook:disable-output-scrolling');\n    });\n    await expect(page.locator(`${cellSelector} >> nth=0`)).not.toHaveClass(/jp-mod-outputsScrolled/);\n  });",
+            "file": "jupyterlab/output-scrolling.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Switching with prompt overlay",
+            "suites": [],
+            "updatePoint": {
+                "line": 39,
+                "column": 37,
+                "index": 1532
+            },
+            "line": 39,
+            "code": "  test('Switching with prompt overlay', async ({\n    page\n  }) => {\n    await page.locator(`${cellSelector} >> nth=1 >> .jp-OutputArea-promptOverlay`).hover();\n    const cell = await page.notebook.getCell(1);\n    expect(await cell.screenshot()).toMatchSnapshot('prompt-overlay-hover-normal.png');\n    await page.click(`${cellSelector} >> nth=1 >> .jp-OutputArea-promptOverlay`);\n    await expect(page.locator(`${cellSelector} >> nth=1`)).toHaveClass(/jp-mod-outputsScrolled/);\n    expect(await cell.screenshot()).toMatchSnapshot('prompt-overlay-hover-scroll.png');\n    await page.click(`${cellSelector} >> nth=1 >> .jp-OutputArea-promptOverlay`);\n    await expect(page.locator(`${cellSelector} >> nth=1`)).not.toHaveClass(/jp-mod-outputsScrolled/);\n  });",
+            "file": "jupyterlab/output-scrolling.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
             "name": "Prompt to rename new  file",
             "suites": [],
             "updatePoint": {
@@ -27191,6 +27219,23 @@
             "dir": "packages/notebook/test"
         },
         {
+            "name": "should only include `trusted` metadata in code cells",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookModel",
+                "#toJSON()"
+            ],
+            "updatePoint": {
+                "line": 278,
+                "column": 62
+            },
+            "line": 278,
+            "code": "      it('should only include `trusted` metadata in code cells', () => {\n        const model = new NotebookModel();\n        model.fromJSON(utils.DEFAULT_CONTENT_45);\n\n        [...model.cells].map(cell => (cell.trusted = true));\n        expect(model.cells.get(0).type).toBe('code');\n        expect(model.cells.get(1).type).toBe('markdown');\n        expect(model.cells.get(2).type).toBe('raw');\n\n        const data = model.toJSON();\n        // code cell trust should be preserved\n        expect(data.cells[0].metadata.trusted).toBe(true);\n        // markdown cell should have no trusted entry\n        expect(data.cells[1].metadata.trusted).toBeUndefined();\n        // raw cell should have no trusted entry\n        expect(data.cells[2].metadata.trusted).toBeUndefined();\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
             "name": "should serialize the model from format<=4.4 JSON",
             "suites": [
                 "@jupyterlab/notebook",
@@ -27198,10 +27243,10 @@
                 "#fromJSON()"
             ],
             "updatePoint": {
-                "line": 281,
+                "line": 298,
                 "column": 58
             },
-            "line": 281,
+            "line": 298,
             "code": "      it('should serialize the model from format<=4.4 JSON', () => {\n        const model = new NotebookModel();\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        expect(model.cells.length).toBe(7);\n        expect(model.nbformat).toBe(utils.DEFAULT_CONTENT.nbformat);\n        expect(model.nbformatMinor).toBe(nbformat.MINOR_VERSION);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27215,10 +27260,10 @@
                 "#fromJSON()"
             ],
             "updatePoint": {
-                "line": 289,
+                "line": 306,
                 "column": 57
             },
-            "line": 289,
+            "line": 306,
             "code": "      it('should serialize the model from format 4.5 JSON', () => {\n        const model = new NotebookModel();\n        const json = utils.DEFAULT_CONTENT_45;\n        model.fromJSON(json);\n        expect(model.cells.length).toBe(7);\n        expect(model.nbformat).toBe(json.nbformat);\n        expect(model.nbformatMinor).toBe(json.nbformat_minor);\n        expect(model.cells.get(0).id).toBe('cell_1');\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27232,11 +27277,28 @@
                 "#fromJSON()"
             ],
             "updatePoint": {
-                "line": 299,
+                "line": 316,
                 "column": 35
             },
-            "line": 299,
+            "line": 316,
             "code": "      it('should set the dirty flag', () => {\n        const model = new NotebookModel();\n        model.dirty = false;\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        expect(model.dirty).toBe(true);\n      });",
+            "file": "model.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should populate empty notebook with empty trusted code cell",
+            "suites": [
+                "@jupyterlab/notebook",
+                "NotebookModel",
+                "#fromJSON()"
+            ],
+            "updatePoint": {
+                "line": 323,
+                "column": 69
+            },
+            "line": 323,
+            "code": "      it('should populate empty notebook with empty trusted code cell', () => {\n        const model = new NotebookModel();\n        model.fromJSON(utils.EMPTY_CONTENT);\n        const cell = model.cells.get(0);\n        expect(cell.trusted).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -27249,10 +27311,10 @@
                 "#metadata"
             ],
             "updatePoint": {
-                "line": 308,
+                "line": 332,
                 "column": 36
             },
-            "line": 308,
+            "line": 332,
             "code": "      it('should have default values', () => {\n        const model = new NotebookModel();\n        const metadata = model.metadata;\n        expect(metadata['kernelspec']).toBeTruthy();\n        expect(metadata['language_info']).toBeTruthy();\n        expect(Object.keys(metadata)).toHaveLength(2);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27266,10 +27328,10 @@
                 "#metadata"
             ],
             "updatePoint": {
-                "line": 316,
+                "line": 340,
                 "column": 48
             },
-            "line": 316,
+            "line": 340,
             "code": "      it('should set the dirty flag when changed', () => {\n        const model = new NotebookModel();\n        expect(model.dirty).toBe(false);\n        model.setMetadata('foo', 'bar');\n        expect(model.dirty).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27283,10 +27345,10 @@
                 "#metadata"
             ],
             "updatePoint": {
-                "line": 323,
+                "line": 347,
                 "column": 49
             },
-            "line": 323,
+            "line": 347,
             "code": "      it('should emit the `contentChanged` signal', () => {\n        const model = new NotebookModel();\n        let called = false;\n        model.contentChanged.connect(() => {\n          called = true;\n        });\n        model.setMetadata('foo', 'bar');\n        expect(called).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27300,10 +27362,10 @@
                 "#metadata"
             ],
             "updatePoint": {
-                "line": 333,
+                "line": 357,
                 "column": 50
             },
-            "line": 333,
+            "line": 357,
             "code": "      it('should emit the `metadataChanged` signal', () => {\n        const model = new NotebookModel();\n        let called = false;\n        model.metadataChanged.connect((sender, args) => {\n          expect(sender).toBe(model);\n          expect(args.key).toBe('foo');\n          expect(args.oldValue).toBeUndefined();\n          expect(args.newValue).toBe('bar');\n          called = true;\n        });\n        model.setMetadata('foo', 'bar');\n        expect(called).toBe(true);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
@@ -27317,10 +27379,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 349,
+                "line": 373,
                 "column": 34
             },
-            "line": 349,
+            "line": 373,
             "code": "      it('should be an empty model', () => {\n        const model = new NotebookModel();\n        expect(model.cells.length).toBe(0);\n      });",
             "file": "model.spec.ts",
             "skipped": false,
