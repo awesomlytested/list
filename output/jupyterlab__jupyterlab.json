@@ -2351,15 +2351,29 @@
             "dir": "galata/test"
         },
         {
-            "name": "Search selected",
+            "name": "Multi-line search",
             "suites": [],
             "updatePoint": {
                 "line": 43,
-                "column": 23,
-                "index": 1525
+                "column": 25,
+                "index": 1527
             },
             "line": 43,
-            "code": "  test('Search selected', async ({\n    page\n  }) => {\n    // Enter first cell\n    await page.notebook.enterCellEditingMode(0);\n\n    // Go to first line\n    await page.keyboard.press('PageUp');\n\n    // Select first line\n    await page.keyboard.press('Shift+End');\n\n    // Open search box\n    await page.keyboard.press('Control+f');\n\n    // Expect it to be populated with first line\n    await page.waitForSelector('[placeholder=\"Find\"][value=\"Test with one notebook withr\"]');\n\n    // Expect both matches to be found (xfail)\n    // await page.waitForSelector('text=1/2');\n\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeVisible();\n  });",
+            "code": "  test('Multi-line search', async ({\n    page\n  }) => {\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'one notebook withr\\n\\n\\nThis is a multi');\n    await page.waitForSelector('text=1/1');\n\n    // Show replace buttons to check for visual regressions\n    await page.click('button[title=\"Toggle Replace\"]');\n    await page.fill('[placeholder=\"Replace\"]', 'line1\\nline2');\n    const overlay = page.locator('.jp-DocumentSearch-overlay');\n    expect(await overlay.screenshot()).toMatchSnapshot('multi-line-search.png');\n  });",
+            "file": "jupyterlab/notebook-search.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Search selected",
+            "suites": [],
+            "updatePoint": {
+                "line": 56,
+                "column": 23,
+                "index": 2089
+            },
+            "line": 56,
+            "code": "  test('Search selected', async ({\n    page\n  }) => {\n    // Enter first cell\n    await page.notebook.enterCellEditingMode(0);\n\n    // Go to first line\n    await page.keyboard.press('PageUp');\n\n    // Select first line\n    await page.keyboard.press('Shift+End');\n\n    // Open search box\n    await page.keyboard.press('Control+f');\n\n    // Expect it to be populated with first line\n    await page.waitForSelector('[placeholder=\"Find\"] >> text=\"Test with one notebook withr\"');\n\n    // Expect both matches to be found (xfail)\n    // await page.waitForSelector('text=1/2');\n\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeVisible();\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2368,11 +2382,11 @@
             "name": "Close with Escape",
             "suites": [],
             "updatePoint": {
-                "line": 66,
+                "line": 79,
                 "column": 25,
-                "index": 2180
+                "index": 2745
             },
-            "line": 66,
+            "line": 79,
             "code": "  test('Close with Escape', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeVisible();\n\n    // Close search box\n    await page.keyboard.press('Escape');\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeHidden();\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2382,11 +2396,11 @@
             "name": "Close with Escape from Notebook",
             "suites": [],
             "updatePoint": {
-                "line": 77,
+                "line": 90,
                 "column": 39,
-                "index": 2540
+                "index": 3105
             },
-            "line": 77,
+            "line": 90,
             "code": "  test('Close with Escape from Notebook', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeVisible();\n\n    // Enter first cell\n    await page.notebook.enterCellEditingMode(0);\n\n    // First escape should NOT close the search box (but leave the editing mode)\n    await page.keyboard.press('Escape');\n    await page.waitForTimeout(250);\n    expect(await page.notebook.isCellInEditingMode(0)).toBeFalsy();\n    expect(await page.isVisible('.jp-DocumentSearch-overlay')).toBeTruthy();\n\n    // Second escape should close the search box (even if it is not focused)\n    await page.keyboard.press('Escape');\n    await expect(page.locator('.jp-DocumentSearch-overlay')).toBeHidden();\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2396,11 +2410,11 @@
             "name": "Search within outputs",
             "suites": [],
             "updatePoint": {
-                "line": 97,
+                "line": 110,
                 "column": 29,
-                "index": 3321
+                "index": 3886
             },
-            "line": 97,
+            "line": 110,
             "code": "  test('Search within outputs', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.click('button[title=\"Show Search Filters\"]');\n    await page.click('text=Search Cell Outputs');\n    await page.waitForSelector('text=1/29');\n    const cell = await page.notebook.getCell(5);\n    await cell.scrollIntoViewIfNeeded();\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot('search-within-outputs.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2410,11 +2424,11 @@
             "name": "Search in selected cells",
             "suites": [],
             "updatePoint": {
-                "line": 111,
+                "line": 124,
                 "column": 32,
-                "index": 3903
+                "index": 4468
             },
-            "line": 111,
+            "line": 124,
             "code": "  test('Search in selected cells', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.click('button[title=\"Show Search Filters\"]');\n    await page.click('text=Search Selected Cell(s)');\n    await page.waitForSelector('text=1/4');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot('search-in-selected-cells.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2424,11 +2438,11 @@
             "name": "Highlight next hit same editor",
             "suites": [],
             "updatePoint": {
-                "line": 123,
+                "line": 136,
                 "column": 38,
-                "index": 4407
+                "index": 4972
             },
-            "line": 123,
+            "line": 136,
             "code": "  test('Highlight next hit same editor', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n\n    // Click next button\n    await page.click('button[title=\"Next Match\"]');\n    const cell = await page.notebook.getCell(0);\n    expect(await (await cell.$('.jp-Editor')).screenshot()).toMatchSnapshot('highlight-next-in-editor.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2438,11 +2452,11 @@
             "name": "Highlight next hit in the next cell",
             "suites": [],
             "updatePoint": {
-                "line": 136,
+                "line": 149,
                 "column": 43,
-                "index": 4888
+                "index": 5453
             },
-            "line": 136,
+            "line": 149,
             "code": "  test('Highlight next hit in the next cell', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n\n    // Click next button\n    await page.click('button[title=\"Next Match\"]', {\n      clickCount: 4\n    });\n    const cell = await page.notebook.getCell(1);\n    expect(await cell.screenshot()).toMatchSnapshot('highlight-next-cell.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2452,11 +2466,11 @@
             "name": "Highlight previous hit",
             "suites": [],
             "updatePoint": {
-                "line": 151,
+                "line": 164,
                 "column": 30,
-                "index": 5356
+                "index": 5921
             },
-            "line": 151,
+            "line": 164,
             "code": "  test('Highlight previous hit', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n    const cell = await page.notebook.getCell(5);\n    await cell.click();\n    await page.keyboard.press('Escape');\n    await cell.scrollIntoViewIfNeeded();\n\n    // Click previous button\n    await page.click('button[title=\"Previous Match\"]');\n    await page.waitForSelector('text=19/21');\n    const hit = await page.notebook.getCell(2);\n    expect(await hit.screenshot()).toMatchSnapshot('highlight-previous-element.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2466,11 +2480,11 @@
             "name": "Highlight on markdown rendered state change",
             "suites": [],
             "updatePoint": {
-                "line": 169,
+                "line": 182,
                 "column": 51,
-                "index": 6030
+                "index": 6595
             },
-            "line": 169,
+            "line": 182,
             "code": "  test('Highlight on markdown rendered state change', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n\n    // Click next button\n    await page.click('button[title=\"Next Match\"]', {\n      clickCount: 4\n    });\n    const cell = await page.notebook.getCell(1);\n    await cell.dblclick();\n    expect(await (await cell.$('.jp-Editor')).screenshot()).toMatchSnapshot('highlight-markdown-switch-state.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2480,11 +2494,11 @@
             "name": "Search on typing",
             "suites": [],
             "updatePoint": {
-                "line": 185,
+                "line": 198,
                 "column": 24,
-                "index": 6555
+                "index": 7120
             },
-            "line": 185,
+            "line": 198,
             "code": "  test('Search on typing', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.notebook.setCell(5, 'code', 'with');\n    const cell = await page.notebook.getCell(5);\n    expect(await cell.screenshot()).toMatchSnapshot('search-typing.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2494,11 +2508,11 @@
             "name": "Search new outputs",
             "suites": [],
             "updatePoint": {
-                "line": 195,
+                "line": 208,
                 "column": 26,
-                "index": 6913
+                "index": 7478
             },
-            "line": 195,
+            "line": 208,
             "code": "  test('Search new outputs', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.click('button[title=\"Show Search Filters\"]');\n    await page.click('text=Search Cell Outputs');\n    await page.waitForSelector('text=1/29');\n    const cell = await page.notebook.getCell(5);\n    await cell.click();\n    await page.notebook.runCell(5);\n    expect(await cell.screenshot()).toMatchSnapshot('search-new-outputs.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2508,11 +2522,11 @@
             "name": "Search on new cell",
             "suites": [],
             "updatePoint": {
-                "line": 209,
+                "line": 222,
                 "column": 26,
-                "index": 7440
+                "index": 8005
             },
-            "line": 209,
+            "line": 222,
             "code": "  test('Search on new cell', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n    const cell = await page.notebook.getCell(5);\n    await cell.click();\n    await page.notebook.clickToolbarItem('insert');\n    await page.notebook.setCell(6, 'code', 'with');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot('search-on-new-cell.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -2522,11 +2536,11 @@
             "name": "Search on deleted cell",
             "suites": [],
             "updatePoint": {
-                "line": 223,
+                "line": 236,
                 "column": 30,
-                "index": 7993
+                "index": 8558
             },
-            "line": 223,
+            "line": 236,
             "code": "  test('Search on deleted cell', async ({\n    page\n  }) => {\n    // Open search box\n    await page.keyboard.press('Control+f');\n    await page.fill('[placeholder=\"Find\"]', 'with');\n    await page.waitForSelector('text=1/21');\n    const cell = await page.notebook.getCell(5);\n    await cell.click();\n    await page.keyboard.press('Escape');\n    await cell.scrollIntoViewIfNeeded();\n    await page.keyboard.press('d');\n    await page.keyboard.press('d');\n    await page.waitForSelector('text=-/19');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot('search-on-deleted-cell.png');\n  });",
             "file": "jupyterlab/notebook-search.test.ts",
             "skipped": false,
@@ -21633,7 +21647,7 @@
             "dir": "packages/fileeditor/test"
         },
         {
-            "name": "should not focus the editor",
+            "name": "should find multi-line matches",
             "suites": [
                 "@jupyterlab/fileeditor",
                 "FileEditorSearchProvider",
@@ -21641,9 +21655,26 @@
             ],
             "updatePoint": {
                 "line": 77,
-                "column": 37
+                "column": 40
             },
             "line": 77,
+            "code": "      it('should find multi-line matches', async () => {\n        await provider.startQuery(/est\\nte/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.endQuery();\n      });",
+            "file": "searchprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/fileeditor/test"
+        },
+        {
+            "name": "should not focus the editor",
+            "suites": [
+                "@jupyterlab/fileeditor",
+                "FileEditorSearchProvider",
+                "#highlightNext()"
+            ],
+            "updatePoint": {
+                "line": 84,
+                "column": 37
+            },
+            "line": 84,
             "code": "      it('should not focus the editor', async () => {\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(widget.editor.hasFocus()).toBe(false);\n      });",
             "file": "searchprovider.spec.ts",
             "skipped": false,
@@ -21657,10 +21688,10 @@
                 "#highlightNext()"
             ],
             "updatePoint": {
-                "line": 83,
+                "line": 90,
                 "column": 41
             },
-            "line": 83,
+            "line": 90,
             "code": "      it('should loop back to first match', async () => {\n        widget.editor.setCursorPosition({ line: 1, column: 0 });\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(2);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.endQuery();\n      });",
             "file": "searchprovider.spec.ts",
             "skipped": false,
@@ -21674,10 +21705,10 @@
                 "#highlightNext()"
             ],
             "updatePoint": {
-                "line": 93,
+                "line": 100,
                 "column": 52
             },
-            "line": 93,
+            "line": 100,
             "code": "      it('should do nothing if the document is empty', async () => {\n        widget.context.model.fromString('');\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(null);\n        await provider.endQuery();\n      });",
             "file": "searchprovider.spec.ts",
             "skipped": false,
@@ -21691,10 +21722,10 @@
                 "#highlightPrevious()"
             ],
             "updatePoint": {
-                "line": 103,
+                "line": 110,
                 "column": 41
             },
-            "line": 103,
+            "line": 110,
             "code": "      it('should highlight previous match', async () => {\n        widget.editor.setCursorPosition({ line: 1, column: 0 });\n        await provider.startQuery(/tes/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(2);\n        expect(widget.editor.getCursorPosition().line).toBe(1);\n        await provider.highlightPrevious();\n        expect(widget.editor.getCursorPosition().line).toBe(0);\n        expect(provider.currentMatchIndex).toBe(1);\n        await provider.highlightPrevious();\n        expect(widget.editor.getCursorPosition().line).toBe(0);\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.endQuery();\n      });",
             "file": "searchprovider.spec.ts",
             "skipped": false,
@@ -21708,10 +21739,10 @@
                 "#highlightPrevious()"
             ],
             "updatePoint": {
-                "line": 118,
+                "line": 125,
                 "column": 40
             },
-            "line": 118,
+            "line": 125,
             "code": "      it('should loop back to last match', async () => {\n        await provider.startQuery(/test/, undefined);\n        await provider.highlightNext();\n        expect(provider.currentMatchIndex).toBe(0);\n        await provider.highlightPrevious();\n        expect(provider.currentMatchIndex).toBe(2);\n        await provider.endQuery();\n      });",
             "file": "searchprovider.spec.ts",
             "skipped": false,
