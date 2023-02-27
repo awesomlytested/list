@@ -2841,6 +2841,20 @@
             "dir": "galata/test"
         },
         {
+            "name": "Stdin history search",
+            "suites": [],
+            "updatePoint": {
+                "line": 11,
+                "column": 28,
+                "index": 313
+            },
+            "line": 11,
+            "code": "  test('Stdin history search', async ({\n    page\n  }) => {\n    await page.notebook.setCell(0, 'code', 'raise');\n    await page.notebook.addCell('code', '%debug');\n\n    // Run first cell on proceed to the second one.\n    await page.notebook.runCell(0);\n\n    // Run the selected (second) cell without proceeding and without waiting\n    // for it to complete (as it should stay waiting for input).\n    await page.keyboard.press('Control+Enter');\n\n    // enter a bunch of nonsense commands into the stdin attached to ipdb\n    await page.waitForSelector('.jp-Stdin-input');\n    await page.keyboard.insertText('foofoo');\n    await page.keyboard.press('Enter');\n    await page.waitForSelector('.jp-Stdin-input');\n    await page.keyboard.insertText('barbar');\n    await page.keyboard.press('Enter');\n    await page.waitForSelector('.jp-Stdin-input');\n    await page.keyboard.insertText('bazbaz');\n    await page.keyboard.press('Enter');\n\n    // search for the first nonsense command\n    await page.waitForSelector('.jp-Stdin-input');\n    await page.keyboard.insertText('foo');\n    await page.keyboard.press('Control+ArrowUp');\n\n    // Mask out random kernel temporary file path\n    // e.g. `/tmp/ipykernel_104185/2235509928.py`\n    const filePath = await page.$('.jp-OutputArea-output :text-matches(\"/tmp/\")');\n    await filePath.evaluate(node => node.textContent = '/tmp/masked.py');\n    const imageName = 'stdin-history-search.png';\n    const cell = await page.notebook.getCell(1);\n    expect(await cell.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "file": "jupyterlab/outputarea-stdin.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
             "name": "Prompt to rename new  file",
             "suites": [],
             "updatePoint": {
