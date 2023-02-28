@@ -2619,6 +2619,23 @@
             "dir": "packages/plugins/other/visitor-plugin-common/tests"
         },
         {
+            "name": "preserves `.js` on Operations import path",
+            "suites": [
+                "getImports",
+                "when documentMode \"external\", importDocumentNodeExternallyFrom is relative path",
+                "when emitLegacyCommonJSImports is false"
+            ],
+            "updatePoint": {
+                "line": 99,
+                "column": 51
+            },
+            "line": 99,
+            "code": "      it('preserves `.js` on Operations import path', () => {\n        const fileName = 'fooBarQuery';\n        const importPath = `./src/queries/${fileName}.js`;\n\n        const document = parse(\n          `query fooBarQuery {\n            a {\n              foo\n              bar\n            }\n          }\n        `\n        );\n\n        const visitor = new ClientSideBaseVisitor(\n          schema,\n          [],\n          {\n            emitLegacyCommonJSImports: false,\n            importDocumentNodeExternallyFrom: importPath,\n            documentMode: DocumentMode.external,\n          },\n          {},\n          [{ document, location: importPath }]\n        );\n\n        visitor.OperationDefinition(document.definitions[0] as OperationDefinitionNode);\n\n        const imports = visitor.getImports();\n        expect(imports[0]).toBe(`import * as Operations from '${importPath}';`);\n      });",
+            "file": "client-side-base-visitor.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/other/visitor-plugin-common/tests"
+        },
+        {
             "name": "checks if types are actually included when Omit is applied",
             "suites": [
                 "BaseResolversVisitor.createResolversFields"
