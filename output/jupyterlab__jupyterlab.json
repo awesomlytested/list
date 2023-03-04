@@ -581,7 +581,7 @@
                 "index": 1085
             },
             "line": 37,
-            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('[title=\"Property Inspector\"]');\n    await page.click('.jp-PropertyInspector >> text=Common Tools');\n    await page.selectOption('.jp-PropertyInspector >> text=Slide Type >> select', {\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
+            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('[title=\"Property Inspector\"]');\n    await page.click('.jp-PropertyInspector >> text=Common Tools');\n    await page.selectOption('#jp-MetadataForm-\\\\@jupyterlab\\\\/notebook-extension\\\\:tools_\\\\/slideshow\\\\/slide_type', {\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
             "file": "documentation/export_notebook.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -28054,10 +28054,10 @@
                 "#constructor()"
             ],
             "updatePoint": {
-                "line": 147,
+                "line": 109,
                 "column": 48
             },
-            "line": 147,
+            "line": 109,
             "code": "        it('should create a notebooktools object', () => {\n          expect(notebookTools).toBeInstanceOf(NotebookTools);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
@@ -28072,10 +28072,10 @@
                 "#activeNotebookPanel"
             ],
             "updatePoint": {
-                "line": 153,
+                "line": 115,
                 "column": 41
             },
-            "line": 153,
+            "line": 115,
             "code": "        it('should be the active notebook', () => {\n          expect(notebookTools.activeNotebookPanel).toBe(panel1);\n          tabpanel.currentIndex = 0;\n          simulate(panel0.node, 'focus');\n          expect(notebookTools.activeNotebookPanel).toBe(panel0);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
@@ -28090,10 +28090,10 @@
                 "#activeCell"
             ],
             "updatePoint": {
-                "line": 162,
+                "line": 124,
                 "column": 37
             },
-            "line": 162,
+            "line": 124,
             "code": "        it('should be the active cell', () => {\n          expect(notebookTools.activeCell).toBe(panel1.content.activeCell);\n          tabpanel.currentIndex = 0;\n          simulate(panel0.node, 'focus');\n          expect(notebookTools.activeCell).toBe(panel0.content.activeCell);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
@@ -28108,11 +28108,47 @@
                 "#selectedCells"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 133,
                 "column": 50
             },
-            "line": 171,
+            "line": 133,
             "code": "        it('should be the currently selected cells', () => {\n          expect(notebookTools.selectedCells).toEqual([\n            panel1.content.activeCell\n          ]);\n          tabpanel.currentIndex = 0;\n          simulate(panel0.node, 'focus');\n          expect(notebookTools.selectedCells).toEqual([\n            panel0.content.activeCell\n          ]);\n          panel0.content.select(panel0.content.widgets[1]);\n          expect(notebookTools.selectedCells.length).toBe(2);\n        });",
+            "file": "notebooktools.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should add an empty section",
+            "suites": [
+                "@jupyterlab/notebook",
+                "notebooktools",
+                "NotebookTools",
+                "#addSection()"
+            ],
+            "updatePoint": {
+                "line": 148,
+                "column": 39
+            },
+            "line": 148,
+            "code": "        it('should add an empty section', () => {\n          const newSectionName = 'newSection';\n          expect(() => {\n            notebookTools.addSection({ sectionName: newSectionName });\n          }).not.toThrow();\n          const currentWidgets = (\n            notebookTools.layout as PanelLayout\n          ).widgets.map(w => {\n            return (w as Collapser).widget;\n          });\n          expect(\n            currentWidgets.filter(w => w.title.label === newSectionName)\n          ).toHaveLength(1);\n        });",
+            "file": "notebooktools.spec.ts",
+            "skipped": false,
+            "dir": "packages/notebook/test"
+        },
+        {
+            "name": "should add an section with a widget",
+            "suites": [
+                "@jupyterlab/notebook",
+                "notebooktools",
+                "NotebookTools",
+                "#addSection()"
+            ],
+            "updatePoint": {
+                "line": 163,
+                "column": 47
+            },
+            "line": 163,
+            "code": "        it('should add an section with a widget', () => {\n          const newSectionName = 'newSection';\n          const tool = new NotebookTools.Tool();\n          expect(() => {\n            notebookTools.addSection({ sectionName: newSectionName, tool });\n          }).not.toThrow();\n          const currentWidgets = (\n            notebookTools.layout as PanelLayout\n          ).widgets.map(w => {\n            return (w as Collapser).widget;\n          });\n          const sections = currentWidgets.filter(\n            w => w.title.label === newSectionName\n          );\n          expect(sections).toHaveLength(1);\n          expect((sections[0].layout as PanelLayout).widgets).toContain(tool);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28126,11 +28162,11 @@
                 "#addItem()"
             ],
             "updatePoint": {
-                "line": 186,
+                "line": 183,
                 "column": 39
             },
-            "line": 186,
-            "code": "        it('should add a cell tool item', () => {\n          const tool = new NotebookTools.Tool();\n          expect(() => {\n            notebookTools.addItem({ tool });\n          }).not.toThrow();\n          tool.dispose();\n        });",
+            "line": 183,
+            "code": "        it('should add a cell tool item', () => {\n          const tool = new NotebookTools.Tool();\n          expect(() => {\n            notebookTools.addItem({ tool, section: sectionName });\n          }).not.toThrow();\n          tool.dispose();\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28144,11 +28180,11 @@
                 "#addItem()"
             ],
             "updatePoint": {
-                "line": 194,
+                "line": 191,
                 "column": 32
             },
-            "line": 194,
-            "code": "        it('should accept a rank', () => {\n          const tool = new NotebookTools.Tool();\n          expect(() => {\n            notebookTools.addItem({ tool, rank: 100 });\n          }).not.toThrow();\n          tool.dispose();\n        });",
+            "line": 191,
+            "code": "        it('should accept a rank', () => {\n          const tool = new NotebookTools.Tool();\n          expect(() => {\n            notebookTools.addItem({ tool, section: sectionName, rank: 100 });\n          }).not.toThrow();\n          tool.dispose();\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28162,10 +28198,10 @@
                 "#constructor"
             ],
             "updatePoint": {
-                "line": 206,
+                "line": 203,
                 "column": 41
             },
-            "line": 206,
+            "line": 203,
             "code": "        it('should create a new base tool', () => {\n          const tool = new NotebookTools.Tool();\n          expect(tool).toBeInstanceOf(NotebookTools.Tool);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
@@ -28180,11 +28216,11 @@
                 "#parent"
             ],
             "updatePoint": {
-                "line": 213,
+                "line": 210,
                 "column": 63
             },
-            "line": 213,
-            "code": "        it('should be the notebooktools object used by the tool', () => {\n          const tool = new NotebookTools.Tool({});\n          notebookTools.addItem({ tool });\n          expect(tool.notebookTools).toBe(notebookTools);\n        });",
+            "line": 210,
+            "code": "        it('should be the notebooktools object used by the tool', () => {\n          const tool = new NotebookTools.Tool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          expect(tool.notebookTools).toBe(notebookTools);\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28198,11 +28234,11 @@
                 "#onActiveNotebookPanelChanged()"
             ],
             "updatePoint": {
-                "line": 221,
+                "line": 218,
                 "column": 67
             },
-            "line": 221,
-            "code": "        it('should be called when the active notebook panel changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool });\n          tool.methods = [];\n          simulate(panel0.node, 'focus');\n          expect(tool.methods).toContain('onActiveNotebookPanelChanged');\n        });",
+            "line": 218,
+            "code": "        it('should be called when the active notebook panel changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          tool.methods = [];\n          simulate(panel0.node, 'focus');\n          expect(tool.methods).toContain('onActiveNotebookPanelChanged');\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28216,11 +28252,11 @@
                 "#onActiveCellChanged()"
             ],
             "updatePoint": {
-                "line": 231,
+                "line": 228,
                 "column": 57
             },
-            "line": 231,
-            "code": "        it('should be called when the active cell changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool });\n          tool.methods = [];\n          simulate(panel0.node, 'focus');\n          expect(tool.methods).toContain('onActiveCellChanged');\n        });",
+            "line": 228,
+            "code": "        it('should be called when the active cell changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          tool.methods = [];\n          simulate(panel0.node, 'focus');\n          expect(tool.methods).toContain('onActiveCellChanged');\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28234,11 +28270,11 @@
                 "#onSelectionChanged()"
             ],
             "updatePoint": {
-                "line": 241,
+                "line": 238,
                 "column": 55
             },
-            "line": 241,
-            "code": "        it('should be called when the selection changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool });\n          tool.methods = [];\n          const current = tracker.currentWidget!;\n          current.content.select(current.content.widgets[1]);\n          expect(tool.methods).toContain('onSelectionChanged');\n        });",
+            "line": 238,
+            "code": "        it('should be called when the selection changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          tool.methods = [];\n          const current = tracker.currentWidget!;\n          current.content.select(current.content.widgets[1]);\n          expect(tool.methods).toContain('onSelectionChanged');\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28252,11 +28288,11 @@
                 "#onActiveCellMetadataChanged()"
             ],
             "updatePoint": {
-                "line": 252,
+                "line": 249,
                 "column": 66
             },
-            "line": 252,
-            "code": "        it('should be called when the active cell metadata changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool });\n          tool.methods = [];\n          const model = notebookTools.activeCell!.model;\n          model.setMetadata('foo', 1);\n          model.setMetadata('foo', 2);\n          expect(tool.methods).toContain('onActiveCellMetadataChanged');\n        });",
+            "line": 249,
+            "code": "        it('should be called when the active cell metadata changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          tool.methods = [];\n          const model = notebookTools.activeCell!.model;\n          model.setMetadata('foo', 1);\n          model.setMetadata('foo', 2);\n          expect(tool.methods).toContain('onActiveCellMetadataChanged');\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -28270,399 +28306,11 @@
                 "#onActiveNotebookPanelMetadataChanged()"
             ],
             "updatePoint": {
-                "line": 264,
+                "line": 261,
                 "column": 76
             },
-            "line": 264,
-            "code": "        it('should be called when the active notebook panel metadata changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool });\n          tool.methods = [];\n          const model = notebookTools.activeNotebookPanel!.model!;\n          model.setMetadata('foo', 1);\n          model.setMetadata('foo', 2);\n          expect(tool.methods).toContain(\n            'onActiveNotebookPanelMetadataChanged'\n          );\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a new active cell tool",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.ActiveCellTool"
-            ],
-            "updatePoint": {
-                "line": 279,
-                "column": 46
-            },
-            "line": 279,
-            "code": "      it('should create a new active cell tool', () => {\n        const tool = new NotebookTools.ActiveCellTool(\n          new EditorLanguageRegistry()\n        );\n        notebookTools.addItem({ tool });\n        expect(tool).toBeInstanceOf(NotebookTools.ActiveCellTool);\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should handle a change to the active cell",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.ActiveCellTool"
-            ],
-            "updatePoint": {
-                "line": 287,
-                "column": 51
-            },
-            "line": 287,
-            "code": "      it('should handle a change to the active cell', () => {\n        const tool = new NotebookTools.ActiveCellTool(\n          new EditorLanguageRegistry()\n        );\n        notebookTools.addItem({ tool });\n        const widget = tracker.currentWidget!;\n        widget.content.activeCellIndex++;\n        widget.content.activeCell!.model.setMetadata('bar', 1);\n        expect(tool.node.querySelector('pre')).toBeTruthy();\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a new metadata editor tool",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.CellMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 303,
-                "column": 50
-            },
-            "line": 303,
-            "code": "      it('should create a new metadata editor tool', () => {\n        const tool = new NotebookTools.CellMetadataEditorTool({\n          editorFactory\n        });\n        expect(tool).toBeInstanceOf(NotebookTools.CellMetadataEditorTool);\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should handle a change to the active cell",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.CellMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 310,
-                "column": 51
-            },
-            "line": 310,
-            "code": "      it('should handle a change to the active cell', () => {\n        const tool = new NotebookTools.CellMetadataEditorTool({\n          editorFactory\n        });\n        notebookTools.addItem({ tool });\n        const model = tool.editor.model;\n        expect(JSON.stringify(model.sharedModel.getSource())).toBeTruthy();\n        const widget = tracker.currentWidget!;\n        widget.content.activeCellIndex++;\n        widget.content.activeCell!.model.setMetadata('bar', 1);\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).toContain('bar');\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should handle a change to the metadata",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.CellMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 325,
-                "column": 48
-            },
-            "line": 325,
-            "code": "      it('should handle a change to the metadata', () => {\n        const tool = new NotebookTools.CellMetadataEditorTool({\n          editorFactory\n        });\n        notebookTools.addItem({ tool });\n        const model = tool.editor.model;\n        const previous = model.sharedModel.getSource();\n        const cellModel = notebookTools.activeCell!.model;\n        cellModel.setMetadata('foo', 1);\n        expect(tool.editor.model.sharedModel.getSource()).not.toBe(previous);\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a new metadata editor tool",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.NotebookMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 342,
-                "column": 50
-            },
-            "line": 342,
-            "code": "      it('should create a new metadata editor tool', () => {\n        const tool = new NotebookTools.NotebookMetadataEditorTool({\n          editorFactory\n        });\n        expect(tool).toBeInstanceOf(NotebookTools.NotebookMetadataEditorTool);\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should handle a change to the active notebook",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.NotebookMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 349,
-                "column": 55
-            },
-            "line": 349,
-            "code": "      it('should handle a change to the active notebook', () => {\n        panel0.model!.setMetadata('panel0', 1);\n        panel1.model!.setMetadata('panel1', 1);\n        const tool = new NotebookTools.NotebookMetadataEditorTool({\n          editorFactory\n        });\n        notebookTools.addItem({ tool });\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).toBeTruthy();\n\n        simulate(panel0.node, 'focus');\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).toContain('panel0');\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).not.toContain('panel1');\n\n        simulate(panel1.node, 'focus');\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).not.toContain('panel0');\n        expect(\n          JSON.stringify(tool.editor.model.sharedModel.getSource())\n        ).toContain('panel1');\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should handle a change to the metadata",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.NotebookMetadataEditorTool"
-            ],
-            "updatePoint": {
-                "line": 377,
-                "column": 48
-            },
-            "line": 377,
-            "code": "      it('should handle a change to the metadata', () => {\n        const tool = new NotebookTools.NotebookMetadataEditorTool({\n          editorFactory\n        });\n        notebookTools.addItem({ tool });\n        const model = tool.editor.model;\n        const widget = tracker.currentWidget!;\n        expect(JSON.stringify(model.sharedModel.getSource())).not.toContain(\n          'newvalue'\n        );\n        widget.content.model!.setMetadata('newvalue', 1);\n        expect(JSON.stringify(model.sharedModel.getSource())).toContain(\n          'newvalue'\n        );\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a new key selector",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#constructor()"
-            ],
-            "updatePoint": {
-                "line": 416,
-                "column": 44
-            },
-            "line": 416,
-            "code": "        it('should create a new key selector', () => {\n          expect(tool).toBeInstanceOf(NotebookTools.KeySelector);\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should be the key used by the selector",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#key"
-            ],
-            "updatePoint": {
-                "line": 422,
-                "column": 50
-            },
-            "line": 422,
-            "code": "        it('should be the key used by the selector', () => {\n          expect(tool.key).toBe('foo');\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should be the select node",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#selectNode"
-            ],
-            "updatePoint": {
-                "line": 428,
-                "column": 37
-            },
-            "line": 428,
-            "code": "        it('should be the select node', () => {\n          expect(tool.selectNode.localName).toBe('select');\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should update the metadata",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#handleEvent()",
-                "change"
-            ],
-            "updatePoint": {
-                "line": 435,
-                "column": 40
-            },
-            "line": 435,
-            "code": "          it('should update the metadata', () => {\n            const select = tool.selectNode;\n            simulate(select, 'focus');\n            select.selectedIndex = 1;\n            simulate(select, 'change');\n            expect(tool.events).toContain('change');\n            const model = notebookTools.activeCell!.model;\n            expect(model.getMetadata('foo')).toEqual([1, 2, 'a']);\n          });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should add the focused class to the wrapper node",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#handleEvent()",
-                "focus"
-            ],
-            "updatePoint": {
-                "line": 447,
-                "column": 62
-            },
-            "line": 447,
-            "code": "          it('should add the focused class to the wrapper node', () => {\n            const select = tool.selectNode;\n            simulate(select, 'focus');\n            const selector = '.jp-mod-focused';\n            expect(tool.node.querySelector(selector)).toBeTruthy();\n          });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should remove the focused class from the wrapper node",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#handleEvent()",
-                "blur"
-            ],
-            "updatePoint": {
-                "line": 456,
-                "column": 67
-            },
-            "line": 456,
-            "code": "          it('should remove the focused class from the wrapper node', () => {\n            const select = tool.selectNode;\n            simulate(select, 'focus');\n            simulate(select, 'blur');\n            const selector = '.jp-mod-focused';\n            expect(tool.node.querySelector(selector)).toBeFalsy();\n          });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should add event listeners",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#onAfterAttach()"
-            ],
-            "updatePoint": {
-                "line": 467,
-                "column": 38
-            },
-            "line": 467,
-            "code": "        it('should add event listeners', () => {\n          const select = tool.selectNode;\n          expect(tool.methods).toContain('onAfterAttach');\n          simulate(select, 'focus');\n          simulate(select, 'blur');\n          select.selectedIndex = 0;\n          simulate(select, 'change');\n          expect(tool.events).toEqual(['change']);\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should remove event listeners",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#onBeforeDetach()"
-            ],
-            "updatePoint": {
-                "line": 479,
-                "column": 41
-            },
-            "line": 479,
-            "code": "        it('should remove event listeners', () => {\n          const select = tool.selectNode;\n          notebookTools.dispose();\n          expect(tool.methods).toContain('onBeforeDetach');\n          simulate(select, 'focus');\n          simulate(select, 'blur');\n          simulate(select, 'change');\n          expect(tool.events).toEqual([]);\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should update the metadata",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#onValueChanged()"
-            ],
-            "updatePoint": {
-                "line": 491,
-                "column": 38
-            },
-            "line": 491,
-            "code": "        it('should update the metadata', () => {\n          const select = tool.selectNode;\n          simulate(select, 'focus');\n          select.selectedIndex = 1;\n          simulate(select, 'change');\n          expect(tool.methods).toContain('onValueChanged');\n          const model = notebookTools.activeCell!.model;\n          expect(model.getMetadata('foo')).toEqual([1, 2, 'a']);\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should update the select value",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#onActiveCellChanged()"
-            ],
-            "updatePoint": {
-                "line": 503,
-                "column": 42
-            },
-            "line": 503,
-            "code": "        it('should update the select value', () => {\n          const cell = panel0.content.model!.cells.get(1);\n          cell.setMetadata('foo', 1);\n          panel0.content.activeCellIndex = 1;\n          expect(tool.methods).toContain('onActiveCellChanged');\n          expect(tool.selectNode.value).toBe('1');\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should update the select value",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.KeySelector",
-                "#onActiveCellMetadataChanged()"
-            ],
-            "updatePoint": {
-                "line": 513,
-                "column": 42
-            },
-            "line": 513,
-            "code": "        it('should update the select value', () => {\n          const model = notebookTools.activeCell!.model;\n          model.setMetadata('foo', 1);\n          expect(tool.methods).toContain('onActiveCellMetadataChanged');\n          expect(tool.selectNode.value).toBe('1');\n        });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a slide show selector",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.createSlideShowSelector()"
-            ],
-            "updatePoint": {
-                "line": 523,
-                "column": 45
-            },
-            "line": 523,
-            "code": "      it('should create a slide show selector', () => {\n        const tool = NotebookTools.createSlideShowSelector();\n        tool.selectNode.selectedIndex = -1;\n        notebookTools.addItem({ tool });\n        simulate(panel0.node, 'focus');\n        tabpanel.currentIndex = 2;\n        expect(tool).toBeInstanceOf(NotebookTools.KeySelector);\n        expect(tool.key).toBe('slideshow');\n        const select = tool.selectNode;\n        expect(select.value).toBe('');\n        const model = notebookTools.activeCell!.model;\n        expect(model.getMetadata('slideshow')).toBeUndefined();\n        simulate(select, 'focus');\n        tool.selectNode.selectedIndex = 1;\n        simulate(select, 'change');\n        expect(model.getMetadata('slideshow')).toEqual({\n          slide_type: 'slide'\n        });\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should create a raw mimetype selector",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.createNBConvertSelector()"
-            ],
-            "updatePoint": {
-                "line": 545,
-                "column": 47
-            },
-            "line": 545,
-            "code": "      it('should create a raw mimetype selector', () => {\n        const optionValueArray: any = [\n          [null, '-'],\n          ['LaTeX', 'text/latex'],\n          ['reST', 'text/restructuredtext'],\n          ['HTML', 'text/html'],\n          ['Markdown', 'text/markdown'],\n          ['Python', 'text/x-python']\n        ];\n        optionValueArray.push(['None', '-']);\n        const tool = NotebookTools.createNBConvertSelector(optionValueArray);\n        tool.selectNode.selectedIndex = -1;\n        notebookTools.addItem({ tool });\n        simulate(panel0.node, 'focus');\n        NotebookActions.changeCellType(panel0.content, 'raw');\n        tabpanel.currentIndex = 2;\n        expect(tool).toBeInstanceOf(NotebookTools.KeySelector);\n        expect(tool.key).toBe('raw_mimetype');\n        const select = tool.selectNode;\n        expect(select.value).toBe('');\n\n        const model = notebookTools.activeCell!.model;\n        expect(model.getMetadata('raw_mimetype')).toBeUndefined();\n        simulate(select, 'focus');\n        tool.selectNode.selectedIndex = 2;\n        simulate(select, 'change');\n        expect(model.getMetadata('raw_mimetype')).toBe('text/restructuredtext');\n      });",
-            "file": "notebooktools.spec.ts",
-            "skipped": false,
-            "dir": "packages/notebook/test"
-        },
-        {
-            "name": "should have no effect on a code cell",
-            "suites": [
-                "@jupyterlab/notebook",
-                "notebooktools",
-                "NotebookTools.createNBConvertSelector()"
-            ],
-            "updatePoint": {
-                "line": 574,
-                "column": 46
-            },
-            "line": 574,
-            "code": "      it('should have no effect on a code cell', () => {\n        const optionValueArray: any = [\n          ['None', '-'],\n          ['LaTeX', 'text/latex'],\n          ['reST', 'text/restructuredtext'],\n          ['HTML', 'text/html'],\n          ['Markdown', 'text/markdown'],\n          ['Python', 'text/x-python']\n        ];\n        const tool = NotebookTools.createNBConvertSelector(optionValueArray);\n        tool.selectNode.selectedIndex = -1;\n        notebookTools.addItem({ tool });\n        simulate(panel0.node, 'focus');\n        NotebookActions.changeCellType(panel0.content, 'code');\n\n        tabpanel.currentIndex = 2;\n        expect(tool).toBeInstanceOf(NotebookTools.KeySelector);\n        expect(tool.key).toBe('raw_mimetype');\n        const select = tool.selectNode;\n        expect(select.disabled).toBe(true);\n        expect(select.value).toBe('');\n      });",
+            "line": 261,
+            "code": "        it('should be called when the active notebook panel metadata changes', () => {\n          const tool = new LogTool({});\n          notebookTools.addItem({ tool, section: sectionName });\n          tool.methods = [];\n          const model = notebookTools.activeNotebookPanel!.model!;\n          model.setMetadata('foo', 1);\n          model.setMetadata('foo', 2);\n          expect(tool.methods).toContain(\n            'onActiveNotebookPanelMetadataChanged'\n          );\n        });",
             "file": "notebooktools.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
