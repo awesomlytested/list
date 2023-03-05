@@ -813,11 +813,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 107,
+                "line": 109,
                 "column": 65,
-                "index": 3260
+                "index": 3329
             },
-            "line": 107,
+            "line": 109,
             "code": "  it('throws a promise if the requested value is not in the cache', async () => {\n    function App() {\n      return /*#__PURE__*/React.createElement(Suspense, {\n        fallback: /*#__PURE__*/React.createElement(Text, {\n          text: \"Loading...\"\n        })\n      }, /*#__PURE__*/React.createElement(AsyncText, {\n        ms: 100,\n        text: \"Hi\"\n      }));\n    }\n    ReactTestRenderer.create( /*#__PURE__*/React.createElement(App, null), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Suspend! [Hi]', 'Loading...']);\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise resolved [Hi]']);\n    await waitForAll(['Hi']);\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
@@ -829,12 +829,12 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 126,
+                "line": 128,
                 "column": 71,
-                "index": 3921
+                "index": 3990
             },
-            "line": 126,
-            "code": "  it('throws an error on the subsequent read if the promise is rejected', async () => {\n    function App() {\n      return /*#__PURE__*/React.createElement(Suspense, {\n        fallback: /*#__PURE__*/React.createElement(Text, {\n          text: \"Loading...\"\n        })\n      }, /*#__PURE__*/React.createElement(AsyncText, {\n        ms: 100,\n        text: \"Hi\"\n      }));\n    }\n    const root = ReactTestRenderer.create( /*#__PURE__*/React.createElement(App, null), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Suspend! [Hi]', 'Loading...']);\n    textResourceShouldFail = true;\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise rejected [Hi]']);\n    expect(Scheduler).toFlushAndThrow('Failed to load: Hi');\n    assertLog(['Error! [Hi]', 'Error! [Hi]']);\n\n    // Should throw again on a subsequent read\n    root.update( /*#__PURE__*/React.createElement(App, null));\n    expect(Scheduler).toFlushAndThrow('Failed to load: Hi');\n    assertLog(['Error! [Hi]', 'Error! [Hi]']);\n  });",
+            "line": 128,
+            "code": "  it('throws an error on the subsequent read if the promise is rejected', async () => {\n    function App() {\n      return /*#__PURE__*/React.createElement(Suspense, {\n        fallback: /*#__PURE__*/React.createElement(Text, {\n          text: \"Loading...\"\n        })\n      }, /*#__PURE__*/React.createElement(AsyncText, {\n        ms: 100,\n        text: \"Hi\"\n      }));\n    }\n    const root = ReactTestRenderer.create( /*#__PURE__*/React.createElement(App, null), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Suspend! [Hi]', 'Loading...']);\n    textResourceShouldFail = true;\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise rejected [Hi]']);\n    await waitForThrow('Failed to load: Hi');\n    assertLog(['Error! [Hi]', 'Error! [Hi]']);\n\n    // Should throw again on a subsequent read\n    root.update( /*#__PURE__*/React.createElement(App, null));\n    await waitForThrow('Failed to load: Hi');\n    assertLog(['Error! [Hi]', 'Error! [Hi]']);\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
             "dir": "packages/react-cache/src/__tests__"
@@ -845,12 +845,12 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 152,
+                "line": 154,
                 "column": 80,
-                "index": 4936
+                "index": 4975
             },
-            "line": 152,
-            "code": "  it('warns if non-primitive key is passed to a resource without a hash function', async () => {\n    const BadTextResource = createResource(([text, ms = 0]) => {\n      return new Promise((resolve, reject) => setTimeout(() => {\n        resolve(text);\n      }, ms));\n    });\n    function App() {\n      Scheduler.unstable_yieldValue('App');\n      return BadTextResource.read(['Hi', 100]);\n    }\n    ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(App, null)), {\n      unstable_isConcurrent: true\n    });\n    if (__DEV__) {\n      expect(async () => {\n        await waitForAll(['App', 'Loading...']);\n      }).toErrorDev(['Invalid key type. Expected a string, number, symbol, or ' + 'boolean, but instead received: Hi,100\\n\\n' + 'To use non-primitive values as keys, you must pass a hash ' + 'function as the second argument to createResource().']);\n    } else {\n      await waitForAll(['App', 'Loading...']);\n    }\n  });",
+            "line": 154,
+            "code": "  it('warns if non-primitive key is passed to a resource without a hash function', async () => {\n    const BadTextResource = createResource(([text, ms = 0]) => {\n      return new Promise((resolve, reject) => setTimeout(() => {\n        resolve(text);\n      }, ms));\n    });\n    function App() {\n      Scheduler.unstable_yieldValue('App');\n      return BadTextResource.read(['Hi', 100]);\n    }\n    ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(App, null)), {\n      unstable_isConcurrent: true\n    });\n    if (__DEV__) {\n      await expect(async () => {\n        await waitForAll(['App', 'Loading...']);\n      }).toErrorDev(['Invalid key type. Expected a string, number, symbol, or ' + 'boolean, but instead received: Hi,100\\n\\n' + 'To use non-primitive values as keys, you must pass a hash ' + 'function as the second argument to createResource().']);\n    } else {\n      await waitForAll(['App', 'Loading...']);\n    }\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
             "dir": "packages/react-cache/src/__tests__"
@@ -861,11 +861,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 177,
+                "line": 179,
                 "column": 39,
-                "index": 5968
+                "index": 6013
             },
-            "line": 177,
+            "line": 179,
             "code": "  it('evicts least recently used values', async () => {\n    ReactCache.unstable_setGlobalCacheLimit(3);\n\n    // Render 1, 2, and 3\n    const root = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 1\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 2\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 3\n    })), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Suspend! [1]', 'Suspend! [2]', 'Suspend! [3]', 'Loading...']);\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise resolved [1]', 'Promise resolved [2]', 'Promise resolved [3]']);\n    await waitForAll([1, 2, 3]);\n    expect(root).toMatchRenderedOutput('123');\n\n    // Render 1, 4, 5\n    root.update( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 1\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 4\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 5\n    })));\n    await waitForAll([1, 'Suspend! [4]', 'Suspend! [5]', 'Loading...']);\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise resolved [4]', 'Promise resolved [5]']);\n    await waitForAll([1, 4, 5]);\n    expect(root).toMatchRenderedOutput('145');\n\n    // We've now rendered values 1, 2, 3, 4, 5, over our limit of 3. The least\n    // recently used values are 2 and 3. They should have been evicted.\n\n    root.update( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 1\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 2\n    }), /*#__PURE__*/React.createElement(AsyncText, {\n      ms: 100,\n      text: 3\n    })));\n    await waitForAll([\n    // 1 is still cached\n    1,\n    // 2 and 3 suspend because they were evicted from the cache\n    'Suspend! [2]', 'Suspend! [3]', 'Loading...']);\n    jest.advanceTimersByTime(100);\n    assertLog(['Promise resolved [2]', 'Promise resolved [3]']);\n    await waitForAll([1, 2, 3]);\n    expect(root).toMatchRenderedOutput('123');\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
@@ -877,11 +877,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 251,
+                "line": 253,
                 "column": 38,
-                "index": 8482
+                "index": 8527
             },
-            "line": 251,
+            "line": 253,
             "code": "  it('preloads during the render phase', async () => {\n    function App() {\n      TextResource.preload(['B', 1000]);\n      TextResource.read(['A', 1000]);\n      TextResource.read(['B', 1000]);\n      return /*#__PURE__*/React.createElement(Text, {\n        text: \"Result\"\n      });\n    }\n    const root = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(App, null)), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Loading...']);\n    jest.advanceTimersByTime(1000);\n    assertLog(['Promise resolved [B]', 'Promise resolved [A]']);\n    await waitForAll(['Result']);\n    expect(root).toMatchRenderedOutput('Result');\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
@@ -893,11 +893,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 273,
+                "line": 275,
                 "column": 83,
-                "index": 9320
+                "index": 9365
             },
-            "line": 273,
+            "line": 275,
             "code": "  it('if a thenable resolves multiple times, does not update the first cached value', async () => {\n    let resolveThenable;\n    const BadTextResource = createResource(([text, ms = 0]) => {\n      let listeners = null;\n      const value = null;\n      return {\n        then(resolve, reject) {\n          if (value !== null) {\n            resolve(value);\n          } else {\n            if (listeners === null) {\n              listeners = [resolve];\n              resolveThenable = v => {\n                listeners.forEach(listener => listener(v));\n              };\n            } else {\n              listeners.push(resolve);\n            }\n          }\n        }\n      };\n    }, ([text, ms]) => text);\n    function BadAsyncText(props) {\n      const text = props.text;\n      try {\n        const actualText = BadTextResource.read([props.text, props.ms]);\n        Scheduler.unstable_yieldValue(actualText);\n        return actualText;\n      } catch (promise) {\n        if (typeof promise.then === 'function') {\n          Scheduler.unstable_yieldValue(`Suspend! [${text}]`);\n        } else {\n          Scheduler.unstable_yieldValue(`Error! [${text}]`);\n        }\n        throw promise;\n      }\n    }\n    const root = ReactTestRenderer.create( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(BadAsyncText, {\n      text: \"Hi\"\n    })), {\n      unstable_isConcurrent: true\n    });\n    await waitForAll(['Suspend! [Hi]', 'Loading...']);\n    resolveThenable('Hi');\n    // This thenable improperly resolves twice. We should not update the\n    // cached value.\n    resolveThenable('Hi muahahaha I am different');\n    root.update( /*#__PURE__*/React.createElement(Suspense, {\n      fallback: /*#__PURE__*/React.createElement(Text, {\n        text: \"Loading...\"\n      })\n    }, /*#__PURE__*/React.createElement(BadAsyncText, {\n      text: \"Hi\"\n    })), {\n      unstable_isConcurrent: true\n    });\n    assertLog([]);\n    await waitForAll(['Hi']);\n    expect(root).toMatchRenderedOutput('Hi');\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
@@ -909,11 +909,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 337,
+                "line": 339,
                 "column": 45,
-                "index": 11388
+                "index": 11433
             },
-            "line": 337,
+            "line": 339,
             "code": "  it('throws if read is called outside render', () => {\n    expect(() => TextResource.read(['A', 1000])).toThrow(\"read and preload may only be called from within a component's render\");\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
@@ -925,11 +925,11 @@
                 "ReactCache"
             ],
             "updatePoint": {
-                "line": 340,
+                "line": 342,
                 "column": 48,
-                "index": 11583
+                "index": 11628
             },
-            "line": 340,
+            "line": 342,
             "code": "  it('throws if preload is called outside render', () => {\n    expect(() => TextResource.preload(['A', 1000])).toThrow(\"read and preload may only be called from within a component's render\");\n  });",
             "file": "ReactCacheOld-test.internal.js",
             "skipped": false,
