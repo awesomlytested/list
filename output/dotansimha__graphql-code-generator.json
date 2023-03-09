@@ -5450,15 +5450,30 @@
             "dir": "packages/plugins/typescript/resolvers/tests"
         },
         {
-            "name": "should include fields from @requires directive",
+            "name": "should include nested fields from @provides directive",
             "suites": [
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
                 "line": 95,
-                "column": 52
+                "column": 59
             },
             "line": 95,
+            "code": "  it('should include nested fields from @provides directive', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type Book {\n        author: User @provides(fields: \"name { first last}\")\n      }\n\n      type Name @key(fields: \"id\") {\n        id: ID! @external\n        first: String!\n        middle: String @external\n        last: String!\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: Name @external\n        username: String @external\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        name?: Resolver<Maybe<ResolversTypes['Name']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      }\n    `);\n\n    expect(content).toBeSimilarStringTo(`\n      export type NameResolvers<ContextType = any, ParentType extends ResolversParentTypes['Name'] = ResolversParentTypes['Name']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['Name']>, { __typename: 'Name' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        first?: Resolver<ResolversTypes['String'], { __typename: 'Name' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        last?: Resolver<ResolversTypes['String'], { __typename: 'Name' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      }\n    `);\n  });",
+            "file": "federation.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/typescript/resolvers/tests"
+        },
+        {
+            "name": "should include fields from @requires directive",
+            "suites": [
+                "TypeScript Resolvers Plugin + Apollo Federation"
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 52
+            },
+            "line": 145,
             "code": "  it('should include fields from @requires directive', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: String @external\n        age: Int! @external\n        username: String @requires(fields: \"name age\")\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    // User should have it\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        username?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}> & GraphQLRecursivePick<ParentType, {\"name\":true,\"age\":true}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5470,10 +5485,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 127,
+                "line": 177,
                 "column": 58
             },
-            "line": 127,
+            "line": 177,
             "code": "  it('should handle nested fields from @requires directive', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      extend type User @key(fields: \"id\") {\n        id: ID! @external\n        name: String @external\n        age: Int! @external\n        address: Address! @external\n        username: String @requires(fields: \"name age address { street }\")\n      }\n\n      extend type Address {\n        street: String! @external\n        zip: Int! @external\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        username?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}> & GraphQLRecursivePick<ParentType, {\"name\":true,\"age\":true,\"address\":{\"street\":true}}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5485,10 +5500,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 163,
+                "line": 213,
                 "column": 53
             },
-            "line": 163,
+            "line": 213,
             "code": "  it('should handle nested fields from @key directive', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type User @key(fields: \"name { first last }\") {\n        name: Name! @external\n        username: String\n      }\n\n      type Name {\n        first: String! @external\n        last: String! @external\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"name\":{\"first\":true,\"last\":true}}>, ContextType>;\n        username?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"name\":{\"first\":true,\"last\":true}}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5500,10 +5515,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 196,
+                "line": 246,
                 "column": 79
             },
-            "line": 196,
+            "line": 246,
             "code": "  it('should not apply key/requires fields restriction for base federated types', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type User @key(fields: \"name { first last }\") {\n        name: Name!\n        username: String\n      }\n\n      type Name {\n        first: String!\n        last: String!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"name\":{\"first\":true,\"last\":true}}>, ContextType>;\n        name?: Resolver<ResolversTypes['Name'], ParentType, ContextType>;\n        username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5514,7 +5529,7 @@
             "suites": [
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
-            "line": 230,
+            "line": 280,
             "code": "  it.skip('should handle interface types', async () => {",
             "file": "federation.spec.ts",
             "skipped": true,
@@ -5526,10 +5541,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 274,
+                "line": 324,
                 "column": 74
             },
-            "line": 274,
+            "line": 324,
             "code": "  it('should skip to generate resolvers of fields with @external directive', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type Book {\n        author: User @provides(fields: \"name\")\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: String @external\n        username: String @external\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    // UserResolver should not have a resolver function of name field\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        id?: Resolver<ResolversTypes['ID'], { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        name?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & GraphQLRecursivePick<ParentType, {\"id\":true}>, ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5541,10 +5556,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 309,
+                "line": 359,
                 "column": 41
             },
-            "line": 309,
+            "line": 359,
             "code": "  it('should not include _FieldSet scalar', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: String\n        username: String\n      }\n\n      type Book {\n        id: ID!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).not.toMatch(`_FieldSet`);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5556,10 +5571,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 336,
+                "line": 386,
                 "column": 46
             },
-            "line": 336,
+            "line": 386,
             "code": "  it('should not include federation directives', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        users: [User]\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: String\n        username: String\n      }\n\n      type Book {\n        id: ID!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).not.toMatch('ExternalDirectiveResolver');\n    expect(content).not.toMatch('RequiresDirectiveResolver');\n    expect(content).not.toMatch('ProvidesDirectiveResolver');\n    expect(content).not.toMatch('KeyDirectiveResolver');\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5571,10 +5586,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 366,
+                "line": 416,
                 "column": 80
             },
-            "line": 366,
+            "line": 416,
             "code": "  it('should not add directive definitions and scalars if they are already there', async () => {\n    const federatedSchema = /* GraphQL */ `\n      scalar _FieldSet\n\n      directive @key(fields: _FieldSet!) on OBJECT | INTERFACE\n\n      type Query {\n        allUsers: [User]\n      }\n\n      type User @key(fields: \"id\") {\n        id: ID!\n        name: String\n        username: String\n      }\n\n      type Book {\n        id: ID!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    expect(content).not.toMatch(`_FieldSet`);\n    expect(content).not.toMatch('ExternalDirectiveResolver');\n    expect(content).not.toMatch('RequiresDirectiveResolver');\n    expect(content).not.toMatch('ProvidesDirectiveResolver');\n    expect(content).not.toMatch('KeyDirectiveResolver');\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5586,10 +5601,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 401,
+                "line": 451,
                 "column": 44
             },
-            "line": 401,
+            "line": 451,
             "code": "  it('should allow for duplicated directives', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        allUsers: [User]\n      }\n\n      extend type User @key(fields: \"id\") @key(fields: \"name\") {\n        id: ID! @external\n        name: String\n        username: String\n      }\n\n      type Book {\n        id: ID!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    // User should have it\n    expect(content).toBeSimilarStringTo(`\n      export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & (GraphQLRecursivePick<ParentType, {\"id\":true}> | GraphQLRecursivePick<ParentType, {\"name\":true}>), ContextType>;\n        name?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & (GraphQLRecursivePick<ParentType, {\"id\":true}> | GraphQLRecursivePick<ParentType, {\"name\":true}>), ContextType>;\n        username?: Resolver<Maybe<ResolversTypes['String']>, { __typename: 'User' } & (GraphQLRecursivePick<ParentType, {\"id\":true}> | GraphQLRecursivePick<ParentType, {\"name\":true}>), ContextType>;\n        __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;\n      };\n    `);\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5600,7 +5615,7 @@
             "suites": [
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
-            "line": 436,
+            "line": 486,
             "code": "  it.skip('should only extend an original type by a mapped type', async () => {",
             "file": "federation.spec.ts",
             "skipped": true,
@@ -5612,10 +5627,10 @@
                 "TypeScript Resolvers Plugin + Apollo Federation"
             ],
             "updatePoint": {
-                "line": 470,
+                "line": 520,
                 "column": 40
             },
-            "line": 470,
+            "line": 520,
             "code": "  it('should not generate unused scalars', async () => {\n    const federatedSchema = /* GraphQL */ `\n      type Query {\n        user(id: ID!): User!\n      }\n\n      type User {\n        id: ID!\n        username: String!\n      }\n    `;\n\n    const content = await generate({\n      schema: federatedSchema,\n      config: {\n        federation: true,\n      },\n    });\n\n    // no GraphQLScalarTypeConfig\n    expect(content).not.toContain('GraphQLScalarTypeConfig');\n    // no GraphQLScalarType\n    expect(content).not.toContain('GraphQLScalarType');\n  });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5628,10 +5643,10 @@
                 "When field definition wrapping is enabled"
             ],
             "updatePoint": {
-                "line": 496,
+                "line": 546,
                 "column": 43
             },
-            "line": 496,
+            "line": 546,
             "code": "    it('should add the UnwrappedObject type', async () => {\n      const federatedSchema = /* GraphQL */ `\n        type User @key(fields: \"id\") {\n          id: ID!\n        }\n      `;\n\n      const content = await generate({\n        schema: federatedSchema,\n        config: {\n          federation: true,\n          wrapFieldDefinitions: true,\n        },\n      });\n\n      expect(content).toBeSimilarStringTo(`type UnwrappedObject<T> = {`);\n    });",
             "file": "federation.spec.ts",
             "skipped": false,
@@ -5644,10 +5659,10 @@
                 "When field definition wrapping is enabled"
             ],
             "updatePoint": {
-                "line": 514,
+                "line": 564,
                 "column": 75
             },
-            "line": 514,
+            "line": 564,
             "code": "    it('should add UnwrappedObject around ParentType for __resloveReference', async () => {\n      const federatedSchema = /* GraphQL */ `\n        type User @key(fields: \"id\") {\n          id: ID!\n        }\n      `;\n\n      const content = await generate({\n        schema: federatedSchema,\n        config: {\n          federation: true,\n          wrapFieldDefinitions: true,\n        },\n      });\n\n      // __resolveReference should be unwrapped\n      expect(content).toBeSimilarStringTo(`\n        __resolveReference?: ReferenceResolver<Maybe<ResolversTypes['User']>, { __typename: 'User' } & GraphQLRecursivePick<UnwrappedObject<ParentType>, {\"id\":true}>, ContextType>;\n      `);\n      // but ID should not\n      expect(content).toBeSimilarStringTo(`id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>`);\n    });",
             "file": "federation.spec.ts",
             "skipped": false,
