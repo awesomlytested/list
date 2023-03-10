@@ -581,7 +581,7 @@
                 "index": 1085
             },
             "line": 37,
-            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('[title=\"Property Inspector\"]');\n    await page.click('.jp-PropertyInspector >> text=Common Tools');\n    await page.selectOption('#jp-MetadataForm-\\\\@jupyterlab\\\\/notebook-extension\\\\:tools_\\\\/slideshow\\\\/slide_type', {\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
+            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.locator('[aria-label=\"File Browser Section\"]').getByText('notebooks').dblclick();\n    await page.getByText('Lorenz.ipynb').dblclick();\n    await page.getByText('Python 3 (ipykernel) | Idle').waitFor();\n    await page.getByTitle('Property Inspector').click();\n    await page.locator('.jp-PropertyInspector').getByText('Common Tools').click();\n    await page.locator('.jp-ActiveCellTool').getByText(/# The Lorenz/).waitFor();\n    await page.locator('#jp-MetadataForm-\\\\@jupyterlab\\\\/notebook-extension\\\\:tools_\\\\/slideshow\\\\/slide_type').selectOption({\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.getByText('(𝜎σ, 𝛽β, 𝜌ρ)').waitFor();\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
             "file": "documentation/export_notebook.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2009,7 +2009,7 @@
                 "index": 1731
             },
             "line": 46,
-            "code": "  test('Copy-Paste cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    let imageName = 'copy-paste-cell.png';\n    await page.notebook.selectCells(1);\n    await page.menu.clickMenuItem('Edit>Copy Cells');\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Paste Cells Above');\n    let nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Copy-Paste cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    let imageName = 'copy-paste-cell.png';\n    await page.notebook.selectCells(1);\n    await page.menu.clickMenuItem('Edit>Copy Cell');\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Paste Cell Above');\n    let nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2020,10 +2020,10 @@
             "updatePoint": {
                 "line": 58,
                 "column": 22,
-                "index": 2189
+                "index": 2187
             },
             "line": 58,
-            "code": "  test('Cut-Paste cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'cut-paste-cell.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Cut Cells');\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Paste Cells Below');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Cut-Paste cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'cut-paste-cell.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Cut Cell');\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Paste Cell Below');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2034,10 +2034,10 @@
             "updatePoint": {
                 "line": 70,
                 "column": 26,
-                "index": 2653
+                "index": 2649
             },
             "line": 70,
-            "code": "  test('Paste-Replace cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'paste-replace-cell.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Copy Cells');\n    await page.notebook.selectCells(2);\n    await page.menu.clickMenuItem('Edit>Paste Cells and Replace');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Paste-Replace cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'paste-replace-cell.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Copy Cell');\n    await page.notebook.selectCells(2);\n    await page.menu.clickMenuItem('Edit>Paste Cell and Replace');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2048,10 +2048,10 @@
             "updatePoint": {
                 "line": 82,
                 "column": 19,
-                "index": 3121
+                "index": 3115
             },
             "line": 82,
-            "code": "  test('Delete cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'delete-cell.png';\n    await page.notebook.selectCells(2);\n    await page.menu.clickMenuItem('Edit>Delete Cells');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Delete cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'delete-cell.png';\n    await page.notebook.selectCells(2);\n    await page.menu.clickMenuItem('Edit>Delete Cell');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2062,7 +2062,7 @@
             "updatePoint": {
                 "line": 92,
                 "column": 24,
-                "index": 3482
+                "index": 3475
             },
             "line": 92,
             "code": "  test('Select all cells', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'select-all-cells.png';\n    await page.notebook.selectCells(2);\n    await page.menu.clickMenuItem('Edit>Select All Cells');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
@@ -2076,7 +2076,7 @@
             "updatePoint": {
                 "line": 102,
                 "column": 26,
-                "index": 3854
+                "index": 3847
             },
             "line": 102,
             "code": "  test('Deselect all cells', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'deselect-all-cells.png';\n    await page.notebook.selectCells(1, 2);\n    await page.menu.clickMenuItem('Edit>Deselect All Cells');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
@@ -2090,10 +2090,10 @@
             "updatePoint": {
                 "line": 112,
                 "column": 21,
-                "index": 4228
+                "index": 4221
             },
             "line": 112,
-            "code": "  test('Move cells up', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'move-cell-up.png';\n    await page.notebook.selectCells(1);\n    await page.menu.clickMenuItem('Edit>Move Cells Up');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Move cells up', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'move-cell-up.png';\n    await page.notebook.selectCells(1);\n    await page.menu.clickMenuItem('Edit>Move Cell Up');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2104,10 +2104,10 @@
             "updatePoint": {
                 "line": 122,
                 "column": 23,
-                "index": 4590
+                "index": 4582
             },
             "line": 122,
-            "code": "  test('Move cells down', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'move-cell-down.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Move Cells Down');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
+            "code": "  test('Move cells down', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'move-cell-down.png';\n    await page.notebook.selectCells(0);\n    await page.menu.clickMenuItem('Edit>Move Cell Down');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
             "file": "jupyterlab/notebook-edit.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -2118,7 +2118,7 @@
             "updatePoint": {
                 "line": 132,
                 "column": 18,
-                "index": 4951
+                "index": 4942
             },
             "line": 132,
             "code": "  test('Split cell', async ({\n    page\n  }) => {\n    await populateNotebook(page);\n    const imageName = 'split-cell.png';\n    await page.notebook.enterCellEditingMode(2);\n    await page.keyboard.press('End');\n    await page.keyboard.press('Enter');\n    await page.keyboard.insertText('3 ** 2');\n    await page.keyboard.press('Home');\n    await page.menu.clickMenuItem('Edit>Split Cell');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
@@ -2132,7 +2132,7 @@
             "updatePoint": {
                 "line": 146,
                 "column": 25,
-                "index": 5482
+                "index": 5473
             },
             "line": 146,
             "code": "  test('Merge split cells', async ({\n    page\n  }) => {\n    await page.notebook.addCell('code', '2 ** 3');\n    await page.notebook.addCell('code', '3 ** 2');\n    const imageName = 'merge-cells.png';\n    await page.notebook.selectCells(1, 2);\n    await page.menu.clickMenuItem('Edit>Merge Selected Cells');\n    const nbPanel = await page.notebook.getNotebookInPanel();\n    expect(await nbPanel.screenshot()).toMatchSnapshot(imageName);\n  });",
