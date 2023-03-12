@@ -1710,12 +1710,12 @@
             "name": "should display the form",
             "suites": [],
             "updatePoint": {
-                "line": 119,
+                "line": 121,
                 "column": 31,
-                "index": 3526
+                "index": 3509
             },
-            "line": 119,
-            "code": "  test('should display the form', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Activate the property inspector.\n    await activatePropertyInspector(page);\n\n    // Retrieves the form from its header's text, it should be collapsed.\n    const form = page.locator('.jp-NotebookTools .jp-Collapse:has(>.jp-Collapse-header:text(\"Extension metadata\"))');\n    expect(await form.screenshot()).toMatchSnapshot('metadata-collapsed-form.png');\n    await expect(form.locator('.jp-Collapse-contents.lm-mod-hidden')).toHaveCount(1);\n\n    // Expand the form.\n    await form.click();\n    await expect(form.locator('.jp-Collapse-contents.lm-mod-hidden')).toHaveCount(0);\n\n    // Get the formGroup (form content).\n    const formGroup = form.locator('.jp-Collapse-contents .jp-MetadataForm fieldset > .form-group');\n\n    // There should be only one field in formGroup, with correct title and description.\n    await expect(formGroup).toHaveCount(1);\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-fieldLabel')).toHaveText('Basic metadata');\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-description')).toHaveText('Basic metadata description');\n  });",
+            "line": 121,
+            "code": "  test('should display the form', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Activate the property inspector.\n    await activatePropertyInspector(page);\n\n    // Retrieves the form from its header's text, it should be collapsed.\n    const form = page.locator('.jp-NotebookTools .jp-Collapse', {\n      hasText: 'Extension metadata'\n    });\n    expect(await form.screenshot()).toMatchSnapshot('metadata-collapsed-form.png');\n    await expect(form.locator('.jp-Collapse-contents.lm-mod-hidden')).toHaveCount(1);\n\n    // Expand the form.\n    await form.click();\n    await expect(form.locator('.jp-Collapse-contents.lm-mod-hidden')).toHaveCount(0);\n\n    // Get the formGroup (form content).\n    const formGroup = form.locator('.jp-Collapse-contents .jp-MetadataForm fieldset > .form-group');\n\n    // There should be only one field in formGroup, with correct title and description.\n    await expect(formGroup).toHaveCount(1);\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-fieldLabel')).toHaveText('Basic metadata');\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-description')).toHaveText('Basic metadata description');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -1724,11 +1724,11 @@
             "name": "should fill metadata and display errors",
             "suites": [],
             "updatePoint": {
-                "line": 148,
+                "line": 152,
                 "column": 47,
-                "index": 4869
+                "index": 4844
             },
-            "line": 148,
+            "line": 152,
             "code": "  test('should fill metadata and display errors', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      form,\n      formGroup\n    } = await getFormGroup(page);\n\n    // Error should be displayed as required field is empty.\n    await expect(formGroup.locator('.validationErrors')).not.toBeEmpty();\n    expect(await form.screenshot()).toMatchSnapshot('metadata-required-missing.png');\n\n    // Relevant metadata should be empty.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['basic-metadata']).toBeUndefined();\n\n    // Filling the form.\n    await formGroup.locator('input').fill('abc');\n\n    // Metadata should be filled, and error not displayed anymore.\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['basic-metadata']).toBe('abc');\n    await expect(formGroup.locator('.validationErrors')).toBeEmpty();\n    expect(await form.screenshot()).toMatchSnapshot('metadata-required-filled.png');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1738,11 +1738,11 @@
             "name": "should fill nested metadata and remove the all tree if empty value",
             "suites": [],
             "updatePoint": {
-                "line": 205,
+                "line": 209,
                 "column": 74,
-                "index": 6655
+                "index": 6630
             },
-            "line": 205,
+            "line": 209,
             "code": "  test('should fill nested metadata and remove the all tree if empty value', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      formGroup\n    } = await getFormGroup(page);\n\n    // Metadata should be empty.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']).toBeUndefined();\n\n    // Replace the default value by 0, should write in metadata.\n    await formGroup.locator('input').last().fill('0');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']['level2']['nested']).toBe(0);\n\n    // Empty the field, should remove the metadata tree.\n    await formGroup.locator('input').last().fill('');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']).toBeUndefined();\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1752,11 +1752,11 @@
             "name": "should remove only the empty metadata",
             "suites": [],
             "updatePoint": {
-                "line": 233,
+                "line": 237,
                 "column": 45,
-                "index": 7568
+                "index": 7543
             },
-            "line": 233,
+            "line": 237,
             "code": "  test('should remove only the empty metadata', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      formGroup\n    } = await getFormGroup(page);\n\n    // Metadata should be empty.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']).toBeUndefined();\n\n    // Set the first level nested metadata.\n    await formGroup.locator('input').first().fill('1');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']['nested']).toBe(1);\n    expect(cellMetadata['level1']['level2']).toBeUndefined();\n\n    // Set the second level nested metadata.\n    await formGroup.locator('input').last().fill('1');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']['level2']['nested']).toBe(1);\n\n    // If the value of level2 is deleted, only the level2 metadata should be removed.\n    await formGroup.locator('input').last().fill('');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['level1']['nested']).toBe(1);\n    expect(cellMetadata['level1']['level2']).toBeUndefined();\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1766,11 +1766,11 @@
             "name": "should not fill metadata with \"writeDefault\" flag to false",
             "suites": [],
             "updatePoint": {
-                "line": 300,
+                "line": 304,
                 "column": 66,
-                "index": 9695
+                "index": 9670
             },
-            "line": 300,
+            "line": 304,
             "code": "  test('should not fill metadata with \"writeDefault\" flag to false', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      formGroup\n    } = await getFormGroup(page);\n\n    // Metadata should contains written default value.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-written']).toBe(1);\n\n    // Empty value should remove the metadata.\n    await formGroup.locator('input').first().fill('');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-written']).toBeUndefined();\n\n    // Fill the first one with default should be written in metadata.\n    await formGroup.locator('input').first().fill('1');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-written']).toBe(1);\n\n    // Fill the second one with non default value should write metadata.\n    await formGroup.locator('input').last().fill('0');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-not-written']).toBe(0);\n\n    // Fill the second one with default value should remove the metadata.\n    await formGroup.locator('input').last().fill('1');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-not-written']).toBeUndefined();\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1780,11 +1780,11 @@
             "name": "should not display the modified field",
             "suites": [],
             "updatePoint": {
-                "line": 338,
+                "line": 342,
                 "column": 45,
-                "index": 11109
+                "index": 11084
             },
-            "line": 338,
+            "line": 342,
             "code": "  test('should not display the modified field', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      formGroup\n    } = await getFormGroup(page);\n\n    // Metadata should contains written default value.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-written']).toBe(1);\n\n    // Fill the first one with default should be written in metadata.\n    await formGroup.locator('input').first().fill('2');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['default-written']).toBe(2);\n    await expect(formGroup.locator('.jp-FormGroup-default')).toHaveCount(0);\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1794,11 +1794,11 @@
             "name": "should display the modified field",
             "suites": [],
             "updatePoint": {
-                "line": 385,
+                "line": 389,
                 "column": 41,
-                "index": 12492
+                "index": 12467
             },
-            "line": 385,
+            "line": 389,
             "code": "  test('should display the modified field', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      formGroup\n    } = await getFormGroup(page);\n\n    // Metadata should contains the default value.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['value-with-default']).toBe(1);\n\n    // Fill the field with non default value should display that value is different from default.\n    await formGroup.locator('input').first().fill('2');\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['value-with-default']).toBe(2);\n    await expect(formGroup.locator('.jp-FormGroup-default')).toHaveCount(1);\n    await expect(formGroup.locator('.jp-FormGroup-default')).toContainText('1');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1808,11 +1808,11 @@
             "name": "should manage cell and notebook metadata in the same form",
             "suites": [],
             "updatePoint": {
-                "line": 443,
+                "line": 447,
                 "column": 65,
-                "index": 14288
+                "index": 14263
             },
-            "line": 443,
+            "line": 447,
             "code": "  test('should manage cell and notebook metadata in the same form', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM\n    const {\n      form,\n      formGroup\n    } = await getFormGroup(page);\n\n    // There should be 2 fields displayed.\n    await expect(formGroup).toHaveCount(2);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-level.png');\n\n    // Metadata should be empty.\n    let cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['cell-metadata']).toBeUndefined();\n    let nbMetadata = await getNotebookMetadata(page);\n    expect(nbMetadata['nb-nested']).toBeUndefined();\n\n    // Fill the first level nested metadata.\n    await formGroup.locator('input').first().fill('Cell input');\n    await formGroup.locator('input').last().fill('Notebook input');\n\n    // Metadata should be filled at their correct level.\n    cellMetadata = await getCellMetadata(page, 0);\n    expect(cellMetadata['cell-metadata']).toBe('Cell input');\n    expect(cellMetadata['nb-nested']).toBeUndefined();\n    nbMetadata = await getNotebookMetadata(page);\n    expect(nbMetadata['nb-nested']['nb-metadata']).toBe('Notebook input');\n    expect(nbMetadata['cell-metadata']).toBeUndefined();\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1822,11 +1822,11 @@
             "name": "should not display field for non relevant cell type",
             "suites": [],
             "updatePoint": {
-                "line": 480,
+                "line": 484,
                 "column": 59,
-                "index": 15639
+                "index": 15614
             },
-            "line": 480,
+            "line": 484,
             "code": "  test('should not display field for non relevant cell type', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    let form, formGroup;\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Create a Markdown cell and select it.\n    await page.notebook.addCell('markdown', 'Markdown cell');\n    await page.notebook.selectCells((await page.notebook.getCellCount()) - 1);\n    ({\n      form,\n      formGroup\n    } = await getFormGroup(page));\n    await expect(formGroup).toHaveCount(1);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-wrong-cell-type.png');\n\n    // Create a raw cell and select it.\n    await page.notebook.addCell('raw', 'Raw cell');\n    await page.notebook.selectCells((await page.notebook.getCellCount()) - 1);\n    ({\n      form,\n      formGroup\n    } = await getFormGroup(page));\n    await expect(formGroup).toHaveCount(1);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-wrong-cell-type.png');\n\n    // Select the code cell again to retrieve full form.\n    await page.notebook.selectCells(0);\n    ({\n      form,\n      formGroup\n    } = await getFormGroup(page));\n    await expect(formGroup).toHaveCount(2);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-correct-cell-type.png');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1836,11 +1836,11 @@
             "name": "display conditional field",
             "suites": [],
             "updatePoint": {
-                "line": 558,
+                "line": 562,
                 "column": 33,
-                "index": 17926
+                "index": 17901
             },
-            "line": 558,
+            "line": 562,
             "code": "  test('display conditional field', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM\n    const {\n      form,\n      formGroup\n    } = await getFormGroup(page);\n\n    // There should be 1 field displayed as condition is not met.\n    await formGroup.locator('select').first().selectOption('not met');\n    await expect(formGroup).toHaveCount(1);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-condition-not-met.png');\n\n    // Met the condition, then the second field should be displayed too.\n    await formGroup.locator('select').first().selectOption('met');\n    await expect(formGroup).toHaveCount(2);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-condition-met.png');\n\n    // If the condition is not met, only one field should be displayed.\n    await formGroup.locator('select').first().selectOption('not met');\n    await expect(formGroup).toHaveCount(1);\n    expect(await form.screenshot()).toMatchSnapshot('metadata-condition-not-met.png');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
@@ -1850,11 +1850,11 @@
             "name": "should respect the order of the fields",
             "suites": [],
             "updatePoint": {
-                "line": 618,
+                "line": 622,
                 "column": 46,
-                "index": 19811
+                "index": 19786
             },
-            "line": 618,
+            "line": 622,
             "code": "  test('should respect the order of the fields', async ({\n    page,\n    baseURL,\n    tmpPath\n  }) => {\n    // Open the Notebook.\n    await page.goto(baseURL);\n    await page.notebook.openByPath(`${tmpPath}/${nbFile}`);\n\n    // Open and get the form DOM.\n    const {\n      form,\n      formGroup\n    } = await getFormGroup(page);\n\n    // The order of the fields should be respected.\n    expect(await form.screenshot()).toMatchSnapshot('metadata-ui-schema.png');\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-fieldLabel').first()).toHaveText('Metadata 2');\n    await expect(formGroup.locator('input').first()).toHaveAttribute('type', 'number');\n\n    // Should display the title and description from uiSchema.\n    await expect(formGroup.locator('.jp-FormGroup-compactTitle > .jp-FormGroup-fieldLabel').last()).toHaveText('Metadata 1 title');\n    await expect(formGroup.locator('input').last()).toHaveAttribute('type', 'text');\n  });",
             "file": "jupyterlab/metadataform.test.ts",
             "skipped": false,
