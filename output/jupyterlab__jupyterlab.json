@@ -15664,7 +15664,7 @@
                 "column": 61
             },
             "line": 42,
-            "code": "      it('should emit a value when the dropdown value changes', () => {\n        const widget = new CSVDelimiter({ widget: mockViewer() });\n        let delimiterTest = '';\n        const index = DELIMITERS.length - 1;\n        const wanted = DELIMITERS[index];\n        widget.delimiterChanged.connect((s, value) => {\n          delimiterTest = value;\n        });\n        Widget.attach(widget, document.body);\n        widget.selectNode.selectedIndex = index;\n        simulate(widget.selectNode, 'change');\n        expect(delimiterTest).toBe(wanted);\n        widget.dispose();\n      });",
+            "code": "      it('should emit a value when the dropdown value changes', () => {\n        const parent = mockViewer();\n        const widget = new CSVDelimiter({ widget: parent });\n        const index = DELIMITERS.length - 1;\n        const wanted = DELIMITERS[index];\n        Widget.attach(widget, document.body);\n        widget.selectNode.selectedIndex = index;\n        simulate(widget.selectNode, 'change');\n        expect(parent.delimiter).toBe(wanted);\n        widget.dispose();\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/csvviewer/test"
@@ -15677,10 +15677,10 @@
                 "#handleEvent"
             ],
             "updatePoint": {
-                "line": 59,
+                "line": 56,
                 "column": 37
             },
-            "line": 59,
+            "line": 56,
             "code": "      it('should change the delimiter', () => {\n        const viewer = mockViewer();\n        const widget = new CSVDelimiter({ widget: viewer });\n        const wanted = DELIMITERS[1];\n        widget.selectNode.value = wanted;\n        widget.handleEvent({ type: 'change' } as any);\n        expect(viewer.delimiter).toBe(wanted);\n        widget.dispose();\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -15694,10 +15694,10 @@
                 "#selectNode"
             ],
             "updatePoint": {
-                "line": 71,
+                "line": 68,
                 "column": 57
             },
-            "line": 71,
+            "line": 68,
             "code": "      it('should return the delimiter dropdown select tag', () => {\n        const widget = new CSVDelimiter({ widget: mockViewer() });\n        expect(widget.selectNode.tagName.toLowerCase()).toBe('select');\n        widget.dispose();\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -15711,10 +15711,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 79,
+                "line": 76,
                 "column": 60
             },
-            "line": 79,
+            "line": 76,
             "code": "      it('should dispose of the resources held by the widget', () => {\n        const widget = new CSVDelimiter({ widget: mockViewer() });\n        expect(widget.isDisposed).toBe(false);\n        widget.dispose();\n        expect(widget.isDisposed).toBe(true);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -15728,10 +15728,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 86,
+                "line": 83,
                 "column": 47
             },
-            "line": 86,
+            "line": 83,
             "code": "      it('should be safe to call multiple times', () => {\n        const widget = new CSVDelimiter({ widget: mockViewer() });\n        expect(widget.isDisposed).toBe(false);\n        widget.dispose();\n        widget.dispose();\n        expect(widget.isDisposed).toBe(true);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -31183,7 +31183,7 @@
                 "column": 51
             },
             "line": 103,
-            "code": "      it('should populate the default toolbar items', () => {\n        const factory = utils.createNotebookWidgetFactory();\n        const panel = factory.createNew(context);\n        const items = Array.from(panel.toolbar.names());\n        expect(items).toEqual(expect.arrayContaining(['save']));\n        expect(items).toEqual(expect.arrayContaining(['restart']));\n      });",
+            "code": "      it('should populate the default toolbar items', () => {\n        const factory = utils.createNotebookWidgetFactory();\n        const panel = factory.createNew(context);\n        // It will only contain the popup opener\n        expect(Array.from(panel.toolbar.names())).toHaveLength(1);\n      });",
             "file": "widgetfactory.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -31196,10 +31196,10 @@
                 "#createNew()"
             ],
             "updatePoint": {
-                "line": 111,
+                "line": 110,
                 "column": 54
             },
-            "line": 111,
+            "line": 110,
             "code": "      it('should populate the customized toolbar items', () => {\n        const toolbarFactory = () => [\n          { name: 'foo', widget: new ToolbarButton() },\n          { name: 'bar', widget: new ToolbarButton() }\n        ];\n        const factory = utils.createNotebookWidgetFactory(toolbarFactory);\n        const panel = factory.createNew(context);\n        const panel2 = factory.createNew(context);\n        expect(Array.from(panel.toolbar.names())).toEqual([\n          'foo',\n          'bar',\n          'toolbar-popup-opener'\n        ]);\n        expect(Array.from(panel2.toolbar.names())).toEqual([\n          'foo',\n          'bar',\n          'toolbar-popup-opener'\n        ]);\n        expect(Array.from(panel.toolbar.children()).length).toBe(3);\n        expect(Array.from(panel2.toolbar.children()).length).toBe(3);\n      });",
             "file": "widgetfactory.spec.ts",
             "skipped": false,
@@ -31213,10 +31213,10 @@
                 "#createNew()"
             ],
             "updatePoint": {
-                "line": 133,
+                "line": 132,
                 "column": 54
             },
-            "line": 133,
+            "line": 132,
             "code": "      it('should clone from the optional source widget', () => {\n        const factory = utils.createNotebookWidgetFactory();\n        const panel = factory.createNew(context);\n        const clone = factory.createNew(panel.context, panel);\n        expect(clone).toBeInstanceOf(NotebookPanel);\n        expect(clone.content.rendermime).toBe(panel.content.rendermime);\n        expect(clone.content.editorConfig).toBe(panel.content.editorConfig);\n        expect(clone.content.notebookConfig).toBe(panel.content.notebookConfig);\n      });",
             "file": "widgetfactory.spec.ts",
             "skipped": false,
