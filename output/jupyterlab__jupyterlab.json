@@ -34463,7 +34463,7 @@
             "dir": "packages/rendermime/test"
         },
         {
-            "name": "should autolink multiple URLs",
+            "name": "should not skip autolink",
             "suites": [
                 "rendermime/factories",
                 "textRendererFactory",
@@ -34471,9 +34471,43 @@
             ],
             "updatePoint": {
                 "line": 175,
-                "column": 39
+                "column": 34
             },
             "line": 175,
+            "code": "      it('should not skip autolink', async () => {\n        const source = 'www.example.com';\n        const expected =\n          '<pre><a href=\"https://www.example.com\" rel=\"noopener\" target=\"_blank\">www.example.com</a></pre>';\n        const f = textRendererFactory;\n        const mimeType = 'text/plain';\n        const model = createModel(mimeType, source);\n        sanitizer.setAutolink(true);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(expected);\n      });",
+            "file": "factories.spec.ts",
+            "skipped": false,
+            "dir": "packages/rendermime/test"
+        },
+        {
+            "name": "should skip autolink",
+            "suites": [
+                "rendermime/factories",
+                "textRendererFactory",
+                "#createRenderer()"
+            ],
+            "updatePoint": {
+                "line": 188,
+                "column": 30
+            },
+            "line": 188,
+            "code": "      it('should skip autolink', async () => {\n        const source = 'www.example.com';\n        const expected = '<pre>www.example.com</pre>';\n        const f = textRendererFactory;\n        const mimeType = 'text/plain';\n        const model = createModel(mimeType, source);\n        sanitizer.setAutolink(false);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(expected);\n        sanitizer.setAutolink(true);\n      });",
+            "file": "factories.spec.ts",
+            "skipped": false,
+            "dir": "packages/rendermime/test"
+        },
+        {
+            "name": "should autolink multiple URLs",
+            "suites": [
+                "rendermime/factories",
+                "textRendererFactory",
+                "#createRenderer()"
+            ],
+            "updatePoint": {
+                "line": 201,
+                "column": 39
+            },
+            "line": 201,
             "code": "      it('should autolink multiple URLs', async () => {\n        const source = 'www.example.com\\nwww.python.org';\n        const expected =\n          '<pre><a href=\"https://www.example.com\" rel=\"noopener\" target=\"_blank\">www.example.com</a>\\n<a href=\"https://www.python.org\" rel=\"noopener\" target=\"_blank\">www.python.org</a></pre>';\n        const f = textRendererFactory;\n        const mimeType = 'text/plain';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(expected);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34487,10 +34521,10 @@
                 "#mimeTypes"
             ],
             "updatePoint": {
-                "line": 191,
+                "line": 217,
                 "column": 45
             },
-            "line": 191,
+            "line": 217,
             "code": "      it('should have the text/latex mimeType', () => {\n        expect(latexRendererFactory.mimeTypes).toEqual(['text/latex']);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34504,10 +34538,10 @@
                 "#safe"
             ],
             "updatePoint": {
-                "line": 197,
+                "line": 223,
                 "column": 24
             },
-            "line": 197,
+            "line": 223,
             "code": "      it('should be safe', () => {\n        expect(latexRendererFactory.safe).toBe(true);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34521,10 +34555,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 203,
+                "line": 229,
                 "column": 50
             },
-            "line": 203,
+            "line": 229,
             "code": "      it('should set the textContent of the widget', async () => {\n        const source = 'sumlimits_{i=0}^{infty} \\frac{1}{n^2}';\n        const f = latexRendererFactory;\n        const mimeType = 'text/latex';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.textContent).toBe(source);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34538,10 +34572,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 213,
+                "line": 239,
                 "column": 33
             },
-            "line": 213,
+            "line": 239,
             "code": "      it('should be re-renderable', async () => {\n        const source = 'sumlimits_{i=0}^{infty} \\frac{1}{n^2}';\n        const f = latexRendererFactory;\n        const mimeType = 'text/latex';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        await w.renderModel(model);\n        expect(w.node.textContent).toBe(source);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34555,10 +34589,10 @@
                 "#mimeTypes"
             ],
             "updatePoint": {
-                "line": 228,
+                "line": 254,
                 "column": 48
             },
-            "line": 228,
+            "line": 254,
             "code": "      it('should have the image/svg+xml mimeType', () => {\n        expect(svgRendererFactory.mimeTypes).toEqual(['image/svg+xml']);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34572,10 +34606,10 @@
                 "#safe"
             ],
             "updatePoint": {
-                "line": 234,
+                "line": 260,
                 "column": 28
             },
-            "line": 234,
+            "line": 260,
             "code": "      it('should not be safe', () => {\n        expect(svgRendererFactory.safe).toBe(false);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34589,10 +34623,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 266,
                 "column": 70
             },
-            "line": 240,
+            "line": 266,
             "code": "      it('should create an img element with the uri encoded svg inline', async () => {\n        const source = '<svg></svg>';\n        const displaySource = '<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>';\n        const f = svgRendererFactory;\n        const mimeType = 'image/svg+xml';\n        const model = createModel(mimeType, source, true);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        const imgEl = w.node.getElementsByTagName('img')[0];\n        expect(imgEl).toBeTruthy();\n        expect(imgEl.src).toContain(encodeURIComponent(displaySource));\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34606,10 +34640,10 @@
                 "#mimeTypes"
             ],
             "updatePoint": {
-                "line": 257,
+                "line": 283,
                 "column": 48
             },
-            "line": 257,
+            "line": 283,
             "code": "      it('should have the text/markdown mimeType', function () {\n        expect(markdownRendererFactory.mimeTypes).toEqual(['text/markdown']);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34623,10 +34657,10 @@
                 "#safe"
             ],
             "updatePoint": {
-                "line": 263,
+                "line": 289,
                 "column": 24
             },
-            "line": 263,
+            "line": 289,
             "code": "      it('should be safe', () => {\n        expect(markdownRendererFactory.safe).toBe(true);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34640,10 +34674,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 277,
+                "line": 303,
                 "column": 50
             },
-            "line": 277,
+            "line": 303,
             "code": "      it('should set the inner html with no parser', async () => {\n        const f = markdownRendererFactory;\n        const source = '<p>hello</p>';\n        const mimeType = 'text/markdown';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(`<pre>${source}</pre>`);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34657,10 +34691,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 287,
+                "line": 313,
                 "column": 50
             },
-            "line": 287,
+            "line": 313,
             "code": "      it('should set the inner html with md parser', async () => {\n        const f = markdownRendererFactory;\n        const source = '<p>hello</p>';\n        const mimeType = 'text/markdown';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({\n          mimeType,\n          ...defaultOptions,\n          markdownParser\n        });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(source);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34674,10 +34708,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 301,
+                "line": 327,
                 "column": 33
             },
-            "line": 301,
+            "line": 327,
             "code": "      it('should be re-renderable', async () => {\n        const f = markdownRendererFactory;\n        const source = '<p>hello</p>';\n        const mimeType = 'text/markdown';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({\n          mimeType,\n          ...defaultOptions,\n          markdownParser\n        });\n        await w.renderModel(model);\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe(`${source}`);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34691,10 +34725,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 316,
+                "line": 342,
                 "column": 35
             },
-            "line": 316,
+            "line": 342,
             "code": "      it('should add header anchors', async () => {\n        const f = markdownRendererFactory;\n        const mimeType = 'text/markdown';\n        const sampleData = '### Title third level';\n\n        const model = createModel(mimeType, sampleData);\n        const w = f.createRenderer({\n          mimeType,\n          ...defaultOptions,\n          markdownParser: { render: content => '<h3>Title third level</h3>' }\n        });\n        await w.renderModel(model);\n        Widget.attach(w, document.body);\n\n        const node = document.getElementById('Title-third-level')!;\n        expect(node.localName).toBe('h3');\n        const anchor = node.firstChild!.nextSibling as HTMLAnchorElement;\n        expect(anchor.href).toContain('#Title-third-level');\n        expect(anchor.target).toBe('_self');\n        expect(anchor.className).toContain('jp-InternalAnchorLink');\n        expect(anchor.textContent).toBe('¶');\n        Widget.detach(w);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34708,10 +34742,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 340,
+                "line": 366,
                 "column": 34
             },
-            "line": 340,
+            "line": 366,
             "code": "      it('should sanitize the html', async () => {\n        const f = markdownRendererFactory;\n        const source = '<p>hello</p><script>alert(\"foo\")</script>';\n        const mimeType = 'text/markdown';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toEqual(\n          expect.not.arrayContaining(['script'])\n        );\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34725,10 +34759,10 @@
                 "#mimeTypes"
             ],
             "updatePoint": {
-                "line": 356,
+                "line": 382,
                 "column": 44
             },
-            "line": 356,
+            "line": 382,
             "code": "      it('should have the text/html mimeType', () => {\n        expect(htmlRendererFactory.mimeTypes).toEqual(['text/html']);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34742,10 +34776,10 @@
                 "#safe"
             ],
             "updatePoint": {
-                "line": 362,
+                "line": 388,
                 "column": 24
             },
-            "line": 362,
+            "line": 388,
             "code": "      it('should be safe', () => {\n        expect(htmlRendererFactory.safe).toBe(true);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34759,10 +34793,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 368,
+                "line": 394,
                 "column": 35
             },
-            "line": 368,
+            "line": 394,
             "code": "      it('should set the inner HTML', async () => {\n        const f = htmlRendererFactory;\n        const source = '<h1>This is great</h1>';\n        const mimeType = 'text/html';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe('<h1>This is great</h1>');\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34776,10 +34810,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 378,
+                "line": 404,
                 "column": 33
             },
-            "line": 378,
+            "line": 404,
             "code": "      it('should be re-renderable', async () => {\n        const f = htmlRendererFactory;\n        const source = '<h1>This is great</h1>';\n        const mimeType = 'text/html';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe('<h1>This is great</h1>');\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34792,7 +34826,7 @@
                 "htmlRendererFactory",
                 "#createRenderer()"
             ],
-            "line": 390,
+            "line": 416,
             "code": "      it.skip('should execute a script tag when attached', () => {",
             "file": "factories.spec.ts",
             "skipped": true,
@@ -34806,10 +34840,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 404,
+                "line": 430,
                 "column": 40
             },
-            "line": 404,
+            "line": 430,
             "code": "      it('should sanitize when untrusted', async () => {\n        const source = '<pre><script>window.y=3;</script></pre>';\n        const f = htmlRendererFactory;\n        const mimeType = 'text/html';\n        const model = createModel(mimeType, source);\n        const w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        expect(w.node.innerHTML).toBe('<pre></pre>');\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34823,10 +34857,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 415,
+                "line": 441,
                 "column": 28
             },
-            "line": 415,
+            "line": 441,
             "code": "    it('should sanitize html', async () => {\n      const model = createModel(\n        'text/html',\n        '<h1>foo <script>window.x=1></scrip></h1>'\n      );\n      const f = htmlRendererFactory;\n      const mimeType = 'text/html';\n      const w = f.createRenderer({ mimeType, ...defaultOptions });\n      await w.renderModel(model);\n      expect(w.node.innerHTML).toBe('<h1>foo </h1>');\n    });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34840,10 +34874,10 @@
                 "#mimeTypes"
             ],
             "updatePoint": {
-                "line": 430,
+                "line": 456,
                 "column": 43
             },
-            "line": 430,
+            "line": 456,
             "code": "      it('should support multiple mimeTypes', () => {\n        expect(imageRendererFactory.mimeTypes).toEqual([\n          'image/bmp',\n          'image/png',\n          'image/jpeg',\n          'image/gif',\n          'image/webp'\n        ]);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34857,10 +34891,10 @@
                 "#safe"
             ],
             "updatePoint": {
-                "line": 442,
+                "line": 468,
                 "column": 24
             },
-            "line": 442,
+            "line": 468,
             "code": "      it('should be safe', () => {\n        expect(imageRendererFactory.safe).toBe(true);\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
@@ -34874,10 +34908,10 @@
                 "#createRenderer()"
             ],
             "updatePoint": {
-                "line": 448,
+                "line": 474,
                 "column": 56
             },
-            "line": 448,
+            "line": 474,
             "code": "      it('should create an <img> with the right mimeType', async () => {\n        let source = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';\n        const f = imageRendererFactory;\n        let mimeType = 'image/png';\n        let model = createModel(mimeType, source);\n        let w = f.createRenderer({ mimeType, ...defaultOptions });\n\n        await w.renderModel(model);\n        let el = w.node.firstChild as HTMLImageElement;\n        expect(el.src).toBe('data:image/png;base64,' + source);\n        expect(el.localName).toBe('img');\n        expect(el.innerHTML).toBe('');\n\n        source = 'R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=';\n        mimeType = 'image/gif';\n        model = createModel(mimeType, source);\n        w = f.createRenderer({ mimeType, ...defaultOptions });\n        await w.renderModel(model);\n        el = w.node.firstChild as HTMLImageElement;\n        expect(el.src).toBe('data:image/gif;base64,' + source);\n        expect(el.localName).toBe('img');\n        expect(el.innerHTML).toBe('');\n      });",
             "file": "factories.spec.ts",
             "skipped": false,
