@@ -567,7 +567,7 @@
                 "index": 401
             },
             "line": 15,
-            "code": "  test('Export Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('text=File');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Save and Export Notebook As');\n\n    // Wait for Latex renderer\n    await page.waitForSelector('text=(𝜎σ, 𝛽β, 𝜌ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 0,\n        width: 700,\n        height: 700\n      }\n    })).toMatchSnapshot('exporting_menu.png');\n  });",
+            "code": "  test('Export Menu', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.dblclick('[aria-label=\"File Browser Section\"] >> text=notebooks');\n    await page.dblclick('text=Lorenz.ipynb');\n    await page.waitForSelector('text=Python 3 (ipykernel) | Idle');\n    await page.click('text=File');\n    await page.click('.lm-Menu ul[role=\"menu\"] >> text=Save and Export Notebook As');\n\n    // Wait for Latex renderer\n    // note: requires the a11y/assistive-mml MathJax extension\n    await page.waitForSelector('text=(σ, β, ρ)');\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 0,\n        width: 700,\n        height: 700\n      }\n    })).toMatchSnapshot('exporting_menu.png');\n  });",
             "file": "documentation/export_notebook.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -576,12 +576,12 @@
             "name": "Slides",
             "suites": [],
             "updatePoint": {
-                "line": 37,
+                "line": 38,
                 "column": 14,
-                "index": 1085
+                "index": 1142
             },
-            "line": 37,
-            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.locator('[aria-label=\"File Browser Section\"]').getByText('notebooks').dblclick();\n    await page.getByText('Lorenz.ipynb').dblclick();\n    await page.getByText('Python 3 (ipykernel) | Idle').waitFor();\n    await page.getByTitle('Property Inspector').click();\n    await page.locator('.jp-PropertyInspector').getByText('Common Tools').click();\n    await page.locator('.jp-ActiveCellTool').getByText(/# The Lorenz/).waitFor();\n    await page.locator('#jp-MetadataForm-\\\\@jupyterlab\\\\/notebook-extension\\\\:tools_\\\\/slideshow\\\\/slide_type').selectOption({\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.getByText('(𝜎σ, 𝛽β, 𝜌ρ)').waitFor();\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
+            "line": 38,
+            "code": "  test('Slides', async ({\n    page\n  }) => {\n    await page.goto();\n    await setSidebarWidth(page);\n    await page.locator('[aria-label=\"File Browser Section\"]').getByText('notebooks').dblclick();\n    await page.getByText('Lorenz.ipynb').dblclick();\n    await page.getByText('Python 3 (ipykernel) | Idle').waitFor();\n    await page.getByTitle('Property Inspector').click();\n    await page.locator('.jp-PropertyInspector').getByText('Common Tools').click();\n    await page.locator('.jp-ActiveCellTool').getByText(/# The Lorenz/).waitFor();\n    await page.locator('#jp-MetadataForm-\\\\@jupyterlab\\\\/notebook-extension\\\\:tools_\\\\/slideshow\\\\/slide_type').selectOption({\n      label: 'Slide'\n    });\n    // Wait for Latex renderer\n    await page.getByText('(σ, β, ρ)').waitFor();\n    expect(await page.screenshot({\n      clip: {\n        y: 5,\n        x: 283,\n        width: 997,\n        height: 400\n      }\n    })).toMatchSnapshot('exporting_slide_type.png');\n  });",
             "file": "documentation/export_notebook.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -1703,6 +1703,76 @@
             "line": 7,
             "code": "test('Switch back and forth to reference page', async ({\n  page\n}) => {\n  // The goal is to test switching back and forth with a tab containing an iframe\n  const notebookFilename = 'test-switch-doc-notebook';\n  const cellContent = '# First cell';\n  await page.notebook.createNew(notebookFilename);\n  await page.notebook.setCell(0, 'markdown', cellContent);\n  await page.menu.clickMenuItem('Help>Jupyter Reference');\n  await expect(page.frameLocator('iframe[src=\"https://jupyter.org/documentation\"]').locator('h1').first()).toHaveText('Jupyter Project Documentation#');\n  await page.activity.activateTab(notebookFilename);\n  await page.locator('.jp-MarkdownCell .jp-InputArea-editor').waitFor();\n  await expect(page.locator('.jp-MarkdownCell .jp-InputArea-editor')).toHaveText(cellContent);\n});",
             "file": "jupyterlab/help.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not ask kernel when creating notebook from launcher",
+            "suites": [],
+            "updatePoint": {
+                "line": 7,
+                "column": 68,
+                "index": 292
+            },
+            "line": 7,
+            "code": "    test('Should not ask kernel when creating notebook from launcher', async ({\n      page\n    }) => {\n      await Promise.all([page.getByRole('tabpanel', {\n        name: 'Launcher'\n      }).waitFor({\n        state: 'detached'\n      }), page.getByTitle('Python 3 (ipykernel)').nth(1).click()]);\n      await expect.soft(page.locator('.jp-Dialog')).toHaveCount(0);\n      await expect(page.getByTitle('Switch kernel')).toHaveText('Python 3 (ipykernel)');\n    });",
+            "file": "jupyterlab/kernel.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should remember kernel auto start for notebook",
+            "suites": [],
+            "updatePoint": {
+                "line": 18,
+                "column": 56,
+                "index": 740
+            },
+            "line": 18,
+            "code": "    test('Should remember kernel auto start for notebook', async ({\n      page\n    }) => {\n      await page.menu.clickMenuItem('File>New>Notebook');\n\n      // Open a notebook without selecting a kernel\n      await page.locator('.jp-Dialog').getByRole('button', {\n        name: 'No Kernel'\n      }).click();\n      await expect.soft(page.getByTitle('Switch kernel')).toHaveText('No Kernel');\n      await Promise.all([page.getByRole('tab', {\n        name: 'Untitled.ipynb'\n      }).waitFor({\n        state: 'detached'\n      }), page.menu.clickMenuItem('File>Close Tab')]);\n\n      // Open the same notebook selecting and turning on auto start\n      await page.filebrowser.open('Untitled.ipynb');\n      await page.locator('.jp-Dialog').getByText('Always start the preferred kernel').click();\n      await page.locator('.jp-Dialog').getByRole('button', {\n        name: 'Select'\n      }).click();\n      await expect.soft(page.getByTitle('Switch kernel')).toHaveText('Python 3 (ipykernel)');\n      await page.menu.clickMenuItem('File>Close and Shut Down Notebook');\n      await Promise.all([page.getByRole('tab', {\n        name: 'Untitled.ipynb'\n      }).waitFor({\n        state: 'detached'\n      }), page.locator('.jp-Dialog').getByRole('button', {\n        name: 'Ok'\n      }).click()]);\n\n      // Open the same notebook and check it turns on the kernel\n      await page.filebrowser.open('Untitled.ipynb');\n      await expect(page.getByTitle('Switch kernel')).toHaveText('Python 3 (ipykernel)');\n    });",
+            "file": "jupyterlab/kernel.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should request kernel selection when executing a cell for notebook without kernel",
+            "suites": [],
+            "updatePoint": {
+                "line": 54,
+                "column": 91,
+                "index": 2271
+            },
+            "line": 54,
+            "code": "    test('Should request kernel selection when executing a cell for notebook without kernel', async ({\n      page\n    }) => {\n      await page.menu.clickMenuItem('File>New>Notebook');\n\n      // Open a notebook without selecting a kernel\n      await page.locator('.jp-Dialog').getByRole('button', {\n        name: 'No Kernel'\n      }).click();\n      await expect.soft(page.getByTitle('Switch kernel')).toHaveText('No Kernel');\n\n      // Request cell execution\n      await page.menu.clickMenuItem('Run>Run Selected Cell');\n      await page.locator('.jp-Dialog').getByRole('button', {\n        name: 'Select'\n      }).click();\n      await expect(page.getByTitle('Switch kernel')).toHaveText('Python 3 (ipykernel)');\n    });",
+            "file": "jupyterlab/kernel.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should not ask kernel when creating console from launcher",
+            "suites": [],
+            "updatePoint": {
+                "line": 74,
+                "column": 67,
+                "index": 3007
+            },
+            "line": 74,
+            "code": "    test('Should not ask kernel when creating console from launcher', async ({\n      page\n    }) => {\n      await Promise.all([page.getByRole('tabpanel', {\n        name: 'Launcher'\n      }).waitFor({\n        state: 'detached'\n      }), page.getByTitle('Python 3 (ipykernel)').nth(2).click()]);\n      await expect.soft(page.locator('.jp-Dialog')).toHaveCount(0);\n      await expect(page.getByTitle('Change kernel for Console 1')).toHaveText('Python 3 (ipykernel) | Idle');\n    });",
+            "file": "jupyterlab/kernel.test.ts",
+            "skipped": false,
+            "dir": "galata/test"
+        },
+        {
+            "name": "Should ask for kernel when creating console from menu",
+            "suites": [],
+            "updatePoint": {
+                "line": 85,
+                "column": 63,
+                "index": 3483
+            },
+            "line": 85,
+            "code": "    test('Should ask for kernel when creating console from menu', async ({\n      page\n    }) => {\n      await page.menu.clickMenuItem('File>New>Console');\n      await page.locator('.jp-Dialog').getByRole('button', {\n        name: 'Select'\n      }).click();\n      await expect(page.getByTitle('Change kernel for Console 1')).toHaveText('Python 3 (ipykernel) | Idle');\n    });",
+            "file": "jupyterlab/kernel.test.ts",
             "skipped": false,
             "dir": "galata/test"
         },
@@ -6235,10 +6305,10 @@
                 "#constructor()"
             ],
             "updatePoint": {
-                "line": 80,
+                "line": 82,
                 "column": 41
             },
-            "line": 80,
+            "line": 82,
             "code": "      it('should create a session context', () => {\n        expect(sessionContext).toBeInstanceOf(SessionContext);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6252,10 +6322,10 @@
                 "#disposed"
             ],
             "updatePoint": {
-                "line": 86,
+                "line": 88,
                 "column": 64
             },
-            "line": 86,
+            "line": 88,
             "code": "      it('should be emitted when the session context is disposed', async () => {\n        sessionContext.kernelPreference = { canStart: false };\n        await sessionContext.initialize();\n        let called = false;\n        sessionContext.disposed.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          expect(args).toBeUndefined();\n          called = true;\n        });\n        sessionContext.dispose();\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6269,10 +6339,10 @@
                 "#kernelChanged"
             ],
             "updatePoint": {
-                "line": 101,
+                "line": 103,
                 "column": 51
             },
-            "line": 101,
+            "line": 103,
             "code": "      it('should be emitted when the kernel changes', async () => {\n        let called = false;\n        sessionContext.kernelChanged.connect(\n          (sender, { oldValue, newValue }) => {\n            if (oldValue !== null) {\n              return;\n            }\n            expect(sender).toBe(sessionContext);\n            expect(oldValue).toBeNull();\n            expect(newValue).toBe(sessionContext.session?.kernel || null);\n            called = true;\n          }\n        );\n        await sessionContext.initialize();\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6286,10 +6356,10 @@
                 "#sessionChanged"
             ],
             "updatePoint": {
-                "line": 120,
+                "line": 122,
                 "column": 52
             },
-            "line": 120,
+            "line": 122,
             "code": "      it('should be emitted when the session changes', async () => {\n        let called = false;\n        sessionContext.sessionChanged.connect(\n          (sender, { oldValue, newValue }) => {\n            if (oldValue !== null) {\n              return;\n            }\n            expect(sender).toBe(sessionContext);\n            expect(oldValue).toBeNull();\n            expect(newValue).toBe(sessionContext.session);\n            called = true;\n          }\n        );\n        await sessionContext.initialize();\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6303,10 +6373,10 @@
                 "#statusChanged"
             ],
             "updatePoint": {
-                "line": 139,
+                "line": 141,
                 "column": 51
             },
-            "line": 139,
+            "line": 141,
             "code": "      it('should be emitted when the status changes', async () => {\n        let called = false;\n        sessionContext.statusChanged.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          expect(typeof args).toBe('string');\n          called = true;\n        });\n        await sessionContext.initialize();\n        await sessionContext.session!.kernel!.info;\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6320,10 +6390,10 @@
                 "#iopubMessage"
             ],
             "updatePoint": {
-                "line": 153,
+                "line": 155,
                 "column": 53
             },
-            "line": 153,
+            "line": 155,
             "code": "      it('should be emitted for iopub kernel messages', async () => {\n        let called = false;\n        sessionContext.iopubMessage.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          called = true;\n        });\n        await sessionContext.initialize();\n        await sessionContext.session!.kernel!.info;\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6337,10 +6407,10 @@
                 "#propertyChanged"
             ],
             "updatePoint": {
-                "line": 166,
+                "line": 168,
                 "column": 55
             },
-            "line": 166,
+            "line": 168,
             "code": "      it('should be emitted when a session path changes', async () => {\n        let called = false;\n        await sessionContext.initialize();\n        sessionContext.propertyChanged.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          expect(args).toBe('path');\n          called = true;\n        });\n        await sessionContext.session!.setPath('foo');\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6354,10 +6424,10 @@
                 "#propertyChanged"
             ],
             "updatePoint": {
-                "line": 178,
+                "line": 180,
                 "column": 55
             },
-            "line": 178,
+            "line": 180,
             "code": "      it('should be emitted when a session name changes', async () => {\n        let called = false;\n        await sessionContext.initialize();\n        sessionContext.propertyChanged.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          expect(args).toBe('name');\n          called = true;\n        });\n        await sessionContext.session!.setName('foo');\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6371,10 +6441,10 @@
                 "#propertyChanged"
             ],
             "updatePoint": {
-                "line": 190,
+                "line": 192,
                 "column": 55
             },
-            "line": 190,
+            "line": 192,
             "code": "      it('should be emitted when a session type changes', async () => {\n        let called = false;\n\n        await sessionContext.initialize();\n        sessionContext.propertyChanged.connect((sender, args) => {\n          expect(sender).toBe(sessionContext);\n          expect(args).toBe('type');\n          called = true;\n        });\n        await sessionContext.session!.setType('foo');\n        expect(called).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6388,10 +6458,10 @@
                 "#kernel"
             ],
             "updatePoint": {
-                "line": 205,
+                "line": 207,
                 "column": 57
             },
-            "line": 205,
+            "line": 207,
             "code": "      it('should be the current kernel of the the session', async () => {\n        expect(sessionContext.session?.kernel).toBeFalsy();\n        await sessionContext.initialize();\n        expect(sessionContext.session?.kernel).toBeTruthy();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6405,10 +6475,10 @@
                 "#kernelPreference"
             ],
             "updatePoint": {
-                "line": 213,
+                "line": 215,
                 "column": 56
             },
-            "line": 213,
+            "line": 215,
             "code": "      it('should be the kernel preference of the session', () => {\n        const preference: ISessionContext.IKernelPreference = {\n          name: 'foo',\n          language: 'bar',\n          id: '1234',\n          shouldStart: true,\n          canStart: true\n        };\n        sessionContext.kernelPreference = preference;\n        expect(sessionContext.kernelPreference).toBe(preference);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6422,10 +6492,10 @@
                 "#manager"
             ],
             "updatePoint": {
-                "line": 227,
+                "line": 229,
                 "column": 59
             },
-            "line": 227,
+            "line": 229,
             "code": "      it('should be the session manager used by the session', () => {\n        expect(sessionContext.sessionManager).toBe(sessionManager);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6439,10 +6509,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 233,
+                "line": 235,
                 "column": 41
             },
-            "line": 233,
+            "line": 235,
             "code": "      it('should start the default kernel', async () => {\n        await sessionContext.initialize();\n        expect(sessionContext.session?.kernel?.name).toBe(\n          specsManager.specs!.default\n        );\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6456,10 +6526,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 240,
+                "line": 242,
                 "column": 59
             },
-            "line": 240,
+            "line": 242,
             "code": "      it('should connect to an existing session on the path', async () => {\n        const other = await sessionManager.startNew({\n          name: '',\n          path,\n          type: 'test'\n        });\n\n        await sessionContext.initialize();\n        expect(other.kernel?.id).toBeDefined();\n        expect(other.kernel?.id).toBe(sessionContext.session?.kernel?.id);\n        await other.shutdown();\n        other.dispose();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6473,10 +6543,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 254,
+                "line": 256,
                 "column": 46
             },
-            "line": 254,
+            "line": 256,
             "code": "      it('should connect to an existing kernel', async () => {\n        // Shut down and dispose the session so it can be re-instantiated.\n        await sessionContext.shutdown();\n\n        const other = await sessionManager.startNew({\n          name: '',\n          path: UUID.uuid4(),\n          type: 'test'\n        });\n        const kernelPreference = { id: other.kernel!.id };\n\n        sessionContext = new SessionContext({\n          sessionManager,\n          specsManager,\n          kernelPreference\n        });\n        await sessionContext.initialize();\n        expect(other.kernel?.id).toBeDefined();\n        expect(other.kernel?.id).toBe(sessionContext.session?.kernel?.id);\n        // We don't call other.shutdown() here because that\n        // is handled by the afterEach() handler above.\n        other.dispose();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6490,10 +6560,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 278,
+                "line": 280,
                 "column": 67
             },
-            "line": 278,
+            "line": 280,
             "code": "      it('should yield true if there is no distinct kernel to start', async () => {\n        // Remove the kernel preference before initializing.\n        sessionContext.kernelPreference = {};\n        const result = await sessionContext.initialize();\n        expect(result).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6507,10 +6577,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 285,
+                "line": 287,
                 "column": 72
             },
-            "line": 285,
+            "line": 287,
             "code": "      it('should be a no-op if the shouldStart kernelPreference is false', async () => {\n        sessionContext.kernelPreference = { shouldStart: false };\n        const result = await sessionContext.initialize();\n        expect(result).toBe(false);\n        expect(sessionContext.session?.kernel).toBeFalsy();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6524,10 +6594,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 292,
+                "line": 294,
                 "column": 69
             },
-            "line": 292,
+            "line": 294,
             "code": "      it('should be a no-op if the canStart kernelPreference is false', async () => {\n        sessionContext.kernelPreference = { canStart: false };\n        const result = await sessionContext.initialize();\n        expect(result).toBe(false);\n        expect(sessionContext.session?.kernel).toBeFalsy();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6541,10 +6611,10 @@
                 "#initialize()"
             ],
             "updatePoint": {
-                "line": 299,
+                "line": 301,
                 "column": 47
             },
-            "line": 299,
+            "line": 301,
             "code": "      it('should handle an error during startup', async () => {\n        // Give it a mock manager that errors on connectTo\n        const mockManager = new SessionManager({ kernelManager });\n\n        sessionContext = new SessionContext({\n          path,\n          sessionManager: mockManager,\n          specsManager,\n          kernelPreference: { name: specsManager.specs?.default }\n        });\n\n        (mockManager as any).running = () => {\n          return [{ path }];\n        };\n        (mockManager as any).connectTo = () => {\n          throw new Error('mock error');\n        };\n\n        let caught = false;\n        const promise = sessionContext.initialize().catch(() => {\n          caught = true;\n        });\n        await Promise.all([promise, acceptDialog()]);\n        expect(caught).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6558,10 +6628,10 @@
                 "#kernelDisplayName"
             ],
             "updatePoint": {
-                "line": 327,
+                "line": 329,
                 "column": 58
             },
-            "line": 327,
+            "line": 329,
             "code": "      it('should be the display name of the current kernel', async () => {\n        await sessionContext.initialize();\n        const spec = await sessionContext.session!.kernel!.spec;\n        expect(sessionContext.kernelDisplayName).toBe(spec!.display_name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6575,28 +6645,11 @@
                 "#kernelDisplayName"
             ],
             "updatePoint": {
-                "line": 333,
+                "line": 335,
                 "column": 60
             },
-            "line": 333,
+            "line": 335,
             "code": "      it('should display \"No Kernel\" when there is no kernel', async () => {\n        sessionContext.kernelPreference = {\n          canStart: false,\n          shouldStart: false\n        };\n        expect(sessionContext.kernelDisplayName).toBe('No Kernel');\n      });",
-            "file": "sessioncontext.spec.ts",
-            "skipped": false,
-            "dir": "packages/apputils/test"
-        },
-        {
-            "name": "should display the pending kernel name when it looks like we are starting a kernel",
-            "suites": [
-                "@jupyterlab/apputils",
-                "SessionContext",
-                "#kernelDisplayName"
-            ],
-            "updatePoint": {
-                "line": 341,
-                "column": 92
-            },
-            "line": 341,
-            "code": "      it('should display the pending kernel name when it looks like we are starting a kernel', async () => {\n        sessionContext.kernelPreference = {\n          autoStartDefault: true,\n          canStart: true,\n          shouldStart: true\n        };\n        expect(sessionContext.kernelDisplayName).toBe('Echo Kernel');\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6609,10 +6662,10 @@
                 "#kernelDisplayStatus"
             ],
             "updatePoint": {
-                "line": 352,
+                "line": 345,
                 "column": 65
             },
-            "line": 352,
+            "line": 345,
             "code": "      it('should be the status of the current kernel if connected', async () => {\n        await sessionContext.initialize();\n        await sessionContext.session!.kernel!.info;\n        expect(sessionContext.kernelDisplayStatus).toBe(\n          sessionContext.session?.kernel?.status\n        );\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6626,10 +6679,10 @@
                 "#kernelDisplayStatus"
             ],
             "updatePoint": {
-                "line": 360,
+                "line": 353,
                 "column": 80
             },
-            "line": 360,
+            "line": 353,
             "code": "      it('should be the connection status of the current kernel if not connected', async () => {\n        await sessionContext.initialize();\n        const reconnect = sessionContext.session!.kernel!.reconnect();\n        expect(sessionContext.kernelDisplayStatus).toBe(\n          sessionContext.session?.kernel?.connectionStatus\n        );\n        await reconnect;\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6643,10 +6696,10 @@
                 "#kernelDisplayStatus"
             ],
             "updatePoint": {
-                "line": 369,
+                "line": 362,
                 "column": 83
             },
-            "line": 369,
+            "line": 362,
             "code": "      it('should be \"initializing\" if it looks like we are trying to start a kernel', async () => {\n        sessionContext.kernelPreference = {};\n        expect(sessionContext.kernelDisplayStatus).toBe('initializing');\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6660,10 +6713,10 @@
                 "#kernelDisplayStatus"
             ],
             "updatePoint": {
-                "line": 374,
+                "line": 367,
                 "column": 59
             },
-            "line": 374,
+            "line": 367,
             "code": "      it('should be \"unknown\" if there is no current kernel', async () => {\n        await sessionContext.initialize();\n        await sessionContext.shutdown();\n        expect(sessionContext.kernelDisplayStatus).toBe('unknown');\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6677,10 +6730,10 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 382,
+                "line": 375,
                 "column": 64
             },
-            "line": 382,
+            "line": 375,
             "code": "      it('should test whether a client session has been disposed', () => {\n        expect(sessionContext.isDisposed).toBe(false);\n        sessionContext.dispose();\n        expect(sessionContext.isDisposed).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6694,10 +6747,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 390,
+                "line": 383,
                 "column": 65
             },
-            "line": 390,
+            "line": 383,
             "code": "      it('should dispose the resources held by the client session', () => {\n        sessionContext.dispose();\n        expect(sessionContext.isDisposed).toBe(true);\n        sessionContext.dispose();\n        expect(sessionContext.isDisposed).toBe(true);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6711,10 +6764,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 397,
+                "line": 390,
                 "column": 53
             },
-            "line": 397,
+            "line": 390,
             "code": "      it('should not shut down the session by default', async () => {\n        await sessionContext.initialize();\n        const id = sessionContext.session!.id;\n        sessionContext.dispose();\n        const sessions = await SessionAPI.listRunning();\n        expect(sessions.find(s => s.id === id)).toBeTruthy();\n        await SessionAPI.shutdownSession(id);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6728,10 +6781,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 406,
+                "line": 399,
                 "column": 69
             },
-            "line": 406,
+            "line": 399,
             "code": "      it('should shut down the session when shutdownOnDispose is true', async () => {\n        sessionContext.kernelPreference = {\n          ...sessionContext.kernelPreference,\n          shutdownOnDispose: true\n        };\n        const delegate = new PromiseDelegate();\n        await sessionContext.initialize();\n        const id = sessionContext.session!.id;\n        // Wait for the session to shut down.\n        sessionContext.sessionManager.runningChanged.connect((_, sessions) => {\n          if (!sessions.find(s => s.id === id)) {\n            delegate.resolve(void 0);\n            return;\n          }\n        });\n        sessionContext.dispose();\n        await expect(delegate.promise).resolves.not.toThrow();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6745,10 +6798,10 @@
                 "#changeKernel()"
             ],
             "updatePoint": {
-                "line": 427,
+                "line": 420,
                 "column": 42
             },
-            "line": 427,
+            "line": 420,
             "code": "      it('should change the current kernel', async () => {\n        await sessionContext.initialize();\n\n        const name = sessionContext.session?.kernel?.name;\n        const id = sessionContext.session?.kernel?.id;\n        const kernel = (await sessionContext.changeKernel({ name }))!;\n\n        expect(kernel.id).not.toBe(id);\n        expect(kernel.name).toBe(name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6762,11 +6815,11 @@
                 "#changeKernel()"
             ],
             "updatePoint": {
-                "line": 438,
+                "line": 431,
                 "column": 62
             },
-            "line": 438,
-            "code": "      it('should still work if called before fully initialized', async () => {\n        const initPromise = sessionContext.initialize(); // Start but don't finish init.\n        const name = 'echo';\n        const kernelPromise = sessionContext.changeKernel({ name });\n\n        let lastKernel = null;\n        sessionContext.kernelChanged.connect(() => {\n          lastKernel = sessionContext.session?.kernel;\n        });\n        const results = await Promise.all([kernelPromise, initPromise]);\n        const kernel = results[0];\n        const shouldSelect = results[1];\n        expect(shouldSelect).toBe(false);\n        expect(lastKernel).toBe(kernel);\n      });",
+            "line": 431,
+            "code": "      it('should still work if called before fully initialized', async () => {\n        const initPromise = sessionContext.initialize(); // Start but don't finish init.\n        const name = 'echo';\n        const kernelPromise = sessionContext.changeKernel({ name });\n\n        let lastKernel: IKernelConnection | null | undefined = null;\n        sessionContext.kernelChanged.connect(() => {\n          lastKernel = sessionContext.session?.kernel;\n        });\n        const results = await Promise.all([kernelPromise, initPromise]);\n        const kernel = results[0];\n        const shouldSelect = results[1];\n        expect(shouldSelect).toBe(false);\n        expect(lastKernel).toBe(kernel);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6779,11 +6832,11 @@
                 "#changeKernel()"
             ],
             "updatePoint": {
-                "line": 454,
+                "line": 447,
                 "column": 41
             },
-            "line": 454,
-            "code": "      it('should handle multiple requests', async () => {\n        await sessionContext.initialize();\n        const name = 'echo';\n        const kernelPromise0 = sessionContext.changeKernel({ name });\n        // The last launched kernel should win.\n        const kernelPromise1 = sessionContext.changeKernel({ name });\n\n        let lastKernel = null;\n        sessionContext.kernelChanged.connect(() => {\n          lastKernel = sessionContext.session?.kernel;\n        });\n        const results = await Promise.all([kernelPromise0, kernelPromise1]);\n        // We can't know which of the two was launched first, so the result\n        // could be either, just make sure it isn't the original kernel.\n        expect([results[0], results[1]]).toContain(lastKernel);\n      });",
+            "line": 447,
+            "code": "      it('should handle multiple requests', async () => {\n        await sessionContext.initialize();\n        const name = 'echo';\n        const kernelPromise0 = sessionContext.changeKernel({ name });\n        // The last launched kernel should win.\n        const kernelPromise1 = sessionContext.changeKernel({ name });\n\n        let lastKernel: IKernelConnection | null | undefined = null;\n        sessionContext.kernelChanged.connect(() => {\n          lastKernel = sessionContext.session?.kernel;\n        });\n        const results = await Promise.all([kernelPromise0, kernelPromise1]);\n        // We can't know which of the two was launched first, so the result\n        // could be either, just make sure it isn't the original kernel.\n        expect([results[0], results[1]]).toContain(lastKernel);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6796,10 +6849,10 @@
                 "#shutdown"
             ],
             "updatePoint": {
-                "line": 473,
+                "line": 466,
                 "column": 58
             },
-            "line": 473,
+            "line": 466,
             "code": "      it('should kill the kernel and shut down the session', async () => {\n        await sessionContext.initialize();\n        expect(sessionContext.session?.kernel).toBeTruthy();\n        await sessionContext.shutdown();\n        expect(sessionContext.session?.kernel).toBeFalsy();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6813,10 +6866,10 @@
                 "#shutdown"
             ],
             "updatePoint": {
-                "line": 480,
+                "line": 473,
                 "column": 49
             },
-            "line": 480,
+            "line": 473,
             "code": "      it('should handle a shutdown during startup', async () => {\n        const initPromise = sessionContext.initialize(); // Start but don't finish init.\n        const shutdownPromise = sessionContext.shutdown();\n        const results = await Promise.all([initPromise, shutdownPromise]);\n        expect(results[0]).toBe(false);\n        expect(sessionContext.session).toBe(null);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6830,10 +6883,10 @@
                 ".getDefaultKernel()"
             ],
             "updatePoint": {
-                "line": 490,
+                "line": 483,
                 "column": 52
             },
-            "line": 490,
+            "line": 483,
             "code": "      it('should return null if no options are given', () => {\n        expect(\n          SessionContext.getDefaultKernel({\n            specs: specsManager.specs,\n            preference: {}\n          })\n        ).toBeNull();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6847,10 +6900,10 @@
                 ".getDefaultKernel()"
             ],
             "updatePoint": {
-                "line": 499,
+                "line": 492,
                 "column": 39
             },
-            "line": 499,
+            "line": 492,
             "code": "      it('should return a matching name', () => {\n        const spec =\n          specsManager.specs!.kernelspecs[specsManager.specs!.default]!;\n\n        expect(\n          SessionContext.getDefaultKernel({\n            specs: specsManager.specs,\n            preference: { name: spec.name }\n          })\n        ).toBe(spec.name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6864,10 +6917,10 @@
                 ".getDefaultKernel()"
             ],
             "updatePoint": {
-                "line": 511,
+                "line": 504,
                 "column": 49
             },
-            "line": 511,
+            "line": 504,
             "code": "      it('should return null if no match is found', () => {\n        expect(\n          SessionContext.getDefaultKernel({\n            specs: specsManager.specs,\n            preference: { name: 'foo' }\n          })\n        ).toBeNull();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6881,10 +6934,10 @@
                 ".getDefaultKernel()"
             ],
             "updatePoint": {
-                "line": 520,
+                "line": 513,
                 "column": 43
             },
-            "line": 520,
+            "line": 513,
             "code": "      it('should return a matching language', () => {\n        const spec =\n          specsManager.specs!.kernelspecs[specsManager.specs!.default]!;\n        const kernelspecs: any = {};\n\n        kernelspecs[spec.name] = spec;\n        expect(\n          SessionContext.getDefaultKernel({\n            specs: {\n              default: spec.name,\n              kernelspecs\n            },\n            preference: { language: spec.language }\n          })\n        ).toBe(spec.name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6898,10 +6951,10 @@
                 ".getDefaultKernel()"
             ],
             "updatePoint": {
-                "line": 537,
+                "line": 530,
                 "column": 56
             },
-            "line": 537,
+            "line": 530,
             "code": "      it('should return null if a language matches twice', () => {\n        const spec =\n          specsManager.specs!.kernelspecs[specsManager.specs!.default]!;\n        const kernelspecs: any = {};\n\n        kernelspecs['foo'] = spec;\n        kernelspecs['bar'] = spec;\n        expect(\n          SessionContext.getDefaultKernel({\n            specs: {\n              default: spec.name,\n              kernelspecs\n            },\n            preference: { language: spec.language }\n          })\n        ).toBeNull();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
@@ -6911,16 +6964,15 @@
             "name": "should select a kernel for the session",
             "suites": [
                 "@jupyterlab/apputils",
-                "SessionContext",
-                ".sessionContextDialogs",
+                "SessionContextDialogs",
                 "#selectKernel()"
             ],
             "updatePoint": {
-                "line": 558,
-                "column": 50
+                "line": 594,
+                "column": 48
             },
-            "line": 558,
-            "code": "        it('should select a kernel for the session', async () => {\n          await sessionContext.initialize();\n\n          const { id, name } = sessionContext!.session!.kernel!;\n          const accept = acceptDialog();\n\n          await sessionContextDialogs.selectKernel(sessionContext);\n          await accept;\n\n          const session = sessionContext?.session;\n          expect(session!.kernel!.id).not.toBe(id);\n          expect(session!.kernel!.name).toBe(name);\n        });",
+            "line": 594,
+            "code": "      it('should select a kernel for the session', async () => {\n        await sessionContext.initialize();\n\n        const { id, name } = sessionContext!.session!.kernel!;\n        const accept = acceptDialog();\n\n        await sessionContextDialogs.selectKernel(sessionContext);\n        await accept;\n\n        const session = sessionContext?.session;\n        expect(session!.kernel!.id).not.toBe(id);\n        expect(session!.kernel!.name).toBe(name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6929,16 +6981,15 @@
             "name": "should keep the existing kernel if dismissed",
             "suites": [
                 "@jupyterlab/apputils",
-                "SessionContext",
-                ".sessionContextDialogs",
+                "SessionContextDialogs",
                 "#selectKernel()"
             ],
             "updatePoint": {
-                "line": 572,
-                "column": 56
+                "line": 608,
+                "column": 54
             },
-            "line": 572,
-            "code": "        it('should keep the existing kernel if dismissed', async () => {\n          await sessionContext.initialize();\n\n          const { id, name } = sessionContext!.session!.kernel!;\n          const dismiss = dismissDialog();\n\n          await sessionContextDialogs.selectKernel(sessionContext);\n          await dismiss;\n\n          const session = sessionContext.session;\n          expect(session!.kernel!.id).toBe(id);\n          expect(session!.kernel!.name).toBe(name);\n        });",
+            "line": 608,
+            "code": "      it('should keep the existing kernel if dismissed', async () => {\n        await sessionContext.initialize();\n\n        const { id, name } = sessionContext!.session!.kernel!;\n        const dismiss = dismissDialog();\n\n        await sessionContextDialogs.selectKernel(sessionContext);\n        await dismiss;\n\n        const session = sessionContext.session;\n        expect(session!.kernel!.id).toBe(id);\n        expect(session!.kernel!.name).toBe(name);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6947,16 +6998,15 @@
             "name": "should restart if the user accepts the dialog",
             "suites": [
                 "@jupyterlab/apputils",
-                "SessionContext",
-                ".sessionContextDialogs",
+                "SessionContextDialogs",
                 "#restart()"
             ],
             "updatePoint": {
-                "line": 588,
-                "column": 57
+                "line": 624,
+                "column": 55
             },
-            "line": 588,
-            "code": "        it('should restart if the user accepts the dialog', async () => {\n          const emission = testEmission(sessionContext.statusChanged, {\n            find: (_, args) => args === 'restarting'\n          });\n          await sessionContext.initialize();\n          await sessionContext!.session?.kernel?.info;\n          const restart = sessionContextDialogs.restart(sessionContext);\n\n          await acceptDialog();\n          expect(await restart).toBe(true);\n          await emission;\n        });",
+            "line": 624,
+            "code": "      it('should restart if the user accepts the dialog', async () => {\n        const emission = testEmission(sessionContext.statusChanged, {\n          find: (_, args) => args === 'restarting'\n        });\n        await sessionContext.initialize();\n        await sessionContext!.session?.kernel?.info;\n        const restart = sessionContextDialogs.restart(sessionContext);\n\n        await acceptDialog();\n        expect(await restart).toBe(true);\n        await emission;\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6965,16 +7015,15 @@
             "name": "should not restart if the user rejects the dialog",
             "suites": [
                 "@jupyterlab/apputils",
-                "SessionContext",
-                ".sessionContextDialogs",
+                "SessionContextDialogs",
                 "#restart()"
             ],
             "updatePoint": {
-                "line": 601,
-                "column": 61
+                "line": 637,
+                "column": 59
             },
-            "line": 601,
-            "code": "        it('should not restart if the user rejects the dialog', async () => {\n          let called = false;\n\n          await sessionContext.initialize();\n          sessionContext.statusChanged.connect((sender, args) => {\n            if (args === 'restarting') {\n              called = true;\n            }\n          });\n\n          const restart = sessionContextDialogs.restart(sessionContext);\n          await dismissDialog();\n          expect(await restart).toBe(false);\n          expect(called).toBe(false);\n        });",
+            "line": 637,
+            "code": "      it('should not restart if the user rejects the dialog', async () => {\n        let called = false;\n\n        await sessionContext.initialize();\n        sessionContext.statusChanged.connect((sender, args) => {\n          if (args === 'restarting') {\n            called = true;\n          }\n        });\n\n        const restart = sessionContextDialogs.restart(sessionContext);\n        await dismissDialog();\n        expect(await restart).toBe(false);\n        expect(called).toBe(false);\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -6983,16 +7032,15 @@
             "name": "should start the same kernel as the previously started kernel",
             "suites": [
                 "@jupyterlab/apputils",
-                "SessionContext",
-                ".sessionContextDialogs",
+                "SessionContextDialogs",
                 "#restart()"
             ],
             "updatePoint": {
-                "line": 617,
-                "column": 73
+                "line": 653,
+                "column": 71
             },
-            "line": 617,
-            "code": "        it('should start the same kernel as the previously started kernel', async () => {\n          await sessionContext.initialize();\n          await sessionContext.shutdown();\n          await sessionContextDialogs.restart(sessionContext);\n          expect(sessionContext?.session?.kernel).toBeTruthy();\n        });",
+            "line": 653,
+            "code": "      it('should start the same kernel as the previously started kernel', async () => {\n        await sessionContext.initialize();\n        await sessionContext.shutdown();\n        await sessionContextDialogs.restart(sessionContext);\n        expect(sessionContext?.session?.kernel).toBeTruthy();\n      });",
             "file": "sessioncontext.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -7006,10 +7054,10 @@
                 ".createInterruptButton()"
             ],
             "updatePoint": {
-                "line": 43,
+                "line": 44,
                 "column": 62
             },
-            "line": 43,
+            "line": 44,
             "code": "        it(\"should add an inline svg node with the 'stop' icon\", async () => {\n          const button = Toolbar.createInterruptButton(sessionContext);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='stop']\")\n          ).toBeDefined();\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7024,11 +7072,11 @@
                 ".createRestartButton()"
             ],
             "updatePoint": {
-                "line": 54,
+                "line": 55,
                 "column": 65
             },
-            "line": 54,
-            "code": "        it(\"should add an inline svg node with the 'refresh' icon\", async () => {\n          const button = Toolbar.createRestartButton(sessionContext);\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='refresh']\")\n          ).toBeDefined();\n        });",
+            "line": 55,
+            "code": "        it(\"should add an inline svg node with the 'refresh' icon\", async () => {\n          const button = Toolbar.createRestartButton(\n            sessionContext,\n            new SessionContextDialogs()\n          );\n          Widget.attach(button, document.body);\n          await framePromise();\n          expect(\n            button.node.querySelector(\"[data-icon$='refresh']\")\n          ).toBeDefined();\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -7042,11 +7090,11 @@
                 ".createKernelNameItem()"
             ],
             "updatePoint": {
-                "line": 65,
+                "line": 69,
                 "column": 61
             },
-            "line": 65,
-            "code": "        it(\"should display the `'display_name'` of the kernel\", async () => {\n          const item = Toolbar.createKernelNameItem(sessionContext);\n          await sessionContext.initialize();\n          Widget.attach(item, document.body);\n          await framePromise();\n          const node = item.node.querySelector(\n            '.jp-ToolbarButtonComponent-label'\n          )!;\n          expect(node.textContent).toBe(sessionContext.kernelDisplayName);\n        });",
+            "line": 69,
+            "code": "        it(\"should display the `'display_name'` of the kernel\", async () => {\n          const item = Toolbar.createKernelNameItem(\n            sessionContext,\n            new SessionContextDialogs()\n          );\n          await sessionContext.initialize();\n          Widget.attach(item, document.body);\n          await framePromise();\n          const node = item.node.querySelector(\n            '.jp-ToolbarButtonComponent-label'\n          )!;\n          expect(node.textContent).toBe(sessionContext.kernelDisplayName);\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
             "dir": "packages/apputils/test"
@@ -7060,10 +7108,10 @@
                 ".createKernelStatusItem()"
             ],
             "updatePoint": {
-                "line": 83,
+                "line": 90,
                 "column": 69
             },
-            "line": 83,
+            "line": 90,
             "code": "        it('should display a busy status if the kernel status is busy', async () => {\n          const item = Toolbar.createKernelStatusItem(sessionContext);\n          let called = false;\n          sessionContext.statusChanged.connect((_, status) => {\n            if (status === 'busy') {\n              // eslint-disable-next-line jest/no-conditional-expect\n              expect(\n                item.node.querySelector(\"[data-icon$='circle']\")\n              ).toBeDefined();\n              called = true;\n            }\n          });\n          const future = sessionContext.session!.kernel!.requestExecute({\n            code: 'a = 109\\na'\n          })!;\n          await future.done;\n          expect(called).toBe(true);\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7078,10 +7126,10 @@
                 ".createKernelStatusItem()"
             ],
             "updatePoint": {
-                "line": 102,
+                "line": 109,
                 "column": 60
             },
-            "line": 102,
+            "line": 109,
             "code": "        it('should show the current status in the node title', async () => {\n          const item = Toolbar.createKernelStatusItem(sessionContext);\n          const status = sessionContext.session?.kernel?.status;\n          expect(item.node.title.toLowerCase()).toContain(status);\n          let called = false;\n          const future = sessionContext.session!.kernel!.requestExecute({\n            code: 'a = 1'\n          })!;\n          future.onIOPub = msg => {\n            if (sessionContext.session?.kernel?.status === 'busy') {\n              // eslint-disable-next-line jest/no-conditional-expect\n              expect(item.node.title.toLowerCase()).toContain('busy');\n              called = true;\n            }\n          };\n          await future.done;\n          expect(called).toBe(true);\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7096,10 +7144,10 @@
                 ".createKernelStatusItem()"
             ],
             "updatePoint": {
-                "line": 121,
+                "line": 128,
                 "column": 44
             },
-            "line": 121,
+            "line": 128,
             "code": "        it('should handle a starting session', async () => {\n          await sessionContext.session?.kernel?.info;\n          await sessionContext.shutdown();\n          sessionContext = await createSessionContext();\n          await sessionContext.initialize();\n          const item = Toolbar.createKernelStatusItem(sessionContext);\n          expect(item.node.title).toBe('Kernel Connecting');\n          expect(\n            item.node.querySelector(\"[data-icon$='circle-empty']\")\n          ).toBeDefined();\n          await sessionContext.initialize();\n          await sessionContext.session?.kernel?.info;\n        });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7113,10 +7161,10 @@
                 "#constructor"
             ],
             "updatePoint": {
-                "line": 140,
+                "line": 147,
                 "column": 38
             },
-            "line": 140,
+            "line": 147,
             "code": "      it('should set a default factory', () => {\n        const dummy = jest.fn();\n        const registry = new ToolbarWidgetRegistry({\n          defaultFactory: dummy\n        });\n\n        expect(registry.defaultFactory).toBe(dummy);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7130,10 +7178,10 @@
                 "#defaultFactory"
             ],
             "updatePoint": {
-                "line": 151,
+                "line": 158,
                 "column": 38
             },
-            "line": 151,
+            "line": 158,
             "code": "      it('should set a default factory', () => {\n        const dummy = jest.fn();\n        const dummy2 = jest.fn();\n        const registry = new ToolbarWidgetRegistry({\n          defaultFactory: dummy\n        });\n\n        registry.defaultFactory = dummy2;\n\n        expect(registry.defaultFactory).toBe(dummy2);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7147,10 +7195,10 @@
                 "#createWidget"
             ],
             "updatePoint": {
-                "line": 165,
+                "line": 172,
                 "column": 53
             },
-            "line": 165,
+            "line": 172,
             "code": "      it('should call the default factory as fallback', () => {\n        const documentWidget = new Widget();\n        const dummyWidget = new Widget();\n        const dummy = jest.fn().mockReturnValue(dummyWidget);\n        const registry = new ToolbarWidgetRegistry({\n          defaultFactory: dummy\n        });\n\n        const item: ToolbarRegistry.IWidget = {\n          name: 'test'\n        };\n\n        const widget = registry.createWidget('factory', documentWidget, item);\n\n        expect(widget).toBe(dummyWidget);\n        expect(dummy).toBeCalledWith('factory', documentWidget, item);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7164,10 +7212,10 @@
                 "#createWidget"
             ],
             "updatePoint": {
-                "line": 183,
+                "line": 190,
                 "column": 44
             },
-            "line": 183,
+            "line": 190,
             "code": "      it('should call the registered factory', () => {\n        const documentWidget = new Widget();\n        const dummyWidget = new Widget();\n        const defaultFactory = jest.fn().mockReturnValue(dummyWidget);\n        const dummy = jest.fn().mockReturnValue(dummyWidget);\n        const registry = new ToolbarWidgetRegistry({\n          defaultFactory\n        });\n\n        const item: ToolbarRegistry.IWidget = {\n          name: 'test'\n        };\n\n        registry.addFactory('factory', item.name, dummy);\n\n        const widget = registry.createWidget('factory', documentWidget, item);\n\n        expect(widget).toBe(dummyWidget);\n        expect(dummy).toBeCalledWith(documentWidget);\n        expect(defaultFactory).toBeCalledTimes(0);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7181,10 +7229,10 @@
                 "#addFactory"
             ],
             "updatePoint": {
-                "line": 207,
+                "line": 214,
                 "column": 55
             },
-            "line": 207,
+            "line": 214,
             "code": "      it('should return the previous registered factory', () => {\n        const defaultFactory = jest.fn();\n        const dummy = jest.fn();\n        const dummy2 = jest.fn();\n        const registry = new ToolbarWidgetRegistry({\n          defaultFactory\n        });\n\n        const item: ToolbarRegistry.IWidget = {\n          name: 'test'\n        };\n\n        expect(\n          registry.addFactory('factory', item.name, dummy)\n        ).toBeUndefined();\n        expect(registry.addFactory('factory', item.name, dummy2)).toBe(dummy);\n      });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7197,10 +7245,10 @@
                 "createToolbarFactory"
             ],
             "updatePoint": {
-                "line": 228,
+                "line": 235,
                 "column": 39
             },
-            "line": 228,
+            "line": 235,
             "code": "    it('should return the toolbar items', async () => {\n      const factoryName = 'dummyFactory';\n      const pluginId = 'test-plugin:settings';\n      const toolbarRegistry = new ToolbarWidgetRegistry({\n        defaultFactory: jest.fn()\n      });\n\n      const bar: ISettingRegistry.IPlugin = {\n        data: {\n          composite: {},\n          user: {}\n        },\n        id: pluginId,\n        raw: '{}',\n        schema: {\n          'jupyter.lab.toolbars': {\n            dummyFactory: [\n              {\n                name: 'insert',\n                command: 'notebook:insert-cell-below',\n                rank: 20\n              },\n              { name: 'spacer', type: 'spacer', rank: 100 },\n              { name: 'cut', command: 'notebook:cut-cell', rank: 21 },\n              {\n                name: 'clear-all',\n                command: 'notebook:clear-all-cell-outputs',\n                rank: 60,\n                disabled: true\n              }\n            ]\n          },\n          'jupyter.lab.transform': true,\n          properties: {\n            toolbar: {\n              type: 'array'\n            }\n          },\n          type: 'object'\n        },\n        version: 'test'\n      };\n\n      const connector: IDataConnector<\n        ISettingRegistry.IPlugin,\n        string,\n        string,\n        string\n      > = {\n        fetch: jest.fn().mockImplementation((id: string) => {\n          switch (id) {\n            case bar.id:\n              return bar;\n            default:\n              return {};\n          }\n        }),\n        list: jest.fn(),\n        save: jest.fn(),\n        remove: jest.fn()\n      };\n\n      const settingRegistry = new SettingRegistry({\n        connector\n      });\n\n      const translator: ITranslator = {\n        languageCode: 'en',\n        load: jest.fn()\n      };\n\n      const factory = createToolbarFactory(\n        toolbarRegistry,\n        settingRegistry,\n        factoryName,\n        pluginId,\n        translator\n      );\n\n      await settingRegistry.load(bar.id);\n\n      const items = factory(new Widget());\n      expect(items).toHaveLength(3);\n      expect(items.get(0).name).toEqual('insert');\n      expect(items.get(1).name).toEqual('cut');\n      expect(items.get(2).name).toEqual('spacer');\n    });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7213,10 +7261,10 @@
                 "createToolbarFactory"
             ],
             "updatePoint": {
-                "line": 316,
+                "line": 323,
                 "column": 63
             },
-            "line": 316,
+            "line": 323,
             "code": "    it('should update the toolbar items with late settings load', async () => {\n      const factoryName = 'dummyFactory';\n      const pluginId = 'test-plugin:settings';\n      const toolbarRegistry = new ToolbarWidgetRegistry({\n        defaultFactory: jest.fn()\n      });\n\n      const foo: ISettingRegistry.IPlugin = {\n        data: {\n          composite: {},\n          user: {}\n        },\n        id: 'foo',\n        raw: '{}',\n        schema: {\n          'jupyter.lab.toolbars': {\n            dummyFactory: [\n              { name: 'cut', command: 'notebook:cut-cell', rank: 21 },\n              { name: 'insert', rank: 40 },\n              {\n                name: 'clear-all',\n                disabled: true\n              }\n            ]\n          },\n          type: 'object'\n        },\n        version: 'test'\n      };\n      const bar: ISettingRegistry.IPlugin = {\n        data: {\n          composite: {},\n          user: {}\n        },\n        id: pluginId,\n        raw: '{}',\n        schema: {\n          'jupyter.lab.toolbars': {\n            dummyFactory: [\n              {\n                name: 'insert',\n                command: 'notebook:insert-cell-below',\n                rank: 20\n              },\n              {\n                name: 'clear-all',\n                command: 'notebook:clear-all-cell-outputs',\n                rank: 60\n              }\n            ]\n          },\n          'jupyter.lab.transform': true,\n          properties: {\n            toolbar: {\n              type: 'array'\n            }\n          },\n          type: 'object'\n        },\n        version: 'test'\n      };\n\n      const connector: IDataConnector<\n        ISettingRegistry.IPlugin,\n        string,\n        string,\n        string\n      > = {\n        fetch: jest.fn().mockImplementation((id: string) => {\n          switch (id) {\n            case bar.id:\n              return bar;\n            case foo.id:\n              return foo;\n            default:\n              return {};\n          }\n        }),\n        list: jest.fn(),\n        save: jest.fn(),\n        remove: jest.fn()\n      };\n\n      const settingRegistry = new SettingRegistry({\n        connector\n      });\n\n      const translator: ITranslator = {\n        languageCode: 'en',\n        load: jest.fn()\n      };\n\n      const factory = createToolbarFactory(\n        toolbarRegistry,\n        settingRegistry,\n        factoryName,\n        pluginId,\n        translator\n      );\n\n      const barPlugin = await settingRegistry.load(bar.id);\n      const baseToolbar = JSONExt.deepCopy(\n        barPlugin.composite['toolbar'] as any\n      );\n\n      let waitForChange = new PromiseDelegate<void>();\n      barPlugin.changed.connect(() => {\n        if (\n          !JSONExt.deepEqual(baseToolbar, barPlugin.composite['toolbar'] as any)\n        ) {\n          waitForChange.resolve();\n        }\n      });\n      await settingRegistry.load(foo.id);\n      await waitForChange.promise;\n\n      const items = factory(new Widget());\n      expect(items).toHaveLength(2);\n      expect(items.get(0).name).toEqual('cut');\n      expect(items.get(1).name).toEqual('insert');\n    });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -7229,10 +7277,10 @@
                 "createToolbarFactory"
             ],
             "updatePoint": {
-                "line": 438,
+                "line": 445,
                 "column": 41
             },
-            "line": 438,
+            "line": 445,
             "code": "    it('should be callable multiple times', async () => {\n      const factoryName = 'dummyFactory';\n      const pluginId = 'test-plugin:settings';\n      const toolbarRegistry = new ToolbarWidgetRegistry({\n        defaultFactory: jest.fn()\n      });\n\n      const bar: ISettingRegistry.IPlugin = {\n        data: {\n          composite: {},\n          user: {}\n        },\n        id: pluginId,\n        raw: '{}',\n        schema: {\n          'jupyter.lab.toolbars': {\n            dummyFactory: [\n              {\n                name: 'insert',\n                command: 'notebook:insert-cell-below',\n                rank: 20\n              },\n              { name: 'spacer', type: 'spacer', rank: 100 },\n              { name: 'cut', command: 'notebook:cut-cell', rank: 21 },\n              {\n                name: 'clear-all',\n                command: 'notebook:clear-all-cell-outputs',\n                rank: 60,\n                disabled: true\n              }\n            ]\n          },\n          'jupyter.lab.transform': true,\n          properties: {\n            toolbar: {\n              type: 'array'\n            }\n          },\n          type: 'object'\n        },\n        version: 'test'\n      };\n\n      const connector: IDataConnector<\n        ISettingRegistry.IPlugin,\n        string,\n        string,\n        string\n      > = {\n        fetch: jest.fn().mockImplementation((id: string) => {\n          switch (id) {\n            case bar.id:\n              return bar;\n            default:\n              return {};\n          }\n        }),\n        list: jest.fn(),\n        save: jest.fn(),\n        remove: jest.fn()\n      };\n\n      const settingRegistry = new SettingRegistry({\n        connector\n      });\n\n      const translator: ITranslator = {\n        languageCode: 'en',\n        load: jest.fn()\n      };\n\n      const factory = createToolbarFactory(\n        toolbarRegistry,\n        settingRegistry,\n        factoryName,\n        pluginId,\n        translator\n      );\n\n      const factory2 = createToolbarFactory(\n        toolbarRegistry,\n        settingRegistry,\n        factoryName,\n        pluginId,\n        translator\n      );\n\n      await settingRegistry.load(bar.id);\n\n      expect(factory(new Widget())).toHaveLength(3);\n      expect(factory2(new Widget())).toHaveLength(3);\n    });",
             "file": "toolbar.spec.ts",
             "skipped": false,
@@ -18372,7 +18420,7 @@
                 "column": 73
             },
             "line": 360,
-            "code": "      it('should save the document to a different path chosen by the user', async () => {\n        const initialize = context.initialize(true);\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await initialize;\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n\n          input.value = newPath;\n          await acceptDialog();\n        };\n        const promise = func();\n        await initialize;\n\n        const oldPath = context.path;\n        await context.saveAs();\n        await promise;\n        expect(context.path).toBe(newPath);\n        // Make sure the both files are there now.\n        const model = await manager.contents.get('', { content: true });\n        expect(model.content.find((x: any) => x.name === oldPath)).toBeTruthy();\n        expect(model.content.find((x: any) => x.name === newPath)).toBeTruthy();\n      });",
+            "code": "      it('should save the document to a different path chosen by the user', async () => {\n        const initialize = context.initialize(true);\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await initialize;\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n\n          input.value = newPath;\n          await acceptDialog();\n        };\n        const promise = func();\n        await initialize;\n\n        const oldPath = context.path;\n        await context.saveAs();\n        await promise;\n        // We no longer rename the current document\n        //expect(context.path).toBe(newPath);\n        // Make sure the both files are there now.\n        const model = await manager.contents.get('', { content: true });\n        expect(model.content.find((x: any) => x.name === oldPath)).toBeTruthy();\n        expect(model.content.find((x: any) => x.name === newPath)).toBeTruthy();\n\n        // Make sure both files are equal\n        const model1 = await manager.contents.get(oldPath, { content: true });\n        const model2 = await manager.contents.get(newPath, { content: true });\n        expect(model1.content).toEqual(model2.content);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18385,11 +18433,11 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 386,
+                "line": 392,
                 "column": 43
             },
-            "line": 386,
-            "code": "      it('should bring up a conflict dialog', async () => {\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog(); // Accept rename dialog\n          await acceptDialog(); // Accept conflict dialog\n        };\n        await manager.contents.save(newPath, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(true);\n        const promise = func();\n        await context.saveAs();\n        await promise;\n        expect(context.path).toBe(newPath);\n      });",
+            "line": 392,
+            "code": "      it('should bring up a conflict dialog', async () => {\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog(); // Accept rename dialog\n          await acceptDialog(); // Accept conflict dialog\n        };\n        await manager.contents.save(newPath, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(true);\n        const promise = func();\n\n        const oldPath = context.path;\n        await context.saveAs();\n        await promise;\n\n        // We no longer rename the current document\n        //expect(context.path).toBe(newPath);\n        // Make sure the both files are there now.\n        const model = await manager.contents.get('', { content: true });\n        expect(model.content.find((x: any) => x.name === oldPath)).toBeTruthy();\n        expect(model.content.find((x: any) => x.name === newPath)).toBeTruthy();\n\n        // Make sure both files are equal\n        const model1 = await manager.contents.get(oldPath, { content: true });\n        const model2 = await manager.contents.get(newPath, { content: true });\n        expect(model1.content).toEqual(model2.content);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18402,10 +18450,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 409,
+                "line": 428,
                 "column": 54
             },
-            "line": 409,
+            "line": 428,
             "code": "      it('should keep the file if overwrite is aborted', async () => {\n        const oldPath = context.path;\n        const newPath = UUID.uuid4() + '.txt';\n        const func = async () => {\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog(); // Accept rename dialog\n          await dismissDialog(); // Reject conflict dialog\n        };\n        await manager.contents.save(newPath, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(true);\n        const promise = func();\n        await context.saveAs();\n        await promise;\n        expect(context.path).toBe(oldPath);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18419,11 +18467,28 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 432,
+                "line": 451,
                 "column": 59
             },
-            "line": 432,
+            "line": 451,
             "code": "      it('should just save if the file name does not change', async () => {\n        const path = context.path;\n        await context.initialize(true);\n        const promise = context.saveAs();\n        await acceptDialog();\n        await promise;\n        expect(context.path).toBe(path);\n      });",
+            "file": "context.spec.ts",
+            "skipped": false,
+            "dir": "packages/docregistry/test"
+        },
+        {
+            "name": "should be rejected if the user cancel the dialog",
+            "suites": [
+                "docregistry/context",
+                "Context",
+                "#saveAs()"
+            ],
+            "updatePoint": {
+                "line": 460,
+                "column": 58
+            },
+            "line": 460,
+            "code": "      it('should be rejected if the user cancel the dialog', async () => {\n        await context.initialize(true);\n\n        const promise = context.saveAs();\n        await dismissDialog();\n\n        await expect(promise).rejects.toEqual('Save as cancelled by user.');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18436,10 +18501,10 @@
                 "#revert()"
             ],
             "updatePoint": {
-                "line": 443,
+                "line": 471,
                 "column": 60
             },
-            "line": 443,
+            "line": 471,
             "code": "      it('should revert the contents of the file to the disk', async () => {\n        await context.initialize(true);\n        context.model.fromString('foo');\n        await context.save();\n        context.model.fromString('bar');\n        await context.revert();\n        expect(context.model.toString()).toBe('foo');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18453,10 +18518,10 @@
                 "#revert()"
             ],
             "updatePoint": {
-                "line": 452,
+                "line": 480,
                 "column": 50
             },
-            "line": 452,
+            "line": 480,
             "code": "      it('should normalize CRLF line endings to LF', async () => {\n        await context.initialize(true);\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo\\r\\nbar'\n        });\n        await context.revert();\n        expect(context.model.toString()).toBe('foo\\nbar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18470,10 +18535,10 @@
                 "#createCheckpoint()"
             ],
             "updatePoint": {
-                "line": 465,
+                "line": 493,
                 "column": 49
             },
-            "line": 465,
+            "line": 493,
             "code": "      it('should create a checkpoint for the file', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        expect(model.id).toBeTruthy();\n        expect(model.last_modified).toBeTruthy();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18487,10 +18552,10 @@
                 "#deleteCheckpoint()"
             ],
             "updatePoint": {
-                "line": 474,
+                "line": 502,
                 "column": 44
             },
-            "line": 474,
+            "line": 502,
             "code": "      it('should delete the given checkpoint', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        await context.deleteCheckpoint(model.id);\n        const models = await context.listCheckpoints();\n        expect(models.length).toBe(0);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18504,10 +18569,10 @@
                 "#restoreCheckpoint()"
             ],
             "updatePoint": {
-                "line": 484,
+                "line": 512,
                 "column": 63
             },
-            "line": 484,
+            "line": 512,
             "code": "      it('should restore the value to the last checkpoint value', async () => {\n        context.model.fromString('bar');\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        context.model.fromString('foo');\n        const id = model.id;\n        await context.save();\n        await context.restoreCheckpoint(id);\n        await context.revert();\n        expect(context.model.toString()).toBe('bar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18521,10 +18586,10 @@
                 "#listCheckpoints()"
             ],
             "updatePoint": {
-                "line": 498,
+                "line": 526,
                 "column": 50
             },
-            "line": 498,
+            "line": 526,
             "code": "      it('should list the checkpoints for the file', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        const id = model.id;\n        const models = await context.listCheckpoints();\n        let found = false;\n        for (const model of models) {\n          if (model.id === id) {\n            found = true;\n          }\n        }\n        expect(found).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18538,10 +18603,10 @@
                 "#urlResolver"
             ],
             "updatePoint": {
-                "line": 514,
+                "line": 542,
                 "column": 34
             },
-            "line": 514,
+            "line": 542,
             "code": "      it('should be a url resolver', () => {\n        expect(context.urlResolver).toBeInstanceOf(\n          RenderMimeRegistry.UrlResolver\n        );\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18555,10 +18620,10 @@
                 "#addSibling()"
             ],
             "updatePoint": {
-                "line": 522,
+                "line": 550,
                 "column": 37
             },
-            "line": 522,
+            "line": 550,
             "code": "      it('should add a sibling widget', () => {\n        let called = false;\n        const opener = (widget: Widget) => {\n          called = true;\n        };\n        context = new Context({\n          manager,\n          factory,\n          path: UUID.uuid4() + '.txt',\n          opener\n        });\n        context.addSibling(new Widget());\n        expect(called).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -25289,7 +25354,7 @@
                 "column": 34
             },
             "line": 687,
-            "code": "      it('should handle no session', async () => {\n        let emitted = 0;\n        NotebookActions.selectionExecuted.connect(() => {\n          emitted += 1;\n        });\n        const result = await NotebookActions.run(widget, undefined);\n        expect(result).toBe(true);\n        const cell = widget.activeCell as CodeCell;\n        expect(cell.model.executionCount).toBe(null);\n        expect(emitted).toBe(1);\n      });",
+            "code": "      it('should handle no session', async () => {\n        let emitted = 0;\n        NotebookActions.selectionExecuted.connect(() => {\n          emitted += 1;\n        });\n        const result = await NotebookActions.run(\n          widget,\n          {\n            isTerminating: false,\n            pendingInput: false,\n            hasNoKernel: true,\n            kernelPreference: { autoStartDefault: false },\n            startKernel: () => Promise.resolve(true)\n          } as ISessionContext,\n          { selectKernel: () => Promise.resolve() } as any\n        );\n        expect(result).toBe(true);\n        const cell = widget.activeCell as CodeCell;\n        expect(cell.model.executionCount).toBe(null);\n        expect(emitted).toBe(1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
             "dir": "packages/notebook/test"
@@ -25302,10 +25367,10 @@
                 "#run()"
             ],
             "updatePoint": {
-                "line": 699,
+                "line": 709,
                 "column": 54
             },
-            "line": 699,
+            "line": 709,
             "code": "      it('should stop executing code cells on an error', async () => {\n        let emitted = 0;\n        NotebookActions.selectionExecuted.connect(() => {\n          emitted += 1;\n        });\n        widget.model!.sharedModel.insertCell(2, {\n          cell_type: 'code',\n          source: ERROR_INPUT\n        });\n        widget.select(widget.widgets[2]);\n        const cell = widget.model!.sharedModel.insertCell(\n          widget.widgets.length,\n          { cell_type: 'code' }\n        ) as ISharedCodeCell;\n        widget.select(widget.widgets[widget.widgets.length - 1]);\n        const result = await NotebookActions.run(widget, ipySessionContext);\n        await sleep(400);\n        expect(result).toBe(false);\n        expect(cell.execution_count).toBeNull();\n        expect(emitted).toBe(1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25319,10 +25384,10 @@
                 "#run()"
             ],
             "updatePoint": {
-                "line": 721,
+                "line": 731,
                 "column": 54
             },
-            "line": 721,
+            "line": 731,
             "code": "      it('should render all markdown cells on an error', async () => {\n        let emitted = 0;\n        NotebookActions.selectionExecuted.connect(() => {\n          emitted += 1;\n        });\n        widget.model!.sharedModel.insertCell(widget.widgets.length, {\n          cell_type: 'markdown'\n        });\n        const child = widget.widgets[widget.widgets.length - 1] as MarkdownCell;\n        child.rendered = false;\n        widget.select(child);\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const result = await NotebookActions.run(widget, ipySessionContext);\n        // Markdown rendering is asynchronous, but the cell\n        // provides no way to hook into that. Sleep here\n        // to make sure it finishes.\n        await sleep(400);\n        expect(result).toBe(false);\n        expect(child.rendered).toBe(true);\n        expect(emitted).toBe(1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25336,10 +25401,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 745,
+                "line": 755,
                 "column": 39
             },
-            "line": 745,
+            "line": 755,
             "code": "      it('should run the selected cells', async () => {\n        const next = widget.widgets[1] as MarkdownCell;\n        widget.select(next);\n        const cell = widget.activeCell as CodeCell;\n        cell.model.outputs.clear();\n        next.rendered = false;\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(cell.model.outputs.length).toBeGreaterThan(0);\n        expect(next.rendered).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25353,10 +25418,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 760,
+                "line": 770,
                 "column": 48
             },
-            "line": 760,
+            "line": 770,
             "code": "      it('should be a no-op if there is no model', async () => {\n        widget.model = null;\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25370,10 +25435,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 769,
+                "line": 779,
                 "column": 45
             },
-            "line": 769,
+            "line": 779,
             "code": "      it('should clear the existing selection', async () => {\n        const next = widget.widgets[3];\n        widget.select(next);\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          ipySessionContext\n        );\n        expect(result).toBe(false);\n        expect(widget.isSelected(widget.widgets[0])).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25387,10 +25452,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 780,
+                "line": 790,
                 "column": 39
             },
-            "line": 780,
+            "line": 790,
             "code": "      it('should change to command mode', async () => {\n        widget.mode = 'edit';\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25404,10 +25469,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 790,
+                "line": 800,
                 "column": 63
             },
-            "line": 790,
+            "line": 800,
             "code": "      it('should activate the cell after the last selected cell', async () => {\n        const next = widget.widgets[3] as MarkdownCell;\n        widget.select(next);\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(widget.activeCellIndex).toBe(4);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25421,10 +25486,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 801,
+                "line": 811,
                 "column": 65
             },
-            "line": 801,
+            "line": 811,
             "code": "      it('should create a new code cell in edit mode if necessary', async () => {\n        const count = widget.widgets.length;\n        widget.activeCellIndex = count - 1;\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(widget.widgets.length).toBe(count + 1);\n        expect(widget.activeCell).toBeInstanceOf(CodeCell);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25438,10 +25503,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 814,
+                "line": 824,
                 "column": 46
             },
-            "line": 814,
+            "line": 824,
             "code": "      it('should allow an undo of the new cell', async () => {\n        const count = widget.widgets.length;\n        widget.activeCellIndex = count - 1;\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        NotebookActions.undo(widget);\n        expect(widget.widgets.length).toBe(count);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25455,10 +25520,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 826,
+                "line": 836,
                 "column": 54
             },
-            "line": 826,
+            "line": 836,
             "code": "      it('should stop executing code cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.model!.sharedModel.insertCell(\n          widget.widgets.length,\n          { cell_type: 'code' }\n        ) as ISharedCodeCell;\n        widget.select(widget.widgets[widget.widgets.length - 1]);\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          ipySessionContext\n        );\n        expect(result).toBe(false);\n        expect(cell.execution_count).toBeNull();\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25472,10 +25537,10 @@
                 "#runAndAdvance()"
             ],
             "updatePoint": {
-                "line": 841,
+                "line": 851,
                 "column": 54
             },
-            "line": 841,
+            "line": 851,
             "code": "      it('should render all markdown cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.widgets[1] as MarkdownCell;\n        cell.rendered = false;\n        widget.select(cell);\n        const result = await NotebookActions.runAndAdvance(\n          widget,\n          ipySessionContext\n        );\n        // Markdown rendering is asynchronous, but the cell\n        // provides no way to hook into that. Sleep here\n        // to make sure it finishes.\n        await sleep(400);\n        expect(result).toBe(false);\n        expect(cell.rendered).toBe(true);\n        expect(widget.activeCellIndex).toBe(2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25489,10 +25554,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 861,
+                "line": 871,
                 "column": 39
             },
-            "line": 861,
+            "line": 871,
             "code": "      it('should run the selected cells', async () => {\n        const next = widget.widgets[1] as MarkdownCell;\n        widget.select(next);\n        const cell = widget.activeCell as CodeCell;\n        cell.model.outputs.clear();\n        next.rendered = false;\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(cell.model.outputs.length).toBeGreaterThan(0);\n        expect(next.rendered).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25506,10 +25571,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 876,
+                "line": 886,
                 "column": 48
             },
-            "line": 876,
+            "line": 886,
             "code": "      it('should be a no-op if there is no model', async () => {\n        widget.model = null;\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25523,10 +25588,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 885,
+                "line": 895,
                 "column": 45
             },
-            "line": 885,
+            "line": 895,
             "code": "      it('should clear the existing selection', async () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(widget.isSelected(widget.widgets[0])).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25540,10 +25605,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 896,
+                "line": 906,
                 "column": 81
             },
-            "line": 896,
+            "line": 906,
             "code": "      it('should insert a new code cell in edit mode after the last selected cell', async () => {\n        const next = widget.widgets[2];\n        widget.select(next);\n        next.model.sharedModel.setSource('a = 1');\n        const count = widget.widgets.length;\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        expect(widget.activeCell).toBeInstanceOf(CodeCell);\n        expect(widget.mode).toBe('edit');\n        expect(widget.widgets.length).toBe(count + 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25557,10 +25622,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 911,
+                "line": 921,
                 "column": 49
             },
-            "line": 911,
+            "line": 921,
             "code": "      it('should allow an undo of the cell insert', async () => {\n        const next = widget.widgets[2];\n        widget.select(next);\n        next.model.sharedModel.setSource('a = 1');\n        const count = widget.widgets.length;\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          sessionContext\n        );\n        expect(result).toBe(true);\n        NotebookActions.undo(widget);\n        expect(widget.widgets.length).toBe(count);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25574,10 +25639,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 925,
+                "line": 935,
                 "column": 54
             },
-            "line": 925,
+            "line": 935,
             "code": "      it('should stop executing code cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.model!.sharedModel.insertCell(\n          widget.widgets.length,\n          { cell_type: 'code' }\n        ) as ISharedCodeCell;\n        widget.select(widget.widgets[widget.widgets.length - 1]);\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          ipySessionContext\n        );\n        await sleep(400);\n        expect(result).toBe(false);\n        expect(cell.execution_count).toBeNull();\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25591,10 +25656,10 @@
                 "#runAndInsert()"
             ],
             "updatePoint": {
-                "line": 941,
+                "line": 951,
                 "column": 54
             },
-            "line": 941,
+            "line": 951,
             "code": "      it('should render all markdown cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.widgets[1] as MarkdownCell;\n        cell.rendered = false;\n        widget.select(cell);\n        const result = await NotebookActions.runAndInsert(\n          widget,\n          ipySessionContext\n        );\n        // Markdown rendering is asynchronous, but the cell\n        // provides no way to hook into that. Sleep here\n        // to make sure it finishes.\n        await sleep(500);\n        expect(result).toBe(false);\n        expect(cell.rendered).toBe(true);\n        expect(widget.activeCellIndex).toBe(2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25608,10 +25673,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 966,
+                "line": 976,
                 "column": 53
             },
-            "line": 966,
+            "line": 976,
             "code": "      it('should run all of the cells in the notebook', async () => {\n        const next = widget.widgets[1] as MarkdownCell;\n        const cell = widget.activeCell as CodeCell;\n        cell.model.outputs.clear();\n        next.rendered = false;\n        const result = await NotebookActions.runAll(widget, sessionContext);\n        expect(result).toBe(true);\n        expect(cell.model.outputs.length).toBeGreaterThan(0);\n        expect(next.rendered).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25625,10 +25690,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 977,
+                "line": 987,
                 "column": 48
             },
-            "line": 977,
+            "line": 987,
             "code": "      it('should be a no-op if there is no model', async () => {\n        widget.model = null;\n        const result = await NotebookActions.runAll(widget, sessionContext);\n        expect(result).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25642,10 +25707,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 983,
+                "line": 993,
                 "column": 39
             },
-            "line": 983,
+            "line": 993,
             "code": "      it('should change to command mode', async () => {\n        widget.mode = 'edit';\n        const result = await NotebookActions.runAll(widget, sessionContext);\n        expect(result).toBe(true);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25659,10 +25724,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 990,
+                "line": 1000,
                 "column": 45
             },
-            "line": 990,
+            "line": 1000,
             "code": "      it('should clear the existing selection', async () => {\n        const next = widget.widgets[2];\n        widget.select(next);\n        const result = await NotebookActions.runAll(widget, sessionContext);\n        expect(result).toBe(true);\n        expect(widget.isSelected(widget.widgets[2])).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25676,10 +25741,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 998,
+                "line": 1008,
                 "column": 39
             },
-            "line": 998,
+            "line": 1008,
             "code": "      it('should activate the last cell', async () => {\n        await NotebookActions.runAll(widget, sessionContext);\n        expect(widget.activeCellIndex).toBe(widget.widgets.length - 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25693,10 +25758,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 1003,
+                "line": 1013,
                 "column": 54
             },
-            "line": 1003,
+            "line": 1013,
             "code": "      it('should stop executing code cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.model!.sharedModel.insertCell(\n          widget.widgets.length,\n          { cell_type: 'code' }\n        ) as ISharedCodeCell;\n        widget.select(widget.widgets[widget.widgets.length - 1]);\n        const result = await NotebookActions.runAll(widget, ipySessionContext);\n        expect(result).toBe(false);\n        expect(cell.execution_count).toBeNull();\n        expect(widget.activeCellIndex).toBe(widget.widgets.length - 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25710,10 +25775,10 @@
                 "#runAll()"
             ],
             "updatePoint": {
-                "line": 1016,
+                "line": 1026,
                 "column": 54
             },
-            "line": 1016,
+            "line": 1026,
             "code": "      it('should render all markdown cells on an error', async () => {\n        widget.activeCell!.model.sharedModel.setSource(ERROR_INPUT);\n        const cell = widget.widgets[1] as MarkdownCell;\n        cell.rendered = false;\n        const result = await NotebookActions.runAll(widget, ipySessionContext);\n        // Markdown rendering is asynchronous, but the cell\n        // provides no way to hook into that. Sleep here\n        // to make sure it finishes.\n        await sleep(400);\n        expect(result).toBe(false);\n        expect(cell.rendered).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25727,10 +25792,10 @@
                 "#selectAbove()"
             ],
             "updatePoint": {
-                "line": 1031,
+                "line": 1041,
                 "column": 54
             },
-            "line": 1031,
+            "line": 1041,
             "code": "      it('should select the cell above the active cell', () => {\n        widget.activeCellIndex = 1;\n        NotebookActions.selectAbove(widget);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25744,10 +25809,10 @@
                 "#selectAbove()"
             ],
             "updatePoint": {
-                "line": 1037,
+                "line": 1047,
                 "column": 48
             },
-            "line": 1037,
+            "line": 1047,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.selectAbove(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25761,10 +25826,10 @@
                 "#selectAbove()"
             ],
             "updatePoint": {
-                "line": 1043,
+                "line": 1053,
                 "column": 46
             },
-            "line": 1043,
+            "line": 1053,
             "code": "      it('should not wrap around to the bottom', () => {\n        NotebookActions.selectAbove(widget);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25778,10 +25843,10 @@
                 "#selectAbove()"
             ],
             "updatePoint": {
-                "line": 1048,
+                "line": 1058,
                 "column": 34
             },
-            "line": 1048,
+            "line": 1058,
             "code": "      it('should preserve the mode', () => {\n        widget.activeCellIndex = 2;\n        NotebookActions.selectAbove(widget);\n        expect(widget.mode).toBe('command');\n        widget.mode = 'edit';\n        NotebookActions.selectAbove(widget);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25795,10 +25860,10 @@
                 "#selectAbove()"
             ],
             "updatePoint": {
-                "line": 1057,
+                "line": 1067,
                 "column": 50
             },
-            "line": 1057,
+            "line": 1067,
             "code": "      it('should skip collapsed cells in edit mode', () => {\n        widget.activeCellIndex = 3;\n        widget.mode = 'edit';\n        widget.widgets[1].inputHidden = true;\n        widget.widgets[2].inputHidden = true;\n        widget.widgets[3].inputHidden = false;\n        NotebookActions.selectAbove(widget);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25812,10 +25877,10 @@
                 "#selectBelow()"
             ],
             "updatePoint": {
-                "line": 1069,
+                "line": 1079,
                 "column": 54
             },
-            "line": 1069,
+            "line": 1079,
             "code": "      it('should select the cell below the active cell', () => {\n        NotebookActions.selectBelow(widget);\n        expect(widget.activeCellIndex).toBe(1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25829,10 +25894,10 @@
                 "#selectBelow()"
             ],
             "updatePoint": {
-                "line": 1074,
+                "line": 1084,
                 "column": 48
             },
-            "line": 1074,
+            "line": 1084,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.selectBelow(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25846,10 +25911,10 @@
                 "#selectBelow()"
             ],
             "updatePoint": {
-                "line": 1080,
+                "line": 1090,
                 "column": 43
             },
-            "line": 1080,
+            "line": 1090,
             "code": "      it('should not wrap around to the top', () => {\n        widget.activeCellIndex = widget.widgets.length - 1;\n        NotebookActions.selectBelow(widget);\n        expect(widget.activeCellIndex).not.toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25863,10 +25928,10 @@
                 "#selectBelow()"
             ],
             "updatePoint": {
-                "line": 1086,
+                "line": 1096,
                 "column": 34
             },
-            "line": 1086,
+            "line": 1096,
             "code": "      it('should preserve the mode', () => {\n        widget.activeCellIndex = 2;\n        NotebookActions.selectBelow(widget);\n        expect(widget.mode).toBe('command');\n        widget.mode = 'edit';\n        NotebookActions.selectBelow(widget);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25880,10 +25945,10 @@
                 "#selectBelow()"
             ],
             "updatePoint": {
-                "line": 1095,
+                "line": 1105,
                 "column": 76
             },
-            "line": 1095,
+            "line": 1105,
             "code": "      it('should not change if in edit mode and no non-collapsed cells below', () => {\n        widget.activeCellIndex = widget.widgets.length - 2;\n        widget.mode = 'edit';\n        widget.widgets[widget.widgets.length - 1].inputHidden = true;\n        NotebookActions.selectBelow(widget);\n        expect(widget.activeCellIndex).toBe(widget.widgets.length - 2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25897,10 +25962,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1105,
+                "line": 1115,
                 "column": 55
             },
-            "line": 1105,
+            "line": 1115,
             "code": "      it('should extend the selection to the cell above', () => {\n        widget.activeCellIndex = 1;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.isSelected(widget.widgets[0])).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25914,10 +25979,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1111,
+                "line": 1121,
                 "column": 57
             },
-            "line": 1111,
+            "line": 1121,
             "code": "      it('should extend the selection to the topmost cell', () => {\n        widget.activeCellIndex = 1;\n        NotebookActions.extendSelectionAbove(widget, true);\n        for (let i = widget.activeCellIndex; i >= 0; i--) {\n          expect(widget.isSelected(widget.widgets[i])).toBe(true);\n        }\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25931,10 +25996,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1119,
+                "line": 1129,
                 "column": 48
             },
-            "line": 1119,
+            "line": 1129,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25948,10 +26013,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1125,
+                "line": 1135,
                 "column": 63
             },
-            "line": 1125,
+            "line": 1135,
             "code": "      it('should change to command mode if there is a selection', () => {\n        widget.mode = 'edit';\n        widget.activeCellIndex = 1;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25965,10 +26030,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1132,
+                "line": 1142,
                 "column": 46
             },
-            "line": 1132,
+            "line": 1142,
             "code": "      it('should not wrap around to the bottom', () => {\n        widget.mode = 'edit';\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.activeCellIndex).toBe(0);\n        const last = widget.widgets[widget.widgets.length - 1];\n        expect(widget.isSelected(last)).toBe(false);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25982,10 +26047,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1141,
+                "line": 1151,
                 "column": 72
             },
-            "line": 1141,
+            "line": 1151,
             "code": "      it('should deselect the current cell if the cell above is selected', () => {\n        NotebookActions.extendSelectionBelow(widget);\n        NotebookActions.extendSelectionBelow(widget);\n        const cell = widget.activeCell!;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.isSelected(cell)).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -25999,10 +26064,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1149,
+                "line": 1159,
                 "column": 79
             },
-            "line": 1149,
+            "line": 1159,
             "code": "      it('should select only the first cell if we move from the second to first', () => {\n        NotebookActions.extendSelectionBelow(widget);\n        const cell = widget.activeCell!;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.isSelected(cell)).toBe(false);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26016,10 +26081,10 @@
                 "#extendSelectionAbove()"
             ],
             "updatePoint": {
-                "line": 1157,
+                "line": 1167,
                 "column": 34
             },
-            "line": 1157,
+            "line": 1167,
             "code": "      it('should activate the cell', () => {\n        widget.activeCellIndex = 1;\n        NotebookActions.extendSelectionAbove(widget);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26033,10 +26098,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1165,
+                "line": 1175,
                 "column": 55
             },
-            "line": 1165,
+            "line": 1175,
             "code": "      it('should extend the selection to the cell below', () => {\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.isSelected(widget.widgets[0])).toBe(true);\n        expect(widget.isSelected(widget.widgets[1])).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26050,10 +26115,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1171,
+                "line": 1181,
                 "column": 58
             },
-            "line": 1171,
+            "line": 1181,
             "code": "      it('should extend the selection the bottom-most cell', () => {\n        NotebookActions.extendSelectionBelow(widget, true);\n        for (let i = widget.activeCellIndex; i < widget.widgets.length; i++) {\n          expect(widget.isSelected(widget.widgets[i])).toBe(true);\n        }\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26067,10 +26132,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1177,
+                "line": 1187,
                 "column": 48
             },
-            "line": 1177,
+            "line": 1187,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26084,10 +26149,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1183,
+                "line": 1193,
                 "column": 63
             },
-            "line": 1183,
+            "line": 1193,
             "code": "      it('should change to command mode if there is a selection', () => {\n        widget.mode = 'edit';\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26101,10 +26166,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1189,
+                "line": 1199,
                 "column": 43
             },
-            "line": 1189,
+            "line": 1199,
             "code": "      it('should not wrap around to the top', () => {\n        const last = widget.widgets.length - 1;\n        widget.activeCellIndex = last;\n        widget.mode = 'edit';\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.activeCellIndex).toBe(last);\n        expect(widget.isSelected(widget.widgets[0])).toBe(false);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26118,10 +26183,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1199,
+                "line": 1209,
                 "column": 72
             },
-            "line": 1199,
+            "line": 1209,
             "code": "      it('should deselect the current cell if the cell below is selected', () => {\n        const last = widget.widgets.length - 1;\n        widget.activeCellIndex = last;\n        NotebookActions.extendSelectionAbove(widget);\n        NotebookActions.extendSelectionAbove(widget);\n        const current = widget.activeCell!;\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.isSelected(current)).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26135,10 +26200,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1209,
+                "line": 1219,
                 "column": 82
             },
-            "line": 1209,
+            "line": 1219,
             "code": "      it('should select only the last cell if we move from the second last to last', () => {\n        const last = widget.widgets.length - 1;\n        widget.activeCellIndex = last;\n        NotebookActions.extendSelectionAbove(widget);\n        const current = widget.activeCell!;\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.isSelected(current)).toBe(false);\n        expect(widget.activeCellIndex).toBe(last);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26152,10 +26217,10 @@
                 "#extendSelectionBelow()"
             ],
             "updatePoint": {
-                "line": 1219,
+                "line": 1229,
                 "column": 34
             },
-            "line": 1219,
+            "line": 1229,
             "code": "      it('should activate the cell', () => {\n        NotebookActions.extendSelectionBelow(widget);\n        expect(widget.activeCellIndex).toBe(1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26169,10 +26234,10 @@
                 "#moveUp()"
             ],
             "updatePoint": {
-                "line": 1226,
+                "line": 1236,
                 "column": 43
             },
-            "line": 1226,
+            "line": 1236,
             "code": "      it('should move the selected cells up', () => {\n        widget.activeCellIndex = 2;\n        NotebookActions.extendSelectionAbove(widget);\n        NotebookActions.moveUp(widget);\n        expect(widget.isSelected(widget.widgets[0])).toBe(true);\n        expect(widget.isSelected(widget.widgets[1])).toBe(true);\n        expect(widget.isSelected(widget.widgets[2])).toBe(false);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26186,10 +26251,10 @@
                 "#moveUp()"
             ],
             "updatePoint": {
-                "line": 1236,
+                "line": 1246,
                 "column": 38
             },
-            "line": 1236,
+            "line": 1246,
             "code": "      it('should move the last cell up', () => {\n        const lastIndex = widget.model!.cells.length - 1;\n        widget.activeCellIndex = lastIndex;\n        NotebookActions.moveUp(widget);\n        expect(widget.activeCellIndex).toBe(lastIndex - 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26203,10 +26268,10 @@
                 "#moveUp()"
             ],
             "updatePoint": {
-                "line": 1243,
+                "line": 1253,
                 "column": 48
             },
-            "line": 1243,
+            "line": 1253,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.moveUp(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26220,10 +26285,10 @@
                 "#moveUp()"
             ],
             "updatePoint": {
-                "line": 1249,
+                "line": 1259,
                 "column": 46
             },
-            "line": 1249,
+            "line": 1259,
             "code": "      it('should not wrap around to the bottom', () => {\n        expect(widget.activeCellIndex).toBe(0);\n        NotebookActions.moveUp(widget);\n        expect(widget.activeCellIndex).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26237,10 +26302,10 @@
                 "#moveUp()"
             ],
             "updatePoint": {
-                "line": 1255,
+                "line": 1265,
                 "column": 29
             },
-            "line": 1255,
+            "line": 1265,
             "code": "      it('should be undo-able', () => {\n        widget.activeCellIndex++;\n        const source = widget.activeCell!.model.sharedModel.getSource();\n        NotebookActions.moveUp(widget);\n        expect(widget.model!.cells.get(0).sharedModel.getSource()).toBe(source);\n        NotebookActions.undo(widget);\n        expect(widget.model!.cells.get(1).sharedModel.getSource()).toBe(source);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26254,10 +26319,10 @@
                 "#moveDown()"
             ],
             "updatePoint": {
-                "line": 1266,
+                "line": 1276,
                 "column": 45
             },
-            "line": 1266,
+            "line": 1276,
             "code": "      it('should move the selected cells down', () => {\n        NotebookActions.extendSelectionBelow(widget);\n        NotebookActions.moveDown(widget);\n        expect(widget.isSelected(widget.widgets[0])).toBe(false);\n        expect(widget.isSelected(widget.widgets[1])).toBe(true);\n        expect(widget.isSelected(widget.widgets[2])).toBe(true);\n        expect(widget.activeCellIndex).toBe(2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26271,10 +26336,10 @@
                 "#moveDown()"
             ],
             "updatePoint": {
-                "line": 1275,
+                "line": 1285,
                 "column": 48
             },
-            "line": 1275,
+            "line": 1285,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.moveUp(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26288,10 +26353,10 @@
                 "#moveDown()"
             ],
             "updatePoint": {
-                "line": 1281,
+                "line": 1291,
                 "column": 43
             },
-            "line": 1281,
+            "line": 1291,
             "code": "      it('should not wrap around to the top', () => {\n        widget.activeCellIndex = widget.widgets.length - 1;\n        NotebookActions.moveDown(widget);\n        expect(widget.activeCellIndex).toBe(widget.widgets.length - 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26305,10 +26370,10 @@
                 "#moveDown()"
             ],
             "updatePoint": {
-                "line": 1287,
+                "line": 1297,
                 "column": 29
             },
-            "line": 1287,
+            "line": 1297,
             "code": "      it('should be undo-able', () => {\n        const source = widget.activeCell!.model.sharedModel.getSource();\n        NotebookActions.moveDown(widget);\n        expect(widget.model!.cells.get(1).sharedModel.getSource()).toBe(source);\n        NotebookActions.undo(widget);\n        expect(widget.model!.cells.get(0).sharedModel.getSource()).toBe(source);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26322,10 +26387,10 @@
                 "#copy()"
             ],
             "updatePoint": {
-                "line": 1297,
+                "line": 1307,
                 "column": 61
             },
-            "line": 1297,
+            "line": 1307,
             "code": "      it('should copy the selected cells to a utils.clipboard', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        NotebookActions.copy(widget);\n        expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(true);\n        const data = utils.clipboard.getData(JUPYTER_CELL_MIME);\n        expect(data.length).toBe(2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26339,10 +26404,10 @@
                 "#copy()"
             ],
             "updatePoint": {
-                "line": 1306,
+                "line": 1316,
                 "column": 48
             },
-            "line": 1306,
+            "line": 1316,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.copy(widget);\n        expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26356,10 +26421,10 @@
                 "#copy()"
             ],
             "updatePoint": {
-                "line": 1312,
+                "line": 1322,
                 "column": 39
             },
-            "line": 1312,
+            "line": 1322,
             "code": "      it('should change to command mode', () => {\n        widget.mode = 'edit';\n        NotebookActions.copy(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26373,10 +26438,10 @@
                 "#copy()"
             ],
             "updatePoint": {
-                "line": 1318,
+                "line": 1328,
                 "column": 42
             },
-            "line": 1318,
+            "line": 1328,
             "code": "      it('should delete metadata.deletable', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        next.model.setMetadata('deletable', false);\n        NotebookActions.copy(widget);\n        const data = utils.clipboard.getData(JUPYTER_CELL_MIME) as JSONArray;\n        data.map(cell => {\n          expect(\n            ((cell as JSONObject).metadata as JSONObject).deletable\n          ).toBeUndefined();\n        });\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26390,10 +26455,10 @@
                 "#cut()"
             ],
             "updatePoint": {
-                "line": 1333,
+                "line": 1343,
                 "column": 60
             },
-            "line": 1333,
+            "line": 1343,
             "code": "      it('should cut the selected cells to a utils.clipboard', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        const count = widget.widgets.length;\n        NotebookActions.cut(widget);\n        expect(widget.widgets.length).toBe(count - 2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26407,10 +26472,10 @@
                 "#cut()"
             ],
             "updatePoint": {
-                "line": 1341,
+                "line": 1351,
                 "column": 48
             },
-            "line": 1341,
+            "line": 1351,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.cut(widget);\n        expect(utils.clipboard.hasData(JUPYTER_CELL_MIME)).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26424,10 +26489,10 @@
                 "#cut()"
             ],
             "updatePoint": {
-                "line": 1347,
+                "line": 1357,
                 "column": 39
             },
-            "line": 1347,
+            "line": 1357,
             "code": "      it('should change to command mode', () => {\n        widget.mode = 'edit';\n        NotebookActions.cut(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26441,10 +26506,10 @@
                 "#cut()"
             ],
             "updatePoint": {
-                "line": 1353,
+                "line": 1363,
                 "column": 29
             },
-            "line": 1353,
+            "line": 1363,
             "code": "      it('should be undo-able', () => {\n        const source = widget.activeCell!.model.sharedModel.getSource();\n        NotebookActions.cut(widget);\n        NotebookActions.undo(widget);\n        expect(widget.widgets[0].model.sharedModel.getSource()).toBe(source);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26458,10 +26523,10 @@
                 "#cut()"
             ],
             "updatePoint": {
-                "line": 1360,
+                "line": 1370,
                 "column": 58
             },
-            "line": 1360,
+            "line": 1370,
             "code": "      it('should add a new code cell if all cells were cut', async () => {\n        for (let i = 0; i < widget.widgets.length; i++) {\n          widget.select(widget.widgets[i]);\n        }\n        NotebookActions.cut(widget);\n        await sleep();\n        expect(widget.widgets.length).toBe(1);\n        expect(widget.activeCell).toBeInstanceOf(CodeCell);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26475,10 +26540,10 @@
                 "#paste()"
             ],
             "updatePoint": {
-                "line": 1372,
+                "line": 1382,
                 "column": 51
             },
-            "line": 1372,
+            "line": 1382,
             "code": "      it('should paste cells from a utils.clipboard', () => {\n        const source = widget.activeCell!.model.sharedModel.getSource();\n        const next = widget.widgets[1];\n        widget.select(next);\n        const count = widget.widgets.length;\n        NotebookActions.cut(widget);\n        widget.activeCellIndex = 1;\n        NotebookActions.paste(widget);\n        expect(widget.widgets.length).toBe(count);\n        expect(widget.widgets[2].model.sharedModel.getSource()).toBe(source);\n        expect(widget.activeCellIndex).toBe(3);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26492,10 +26557,10 @@
                 "#paste()"
             ],
             "updatePoint": {
-                "line": 1385,
+                "line": 1395,
                 "column": 48
             },
-            "line": 1385,
+            "line": 1395,
             "code": "      it('should be a no-op if there is no model', () => {\n        NotebookActions.copy(widget);\n        widget.model = null;\n        NotebookActions.paste(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26509,10 +26574,10 @@
                 "#paste()"
             ],
             "updatePoint": {
-                "line": 1392,
+                "line": 1402,
                 "column": 75
             },
-            "line": 1392,
+            "line": 1402,
             "code": "      it('should be a no-op if there is no cell data on the utils.clipboard', () => {\n        const count = widget.widgets.length;\n        NotebookActions.paste(widget);\n        expect(widget.widgets.length).toBe(count);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26526,10 +26591,10 @@
                 "#paste()"
             ],
             "updatePoint": {
-                "line": 1398,
+                "line": 1408,
                 "column": 39
             },
-            "line": 1398,
+            "line": 1408,
             "code": "      it('should change to command mode', () => {\n        widget.mode = 'edit';\n        NotebookActions.cut(widget);\n        NotebookActions.paste(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26543,10 +26608,10 @@
                 "#paste()"
             ],
             "updatePoint": {
-                "line": 1405,
+                "line": 1415,
                 "column": 29
             },
-            "line": 1405,
+            "line": 1415,
             "code": "      it('should be undo-able', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        const count = widget.widgets.length;\n        NotebookActions.cut(widget);\n        widget.activeCellIndex = 1;\n        widget.model?.sharedModel.clearUndoHistory();\n        NotebookActions.paste(widget);\n        NotebookActions.undo(widget);\n        expect(widget.widgets.length).toBe(count - 2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26560,10 +26625,10 @@
                 "#undo()"
             ],
             "updatePoint": {
-                "line": 1419,
+                "line": 1429,
                 "column": 35
             },
-            "line": 1419,
+            "line": 1429,
             "code": "      it('should undo a cell action', () => {\n        const count = widget.widgets.length;\n        const next = widget.widgets[1];\n        widget.select(next);\n        NotebookActions.deleteCells(widget);\n        NotebookActions.undo(widget);\n        expect(widget.widgets.length).toBe(count);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26577,10 +26642,10 @@
                 "#undo()"
             ],
             "updatePoint": {
-                "line": 1428,
+                "line": 1438,
                 "column": 50
             },
-            "line": 1428,
+            "line": 1438,
             "code": "      it('should switch the widget to command mode', () => {\n        widget.mode = 'edit';\n        NotebookActions.undo(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26594,10 +26659,10 @@
                 "#undo()"
             ],
             "updatePoint": {
-                "line": 1434,
+                "line": 1444,
                 "column": 48
             },
-            "line": 1434,
+            "line": 1444,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.undo(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26611,10 +26676,10 @@
                 "#undo()"
             ],
             "updatePoint": {
-                "line": 1440,
+                "line": 1450,
                 "column": 64
             },
-            "line": 1440,
+            "line": 1450,
             "code": "      it('should be a no-op if there are no cell actions to undo', () => {\n        const count = widget.widgets.length;\n        NotebookActions.deleteCells(widget);\n        widget.model!.sharedModel.clearUndoHistory();\n        NotebookActions.undo(widget);\n        expect(widget.widgets.length).toBe(count - 1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26628,10 +26693,10 @@
                 "#redo()"
             ],
             "updatePoint": {
-                "line": 1450,
+                "line": 1460,
                 "column": 35
             },
-            "line": 1450,
+            "line": 1460,
             "code": "      it('should redo a cell action', () => {\n        const count = widget.widgets.length;\n        const next = widget.widgets[1];\n        widget.select(next);\n        NotebookActions.deleteCells(widget);\n        NotebookActions.undo(widget);\n        NotebookActions.redo(widget);\n        expect(widget.widgets.length).toBe(count - 2);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26645,10 +26710,10 @@
                 "#redo()"
             ],
             "updatePoint": {
-                "line": 1460,
+                "line": 1470,
                 "column": 50
             },
-            "line": 1460,
+            "line": 1470,
             "code": "      it('should switch the widget to command mode', () => {\n        NotebookActions.undo(widget);\n        widget.mode = 'edit';\n        NotebookActions.redo(widget);\n        expect(widget.mode).toBe('command');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26662,10 +26727,10 @@
                 "#redo()"
             ],
             "updatePoint": {
-                "line": 1467,
+                "line": 1477,
                 "column": 48
             },
-            "line": 1467,
+            "line": 1477,
             "code": "      it('should be a no-op if there is no model', () => {\n        NotebookActions.undo(widget);\n        widget.model = null;\n        NotebookActions.redo(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26679,10 +26744,10 @@
                 "#redo()"
             ],
             "updatePoint": {
-                "line": 1474,
+                "line": 1484,
                 "column": 64
             },
-            "line": 1474,
+            "line": 1484,
             "code": "      it('should be a no-op if there are no cell actions to redo', () => {\n        const count = widget.widgets.length;\n        NotebookActions.redo(widget);\n        expect(widget.widgets.length).toBe(count);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26696,10 +26761,10 @@
                 "#toggleAllLineNumbers()"
             ],
             "updatePoint": {
-                "line": 1482,
+                "line": 1492,
                 "column": 49
             },
-            "line": 1482,
+            "line": 1492,
             "code": "      it('should toggle line numbers on all cells', () => {\n        const state = widget.activeCell!.editor!.getOption('lineNumbers');\n        NotebookActions.toggleAllLineNumbers(widget);\n        for (let i = 0; i < widget.widgets.length; i++) {\n          const lineNumbers =\n            widget.widgets[i].editor!.getOption('lineNumbers');\n          expect(lineNumbers).toBe(!state);\n        }\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26713,10 +26778,10 @@
                 "#toggleAllLineNumbers()"
             ],
             "updatePoint": {
-                "line": 1492,
+                "line": 1502,
                 "column": 57
             },
-            "line": 1492,
+            "line": 1502,
             "code": "      it('should be based on the state of the active cell', () => {\n        const state = widget.activeCell!.editor!.getOption('lineNumbers');\n        for (let i = 1; i < widget.widgets.length; i++) {\n          widget.widgets[i].editor!.setOption('lineNumbers', !state);\n        }\n        NotebookActions.toggleAllLineNumbers(widget);\n        for (let i = 0; i < widget.widgets.length; i++) {\n          const lineNumbers =\n            widget.widgets[i].editor!.getOption('lineNumbers');\n          expect(lineNumbers).toBe(!state);\n        }\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26730,10 +26795,10 @@
                 "#toggleAllLineNumbers()"
             ],
             "updatePoint": {
-                "line": 1505,
+                "line": 1515,
                 "column": 41
             },
-            "line": 1505,
+            "line": 1515,
             "code": "      it('should preserve the widget mode', () => {\n        NotebookActions.toggleAllLineNumbers(widget);\n        expect(widget.mode).toBe('command');\n        widget.mode = 'edit';\n        NotebookActions.toggleAllLineNumbers(widget);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26747,10 +26812,10 @@
                 "#toggleAllLineNumbers()"
             ],
             "updatePoint": {
-                "line": 1513,
+                "line": 1523,
                 "column": 48
             },
-            "line": 1513,
+            "line": 1523,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.toggleAllLineNumbers(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26764,10 +26829,10 @@
                 "#clearOutputs()"
             ],
             "updatePoint": {
-                "line": 1521,
+                "line": 1531,
                 "column": 56
             },
-            "line": 1521,
+            "line": 1531,
             "code": "      it('should clear the outputs on the selected cells', () => {\n        // Select the next code cell that has outputs.\n        let index = 0;\n        for (let i = 1; i < widget.widgets.length; i++) {\n          const cell = widget.widgets[i];\n          if (cell instanceof CodeCell && cell.model.outputs.length) {\n            widget.select(cell);\n            index = i;\n            break;\n          }\n        }\n        NotebookActions.clearOutputs(widget);\n        let cell = widget.widgets[0] as CodeCell;\n        expect(cell.model.outputs.length).toBe(0);\n        cell = widget.widgets[index] as CodeCell;\n        expect(cell.model.outputs.length).toBe(0);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26781,10 +26846,10 @@
                 "#clearOutputs()"
             ],
             "updatePoint": {
-                "line": 1539,
+                "line": 1549,
                 "column": 41
             },
-            "line": 1539,
+            "line": 1549,
             "code": "      it('should preserve the widget mode', () => {\n        NotebookActions.clearOutputs(widget);\n        expect(widget.mode).toBe('command');\n        widget.mode = 'edit';\n        NotebookActions.clearOutputs(widget);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26798,10 +26863,10 @@
                 "#clearOutputs()"
             ],
             "updatePoint": {
-                "line": 1547,
+                "line": 1557,
                 "column": 48
             },
-            "line": 1547,
+            "line": 1557,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.clearOutputs(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26815,10 +26880,10 @@
                 "#clearAllOutputs()"
             ],
             "updatePoint": {
-                "line": 1555,
+                "line": 1565,
                 "column": 47
             },
-            "line": 1555,
+            "line": 1565,
             "code": "      it('should clear the outputs on all cells', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        NotebookActions.clearAllOutputs(widget);\n        for (let i = 0; i < widget.widgets.length; i++) {\n          const cell = widget.widgets[i];\n          if (cell instanceof CodeCell) {\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(cell.model.outputs.length).toBe(0);\n          }\n        }\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26832,10 +26897,10 @@
                 "#clearAllOutputs()"
             ],
             "updatePoint": {
-                "line": 1568,
+                "line": 1578,
                 "column": 41
             },
-            "line": 1568,
+            "line": 1578,
             "code": "      it('should preserve the widget mode', () => {\n        NotebookActions.clearAllOutputs(widget);\n        expect(widget.mode).toBe('command');\n        widget.mode = 'edit';\n        NotebookActions.clearAllOutputs(widget);\n        expect(widget.mode).toBe('edit');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26849,10 +26914,10 @@
                 "#clearAllOutputs()"
             ],
             "updatePoint": {
-                "line": 1576,
+                "line": 1586,
                 "column": 48
             },
-            "line": 1576,
+            "line": 1586,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.clearAllOutputs(widget);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26866,10 +26931,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1584,
+                "line": 1594,
                 "column": 64
             },
-            "line": 1584,
+            "line": 1594,
             "code": "      it('should set the markdown header level of selected cells', () => {\n        const next = widget.widgets[1];\n        widget.select(next);\n        NotebookActions.setMarkdownHeader(widget, 2);\n        expect(\n          widget.activeCell!.model.sharedModel.getSource().slice(0, 3)\n        ).toBe('## ');\n        expect(next.model.sharedModel.getSource().slice(0, 3)).toBe('## ');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26883,10 +26948,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1594,
+                "line": 1604,
                 "column": 51
             },
-            "line": 1594,
+            "line": 1604,
             "code": "      it('should convert the cells to markdown type', () => {\n        NotebookActions.setMarkdownHeader(widget, 2);\n        expect(widget.activeCell).toBeInstanceOf(MarkdownCell);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26900,10 +26965,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1599,
+                "line": 1609,
                 "column": 43
             },
-            "line": 1599,
+            "line": 1609,
             "code": "      it('should be clamped between 1 and 6', () => {\n        NotebookActions.setMarkdownHeader(widget, -1);\n        expect(\n          widget.activeCell!.model.sharedModel.getSource().slice(0, 2)\n        ).toBe('# ');\n        NotebookActions.setMarkdownHeader(widget, 10);\n        expect(\n          widget.activeCell!.model.sharedModel.getSource().slice(0, 7)\n        ).toBe('###### ');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26917,10 +26982,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1610,
+                "line": 1620,
                 "column": 48
             },
-            "line": 1610,
+            "line": 1620,
             "code": "      it('should be a no-op if there is no model', () => {\n        widget.model = null;\n        NotebookActions.setMarkdownHeader(widget, 1);\n        expect(widget.activeCellIndex).toBe(-1);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26934,10 +26999,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1616,
+                "line": 1626,
                 "column": 43
             },
-            "line": 1616,
+            "line": 1626,
             "code": "      it('should replace an existing header', () => {\n        widget.activeCell!.model.sharedModel.setSource('# foo');\n        NotebookActions.setMarkdownHeader(widget, 2);\n        expect(widget.activeCell!.model.sharedModel.getSource()).toBe('## foo');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26951,10 +27016,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1622,
+                "line": 1632,
                 "column": 44
             },
-            "line": 1622,
+            "line": 1632,
             "code": "      it('should replace leading white space', () => {\n        widget.activeCell!.model.sharedModel.setSource('      foo');\n        NotebookActions.setMarkdownHeader(widget, 2);\n        expect(widget.activeCell!.model.sharedModel.getSource()).toBe('## foo');\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26968,10 +27033,10 @@
                 "#setMarkdownHeader()"
             ],
             "updatePoint": {
-                "line": 1628,
+                "line": 1638,
                 "column": 35
             },
-            "line": 1628,
+            "line": 1638,
             "code": "      it('should unrender the cells', () => {\n        NotebookActions.setMarkdownHeader(widget, 1);\n        expect((widget.activeCell as MarkdownCell).rendered).toBe(false);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -26985,10 +27050,10 @@
                 "#trust()"
             ],
             "updatePoint": {
-                "line": 1635,
+                "line": 1645,
                 "column": 61
             },
-            "line": 1635,
+            "line": 1645,
             "code": "      it('should trust the notebook cells if the user accepts', async () => {\n        const model = widget.model!;\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        const cell = model.cells.get(0);\n        expect(cell.trusted).not.toBe(true);\n        const promise = NotebookActions.trust(widget);\n        await acceptDialog();\n        await promise;\n        expect(cell.trusted).toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -27002,10 +27067,10 @@
                 "#trust()"
             ],
             "updatePoint": {
-                "line": 1646,
+                "line": 1656,
                 "column": 64
             },
-            "line": 1646,
+            "line": 1656,
             "code": "      it('should not trust the notebook cells if the user aborts', async () => {\n        const model = widget.model!;\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        const cell = model.cells.get(0);\n        expect(cell.trusted).not.toBe(true);\n        const promise = NotebookActions.trust(widget);\n        await dismissDialog();\n        await promise;\n        expect(cell.trusted).not.toBe(true);\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -27019,10 +27084,10 @@
                 "#trust()"
             ],
             "updatePoint": {
-                "line": 1657,
+                "line": 1667,
                 "column": 50
             },
-            "line": 1657,
+            "line": 1667,
             "code": "      it('should be a no-op if the model is `null`', async () => {\n        widget.model = null;\n        await expect(NotebookActions.trust(widget)).resolves.not.toThrow();\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
@@ -27036,10 +27101,10 @@
                 "#trust()"
             ],
             "updatePoint": {
-                "line": 1662,
+                "line": 1672,
                 "column": 55
             },
-            "line": 1662,
+            "line": 1672,
             "code": "      it('should show a dialog if all cells are trusted', async () => {\n        const model = widget.model!;\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        model.fromJSON(utils.DEFAULT_CONTENT);\n        for (let i = 0; i < model.cells.length; i++) {\n          const cell = model.cells.get(i);\n          cell.trusted = true;\n        }\n        const promise = NotebookActions.trust(widget);\n        await acceptDialog();\n        await expect(promise).resolves.not.toThrow();\n      });",
             "file": "actions.spec.ts",
             "skipped": false,
