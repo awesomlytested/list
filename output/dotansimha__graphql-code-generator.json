@@ -7467,7 +7467,7 @@
                 "column": 38
             },
             "line": 205,
-            "code": "    it('Should work with enum as const', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A_B_C\n          X_Y_Z\n          _TEST\n          My_Value\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsConst: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export const MyEnum = {\n        ABC: 'A_B_C',\n        XYZ: 'X_Y_Z',\n        Test: '_TEST',\n        MyValue: 'My_Value'\n      } as const;\n      export type MyEnum = typeof MyEnum[keyof typeof MyEnum];`);\n    });",
+            "code": "    it('Should work with enum as const', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A_B_C\n          X_Y_Z\n          _TEST\n          My_Value\n          _123\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsConst: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export const MyEnum = {\n        ABC: 'A_B_C',\n        XYZ: 'X_Y_Z',\n        Test: '_TEST',\n        MyValue: 'My_Value',\n        '123': '_123'\n      } as const;\n      export type MyEnum = typeof MyEnum[keyof typeof MyEnum];`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/typescript/tests"
@@ -7479,10 +7479,10 @@
                 "description to comment"
             ],
             "updatePoint": {
-                "line": 231,
+                "line": 233,
                 "column": 64
             },
-            "line": 231,
+            "line": 233,
             "code": "    it('Should work with enum as const combined with enum values', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A_B_C\n          X_Y_Z\n          _TEST\n          My_Value\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          enumsAsConst: true,\n          enumValues: {\n            MyEnum: {\n              A_B_C: 0,\n              X_Y_Z: 'Foo',\n              _TEST: 'Bar',\n              My_Value: 1,\n            },\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export const MyEnum = {\n        ABC: 0,\n        XYZ: 'Foo',\n        Test: 'Bar',\n        MyValue: 1\n      } as const;\n      export type MyEnum = typeof MyEnum[keyof typeof MyEnum];`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7495,10 +7495,10 @@
                 "description to comment"
             ],
             "updatePoint": {
-                "line": 267,
+                "line": 269,
                 "column": 60
             },
-            "line": 267,
+            "line": 269,
             "code": "    it('Should work with enum and enum values (enumsAsTypes)', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"custom enum\"\n        enum MyEnum {\n          \"this is a\"\n          A\n          \"this is b\"\n          B\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      /** custom enum */\n      export type MyEnum =\n        /** this is a */\n        | 'A'\n        /** this is b */\n        | 'B';`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7511,10 +7511,10 @@
                 "description to comment"
             ],
             "updatePoint": {
-                "line": 293,
+                "line": 295,
                 "column": 35
             },
-            "line": 293,
+            "line": 295,
             "code": "    it('Should work with directives', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"My custom directive\"\n        directive @AsNumber on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n      `);\n      const result = await plugin(\n        schema,\n        [],\n        { directiveArgumentAndInputFieldMappings: { AsNumber: 'number' } },\n        { outputFile: '' }\n      );\n\n      expect(result.content).toBeSimilarStringTo(`\n      /** Type overrides using directives */\n      export type DirectiveArgumentAndInputFieldMappings = {\n        /** My custom directive */\n        AsNumber: number;\n      };\n      `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7527,10 +7527,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 316,
+                "line": 318,
                 "column": 57
             },
-            "line": 316,
+            "line": 318,
             "code": "    it('Should not include a description for Scalars type', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"My custom scalar\"\n        scalar A\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n          ID: string;\n          String: string;\n          Boolean: boolean;\n          Int: number;\n          Float: number;\n          A: any;\n        };\n      `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7543,10 +7543,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 335,
+                "line": 337,
                 "column": 50
             },
-            "line": 335,
+            "line": 337,
             "code": "    it('Should not add description for input types', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"MyInput\"\n        input MyInput {\n          f: String\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7559,10 +7559,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 348,
+                "line": 350,
                 "column": 51
             },
-            "line": 348,
+            "line": 350,
             "code": "    it('Should not add description for input fields', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"MyInput\"\n        input MyInput {\n          \"f is something\"\n          f: String!\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          f: Scalars['String'];\n        }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7575,10 +7575,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 364,
+                "line": 366,
                 "column": 39
             },
-            "line": 364,
+            "line": 366,
             "code": "    it('Should remove multiline comment', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"\"\"\n        MyInput\n        multiline\n        \"\"\"\n        input MyInput {\n          f: String!\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7591,10 +7591,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 380,
+                "line": 382,
                 "column": 31
             },
-            "line": 380,
+            "line": 382,
             "code": "    it('Should work with unions', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"my union\"\n        union A = B | C\n\n        type B {\n          id: ID\n        }\n        type C {\n          id: ID\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type A = `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7607,10 +7607,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 398,
+                "line": 400,
                 "column": 30
             },
-            "line": 398,
+            "line": 400,
             "code": "    it('Should work with types', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"this is b\"\n        type B {\n          id: ID\n        }\n        \"this is c\"\n        type C {\n          id: ID\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type B = `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type C = `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7623,10 +7623,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 418,
+                "line": 420,
                 "column": 36
             },
-            "line": 418,
+            "line": 420,
             "code": "    it('Should work with type fields', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        type B {\n          \"the id\"\n          id: ID\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type B = {\n        __typename?: 'B';\n        id?: Maybe<Scalars['ID']>;\n      };`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7639,10 +7639,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 434,
+                "line": 436,
                 "column": 53
             },
-            "line": 434,
+            "line": 436,
             "code": "    it('Should work with inteface and inteface fields', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        interface Node {\n          \"the id\"\n          id: ID!\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Node = {\n        id: Scalars['ID'];\n      };`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7655,10 +7655,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 449,
+                "line": 451,
                 "column": 45
             },
-            "line": 449,
+            "line": 451,
             "code": "    it('Should work with enum and enum values', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"custom enum\"\n        enum MyEnum {\n          \"this is a\"\n          A\n          \"this is b\"\n          B\n        }\n      `);\n      const result = await plugin(schema, [], { disableDescriptions: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export enum MyEnum {\n        A = 'A',\n        B = 'B'\n      }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7671,10 +7671,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 468,
+                "line": 470,
                 "column": 60
             },
-            "line": 468,
+            "line": 470,
             "code": "    it('Should work with enum and enum values (enumsAsTypes)', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"custom enum\"\n        enum MyEnum {\n          \"this is a\"\n          A\n          \"this is b\"\n          B\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsTypes: true, disableDescriptions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyEnum =\n        | 'A'\n        | 'B';`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7687,10 +7687,10 @@
                 "disable comment generation"
             ],
             "updatePoint": {
-                "line": 491,
+                "line": 493,
                 "column": 44
             },
-            "line": 491,
+            "line": 493,
             "code": "    it('Should not work when config is false', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        \"custom enum\"\n        enum MyEnum {\n          \"this is a\"\n          A\n          \"this is b\"\n          B\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsTypes: true, disableDescriptions: false },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      /** custom enum */\n      export type MyEnum =\n        /** this is a */\n        | 'A'\n        /** this is b */\n        | 'B';`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7703,10 +7703,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 519,
+                "line": 521,
                 "column": 82
             },
-            "line": 519,
+            "line": 521,
             "code": "    it('#6815 - Generate different type for Maybe wrapper based on input variables', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          test(id: ID): String\n          testWithInput(filter: Filter): String\n        }\n\n        input Filter {\n          a: String\n          b: Int\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          maybeValue: 'T | null',\n          inputMaybeValue: 'T | null | undefined',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      const output = mergeOutputs([result]);\n      expect(output).toContain(`export type InputMaybe<T> = T | null | undefined;`);\n      expect(output).toContain(`export type Maybe<T> = T | null;`);\n      expect(output).toContain(`test?: Maybe<Scalars['String']>;`);\n      expect(output).toContain(`id?: InputMaybe<Scalars['ID']>;`);\n      expect(output).toContain(`filter?: InputMaybe<Filter>;`);\n      expect(output).toContain(`a?: InputMaybe<Scalars['String']>;`);\n      expect(output).toContain(`b?: InputMaybe<Scalars['Int']>;`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7719,10 +7719,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 552,
+                "line": 554,
                 "column": 79
             },
-            "line": 552,
+            "line": 554,
             "code": "    it('#5643 - Incorrect combinations of declartionKinds leads to syntax error', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        interface Base {\n          id: ID!\n        }\n\n        type MyType implements Base {\n          id: ID!\n        }\n\n        type Query {\n          t: MyType!\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          declarationKind: {\n            type: 'class',\n            interface: 'interface',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).not.toContain(`export class MyType extends Base {`);\n      expect(output).toContain(`export class MyType implements Base {`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7735,10 +7735,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 583,
+                "line": 585,
                 "column": 55
             },
-            "line": 583,
+            "line": 585,
             "code": "    it('#4564 - numeric enum values set on schema level', async () => {\n      const testSchema = new GraphQLSchema({\n        types: [\n          new GraphQLObjectType({\n            name: 'Query',\n            fields: {\n              test: {\n                type: new GraphQLEnumType({\n                  name: 'MyEnum',\n                  values: {\n                    missing: {\n                      value: 0,\n                    },\n                  },\n                }),\n              },\n            },\n          }),\n        ],\n      });\n\n      const result = (await plugin(testSchema, [], {}, { outputFile: '' })) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).not.toContain(`Missing = 'missing'`);\n      expect(output).toContain(`Missing = 0`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7751,10 +7751,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 610,
+                "line": 612,
                 "column": 73
             },
-            "line": 610,
+            "line": 612,
             "code": "    it('#4564 - numeric enum values set on schema level - complex numeric', async () => {\n      const testSchema = new GraphQLSchema({\n        types: [\n          new GraphQLObjectType({\n            name: 'Query',\n            fields: {\n              test: {\n                type: new GraphQLEnumType({\n                  name: 'MyEnum',\n                  values: {\n                    available: {\n                      value: '01',\n                    },\n                    somethingElse: {\n                      value: '99',\n                    },\n                  },\n                }),\n              },\n            },\n          }),\n        ],\n      });\n\n      const result = (await plugin(testSchema, [], {}, { outputFile: '' })) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).toContain(`Available = '01'`);\n      expect(output).toContain(`SomethingElse = '99'`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7767,10 +7767,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 640,
+                "line": 642,
                 "column": 68
             },
-            "line": 640,
+            "line": 642,
             "code": "    it('#7898 - falsy enum value set on schema with enumsAsTypes set', async () => {\n      const testSchema = new GraphQLSchema({\n        types: [\n          new GraphQLObjectType({\n            name: 'Query',\n            fields: {\n              test: {\n                type: new GraphQLEnumType({\n                  name: 'MyEnum',\n                  values: {\n                    EnumValueName: {\n                      value: 0,\n                    },\n                  },\n                }),\n              },\n            },\n          }),\n        ],\n      });\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        { enumsAsTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).not.toContain('EnumValueName');\n      expect(output).toContain('0');\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7783,10 +7783,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 672,
+                "line": 674,
                 "column": 57
             },
-            "line": 672,
+            "line": 674,
             "code": "    it('#6532 - numeric enum values with namingConvention', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          test: Test!\n        }\n\n        enum Test {\n          Boop\n          BIP\n          BaP\n          TEST_VALUE\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          numericEnums: true,\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).toBeSimilarStringTo(`export enum Test {\n        Boop = 0,\n        Bip = 1,\n        BaP = 2,\n        TestValue = 3\n      }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7799,10 +7799,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 703,
+                "line": 705,
                 "column": 34
             },
-            "line": 703,
+            "line": 705,
             "code": "    it('#3137 - numeric enum value', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Query {\n          test: Test!\n        }\n\n        enum Test {\n          A\n          B\n          C\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          enumValues: {\n            Test: {\n              A: 0,\n              B: 'test',\n              C: '2',\n            },\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      expect(output).toBeSimilarStringTo(`export enum Test {\n        A = 0,\n        B = 'test',\n        C = '2'\n      }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7815,10 +7815,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 738,
+                "line": 740,
                 "column": 87
             },
-            "line": 738,
+            "line": 740,
             "code": "    it('#4157 - Should generate numeric values for enums if numericEnums is set to true', async () => {\n      const testSchema = buildSchema(/* GraphQl */ `\n        enum Status {\n            Idle\n            Running\n            Error\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          numericEnums: true,\n        },\n        {\n          outputFile: '',\n        }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      validateTs(output);\n\n      expect(output).toBeSimilarStringTo(`\n        export enum Status {\n            Idle = 0,\n            Running = 1,\n            Error = 2\n        }\n      `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7831,10 +7831,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 769,
+                "line": 771,
                 "column": 42
             },
-            "line": 769,
+            "line": 771,
             "code": "    it('#2679 - incorrect prefix for enums', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum FilterOption {\n          New\n          Active\n          Closed\n        }\n\n        input UpdateFilterOptionInput {\n          newOption: FilterOption!\n        }\n\n        type Query {\n          exampleQuery(i: UpdateFilterOptionInput, t: FilterOption): String\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          typesPrefix: 'I',\n          enumPrefix: false,\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      const output = mergeOutputs([result]);\n      validateTs(output);\n\n      expect(output).toBeSimilarStringTo(`\n      export enum FilterOption {\n        New = 'New',\n        Active = 'Active',\n        Closed = 'Closed'\n      }`);\n\n      expect(output).toBeSimilarStringTo(`\n      export type IUpdateFilterOptionInput = {\n        newOption: FilterOption;\n      };`);\n      expect(output).toBeSimilarStringTo(`\n      export type IQueryExampleQueryArgs = {\n        i?: InputMaybe<IUpdateFilterOptionInput>;\n        t?: InputMaybe<FilterOption>;\n      };`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7847,10 +7847,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 816,
+                "line": 818,
                 "column": 51
             },
-            "line": 816,
+            "line": 818,
             "code": "    it('#3180 - enumValues and named default import', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A\n          B\n          C\n        }\n\n        type Test {\n          t: MyEnum\n          test(a: MyEnum): String\n        }\n      `);\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          typesPrefix: 'I',\n          namingConvention: { enumValues: 'change-case-all#constantCase' },\n          enumValues: {\n            MyEnum: './files#default as MyEnum',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.prepend[0]).toBe(`import MyEnum from './files';`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7863,10 +7863,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 845,
+                "line": 847,
                 "column": 56
             },
-            "line": 845,
+            "line": 847,
             "code": "    it('#4834 - enum members should be quoted if numeric', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum MediaItemSizeEnum {\n          AXB\n          _1X2\n          _3X4\n        }\n      `);\n\n      const result = (await plugin(testSchema, [], {})) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`export enum MediaItemSizeEnum {\n        Axb = 'AXB',\n        '1X2' = '_1X2',\n        '3X4' = '_3X4'\n      }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7879,10 +7879,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 863,
+                "line": 865,
                 "column": 69
             },
-            "line": 863,
+            "line": 865,
             "code": "    it('#2976 - Issues with mapped enumValues and type prefix in args', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A\n          B\n          C\n        }\n\n        type Test {\n          t: MyEnum\n          test(a: MyEnum): String\n        }\n      `);\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          typesPrefix: 'I',\n          namingConvention: { enumValues: 'change-case-all#constantCase' },\n          enumValues: {\n            MyEnum: './files#MyEnum',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`export type ITest = {\n        __typename?: 'Test';\n       t?: Maybe<MyEnum>;\n       test?: Maybe<Scalars['String']>;\n     };`);\n\n      expect(result.content).toBeSimilarStringTo(`export type ITestTestArgs = {\n      a?: InputMaybe<MyEnum>;\n    };`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7895,10 +7895,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 900,
+                "line": 902,
                 "column": 55
             },
-            "line": 900,
+            "line": 902,
             "code": "    it('#2082 - Issues with enumValues and types prefix', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A\n          B\n          C\n        }\n\n        enum OtherEnum {\n          V\n        }\n\n        type Test {\n          a: MyEnum\n          b: OtherEnum\n        }\n      `);\n      const result = (await plugin(\n        testSchema,\n        [],\n        {\n          typesPrefix: 'GQL_',\n          enumValues: {\n            MyEnum: './files#MyEnum',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      expect(result.prepend).toContain(`import { MyEnum } from './files';`);\n      expect(result.content).toContain(`enum GQL_OtherEnum {`);\n      expect(result.content).toContain(`a?: Maybe<MyEnum>;`);\n      expect(result.content).toContain(`b?: Maybe<GQL_OtherEnum>`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7911,10 +7911,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 934,
+                "line": 936,
                 "column": 87
             },
-            "line": 934,
+            "line": 936,
             "code": "    it('#1488 - Should generate readonly also in input types when immutableTypes is set', async () => {\n      const schema = buildSchema(`\n      input MyInput {\n        f: String!\n      }`);\n\n      const result = (await plugin(\n        schema,\n        [],\n        { immutableTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        readonly f: Scalars['String'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7927,10 +7927,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 954,
+                "line": 956,
                 "column": 45
             },
-            "line": 954,
+            "line": 956,
             "code": "    it('#3141 - @deprecated directive support', async () => {\n      const schema = buildSchema(`\n      type User {\n        fullName: String!\n        firstName: String! @deprecated(reason: \"Field \\`fullName\\` has been superseded by \\`firstName\\`.\")\n      }`);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export type User = {\n        __typename?: 'User';\n        fullName: Scalars['String'];\n        /** @deprecated Field \\`fullName\\` has been superseded by \\`firstName\\`. */\n        firstName: Scalars['String'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7943,10 +7943,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 972,
+                "line": 974,
                 "column": 56
             },
-            "line": 972,
+            "line": 974,
             "code": "    it('#7627 - enum value @deprecated directive support', async () => {\n      const schema = buildSchema(`\n      enum MyEnum {\n        A\n        B @deprecated(reason: \"Enum value \\`B\\` has been deprecated.\")\n      }`);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export enum MyEnum {\n        A = 'A',\n        /** @deprecated Enum value \\`B\\` has been deprecated. */\n        B = 'B'\n      }`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7959,10 +7959,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 989,
+                "line": 991,
                 "column": 57
             },
-            "line": 989,
+            "line": 991,
             "code": "    it('#7766 - input value @deprecated directive support', async () => {\n      const schema = buildSchema(`\n      input MyInput {\n        A: Int\n        B: Int @deprecated(reason: \"input value \\`B\\` has been deprecated.\")\n      }`);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        A?: InputMaybe<Scalars['Int']>;\n        /** @deprecated input value \\`B\\` has been deprecated. */\n        B?: InputMaybe<Scalars['Int']>;\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7975,10 +7975,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1006,
+                "line": 1008,
                 "column": 58
             },
-            "line": 1006,
+            "line": 1008,
             "code": "    it('#1462 - Union of scalars and argument of directive', async () => {\n      const schema = buildSchema(`\n      union Any = String | Int | Float | ID\n\n      directive @default(\n        value: Any,\n      ) on ENUM_VALUE | FIELD_DEFINITION\n\n      type CardEdge {\n        count: Int! @default(value: 1)\n      }`);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(\n        `export type Any = Scalars['String'] | Scalars['Int'] | Scalars['Float'] | Scalars['ID'];`\n      );\n      expect(result.content).toBeSimilarStringTo(`\n      export type CardEdge = {\n        __typename?: 'CardEdge';\n        count: Scalars['Int'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -7991,10 +7991,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1030,
+                "line": 1032,
                 "column": 50
             },
-            "line": 1030,
+            "line": 1032,
             "code": "    it('#1954 - Duplicate type names for args type', async () => {\n      const schema = buildSchema(`\n      type PullRequest {\n        reviewThreads(first: Int!): Int\n      }\n\n      type PullRequestReview {\n          threads(first: Int!, last: Int!): Int\n      }`);\n\n      const result = (await plugin(\n        schema,\n        [],\n        { addUnderscoreToArgsType: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toContain('PullRequest_ReviewThreadsArgs');\n      expect(result.content).toContain('PullRequestReview_ThreadsArgs');\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8007,10 +8007,10 @@
                 "Issues"
             ],
             "updatePoint": {
-                "line": 1050,
+                "line": 1052,
                 "column": 71
             },
-            "line": 1050,
+            "line": 1052,
             "code": "    it('#1980 Do not put prefix on enums in args when enumPrefix: false', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum SuggestionType {\n          concern\n          goal\n        }\n\n        type Suggestion {\n          id: ID!\n          userId: ID!\n          suggestionType: SuggestionType!\n          text: String!\n        }\n\n        type RootQueryType {\n          suggestionsForUser(userId: ID!, suggestionType: SuggestionType!): [Suggestion!]\n        }\n      `);\n      const result = (await plugin(schema, [], {\n        skipTypename: true,\n        declarationKind: 'interface',\n        typesPrefix: 'I',\n        enumPrefix: false,\n        constEnums: true,\n        scalars: {\n          DateTime: 'string',\n          Time: 'string',\n          Date: 'string',\n        },\n      })) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n          export interface ISuggestion {\n            id: Scalars['ID'];\n            userId: Scalars['ID'];\n            suggestionType: SuggestionType;\n            text: Scalars['String'];\n          }\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n          export const enum SuggestionType {\n            Concern = 'concern',\n            Goal = 'goal'\n          };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n          export interface IRootQueryType {\n            suggestionsForUser?: Maybe<Array<ISuggestion>>;\n          }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n          export interface IRootQueryTypeSuggestionsForUserArgs {\n            userId: Scalars['ID'];\n            suggestionType: SuggestionType;\n          }\n      `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8023,10 +8023,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1112,
+                "line": 1114,
                 "column": 77
             },
-            "line": 1112,
+            "line": 1114,
             "code": "    it('Should build type correctly when specified with avoidOptionals config', async () => {\n      const schema = buildSchema(`\n        type MyType {\n          foo: String\n          bar: String!\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { avoidOptionals: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          foo: Maybe<Scalars['String']>;\n          bar: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8039,10 +8039,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1136,
+                "line": 1138,
                 "column": 88
             },
-            "line": 1136,
+            "line": 1138,
             "code": "    it('Should build input type correctly when specified with avoidInputOptionals config', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          foo: String\n          bar: String!\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { avoidOptionals: { inputValue: true } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          foo: InputMaybe<Scalars['String']>;\n          bar: Scalars['String'];\n        }\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8055,10 +8055,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1160,
+                "line": 1162,
                 "column": 77
             },
-            "line": 1160,
+            "line": 1162,
             "code": "    it('Should build type correctly when specified with immutableTypes config', async () => {\n      const schema = buildSchema(`\n        type MyType {\n          foo: [String!]!\n        }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { immutableTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          readonly  __typename?: 'MyType';\n          readonly foo: ReadonlyArray<Scalars['String']>;\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8071,10 +8071,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1181,
+                "line": 1183,
                 "column": 53
             },
-            "line": 1181,
+            "line": 1183,
             "code": "    it('Should use const enums when constEnums is set', async () => {\n      const schema = buildSchema(`\n      enum MyEnum {\n        A\n      }`);\n      const result = await plugin(schema, [], { constEnums: true }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export const enum MyEnum {\n        A = 'A'\n      };\n    `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8087,10 +8087,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1196,
+                "line": 1198,
                 "column": 56
             },
-            "line": 1196,
+            "line": 1198,
             "code": "    it('Should use enum as type when enumsAsTypes is set', async () => {\n      const schema = buildSchema(`\n      enum MyEnum {\n        A\n        B\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyEnum =\n          | 'A'\n          | 'B';\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8103,10 +8103,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1217,
+                "line": 1219,
                 "column": 76
             },
-            "line": 1217,
+            "line": 1219,
             "code": "    it('Should use enum as type when enumsAsTypes is set and also enumValues', async () => {\n      const schema = buildSchema(`\n      enum MyEnum {\n        A\n        B\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: { A: 'BOOP' } }, enumsAsTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyEnum =\n          | 'BOOP'\n          | 'B';\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8119,10 +8119,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1238,
+                "line": 1240,
                 "column": 98
             },
-            "line": 1238,
+            "line": 1240,
             "code": "    it('Should add `%future added value` to enum when futureProofEnums is set and also enumAsTypes', async () => {\n      const schema = buildSchema(`\n      enum MyEnum {\n        A\n        B\n      }\n\n      type MyType {\n        required: MyEnum!\n        optional: MyEnum\n      }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumsAsTypes: true, futureProofEnums: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyEnum =\n        | 'A'\n        | 'B'\n        | '%future added value'\n    `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          required: MyEnum;\n          optional?: Maybe<MyEnum>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8135,10 +8135,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1273,
+                "line": 1275,
                 "column": 104
             },
-            "line": 1273,
+            "line": 1275,
             "code": "    it('Should add `%future added value` to enum usage when futureProofEnums is set, but not enumAsTypes', async () => {\n      const schema = buildSchema(`\n        enum MyEnum {\n          A\n          B\n        }\n\n        type MyType {\n          required: MyEnum!\n          optional: MyEnum\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { futureProofEnums: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum MyEnum {\n          A = 'A',\n          B = 'B'\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          required: MyEnum | '%future added value';\n          optional?: Maybe<MyEnum | '%future added value'>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8151,10 +8151,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1309,
+                "line": 1311,
                 "column": 115
             },
-            "line": 1309,
+            "line": 1311,
             "code": "    it('Should add `%future added value` to enum usage when futureProofEnums is set and allowEnumStringTypes is set', async () => {\n      const schema = buildSchema(`\n        enum MyEnum {\n          A\n          B\n        }\n\n        type MyType {\n          required: MyEnum!\n          optional: MyEnum\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { futureProofEnums: true, allowEnumStringTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum MyEnum {\n          A = 'A',\n          B = 'B'\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          required: MyEnum | '%future added value' | \\`\\${MyEnum}\\`;\n          optional?: Maybe<MyEnum | '%future added value' | \\`\\${MyEnum}\\`>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8167,10 +8167,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1345,
+                "line": 1347,
                 "column": 59
             },
-            "line": 1345,
+            "line": 1347,
             "code": "    it('Should use custom namingConvention for enums (keep)', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum Foo {\n          YES\n          NO\n        }\n        type MyType {\n          foo(a: String!, b: String, c: [String], d: [Int!]!): Foo\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          namingConvention: {\n            typeNames: 'change-case-all#lowerCase',\n            enumValues: 'keep',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum foo {\n          YES = 'YES',\n          NO = 'NO'\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type mytypefooargs = {\n          a: Scalars['String'];\n          b?: InputMaybe<Scalars['String']>;\n          c?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;\n          d: Array<Scalars['Int']>;\n        };\n    `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type mytype = {\n          __typename?: 'MyType';\n          foo?: Maybe<foo>;\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8183,10 +8183,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1392,
+                "line": 1394,
                 "column": 111
             },
-            "line": 1392,
+            "line": 1394,
             "code": "    it('Should use custom namingConvention for enums values as string, without specifying other type converters', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum Foo {\n          YES\n          NO\n        }\n        type MyType {\n          foo(a: String!, b: String, c: [String], d: [Int!]!): Foo\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          namingConvention: {\n            enumValues: 'change-case-all#lowerCase',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export enum Foo {\n        yes = 'YES',\n        no = 'NO'\n      }`);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8199,10 +8199,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1420,
+                "line": 1422,
                 "column": 52
             },
-            "line": 1420,
+            "line": 1422,
             "code": "    it('Should use custom namingConvention for enums', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum Foo {\n          YES\n          NO\n        }\n        type MyType {\n          foo(a: String!, b: String, c: [String], d: [Int!]!): Foo\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          namingConvention: {\n            typeNames: 'keep',\n            enumValues: 'change-case-all#lowerCase',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum Foo {\n          yes = 'YES',\n          no = 'NO'\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypefooArgs = {\n          a: Scalars['String'];\n          b?: InputMaybe<Scalars['String']>;\n          c?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;\n          d: Array<Scalars['Int']>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          foo?: Maybe<Foo>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8215,10 +8215,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1468,
+                "line": 1470,
                 "column": 59
             },
-            "line": 1468,
+            "line": 1470,
             "code": "    it('should handle introspection types (like __TypeKind)', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        type Post {\n          title: String\n        }\n        type Query {\n          post: Post!\n        }\n      `);\n      const query = parse(/* GraphQL */ `\n        query Info {\n          __type(name: \"Post\") {\n            name\n            fields {\n              name\n              type {\n                name\n                kind\n              }\n            }\n          }\n        }\n      `);\n\n      const result = (await plugin(\n        testSchema,\n        [{ location: '', document: query }],\n        {},\n        {\n          outputFile: 'graphql.ts',\n        }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      /** An enum describing what kind of type a given \\`__Type\\` is. */\n      export enum __TypeKind {\n        /** Indicates this type is a scalar. */\n        Scalar = 'SCALAR',\n        /** Indicates this type is an object. \\`fields\\` and \\`interfaces\\` are valid fields. */\n        Object = 'OBJECT',\n        /** Indicates this type is an interface. \\`fields\\`, \\`interfaces\\`, and \\`possibleTypes\\` are valid fields. */\n        Interface = 'INTERFACE',\n        /** Indicates this type is a union. \\`possibleTypes\\` is a valid field. */\n        Union = 'UNION',\n        /** Indicates this type is an enum. \\`enumValues\\` is a valid field. */\n        Enum = 'ENUM',\n        /** Indicates this type is an input object. \\`inputFields\\` is a valid field. */\n        InputObject = 'INPUT_OBJECT',\n        /** Indicates this type is a list. \\`ofType\\` is a valid field. */\n        List = 'LIST',\n        /** Indicates this type is a non-null. \\`ofType\\` is a valid field. */\n        NonNull = 'NON_NULL'\n      }\n      `);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8231,10 +8231,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1524,
+                "line": 1526,
                 "column": 69
             },
-            "line": 1524,
+            "line": 1526,
             "code": "    it('Should use class correctly when declarationKind: class is set', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          id: ID!\n          displayName: String\n        }\n\n        type MyType {\n          id: ID!\n          displayName: String\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: 'class',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export class MyInput {\n          id: Scalars['ID'];\n          displayName?: InputMaybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export class MyType {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8247,10 +8247,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1563,
+                "line": 1565,
                 "column": 75
             },
-            "line": 1563,
+            "line": 1565,
             "code": "    it('Should use interface for type when declarationKind for types is set', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          id: ID!\n          displayName: String\n        }\n\n        type MyType {\n          id: ID!\n          displayName: String\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: {\n            type: 'interface',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          id: Scalars['ID'];\n          displayName?: InputMaybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyType {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8263,10 +8263,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1603,
+                "line": 1605,
                 "column": 77
             },
-            "line": 1603,
+            "line": 1605,
             "code": "    it('Should use interface for input when declarationKind for inputs is set', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          id: ID!\n          displayName: String\n        }\n\n        type MyType {\n          id: ID!\n          displayName: String\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: {\n            input: 'interface',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInput {\n          id: Scalars['ID'];\n          displayName?: InputMaybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8279,10 +8279,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1643,
+                "line": 1645,
                 "column": 84
             },
-            "line": 1643,
+            "line": 1645,
             "code": "    it('Should use interface for arguments when declarationKind for arguments is set', async () => {\n      const schema = buildSchema(`\n        type MyType {\n          id: ID!\n          displayName: String\n          child(id: ID!): MyType\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: {\n            arguments: 'interface',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n          child?: Maybe<MyType>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyTypeChildArgs {\n          id: Scalars['ID'];\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8295,10 +8295,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1679,
+                "line": 1681,
                 "column": 78
             },
-            "line": 1679,
+            "line": 1681,
             "code": "    it('Should use interface for all objects when declarationKind is interface', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          id: ID!\n          displayName: String\n        }\n\n        type MyType {\n          id: ID!\n          displayName: String\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: 'interface',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInput {\n          id: Scalars['ID'];\n          displayName?: InputMaybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyType {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8311,10 +8311,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1717,
+                "line": 1719,
                 "column": 48
             },
-            "line": 1717,
+            "line": 1719,
             "code": "    it('Should correctly render empty interfaces', async () => {\n      const schema = buildSchema(`\n        input MyInput\n\n        type MyType\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: 'interface',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInput {}\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyType {\n          __typename?: 'MyType';\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8327,10 +8327,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1744,
+                "line": 1746,
                 "column": 48
             },
-            "line": 1744,
+            "line": 1746,
             "code": "    it('Should extend one interface from another', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          id: ID!\n          displayName: String\n        }\n\n        type MyType implements MyInterface {\n          id: ID!\n          displayName: String\n          value: Int\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: 'interface',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInterface {\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyType extends MyInterface {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n          value?: Maybe<Scalars['Int']>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8343,10 +8343,10 @@
                 "Config"
             ],
             "updatePoint": {
-                "line": 1784,
+                "line": 1786,
                 "column": 40
             },
-            "line": 1784,
+            "line": 1786,
             "code": "    it('Should extend mutiple interfaces', async () => {\n      const schema = buildSchema(`\n        interface MyInterface1 {\n          id: ID!\n          displayName: String\n        }\n\n        interface MyInterface2 {\n          value: Int\n        }\n\n        type MyType implements MyInterface1 & MyInterface2 {\n          id: ID!\n          displayName: String\n          value: Int\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          declarationKind: 'interface',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInterface1 {\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyInterface2 {\n          value?: Maybe<Scalars['Int']>;\n        }\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export interface MyType extends MyInterface1, MyInterface2 {\n          __typename?: 'MyType';\n          id: Scalars['ID'];\n          displayName?: Maybe<Scalars['String']>;\n          value?: Maybe<Scalars['Int']>;\n        }\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8359,10 +8359,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 1836,
+                "line": 1838,
                 "column": 72
             },
-            "line": 1836,
+            "line": 1838,
             "code": "    it('Should generate a scalars mapping correctly for built-in scalars', async () => {\n      const schema = buildSchema(`\n      type MyType {\n        foo: String\n        bar: String!\n      }`);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['String'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8375,10 +8375,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 1862,
+                "line": 1864,
                 "column": 78
             },
-            "line": 1862,
+            "line": 1864,
             "code": "    it('Should generate a scalars mapping correctly when using scalars as path', async () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          scalars: '../../scalars',\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.prepend).toContain(`import { MyScalar } from '../../scalars';`);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: String;\n        Boolean: Boolean;\n        Int: number;\n        Float: number;\n        MyScalar: MyScalar;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['MyScalar'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8391,10 +8391,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 1899,
+                "line": 1901,
                 "column": 47
             },
-            "line": 1899,
+            "line": 1901,
             "code": "    it('Should import a type of a mapped scalar', async () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n      scalar MyOtherScalar\n      scalar MyAliasedScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n        baz: MyOtherScalar!\n        qux: MyAliasedScalar!\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        {\n          scalars: {\n            MyScalar: '../../scalars#default',\n            MyOtherScalar: '../../scalars#MyOtherScalar',\n            MyAliasedScalar: '../../scalars#MyAliasedScalar as AliasedScalar',\n          },\n        },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      // It seems like we don't group imports...\n      expect(result.prepend).toContain(`import MyScalar from '../../scalars';`);\n      expect(result.prepend).toContain(`import { MyOtherScalar } from '../../scalars';`);\n      expect(result.prepend).toContain(`import { MyAliasedScalar as AliasedScalar } from '../../scalars';`);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n        MyScalar: MyScalar;\n        MyOtherScalar: MyOtherScalar;\n        MyAliasedScalar: AliasedScalar;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['MyScalar'];\n        baz: Scalars['MyOtherScalar'];\n        qux: Scalars['MyAliasedScalar'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8407,10 +8407,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 1951,
+                "line": 1953,
                 "column": 70
             },
-            "line": 1951,
+            "line": 1953,
             "code": "    it('Should generate a scalars mapping correctly for custom scalars', async () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n      }`);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n        MyScalar: any;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['MyScalar'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8423,10 +8423,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 1980,
+                "line": 1982,
                 "column": 83
             },
-            "line": 1980,
+            "line": 1982,
             "code": "    it('Should generate a scalars mapping correctly for custom scalars with mapping', async () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { scalars: { MyScalar: 'Date' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n        MyScalar: Date;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['MyScalar'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8439,10 +8439,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 2014,
+                "line": 2016,
                 "column": 102
             },
-            "line": 2014,
+            "line": 2016,
             "code": "    it('Should correctly throw an error when an unknown scalar is detected while using `strictScalars`', () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n      }`);\n\n      expect(() => {\n        plugin(schema, [], { strictScalars: true }, { outputFile: '' });\n      }).toThrow('Unknown scalar type MyScalar');\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8455,10 +8455,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 2028,
+                "line": 2030,
                 "column": 51
             },
-            "line": 2028,
+            "line": 2030,
             "code": "    it('Should allow overriding default scalar type', async () => {\n      const schema = buildSchema(`\n      scalar MyScalar\n\n      type MyType {\n        foo: String\n        bar: MyScalar!\n      }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { defaultScalarType: 'unknown' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type Scalars = {\n        ID: string;\n        String: string;\n        Boolean: boolean;\n        Int: number;\n        Float: number;\n        MyScalar: unknown;\n      };`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        foo?: Maybe<Scalars['String']>;\n        bar: Scalars['MyScalar'];\n      };`);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8471,10 +8471,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 2062,
+                "line": 2064,
                 "column": 73
             },
-            "line": 2062,
+            "line": 2064,
             "code": "    it('Should add FieldWrapper when field definition wrapping is enabled', async () => {\n      const schema = buildSchema(`\n      scalar A\n      `);\n\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      expect(result.prepend).toBeSimilarStringTo('export type FieldWrapper<T> =');\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8487,10 +8487,10 @@
                 "Scalars"
             ],
             "updatePoint": {
-                "line": 2077,
+                "line": 2079,
                 "column": 57
             },
-            "line": 2077,
+            "line": 2079,
             "code": "    it('Should allow the FieldWrapper type to be modified', async () => {\n      const schema = buildSchema(`\n      scalar A\n      `);\n\n      const result = (await plugin(\n        schema,\n        [],\n        { fieldWrapperValue: 'T | Promise<T>', wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n      expect(result.prepend).toBeSimilarStringTo('export type FieldWrapper<T> = T | Promise<T>');\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8503,10 +8503,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2094,
+                "line": 2096,
                 "column": 35
             },
-            "line": 2094,
+            "line": 2096,
             "code": "    it('Should build type correctly', async () => {\n      const schema = buildSchema(`\n        type MyType {\n          foo: String\n          bar: String!\n        }`);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          foo?: Maybe<Scalars['String']>;\n          bar: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8519,10 +8519,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2112,
+                "line": 2114,
                 "column": 63
             },
-            "line": 2112,
+            "line": 2114,
             "code": "    it('Should build type correctly when implementing interface', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          foo: String!\n        }\n\n        type MyType implements MyInterface {\n          foo: String!\n        }\n        `);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInterface = {\n          foo: Scalars['String'];\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = MyInterface & {\n          __typename?: 'MyType';\n          foo: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8535,10 +8535,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2138,
+                "line": 2140,
                 "column": 73
             },
-            "line": 2138,
+            "line": 2140,
             "code": "    it('Should build type correctly when implementing multiple interfaces', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          foo: String!\n        }\n\n        interface MyOtherInterface {\n          bar: String!\n        }\n\n        type MyType implements MyInterface & MyOtherInterface {\n          foo: String!\n          bar: String!\n        }\n        `);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInterface = {\n          foo: Scalars['String'];\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherInterface = {\n          bar: Scalars['String'];\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = MyInterface & MyOtherInterface & {\n          __typename?: 'MyType';\n          foo: Scalars['String'];\n          bar: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8551,10 +8551,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2175,
+                "line": 2177,
                 "column": 85
             },
-            "line": 2175,
+            "line": 2177,
             "code": "    it('Should build type correctly when implementing interface without adding fields', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          foo: String!\n        }\n\n        type MyType implements MyInterface\n        `);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInterface = {\n          foo: Scalars['String'];\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = MyInterface & {\n          __typename?: 'MyType';\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8567,10 +8567,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2198,
+                "line": 2200,
                 "column": 60
             },
-            "line": 2198,
+            "line": 2200,
             "code": "    it('Should build type correctly with links between types', async () => {\n      const schema = buildSchema(`\n        type MyType {\n          foo: MyOtherType!\n        }\n\n        type MyOtherType {\n          bar: String!\n        }\n        `);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = {\n          __typename?: 'MyType';\n          foo: MyOtherType;\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyOtherType = {\n          __typename?: 'MyOtherType';\n          bar: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8583,10 +8583,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2225,
+                "line": 2227,
                 "column": 67
             },
-            "line": 2225,
+            "line": 2227,
             "code": "    it('Should build type correctly when wrapping field definitions', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          foo: String!\n        }\n\n        type MyType implements MyInterface {\n          foo: String!\n        }\n        `);\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInterface = {\n          foo: FieldWrapper<Scalars['String']>;\n        };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyType = MyInterface & {\n          __typename?: 'MyType';\n          foo: FieldWrapper<Scalars['String']>;\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8599,10 +8599,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2256,
+                "line": 2258,
                 "column": 72
             },
-            "line": 2256,
+            "line": 2258,
             "code": "    it('Should build list type correctly when wrapping field definitions', async () => {\n      const schema = buildSchema(`\n        type ListOfStrings {\n          foo: [String!]!\n        }\n\n        type ListOfMaybeStrings {\n          foo: [String]!\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfStrings = {\n          __typename?: 'ListOfStrings';\n          foo: Array<FieldWrapper<Scalars['String']>>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfMaybeStrings = {\n          __typename?: 'ListOfMaybeStrings';\n          foo: Array<Maybe<FieldWrapper<Scalars['String']>>>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8615,10 +8615,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2290,
+                "line": 2292,
                 "column": 79
             },
-            "line": 2290,
+            "line": 2292,
             "code": "    it('Should build list type correctly when wrapping entire field definitions', async () => {\n      const schema = buildSchema(`\n        type ListOfStrings {\n          foo: [String!]!\n        }\n\n        type ListOfMaybeStrings {\n          foo: [String]!\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapEntireFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfStrings = {\n          __typename?: 'ListOfStrings';\n          foo: EntireFieldWrapper<Array<Scalars['String']>>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfMaybeStrings = {\n          __typename?: 'ListOfMaybeStrings';\n          foo: EntireFieldWrapper<Array<Maybe<Scalars['String']>>>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8631,10 +8631,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2324,
+                "line": 2326,
                 "column": 106
             },
-            "line": 2324,
+            "line": 2326,
             "code": "    it('Should build list type correctly when wrapping both field definitions and entire field definitions', async () => {\n      const schema = buildSchema(`\n        type ListOfStrings {\n          foo: [String!]!\n        }\n\n        type ListOfMaybeStrings {\n          foo: [String]!\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapEntireFieldDefinitions: true, wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfStrings = {\n          __typename?: 'ListOfStrings';\n          foo: EntireFieldWrapper<Array<FieldWrapper<Scalars['String']>>>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type ListOfMaybeStrings = {\n          __typename?: 'ListOfMaybeStrings';\n          foo: EntireFieldWrapper<Array<Maybe<FieldWrapper<Scalars['String']>>>>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8647,10 +8647,10 @@
                 "Object (type)"
             ],
             "updatePoint": {
-                "line": 2358,
+                "line": 2360,
                 "column": 41
             },
-            "line": 2358,
+            "line": 2360,
             "code": "    it('Should not wrap input type fields', async () => {\n      const schema = buildSchema(`\n        input MyInput {\n          foo: String!\n        }\n        `);\n      const result = (await plugin(\n        schema,\n        [],\n        { wrapFieldDefinitions: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          foo: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8663,10 +8663,10 @@
                 "Union"
             ],
             "updatePoint": {
-                "line": 2381,
+                "line": 2383,
                 "column": 44
             },
-            "line": 2381,
+            "line": 2383,
             "code": "    it('Should build union as type correctly', async () => {\n      const schema = buildSchema(`\n      type MyType {\n        foo: String!\n      }\n\n      type MyOtherType {\n        bar: String!\n      }\n\n      union MyUnion = MyType | MyOtherType\n      `);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyUnion = MyType | MyOtherType;\n    `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8679,10 +8679,10 @@
                 "Union"
             ],
             "updatePoint": {
-                "line": 2399,
+                "line": 2401,
                 "column": 82
             },
-            "line": 2399,
+            "line": 2401,
             "code": "    it('Should add `%other` object typename to union when futureProofUnions is set', async () => {\n      const schema = buildSchema(`\n      type MyType {\n        foo: String!\n      }\n\n      type MyOtherType {\n        bar: String!\n      }\n\n      union MyUnion = MyType | MyOtherType\n      `);\n      const result = await plugin(schema, [], { futureProofUnions: true }, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyUnion = MyType | MyOtherType | { __typename?: \"%other\" };\n    `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8695,10 +8695,10 @@
                 "Union"
             ],
             "updatePoint": {
-                "line": 2417,
+                "line": 2419,
                 "column": 101
             },
-            "line": 2417,
+            "line": 2419,
             "code": "    it('Should add `%other` object typename to union when futureProofUnions and immutableTypes is set', async () => {\n      const schema = buildSchema(`\n      type MyType {\n        foo: String!\n      }\n\n      type MyOtherType {\n        bar: String!\n      }\n\n      union MyUnion = MyType | MyOtherType\n      `);\n      const result = await plugin(schema, [], { futureProofUnions: true, immutableTypes: true }, { outputFile: '' });\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyUnion = MyType | MyOtherType | { readonly __typename?: \"%other\" };\n    `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8711,10 +8711,10 @@
                 "Interface"
             ],
             "updatePoint": {
-                "line": 2438,
+                "line": 2440,
                 "column": 40
             },
-            "line": 2438,
+            "line": 2440,
             "code": "    it('Should build interface correctly', async () => {\n      const schema = buildSchema(`\n        interface MyInterface {\n          foo: String\n          bar: String!\n        }`);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInterface = {\n          foo?: Maybe<Scalars['String']>;\n          bar: Scalars['String'];\n        };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8727,10 +8727,10 @@
                 "Directives"
             ],
             "updatePoint": {
-                "line": 2457,
+                "line": 2459,
                 "column": 54
             },
-            "line": 2457,
+            "line": 2459,
             "code": "    it('Should handle directive declarations correctly', async () => {\n      const schema = buildSchema(`\n        directive @simple on FIELD_DEFINITION\n        directive @withArgument(arg: Int!) on FIELD_DEFINITION\n        directive @objSimple on OBJECT\n        directive @universal on OBJECT | FIELD_DEFINITION | ENUM_VALUE\n      `);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).not.toContain('simple');\n      expect(result.content).not.toContain('withArguments');\n      expect(result.content).not.toContain('objSimple');\n      expect(result.content).not.toContain('universal');\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8743,10 +8743,10 @@
                 "Directives"
             ],
             "updatePoint": {
-                "line": 2474,
+                "line": 2476,
                 "column": 35
             },
-            "line": 2474,
+            "line": 2476,
             "code": "    it('Should handle type override', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        directive @AsNumber on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n\n        input MyInput {\n          id: ID! @AsNumber\n        }\n\n        type Query {\n          myField(id: ID! @AsNumber): Boolean\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [],\n        { directiveArgumentAndInputFieldMappings: { AsNumber: 'number' } },\n        { outputFile: '' }\n      );\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type DirectiveArgumentAndInputFieldMappings = {\n        AsNumber: number;\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        id: DirectiveArgumentAndInputFieldMappings['AsNumber'];\n      };\n\n      export type Query = {\n        __typename?: 'Query';\n        myField?: Maybe<Scalars['Boolean']>;\n      };\n\n      export type QueryMyFieldArgs = {\n        id: DirectiveArgumentAndInputFieldMappings['AsNumber'];\n      };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8759,10 +8759,10 @@
                 "Directives"
             ],
             "updatePoint": {
-                "line": 2515,
+                "line": 2517,
                 "column": 35
             },
-            "line": 2515,
+            "line": 2517,
             "code": "    it('Should allow imported types', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        directive @AsNumber on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n\n        input MyInput {\n          id: ID! @AsNumber\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [],\n        {\n          directiveArgumentAndInputFieldMappings: { AsNumber: './someModule#MyType' },\n          directiveArgumentAndInputFieldMappingTypeSuffix: 'Model',\n        },\n        { outputFile: '' }\n      );\n\n      expect(result.prepend).toContain(\"import { MyType as MyTypeModel } from './someModule';\");\n      expect(result.content).toBeSimilarStringTo(`\n      export type DirectiveArgumentAndInputFieldMappings = {\n        AsNumber: MyTypeModel;\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        id: DirectiveArgumentAndInputFieldMappings['AsNumber'];\n      };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8775,10 +8775,10 @@
                 "Directives"
             ],
             "updatePoint": {
-                "line": 2547,
+                "line": 2549,
                 "column": 42
             },
-            "line": 2547,
+            "line": 2549,
             "code": "    it('Should use last directive override', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        directive @AsNumber on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n        directive @AsString on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n\n        input MyInput {\n          id: ID! @AsNumber @AsString\n        }\n      `);\n      const result = await plugin(\n        schema,\n        [],\n        { directiveArgumentAndInputFieldMappings: { AsNumber: 'number', AsString: 'AsString' } },\n        { outputFile: '' }\n      );\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        id: DirectiveArgumentAndInputFieldMappings['AsString'];\n      };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8791,10 +8791,10 @@
                 "Directives"
             ],
             "updatePoint": {
-                "line": 2571,
+                "line": 2573,
                 "column": 41
             },
-            "line": 2571,
+            "line": 2573,
             "code": "    it('Should ignore unmapped directives', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        directive @AsNumber on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION\n\n        input MyInput {\n          id: ID! @AsNumber\n        }\n      `);\n      const result = await plugin(schema, [], { directiveArgumentAndInputFieldMappings: {} }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyInput = {\n        id: Scalars['ID'];\n      };\n      `);\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8808,10 +8808,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2594,
+                "line": 2596,
                 "column": 51
             },
-            "line": 2594,
+            "line": 2596,
             "code": "      it('correct output for type with single field', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const result = await plugin(schema, [], {}, { outputFile: '' });\n\n        expect(result.content).toBeSimilarStringTo(`\n          export type Input =\n            { int: Scalars['Int']; };\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8825,10 +8825,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2615,
+                "line": 2617,
                 "column": 54
             },
-            "line": 2615,
+            "line": 2617,
             "code": "      it('correct output for type with multiple fields', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int\n            boolean: Boolean\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const result = await plugin(schema, [], {}, { outputFile: '' });\n\n        expect(result.content).toBeSimilarStringTo(`\n          export type Input =\n            { int: Scalars['Int']; boolean?: never; }\n            | { int?: never; boolean: Scalars['Boolean']; };\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8842,10 +8842,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2638,
+                "line": 2640,
                 "column": 64
             },
-            "line": 2638,
+            "line": 2640,
             "code": "      it('respects configured declaration kind with single field', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const result = await plugin(schema, [], { declarationKind: 'interface' }, { outputFile: '' });\n\n        expect(result.content).toBeSimilarStringTo(`\n          export interface Input {\n            int: Scalars['Int'];\n          }\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8859,10 +8859,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2660,
+                "line": 2662,
                 "column": 62
             },
-            "line": 2660,
+            "line": 2662,
             "code": "      it('forces declaration kind of type with multiple fields', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int\n            boolean: Boolean\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const result = await plugin(schema, [], { declarationKind: 'interface' }, { outputFile: '' });\n\n        expect(result.content).toBeSimilarStringTo(`\n          export type Input =\n            { int: Scalars['Int']; boolean?: never; }\n            | { int?: never; boolean: Scalars['Boolean']; };\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8876,10 +8876,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2683,
+                "line": 2685,
                 "column": 60
             },
-            "line": 2683,
+            "line": 2685,
             "code": "      it('raises exception for type with non-optional fields', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int!\n            boolean: Boolean!\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        try {\n          await plugin(schema, [], {}, { outputFile: '' });\n          throw new Error('Plugin should have raised an exception.');\n        } catch (err) {\n          expect(err.message).toEqual(\n            'Fields on an input object type can not be non-nullable. It seems like the schema was not validated.'\n          );\n        }\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8893,10 +8893,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2707,
+                "line": 2709,
                 "column": 37
             },
-            "line": 2707,
+            "line": 2709,
             "code": "      it('handles extensions properly', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input @oneOf {\n            int: Int\n          }\n\n          extend input Input {\n            boolean: Boolean\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const result = await plugin(schema, [], {}, { outputFile: '' });\n        expect(result.content).toBeSimilarStringTo(`\n          export type Input =\n            { int: Scalars['Int']; boolean?: never; }\n            | { int?: never; boolean: Scalars['Boolean']; };\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8910,10 +8910,10 @@
                 "@oneOf on input types"
             ],
             "updatePoint": {
-                "line": 2732,
+                "line": 2734,
                 "column": 66
             },
-            "line": 2732,
+            "line": 2734,
             "code": "      it('handles .isOneOf property on input object types properly', async () => {\n        const schema = buildSchema(\n          /* GraphQL */ `\n          input Input {\n            int: Int\n            boolean: Boolean\n          }\n\n          type Query {\n            foo(input: Input!): Boolean!\n          }\n        `.concat(oneOfDirectiveDefinition)\n        );\n\n        const inputType: Record<'isOneOf', boolean> = schema.getType('Input') as any;\n        inputType.isOneOf = true;\n\n        const result = await plugin(schema, [], {}, { outputFile: '' });\n        expect(result.content).toBeSimilarStringTo(`\n          export type Input =\n            { int: Scalars['Int']; boolean?: never; }\n            | { int?: never; boolean: Scalars['Boolean']; };\n        `);\n      });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8926,10 +8926,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2760,
+                "line": 2762,
                 "column": 74
             },
-            "line": 2760,
+            "line": 2762,
             "code": "    it('Should use custom namingConvention for type name and args typename', async () => {\n      const schema = buildSchema(`type MyType { foo(a: String!, b: String, c: [String], d: [Int!]!): String }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { namingConvention: 'change-case-all#lowerCase' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type mytypefooargs = {\n          a: Scalars['String'];\n          b?: InputMaybe<Scalars['String']>;\n          c?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;\n          d: Array<Scalars['Int']>;\n        };\n    `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type mytype = {\n          __typename?: 'MyType';\n          foo?: Maybe<Scalars['String']>;\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8942,10 +8942,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2787,
+                "line": 2789,
                 "column": 64
             },
-            "line": 2787,
+            "line": 2789,
             "code": "    it('Should use custom namingConvention and add custom prefix', async () => {\n      const schema = buildSchema(`type MyType { foo(a: String!, b: String, c: [String], d: [Int!]!): String }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { namingConvention: 'change-case-all#lowerCase', typesPrefix: 'I' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type Imytypefooargs = {\n          a: Scalars['String'];\n          b?: InputMaybe<Scalars['String']>;\n          c?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;\n          d: Array<Scalars['Int']>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type Imytype = {\n          __typename?: 'MyType';\n          foo?: Maybe<Scalars['String']>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8958,10 +8958,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2815,
+                "line": 2817,
                 "column": 53
             },
-            "line": 2815,
+            "line": 2817,
             "code": "    it('Should allow to disable typesPrefix for enums', async () => {\n      const schema = buildSchema(`type T { f: String, e: E } enum E { A }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { typesPrefix: 'I', enumPrefix: false },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toContain(`export enum E {`);\n      expect(result.content).toContain(`e?: Maybe<E>;`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8974,10 +8974,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2830,
+                "line": 2832,
                 "column": 54
             },
-            "line": 2830,
+            "line": 2832,
             "code": "    it('Should enable typesPrefix for enums by default', async () => {\n      const schema = buildSchema(`type T { f: String, e: E } enum E { A }`);\n      const result = await plugin(schema, [], { typesPrefix: 'I' }, { outputFile: '' });\n\n      expect(result.content).toContain(`export enum IE {`);\n      expect(result.content).toContain(`e?: Maybe<IE>;`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -8990,10 +8990,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2882,
+                "line": 2884,
                 "column": 81
             },
-            "line": 2882,
+            "line": 2884,
             "code": "    it('Should generate correct values when using links between types - lowerCase', async () => {\n      const result = (await plugin(\n        schema,\n        [],\n        { namingConvention: 'change-case-all#lowerCase' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum myenum {\n          a = 'A',\n          b = 'B',\n          c = 'C'\n        }\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type mytype = {\n          __typename?: 'MyType';\n          f?: Maybe<Scalars['String']>;\n          bar?: Maybe<myenum>;\n          b_a_r?: Maybe<Scalars['String']>;\n          myOtherField?: Maybe<Scalars['String']>;\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type my_type = {\n          __typename?: 'My_Type';\n          linkTest?: Maybe<mytype>;\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type myunion = my_type | mytype;\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type some_interface = {\n          id: Scalars['ID'];\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type impl1 = some_interface & {\n          __typename?: 'Impl1';\n          id: Scalars['ID'];\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type impl_2 = some_interface & {\n          __typename?: 'Impl_2';\n          id: Scalars['ID'];\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type impl_3 = some_interface & {\n          __typename?: 'impl_3';\n          id: Scalars['ID'];\n        };\n        `);\n      expect(result.content).toBeSimilarStringTo(`\n        export type query = {\n          __typename?: 'Query';\n          something?: Maybe<myunion>;\n          use_interface?: Maybe<some_interface>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9006,10 +9006,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 2949,
+                "line": 2951,
                 "column": 92
             },
-            "line": 2949,
+            "line": 2951,
             "code": "    it('Should generate correct values when using links between types - pascalCase (default)', async () => {\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export enum MyEnum {\n        A = 'A',\n        B = 'B',\n        C = 'C'\n      }\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyType = {\n        __typename?: 'MyType';\n        f?: Maybe<Scalars['String']>;\n        bar?: Maybe<MyEnum>;\n        b_a_r?: Maybe<Scalars['String']>;\n        myOtherField?: Maybe<Scalars['String']>;\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type My_Type = {\n        __typename?: 'My_Type';\n        linkTest?: Maybe<MyType>;\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type MyUnion = My_Type | MyType;\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Some_Interface = {\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Impl1 = Some_Interface & {\n        __typename?: 'Impl1';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Impl_2 = Some_Interface & {\n        __typename?: 'Impl_2';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Impl_3 = Some_Interface & {\n        __typename?: 'impl_3';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type Query = {\n        __typename?: 'Query';\n        something?: Maybe<MyUnion>;\n        use_interface?: Maybe<Some_Interface>;\n      };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9022,10 +9022,10 @@
                 "Naming Convention & Types Prefix"
             ],
             "updatePoint": {
-                "line": 3011,
+                "line": 3013,
                 "column": 111
             },
-            "line": 3011,
+            "line": 3013,
             "code": "    it('Should generate correct values when using links between types - pascalCase (default) with custom prefix', async () => {\n      const result = await plugin(schema, [], { typesPrefix: 'I' }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n      export enum IMyEnum {\n        A = 'A',\n        B = 'B',\n        C = 'C'\n      }`);\n\n      expect(result.content).toBeSimilarStringTo(`\n      export type IMyType = {\n        __typename?: 'MyType';\n        f?: Maybe<Scalars['String']>;\n        bar?: Maybe<IMyEnum>;\n        b_a_r?: Maybe<Scalars['String']>;\n        myOtherField?: Maybe<Scalars['String']>;\n      };`);\n      expect(result.content).toBeSimilarStringTo(`\n      export type IMy_Type = {\n        __typename?: 'My_Type';\n        linkTest?: Maybe<IMyType>;\n      };\n  `);\n      expect(result.content).toBeSimilarStringTo(`export type IMyUnion = IMy_Type | IMyType;`);\n      expect(result.content).toBeSimilarStringTo(`\n      export type ISome_Interface = {\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type IImpl1 = ISome_Interface & {\n        __typename?: 'Impl1';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type IImpl_2 = ISome_Interface & {\n        __typename?: 'Impl_2';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type IImpl_3 = ISome_Interface & {\n        __typename?: 'impl_3';\n        id: Scalars['ID'];\n      };\n      `);\n      expect(result.content).toBeSimilarStringTo(`\n      export type IQuery = {\n        __typename?: 'Query';\n        something?: Maybe<IMyUnion>;\n        use_interface?: Maybe<ISome_Interface>;\n      };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9038,10 +9038,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3072,
+                "line": 3074,
                 "column": 79
             },
-            "line": 3072,
+            "line": 3074,
             "code": "    it('Should generate correctly types for field arguments - with basic fields', async () => {\n      const schema = buildSchema(`type MyType { foo(a: String!, b: String, c: [String], d: [Int!]!): String }`);\n\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypeFooArgs = {\n          a: Scalars['String'];\n          b?: InputMaybe<Scalars['String']>;\n          c?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;\n          d: Array<Scalars['Int']>;\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9054,10 +9054,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3089,
+                "line": 3091,
                 "column": 80
             },
-            "line": 3089,
+            "line": 3091,
             "code": "    it('Should generate correctly types for field arguments - with default value', async () => {\n      const schema = buildSchema(\n        `type MyType { foo(a: String = \"default\", b: String! = \"default\", c: String, d: String!): String }`\n      );\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypeFooArgs = {\n          a?: InputMaybe<Scalars['String']>;\n          b?: Scalars['String'];\n          c?: InputMaybe<Scalars['String']>;\n          d: Scalars['String'];\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9070,10 +9070,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3107,
+                "line": 3109,
                 "column": 118
             },
-            "line": 3107,
+            "line": 3109,
             "code": "    it('Should generate correctly types for field arguments - with default value and avoidOptionals option set to true', async () => {\n      const schema = buildSchema(\n        `type MyType { foo(a: String = \"default\", b: String! = \"default\", c: String, d: String!): String }`\n      );\n      const result = (await plugin(\n        schema,\n        [],\n        { avoidOptionals: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypeFooArgs = {\n          a?: InputMaybe<Scalars['String']>;\n          b?: Scalars['String'];\n          c: InputMaybe<Scalars['String']>;\n          d: Scalars['String'];\n      };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9086,10 +9086,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3130,
+                "line": 3132,
                 "column": 77
             },
-            "line": 3130,
+            "line": 3132,
             "code": "    it('Should generate correctly types for field arguments - with input type', async () => {\n      const schema = buildSchema(\n        `input MyInput { f: String } type MyType { foo(a: MyInput, b: MyInput!, c: [MyInput], d: [MyInput]!, e: [MyInput!]!): String }`\n      );\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypeFooArgs = {\n          a?: InputMaybe<MyInput>;\n          b: MyInput;\n          c?: InputMaybe<Array<InputMaybe<MyInput>>>;\n          d: Array<InputMaybe<MyInput>>;\n          e: Array<MyInput>;\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9102,10 +9102,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3149,
+                "line": 3151,
                 "column": 55
             },
-            "line": 3149,
+            "line": 3151,
             "code": "    it('Should add custom prefix for mutation arguments', async () => {\n      const schema = buildSchema(`input Input { name: String } type Mutation { foo(id: ID, input: Input): String }`);\n      const result = await plugin(schema, [], { typesPrefix: 'T' }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type TInput = {\n          name?: InputMaybe<Scalars['String']>;\n        };\n      `);\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type TMutation = {\n          __typename?: 'Mutation';\n          foo?: Maybe<Scalars['String']>;\n        };\n\n        export type TMutationFooArgs = {\n          id?: InputMaybe<Scalars['ID']>;\n          input?: InputMaybe<TInput>;\n        };\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9118,10 +9118,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3174,
+                "line": 3176,
                 "column": 87
             },
-            "line": 3174,
+            "line": 3176,
             "code": "    it('Should generate the correct type for a method with arguments (interface object)', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        interface Node {\n          text(arg1: String!, arg2: String): String\n        }\n\n        type Book implements Node {\n          id: ID!\n          text(arg: String, arg2: String!): String\n        }\n\n        type Query {\n          books: [Book!]!\n        }\n      `);\n      const result = await plugin(testSchema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type NodeTextArgs = {\n          arg1: Scalars['String'];\n          arg2?: InputMaybe<Scalars['String']>;\n        };\n      `);\n      await validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9134,10 +9134,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3200,
+                "line": 3202,
                 "column": 77
             },
-            "line": 3200,
+            "line": 3202,
             "code": "    it('Should generate correctly types for inputs with default value - #4273', async () => {\n      const schema = buildSchema(\n        `input MyInput { a: String = \"default\", b: String! = \"default\", c: String, d: String! }`\n      );\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          a?: InputMaybe<Scalars['String']>;\n          b?: Scalars['String'];\n          c?: InputMaybe<Scalars['String']>;\n          d: Scalars['String'];\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9150,10 +9150,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3218,
+                "line": 3220,
                 "column": 121
             },
-            "line": 3218,
+            "line": 3220,
             "code": "    it('Should generate correctly types for inputs with default value and avoidOptionals.defaultValue set to true - #5112', async () => {\n      const schema = buildSchema(\n        `input MyInput { a: String = \"default\", b: String! = \"default\", c: String, d: String! }`\n      );\n      const result = await plugin(schema, [], { avoidOptionals: { defaultValue: true } }, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyInput = {\n          a?: InputMaybe<Scalars['String']>;\n          b: Scalars['String'];\n          c?: InputMaybe<Scalars['String']>;\n          d: Scalars['String'];\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9166,10 +9166,10 @@
                 "Arguments"
             ],
             "updatePoint": {
-                "line": 3236,
+                "line": 3238,
                 "column": 137
             },
-            "line": 3236,
+            "line": 3238,
             "code": "    it('Should generate correctly types for field arguments with default value and avoidOptionals.defaultValue option set to true - #5112', async () => {\n      const schema = buildSchema(\n        `type MyType { foo(a: String = \"default\", b: String! = \"default\", c: String, d: String!): String }`\n      );\n      const result = (await plugin(\n        schema,\n        [],\n        { avoidOptionals: { defaultValue: true } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export type MyTypeFooArgs = {\n          a?: InputMaybe<Scalars['String']>;\n          b: Scalars['String'];\n          c?: InputMaybe<Scalars['String']>;\n          d: Scalars['String'];\n        };\n    `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9182,10 +9182,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3261,
+                "line": 3263,
                 "column": 41
             },
-            "line": 3261,
+            "line": 3263,
             "code": "    it('Should build basic enum correctly', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C }`);\n      const result = await plugin(schema, [], {}, { outputFile: '' });\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum MyEnum {\n          A = 'A',\n          B = 'B',\n          C = 'C'\n        }\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9198,10 +9198,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3276,
+                "line": 3278,
                 "column": 54
             },
-            "line": 3276,
+            "line": 3278,
             "code": "    it('Should build enum correctly with custom values', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: { A: 'SomeValue', B: 'TEST' } } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toBeSimilarStringTo(`\n        export enum MyEnum {\n          A = 'SomeValue',\n          B = 'TEST',\n          C = 'C'\n        }\n      `);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9214,10 +9214,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3296,
+                "line": 3298,
                 "column": 61
             },
-            "line": 3296,
+            "line": 3298,
             "code": "    it('Should build enum correctly with custom imported enum', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: './my-file#MyEnum' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).not.toContain(`export enum MyEnum`);\n      expect(result.prepend).toContain(`import { MyEnum } from './my-file';`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9230,10 +9230,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3311,
+                "line": 3313,
                 "column": 96
             },
-            "line": 3311,
+            "line": 3313,
             "code": "    it('Should build enum correctly with custom imported enum from namespace with different name', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: './my-file#NS.ETest' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).not.toContain(`export enum MyEnum`);\n      expect(result.content).toContain(`export { MyEnum }`);\n      expect(result.prepend).toContain(`import MyEnum = NS.ETest;`);\n      expect(result.prepend).toContain(`import { NS } from './my-file';`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9246,10 +9246,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3328,
+                "line": 3330,
                 "column": 91
             },
-            "line": 3328,
+            "line": 3330,
             "code": "    it('Should build enum correctly with custom imported enum from namespace with same name', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: './my-file#NS.MyEnum' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).not.toContain(`export enum MyEnum`);\n      expect(result.content).toContain(`export { MyEnum };`);\n      expect(result.prepend).toContain(`import MyEnum = NS.MyEnum;`);\n      expect(result.prepend).toContain(`import { NS } from './my-file';`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9262,10 +9262,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3345,
+                "line": 3347,
                 "column": 81
             },
-            "line": 3345,
+            "line": 3347,
             "code": "    it('Should build enum correctly with custom imported enum with different name', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C } type Query { t: MyEnum }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: './my-file#MyCustomEnum' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).not.toContain(`export enum MyEnum`);\n      expect(result.prepend).toContain(`import { MyCustomEnum as MyEnum } from './my-file';`);\n      expect(result.content).toContain(`export { MyEnum };`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9278,10 +9278,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3361,
+                "line": 3363,
                 "column": 75
             },
-            "line": 3361,
+            "line": 3363,
             "code": "    it('Should import all enums from a single file when specified as string', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C } enum MyEnum2 { X, Y, Z }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: './my-file' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).not.toContain(`export enum MyEnum`);\n      expect(result.content).not.toContain(`export enum MyEnum2`);\n      expect(result.prepend).toContain(`import { MyEnum } from './my-file';`);\n      expect(result.prepend).toContain(`import { MyEnum2 } from './my-file';`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9294,10 +9294,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3378,
+                "line": 3380,
                 "column": 39
             },
-            "line": 3378,
+            "line": 3380,
             "code": "    it('Should re-export external enums', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C } enum MyEnum2 { X, Y, Z }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: { MyEnum: './my-file#MyEnum', MyEnum2: './my-file#MyEnum2X' } },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.content).toContain(`export { MyEnum };`);\n      expect(result.content).toContain(`export { MyEnum2 };`);\n      expect(result.prepend).toContain(`import { MyEnum2X as MyEnum2 } from './my-file';`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9310,10 +9310,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3394,
+                "line": 3396,
                 "column": 68
             },
-            "line": 3394,
+            "line": 3396,
             "code": "    it('Should re-export external enums when single file option used', async () => {\n      const schema = buildSchema(`enum MyEnum { A, B, C } enum MyEnum2 { X, Y, Z }`);\n      const result = (await plugin(\n        schema,\n        [],\n        { enumValues: './my-file' },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      expect(result.prepend).toContain(`import { MyEnum } from './my-file';`);\n      expect(result.prepend).toContain(`import { MyEnum2 } from './my-file';`);\n      expect(result.content).toContain(`export { MyEnum };`);\n      expect(result.content).toContain(`export { MyEnum2 };`);\n\n      validateTs(result);\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9326,10 +9326,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3411,
+                "line": 3413,
                 "column": 28
             },
-            "line": 3411,
+            "line": 3413,
             "code": "    it('allowEnumStringTypes', async () => {\n      const schema = buildSchema(/* GraphQL */ `\n        enum MyEnum {\n          A\n          B\n          C\n        }\n        type Query {\n          a: MyEnum\n        }\n      `);\n      const result = (await plugin(\n        schema,\n        [],\n        { allowEnumStringTypes: true },\n        { outputFile: '' }\n      )) as Types.ComplexPluginOutput;\n\n      validateTs(result);\n\n      expect(result.content).toBeSimilarStringTo('a?: Maybe<MyEnum | `${MyEnum}`>;');\n    });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9342,10 +9342,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3435,
+                "line": 3437,
                 "column": 37
             },
-            "line": 3435,
+            "line": 3437,
             "code": "  it('should not have [object Object]', async () => {\n    const schema = buildSchema(/* GraphQL */ `\n      type User {\n        id: Int!\n        name: String!\n        email: String!\n      }\n\n      type QueryRoot {\n        allUsers: [User]!\n        userById(id: Int!): User\n\n        # Generates a new answer for the guessing game\n        answer: [Int!]!\n      }\n\n      type SubscriptionRoot {\n        newUser: User\n      }\n\n      schema {\n        query: QueryRoot\n        subscription: SubscriptionRoot\n      }\n    `);\n\n    const content = await plugin(schema, [], {}, { outputFile: '' });\n\n    expect(content).not.toContainEqual('[object Object]');\n\n    validateTs(content);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9358,10 +9358,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3468,
+                "line": 3470,
                 "column": 31
             },
-            "line": 3468,
+            "line": 3470,
             "code": "  it('should contain __typename', async () => {\n    const schema = buildSchema(/* GraphQL */ `\n      type User {\n        id: Int!\n        name: String!\n        email: String!\n      }\n      type QueryRoot {\n        allUsers: [User]!\n        userById(id: Int!): User\n        # Generates a new answer for the guessing game\n        answer: [Int!]!\n      }\n      type SubscriptionRoot {\n        newUser: User\n      }\n      schema {\n        query: QueryRoot\n        subscription: SubscriptionRoot\n      }\n    `);\n\n    const result = await plugin(schema, [], {}, { outputFile: '' });\n    expect(result.content).toContain('__typename');\n\n    validateTs(result);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9374,10 +9374,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3496,
+                "line": 3498,
                 "column": 35
             },
-            "line": 3496,
+            "line": 3498,
             "code": "  it('should not contain __typename', async () => {\n    const schema = buildSchema(/* GraphQL */ `\n      type User {\n        id: Int!\n        name: String!\n        email: String!\n      }\n      type QueryRoot {\n        allUsers: [User]!\n        userById(id: Int!): User\n        # Generates a new answer for the guessing game\n        answer: [Int!]!\n      }\n      type SubscriptionRoot {\n        newUser: User\n      }\n      schema {\n        query: QueryRoot\n        subscription: SubscriptionRoot\n      }\n    `);\n\n    const result = await plugin(schema, [], { skipTypename: true }, { outputFile: '' });\n    expect(result.content).not.toContain('__typename');\n\n    validateTs(result);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9390,10 +9390,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3524,
+                "line": 3526,
                 "column": 62
             },
-            "line": 3524,
+            "line": 3526,
             "code": "  it('should not contain \"export\" when noExport is set to true', async () => {\n    const schema = buildSchema(/* GraphQL */ `\n      type User {\n        id: Int!\n        name: String!\n        email: String!\n      }\n      type QueryRoot {\n        allUsers: [User]!\n        userById(id: Int!): User\n        # Generates a new answer for the guessing game\n        answer: [Int!]!\n      }\n      type SubscriptionRoot {\n        newUser: User\n      }\n      schema {\n        query: QueryRoot\n        subscription: SubscriptionRoot\n      }\n    `);\n\n    const result = await plugin(schema, [], { noExport: true }, { outputFile: '' });\n    expect(result.content).not.toContain('export');\n\n    validateTs(result);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9406,10 +9406,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3552,
+                "line": 3554,
                 "column": 67
             },
-            "line": 3552,
+            "line": 3554,
             "code": "  it('should keep non-optional arguments non-optional - issue #2323', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      enum OrderBy {\n        name\n        id\n      }\n\n      input Filter {\n        contain: String\n      }\n\n      type Node {\n        id: ID!\n        name: String!\n      }\n\n      type Connection {\n        nodes: [Node]\n      }\n\n      type Query {\n        list(after: String, orderBy: OrderBy = name, filter: Filter!): Connection!\n      }\n    `);\n\n    const output = (await plugin(\n      testSchema,\n      [],\n      {\n        avoidOptionals: false,\n        maybeValue: 'T | undefined',\n      } as any,\n      { outputFile: 'graphql.ts' }\n    )) as Types.ComplexPluginOutput;\n\n    // Filter.contain should be optional\n    expect(output.content).toBeSimilarStringTo(`\n      export type Filter = {\n        contain?: InputMaybe<Scalars['String']>;\n      };\n    `);\n    // filter should be non-optional\n    expect(output.content).toBeSimilarStringTo(`\n      export type QueryListArgs = {\n        after?: InputMaybe<Scalars['String']>;\n        orderBy?: InputMaybe<OrderBy>;\n        filter: Filter;\n      };\n    `);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9422,10 +9422,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3603,
+                "line": 3605,
                 "column": 40
             },
-            "line": 3603,
+            "line": 3605,
             "code": "  it('should respect defined enum values', async () => {\n    const testSchema = new GraphQLSchema({\n      query: new GraphQLObjectType({\n        name: 'Query',\n        fields: {\n          foo: {\n            type: new GraphQLEnumType({\n              name: 'Foo',\n              values: {\n                Bar: {\n                  value: 'Qux',\n                },\n              },\n            }),\n          },\n        },\n      }),\n    });\n    const output = await plugin(testSchema, [], {}, { outputFile: 'graphql.ts' });\n\n    expect(output.content).toBeSimilarStringTo(`\n      export enum Foo {\n        Bar = 'Qux'\n      }\n    `);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
@@ -9438,10 +9438,10 @@
                 "Enum"
             ],
             "updatePoint": {
-                "line": 3630,
+                "line": 3632,
                 "column": 62
             },
-            "line": 3630,
+            "line": 3632,
             "code": "  it('should use implementing types as node type - issue #5126', async () => {\n    const testSchema = buildSchema(/* GraphQL */ `\n      type Matrix {\n        pills: [Pill!]!\n      }\n\n      interface Pill {\n        id: ID!\n      }\n\n      type RedPill implements Pill {\n        red: String!\n      }\n\n      type GreenPill implements Pill {\n        green: String!\n      }\n\n      interface Foo {\n        id: ID!\n      }\n\n      type Bar implements Foo {\n        lol: String!\n      }\n\n      type Hello {\n        foo: Foo!\n      }\n\n      type NoInterface {\n        hello: Hello!\n      }\n\n      interface NestedInterface implements Foo {\n        field: String!\n      }\n\n      type NestedType1 implements NestedInterface {\n        hi: String!\n      }\n\n      type NestedType2 implements NestedInterface {\n        ho: String!\n      }\n\n      type NestedField {\n        nested: NestedInterface!\n      }\n    `);\n\n    const output = (await plugin(\n      testSchema,\n      [],\n      {\n        useImplementingTypes: true,\n      } as any,\n      { outputFile: 'graphql.ts' }\n    )) as Types.ComplexPluginOutput;\n\n    expect(output.content).toMatchSnapshot();\n\n    // Type should be Array<RedPill|GreenPill> and not Pill\n    expect(output.content).toBeSimilarStringTo(`\n      export type Matrix = {\n        __typename?: 'Matrix';\n        pills: Array<RedPill | GreenPill>;\n      };\n    `);\n    // Type should be Bar and not Foo\n    expect(output.content).toBeSimilarStringTo(`\n      export type Hello = {\n        __typename?: 'Hello';\n        foo: Bar;\n      };\n    `);\n    // Type should be Hello and not empty\n    expect(output.content).toBeSimilarStringTo(`\n      export type NoInterface = {\n        __typename?: 'NoInterface';\n        hello: Hello;\n      };\n    `);\n    // Type should be NestedType1|NestedType2\n    expect(output.content).toBeSimilarStringTo(`\n      export type NestedField = {\n        __typename?: 'NestedField';\n        nested: NestedType1 | NestedType2;\n      };\n    `);\n  });",
             "file": "typescript.spec.ts",
             "skipped": false,
