@@ -2636,6 +2636,22 @@
             "dir": "packages/plugins/other/visitor-plugin-common/tests"
         },
         {
+            "name": "does not import FragmentDocs",
+            "suites": [
+                "getImports",
+                "when documentMode \"documentNodeImportFragments\""
+            ],
+            "updatePoint": {
+                "line": 145,
+                "column": 36
+            },
+            "line": 145,
+            "code": "    it('does not import FragmentDocs', () => {\n      const fileName = 'fooBarQuery';\n      const importPath = `src/queries/${fileName}`;\n\n      const document = parse(\n        `query fooBarQuery {\n          a {\n            ...fields\n          }\n        }\n        fragment fields on A {\n          foo\n          bar\n        }\n      `\n      );\n\n      const visitor = new ClientSideBaseVisitor(\n        schema,\n        (document.definitions.filter(d => d.kind === Kind.FRAGMENT_DEFINITION) as FragmentDefinitionNode[]).map(\n          fragmentDef => ({\n            node: fragmentDef,\n            name: fragmentDef.name.value,\n            onType: fragmentDef.typeCondition.name.value,\n            isExternal: false,\n          })\n        ),\n        {\n          emitLegacyCommonJSImports: true,\n          importDocumentNodeExternallyFrom: 'near-operation-file',\n          documentMode: DocumentMode.documentNodeImportFragments,\n          fragmentImports: [\n            {\n              baseDir: '/',\n              baseOutputDir: '',\n              outputPath: '',\n              importSource: {\n                path: '~types',\n                identifiers: [\n                  { name: 'FieldsFragmentDoc', kind: 'document' },\n                  { name: 'FieldsFragment', kind: 'type' },\n                ],\n              },\n              emitLegacyCommonJSImports: true,\n              typesImport: false,\n            },\n          ],\n        },\n        {},\n        [{ document, location: importPath }]\n      );\n\n      visitor.OperationDefinition(document.definitions[0] as OperationDefinitionNode);\n\n      const imports = visitor.getImports();\n      imports.forEach(i => {\n        expect(i).not.toContain('FragmentDoc');\n      });\n    });",
+            "file": "client-side-base-visitor.spec.ts",
+            "skipped": false,
+            "dir": "packages/plugins/other/visitor-plugin-common/tests"
+        },
+        {
             "name": "checks if types are actually included when Omit is applied",
             "suites": [
                 "BaseResolversVisitor.createResolversFields"
