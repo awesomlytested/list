@@ -671,11 +671,11 @@
             "name": "should work!",
             "suites": [],
             "updatePoint": {
-                "line": 24,
+                "line": 25,
                 "column": 16
             },
-            "line": 24,
-            "code": "it('should work!', function () {\r\n  const code = `\r\n    import Taro, { setStorage, initPxTransform, param } from '@tarojs/taro-h5';\r\n    initPxTransform(param)\r\n    Taro.initPxTransform()\r\n    Taro.initPxTransform()\r\n    Taro['getStorage']()\r\n    setStorage()\r\n    export { Taro }\r\n  `\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n})\r",
+            "line": 25,
+            "code": "it('should work!', function () {\r\n  const code = `\r\n    import Taro, { setStorage, initPxTransform, param } from '@tarojs/taro-h5';\r\n    initPxTransform(param)\r\n    Taro.initPxTransform()\r\n    Taro.initPxTransform()\r\n    Taro['getStorage']()\r\n    setStorage()\r\n    export { Taro }\r\n  `\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n\r\n  expect(result?.code).toMatchSnapshot()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -684,11 +684,11 @@
             "name": "should leave other apis untouched",
             "suites": [],
             "updatePoint": {
-                "line": 38,
+                "line": 40,
                 "column": 37
             },
-            "line": 38,
-            "code": "it('should leave other apis untouched', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    Taro.noop\r\n  `\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n\r\n  const ast = result.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  const defaultImport = body[0].specifiers.find(v => t.isImportDefaultSpecifier(v))\r\n  expect(defaultImport).toBeTruthy()\r\n\r\n  const taroName = defaultImport.local.name\r\n  const namedImports = getNamedImports(body[0].specifiers)\r\n  expect(namedImports).toEqual(new Set())\r\n  expect(t.isMemberExpression(body[1].expression)).toBeTruthy()\r\n  expect((body[1].expression as t.MemberExpression)).toMatchObject(t.memberExpression(\r\n    t.identifier(taroName),\r\n    t.identifier('noop')\r\n  ))\r\n})\r",
+            "line": 40,
+            "code": "it('should leave other apis untouched', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    Taro.noop\r\n  `\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] }) as babel.BabelFileResult\r\n  expect(result.code).toMatchSnapshot()\r\n\r\n  const ast = result.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  const defaultImport = body[0].specifiers.find(v => t.isImportDefaultSpecifier(v)) as ImportType\r\n  expect(defaultImport).toBeTruthy()\r\n\r\n  const taroName = defaultImport.local.name\r\n  const namedImports = getNamedImports(body[0].specifiers)\r\n  expect(namedImports).toEqual(new Set())\r\n  expect(t.isMemberExpression(body[1].expression)).toBeTruthy()\r\n\r\n  const obj = t.memberExpression(\r\n    t.identifier(taroName),\r\n    t.identifier('noop'),\r\n  )\r\n  delete obj.optional\r\n  \r\n  expect((body[1].expression as t.MemberExpression)).toMatchObject(obj)\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -697,11 +697,11 @@
             "name": "should move static apis under \"Taro\"",
             "suites": [],
             "updatePoint": {
-                "line": 63,
+                "line": 69,
                 "column": 40
             },
-            "line": 63,
-            "code": "it('should move static apis under \"Taro\"', function () {\r\n  const code = `\r\n    import { noop } from '@tarojs/taro-h5';\r\n    noop;\r\n    noop();\r\n  `\r\n\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n\r\n  const ast = result.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  const defaultImport = body[0].specifiers.find(v => t.isImportDefaultSpecifier(v))\r\n  expect(defaultImport).toBeTruthy()\r\n\r\n  const taroName = defaultImport!.local.name\r\n  let memberExpression = body[1].expression\r\n  if (t.isCallExpression(body[1])) {\r\n    memberExpression = (body[1].expression as t.CallExpression).callee\r\n  }\r\n  expect(memberExpression).toMatchObject(t.memberExpression(\r\n    t.identifier(taroName),\r\n    t.identifier('noop')\r\n  ))\r\n})\r",
+            "line": 69,
+            "code": "it('should move static apis under \"Taro\"', function () {\r\n  const code = `\r\n    import { noop } from '@tarojs/taro-h5';\r\n    noop;\r\n    noop();\r\n  `\r\n\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n  expect(result?.code).toMatchSnapshot()\r\n\r\n  const ast = result?.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  const defaultImport = body[0].specifiers.find(v => t.isImportDefaultSpecifier(v))\r\n  expect(defaultImport).toBeTruthy()\r\n\r\n  const taroName = defaultImport!.local.name\r\n  let memberExpression: any = body[1].expression\r\n  if (t.isCallExpression(body[1])) {\r\n    memberExpression = ((body[1] as t.ExpressionStatement).expression as t.CallExpression).callee\r\n  }\r\n  expect(memberExpression).toMatchObject(t.memberExpression(\r\n    t.identifier(taroName),\r\n    t.identifier('noop')\r\n  ))\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -710,11 +710,11 @@
             "name": "should not import taro duplicatly",
             "suites": [],
             "updatePoint": {
-                "line": 91,
+                "line": 97,
                 "column": 37
             },
-            "line": 91,
-            "code": "it('should not import taro duplicatly', function () {\r\n  const code = `\r\n    import { Component } from \"@tarojs/taro-h5\";\r\n    import Taro from '@tarojs/taro-h5';\r\n    Component\r\n    Taro.createAnimation()\r\n    Taro.initPxTransform()\r\n  `\r\n\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n\r\n  const ast = result.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[2])).toBeTruthy()\r\n})\r",
+            "line": 97,
+            "code": "it('should not import taro duplicatly', function () {\r\n  const code = `\r\n    import { Component } from \"@tarojs/taro-h5\";\r\n    import Taro from '@tarojs/taro-h5';\r\n    Component\r\n    Taro.createAnimation()\r\n    Taro.initPxTransform()\r\n  `\r\n\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n  expect(result?.code).toMatchSnapshot()\r\n  const ast = result?.ast as t.File\r\n  const body = ast.program.body as [t.ImportDeclaration, t.ExpressionStatement, t.ExpressionStatement]\r\n  expect(t.isImportDeclaration(body[0])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[1])).toBeTruthy()\r\n  expect(t.isExpressionStatement(body[2])).toBeTruthy()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -723,11 +723,11 @@
             "name": "should not go wrong when using an api twice",
             "suites": [],
             "updatePoint": {
-                "line": 110,
+                "line": 115,
                 "column": 47
             },
-            "line": 110,
-            "code": "it('should not go wrong when using an api twice', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5';\r\n    const animation = Taro.createAnimation({\r\n      duration: dura * 1000,\r\n      timingFunction: 'linear'\r\n    })\r\n    const resetAnimation = Taro.createAnimation({\r\n      duration: 0,\r\n      timingFunction: 'linear'\r\n    })\r\n  `\r\n  expect(() => {\r\n    const result = babel.transform(code, { plugins: [pluginOptions] })\r\n    expect(result.code).toMatchSnapshot()\r\n  }).not.toThrowError()\r\n})\r",
+            "line": 115,
+            "code": "it('should not go wrong when using an api twice', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5';\r\n    const animation = Taro.createAnimation({\r\n      duration: dura * 1000,\r\n      timingFunction: 'linear'\r\n    })\r\n    const resetAnimation = Taro.createAnimation({\r\n      duration: 0,\r\n      timingFunction: 'linear'\r\n    })\r\n  `\r\n  expect(() => {\r\n    const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n    expect(result?.code).toMatchSnapshot()\r\n  }).not.toThrowError()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -736,11 +736,11 @@
             "name": "should preserve default imports",
             "suites": [],
             "updatePoint": {
-                "line": 128,
+                "line": 133,
                 "column": 35
             },
-            "line": 128,
-            "code": "it('should preserve default imports', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    console.log(Taro)\r\n  `\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n})\r",
+            "line": 133,
+            "code": "it('should preserve default imports', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    console.log(Taro)\r\n  `\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n  expect(result?.code).toMatchSnapshot()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -749,11 +749,11 @@
             "name": "should preserve assignments in lefthands",
             "suites": [],
             "updatePoint": {
-                "line": 137,
+                "line": 142,
                 "column": 44
             },
-            "line": 137,
-            "code": "it('should preserve assignments in lefthands', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    let animation\r\n    animation = Taro.createAnimation({\r\n      transformOrigin: \"50% 50%\",\r\n      duration: 1000,\r\n      timingFunction: \"ease\",\r\n      delay: 0\r\n    });\r\n    Taro.request()\r\n    Taro.request = ''\r\n    Taro['request'] = ''\r\n  `\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n})\r",
+            "line": 142,
+            "code": "it('should preserve assignments in lefthands', function () {\r\n  const code = `\r\n    import Taro from '@tarojs/taro-h5'\r\n    let animation\r\n    animation = Taro.createAnimation({\r\n      transformOrigin: \"50% 50%\",\r\n      duration: 1000,\r\n      timingFunction: \"ease\",\r\n      delay: 0\r\n    });\r\n    Taro.request()\r\n    Taro.request = ''\r\n    Taro['request'] = ''\r\n  `\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n  expect(result?.code).toMatchSnapshot()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"
@@ -762,11 +762,11 @@
             "name": "should support rename of imported names",
             "suites": [],
             "updatePoint": {
-                "line": 155,
+                "line": 160,
                 "column": 43
             },
-            "line": 155,
-            "code": "it('should support rename of imported names', function () {\r\n  const code = `\r\n  // import { inject as mobxInject, observer as mobxObserver } from '@tarojs/mobx'\r\n  import { Component as TaroComponent } from \"@tarojs/taro-h5\";\r\n  export class Connected extends TaroComponent {}\r\n  `\r\n  const result = babel.transform(code, { plugins: [pluginOptions] })\r\n  expect(result.code).toMatchSnapshot()\r\n})\r",
+            "line": 160,
+            "code": "it('should support rename of imported names', function () {\r\n  const code = `\r\n  // import { inject as mobxInject, observer as mobxObserver } from '@tarojs/mobx'\r\n  import { Component as TaroComponent } from \"@tarojs/taro-h5\";\r\n  export class Connected extends TaroComponent {}\r\n  `\r\n  const result = babel.transform(code, { ast: true, configFile: false, plugins: [pluginOptions] })\r\n  expect(result?.code).toMatchSnapshot()\r\n})\r",
             "file": "index.spec.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-transform-taroapi/__tests__"

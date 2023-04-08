@@ -21056,6 +21056,57 @@
             "dir": "packages/documentsearch/test"
         },
         {
+            "name": "should return new FileBrowser instance",
+            "suites": [
+                "filebrowser/browser",
+                "FileBrowser",
+                "#constructor"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 48
+            },
+            "line": 71,
+            "code": "      it('should return new FileBrowser instance', () => {\n        expect(fileBrowser).toBeInstanceOf(FileBrowser);\n      });",
+            "file": "browser.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should focus newly created directory after rename",
+            "suites": [
+                "filebrowser/browser",
+                "FileBrowser",
+                "#createNewDirectory"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 59
+            },
+            "line": 77,
+            "code": "      it('should focus newly created directory after rename', async () => {\n        const created = fileBrowser.createNewDirectory();\n        await signalToPromise(fileBrowser.renameCalled);\n        const editNode = document.querySelector(`.${EDITOR_CLASS}`);\n        if (!editNode) {\n          throw new Error('Edit node not found');\n        }\n        const itemNode = Array.from(\n          document.querySelectorAll(`.${ITEM_CLASS}`)\n        ).find(el => {\n          return el.contains(editNode);\n        });\n        if (!itemNode) {\n          throw new Error('Item node not found');\n        }\n        simulate(editNode, 'keydown', {\n          keyCode: 13,\n          key: 'Enter'\n        });\n        await created;\n        expect(itemNode.contains(document.activeElement)).toBe(true);\n      });",
+            "file": "browser.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should focus newly created file after rename",
+            "suites": [
+                "filebrowser/browser",
+                "FileBrowser",
+                "#createNewFile"
+            ],
+            "updatePoint": {
+                "line": 102,
+                "column": 54
+            },
+            "line": 102,
+            "code": "      it('should focus newly created file after rename', async () => {\n        const created = fileBrowser.createNewFile({ ext: '.txt' });\n        await signalToPromise(fileBrowser.renameCalled);\n        const editNode = document.querySelector(`.${EDITOR_CLASS}`);\n        if (!editNode) {\n          throw new Error('Edit node not found');\n        }\n        const itemNode = Array.from(\n          document.querySelectorAll(`.${ITEM_CLASS}`)\n        ).find(el => {\n          return el.contains(editNode);\n        });\n        if (!itemNode) {\n          throw new Error('Item node not found');\n        }\n        simulate(editNode, 'keydown', {\n          keyCode: 13,\n          key: 'Enter'\n        });\n        await created;\n        expect(itemNode.contains(document.activeElement)).toBe(true);\n      });",
+            "file": "browser.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
             "name": "should create a new BreadCrumbs instance",
             "suites": [
                 "filebrowser/model",
@@ -21230,6 +21281,22 @@
             "dir": "packages/filebrowser/test"
         },
         {
+            "name": "should reflect initial conditions",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing"
+            ],
+            "updatePoint": {
+                "line": 70,
+                "column": 41
+            },
+            "line": 70,
+            "code": "    it('should reflect initial conditions', () => {\n      // Check initial conditions\n      const selectedItems = [...dirListing.selectedItems()];\n      const sortedItems = [...dirListing.sortedItems()];\n      expect(selectedItems).toHaveLength(0);\n      expect(sortedItems).toHaveLength(4);\n    });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
             "name": "should return new DirListing instance",
             "suites": [
                 "filebrowser/listing",
@@ -21237,28 +21304,280 @@
                 "#constructor"
             ],
             "updatePoint": {
-                "line": 38,
+                "line": 79,
                 "column": 47
             },
-            "line": 38,
+            "line": 79,
             "code": "      it('should return new DirListing instance', () => {\n        const options = createOptionsForConstructor();\n        const dirListing = new DirListing(options);\n        expect(dirListing).toBeInstanceOf(DirListing);\n      });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
         },
         {
-            "name": "check initial conditions",
+            "name": "backspace during rename does not trigger goUp method",
             "suites": [
                 "filebrowser/listing",
-                "checkboxes",
-                "file/item checkbox"
+                "DirListing",
+                "#rename"
             ],
             "updatePoint": {
-                "line": 79,
-                "column": 34
+                "line": 87,
+                "column": 62
             },
-            "line": 79,
-            "code": "      it('check initial conditions', async () => {\n        expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        expect(Array.from(dirListing.sortedItems())).toHaveLength(2);\n      });",
+            "line": 87,
+            "code": "      it('backspace during rename does not trigger goUp method', async () => {\n        dirListing.selectNext();\n        const newNamePromise = dirListing.rename();\n        const goUpSpy = jest.spyOn(dirListing as any, 'goUp');\n        const editNode = dirListing['_editNode'];\n        simulate(editNode, 'keydown', {\n          key: 'Backspace',\n          keyCode: 8\n        });\n        // Can input node's value be changed with simulated key events?\n        editNode.value = 'new_name.txt';\n        simulate(editNode, 'keydown', {\n          key: 'Enter',\n          keyCode: 13\n        });\n        const newName = await newNamePromise;\n        expect(newName).toBe('new_name.txt');\n        expect(goUpSpy).not.toHaveBeenCalled();\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should focus item after rename",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#rename"
+            ],
+            "updatePoint": {
+                "line": 107,
+                "column": 40
+            },
+            "line": 107,
+            "code": "      it('should focus item after rename', async () => {\n        dirListing.selectNext();\n        const newNamePromise = dirListing.rename();\n        const directoryUpdated = signalToPromise(dirListing.updated);\n        const editNode = dirListing['_editNode'];\n        // Give it a name that should put it at the bottom\n        editNode.value = 'z.txt';\n        simulate(editNode, 'keydown', {\n          key: 'Enter',\n          keyCode: 13\n        });\n        await newNamePromise;\n        const sortedItems = [...dirListing.sortedItems()];\n        const lastIndex = sortedItems.length - 1;\n        expect(sortedItems[lastIndex].name).toBe('z.txt');\n        const itemNode = dirListing['_items'][lastIndex];\n        await directoryUpdated;\n        expect(itemNode.contains(document.activeElement)).toBe(true);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should keep focus on item after user presses escape key",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#rename"
+            ],
+            "updatePoint": {
+                "line": 127,
+                "column": 65
+            },
+            "line": 127,
+            "code": "      it('should keep focus on item after user presses escape key', async () => {\n        dirListing.selectNext();\n        const newNamePromise = dirListing.rename();\n        const editNode = dirListing['_editNode'];\n        simulate(editNode, 'keydown', {\n          key: 'Escape',\n          keyCode: 27\n        });\n        await newNamePromise;\n        const itemNode = dirListing['_items'][0];\n        expect(itemNode.contains(document.activeElement)).toBe(true);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should only select when to-index is same as from-index",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect"
+            ],
+            "updatePoint": {
+                "line": 142,
+                "column": 64
+            },
+            "line": 142,
+            "code": "      it('should only select when to-index is same as from-index', () => {\n        // to-index unselected\n        dirListing['_focusItem'](1);\n        expect(Object.keys(dirListing['selection'])).toHaveLength(0);\n        dirListing['_handleMultiSelect'](1);\n        expect(Object.keys(dirListing['selection'])).toHaveLength(1);\n\n        // to-index selected\n        dirListing['_selectItem'](1, false, true);\n        const items = [...dirListing.sortedItems()];\n        expect(dirListing['selection']).toHaveProperty([items[1].path], true);\n        expect(Object.keys(dirListing['selection'])).toHaveLength(1);\n        dirListing['_handleMultiSelect'](1);\n        expect(dirListing['selection']).toHaveProperty([items[1].path], true);\n        expect(Object.keys(dirListing['selection'])).toHaveLength(1);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should leave to-index selected and unselect from-index and items in-between",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is selected",
+                "when from-index and all items in-between are selected"
+            ],
+            "updatePoint": {
+                "line": 175,
+                "column": 89
+            },
+            "line": 175,
+            "code": "          it('should leave to-index selected and unselect from-index and items in-between', () => {\n            // Directory listing is like this:\n            // 1. selected\n            // 2. selected\n            // 3. selected, focused\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(4);\n            dirListing['_handleMultiSelect'](0);\n            // Now directory should look like:\n            // - selected, unselected, unselected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(Object.keys(dirListing['selection'])).toHaveLength(2);\n            expect(dirListing['selection']).toHaveProperty(\n              [items[0].path],\n              true\n            );\n            expect(dirListing['selection']).toHaveProperty(\n              [items[3].path],\n              true\n            );\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should leave to-index selected and unselect from-index and items in-between",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is selected",
+                "when all are selected except from-index"
+            ],
+            "updatePoint": {
+                "line": 204,
+                "column": 89
+            },
+            "line": 204,
+            "code": "          it('should leave to-index selected and unselect from-index and items in-between', () => {\n            // Directory listing is like this:\n            // 1. selected\n            // 2. selected\n            // 3. unselected, focused\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(3);\n            dirListing['_handleMultiSelect'](0);\n            // Now directory should look like:\n            // - selected, unselected, unselected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(Object.keys(dirListing['selection'])).toHaveLength(2);\n            expect(dirListing['selection']).toHaveProperty(\n              [items[0].path],\n              true\n            );\n            expect(dirListing['selection']).toHaveProperty(\n              [items[3].path],\n              true\n            );\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select all in-between from- and to-index, leaving from-index unselected",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is selected",
+                "when from-index and some items in-between are not selected"
+            ],
+            "updatePoint": {
+                "line": 232,
+                "column": 92
+            },
+            "line": 232,
+            "code": "          it('should select all in-between from- and to-index, leaving from-index unselected', () => {\n            // Directory listing is like this:\n            // 1. selected\n            // 2. unselected\n            // 3. unselected, focused\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(2);\n            dirListing['_handleMultiSelect'](0);\n            // Now directory should look like:\n            // - selected, selected, unselected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(items).toHaveLength(4);\n            expect(Object.keys(dirListing['selection'])).toHaveLength(3);\n            expect(dirListing['selection']).not.toHaveProperty([items[2].path]);\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select all in-between from- and to-index",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is selected",
+                "when from-index is selected but some items in-between are not"
+            ],
+            "updatePoint": {
+                "line": 254,
+                "column": 61
+            },
+            "line": 254,
+            "code": "          it('should select all in-between from- and to-index', () => {\n            // Directory listing is like this:\n            // 1. selected\n            // 2. unselected\n            // 3. selected, focused\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(3);\n            dirListing['_handleMultiSelect'](0);\n            // Now directory should look like:\n            // - selected, selected, selected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(items).toHaveLength(4);\n            expect(Object.keys(dirListing['selection'])).toHaveLength(4);\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select all between from- and to-index",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is unselected",
+                "when from-index and in-between items are selected"
+            ],
+            "updatePoint": {
+                "line": 287,
+                "column": 58
+            },
+            "line": 287,
+            "code": "          it('should select all between from- and to-index', () => {\n            // Directory listing is like this:\n            // 1. selected, focused\n            // 2. selected\n            // 3. unselected [target]\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(3);\n            dirListing['_handleMultiSelect'](2);\n            // Now directory should look like:\n            // - selected, selected, selected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(items).toHaveLength(4);\n            expect(Object.keys(dirListing['selection'])).toHaveLength(4);\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select all between from- and to-index",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "#_handleMultiSelect",
+                "when to-index is unselected",
+                "when from-index is unselected but in-between items are selected"
+            ],
+            "updatePoint": {
+                "line": 309,
+                "column": 58
+            },
+            "line": 309,
+            "code": "          it('should select all between from- and to-index', () => {\n            // Directory listing is like this:\n            // 1. unselected, focused\n            // 2. selected\n            // 3. unselected [target]\n            // 4. selected\n            expect(Object.keys(dirListing['selection'])).toHaveLength(2);\n            dirListing['_handleMultiSelect'](2);\n            // Now directory should look like:\n            // - unselected, selected, selected, selected\n            const items = [...dirListing.sortedItems()];\n            expect(items).toHaveLength(4);\n            expect(Object.keys(dirListing['selection'])).toHaveLength(3);\n            expect(dirListing['selection']).not.toHaveProperty([items[0].path]);\n          });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should not open an item unless it is selected",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "Enter key"
+            ],
+            "updatePoint": {
+                "line": 329,
+                "column": 55
+            },
+            "line": 329,
+            "code": "      it('should not open an item unless it is selected', () => {\n        // Meaning, do not open the item that is focussed if it is not also\n        // selected.\n        dirListing['_selectItem'](0, true);\n        dirListing['_selectItem'](1, true);\n        dirListing['_focusItem'](2);\n        const handleOpenSpy = jest.spyOn(dirListing as any, 'handleOpen');\n        const itemNode = dirListing['_items'][2];\n        const nameNode = dirListing['_renderer'].getNameNode(itemNode);\n        simulate(nameNode, 'keydown', {\n          key: 'Enter',\n          keyCode: 13\n        });\n        expect(handleOpenSpy).toHaveBeenCalledTimes(2);\n        const sortedItems = [...dirListing.sortedItems()];\n        expect(handleOpenSpy).toHaveBeenCalledWith(sortedItems[0]);\n        expect(handleOpenSpy).toHaveBeenCalledWith(sortedItems[1]);\n        expect(handleOpenSpy).not.toHaveBeenCalledWith(sortedItems[2]);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select first item when nothing is selected",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "ArrowDown key"
+            ],
+            "updatePoint": {
+                "line": 372,
+                "column": 59
+            },
+            "line": 372,
+            "code": "      it('should select first item when nothing is selected', async () => {\n        simulate(\n          dirListing.node.querySelector(`.${ITEM_TEXT_CLASS}`)!,\n          'keydown',\n          {\n            key: 'ArrowDown',\n            keyCode: 40\n          }\n        );\n        await signalToPromise(dirListing.updated);\n        const sortedItems = [...dirListing.sortedItems()];\n        const selectedItems = [...dirListing.selectedItems()];\n        expect(selectedItems).toHaveLength(1);\n        expect(selectedItems[0]).toBe(sortedItems[0]);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should select second item once first item is selected",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "ArrowDown key"
+            ],
+            "updatePoint": {
+                "line": 388,
+                "column": 63
+            },
+            "line": 388,
+            "code": "      it('should select second item once first item is selected', async () => {\n        dirListing['_selectItem'](0, false);\n        simulate(\n          dirListing.node.querySelector(`.${ITEM_TEXT_CLASS}`)!,\n          'keydown',\n          {\n            key: 'ArrowDown',\n            keyCode: 40\n          }\n        );\n        await signalToPromise(dirListing.updated);\n        const sortedItems = [...dirListing.sortedItems()];\n        const selectedItems = [...dirListing.selectedItems()];\n        expect(selectedItems).toHaveLength(1);\n        expect(selectedItems[0]).toBe(sortedItems[1]);\n      });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should unselect if current item is selected and previous is unselected",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "ArrowDown key",
+                "when pressing shift key and next item is selected"
+            ],
+            "updatePoint": {
+                "line": 406,
+                "column": 82
+            },
+            "line": 406,
+            "code": "        it('should unselect if current item is selected and previous is unselected', async () => {\n          dirListing['_selectItem'](2, true);\n          dirListing['_selectItem'](1, true);\n          // This should be the state:\n          // - unselected\n          // - selected, focussed\n          // - selected\n          await signalToPromise(dirListing.updated);\n          simulate(\n            dirListing.node.querySelector(`.${ITEM_TEXT_CLASS}`)!,\n            'keydown',\n            {\n              key: 'ArrowDown',\n              keyCode: 40,\n              shiftKey: true\n            }\n          );\n          await signalToPromise(dirListing.updated);\n          // Now it should be:\n          // - unselected\n          // - unselected\n          // - selected, focussed\n          const sortedItems = [...dirListing.sortedItems()];\n          const selectedItems = [...dirListing.selectedItems()];\n          expect(selectedItems).toHaveLength(1);\n          expect(selectedItems[0]).toBe(sortedItems[2]);\n        });",
+            "file": "listing.spec.ts",
+            "skipped": false,
+            "dir": "packages/filebrowser/test"
+        },
+        {
+            "name": "should leave selected otherwise",
+            "suites": [
+                "filebrowser/listing",
+                "DirListing",
+                "ArrowDown key",
+                "when pressing shift key and next item is selected"
+            ],
+            "updatePoint": {
+                "line": 434,
+                "column": 43
+            },
+            "line": 434,
+            "code": "        it('should leave selected otherwise', async () => {\n          dirListing['_selectItem'](0, true);\n          dirListing['_selectItem'](2, true);\n          dirListing['_selectItem'](1, true);\n          // This should be the state:\n          // - selected\n          // - selected, focussed\n          // - selected\n          await signalToPromise(dirListing.updated);\n          simulate(dirListing.node, 'keydown', {\n            key: 'ArrowDown',\n            keyCode: 40,\n            shiftKey: true\n          });\n          await signalToPromise(dirListing.updated);\n          // Now it should be:\n          // - selected\n          // - selected\n          // - selected, focussed\n          const sortedItems = [...dirListing.sortedItems()];\n          const selectedItems = [...dirListing.selectedItems()];\n          expect(selectedItems).toHaveLength(3);\n          expect(sortedItems).toHaveLength(3);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21267,15 +21586,16 @@
             "name": "should be checked after item is selected",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 84,
-                "column": 50
+                "line": 470,
+                "column": 52
             },
-            "line": 84,
-            "code": "      it('should be checked after item is selected', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        expect(checkbox.checked).toBe(false);\n        const nameNode = dirListing.renderer.getNameNode!(\n          itemNode\n        ) as HTMLElement;\n        expect(checkbox.getAttribute('aria-label')).toBe(\n          ariaSelectFile(nameNode.textContent)\n        );\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n        expect(checkbox.getAttribute('aria-label')).toBe(\n          ariaDeselectFile(nameNode.textContent)\n        );\n      });",
+            "line": 470,
+            "code": "        it('should be checked after item is selected', async () => {\n          const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n          const checkbox = dirListing.renderer.getCheckboxNode!(\n            itemNode\n          ) as HTMLInputElement;\n          expect(checkbox.checked).toBe(false);\n          const nameNode = dirListing.renderer.getNameNode!(\n            itemNode\n          ) as HTMLElement;\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaSelectFile(nameNode.textContent)\n          );\n          dirListing.selectNext();\n          await signalToPromise(dirListing.updated);\n          expect(checkbox.checked).toBe(true);\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaDeselectFile(nameNode.textContent)\n          );\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21284,15 +21604,16 @@
             "name": "should be unchecked after item is unselected",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 104,
-                "column": 54
+                "line": 490,
+                "column": 56
             },
-            "line": 104,
-            "code": "      it('should be unchecked after item is unselected', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const nameNode = dirListing.renderer.getNameNode!(\n          itemNode\n        ) as HTMLElement;\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(true);\n        expect(checkbox.getAttribute('aria-label')).toBe(\n          ariaDeselectFile(nameNode.textContent)\n        );\n        // Selecting the next item unselects the first.\n        dirListing.selectNext();\n        await signalToPromise(dirListing.updated);\n        expect(checkbox.checked).toBe(false);\n        expect(checkbox.getAttribute('aria-label')).toBe(\n          ariaSelectFile(nameNode.textContent)\n        );\n      });",
+            "line": 490,
+            "code": "        it('should be unchecked after item is unselected', async () => {\n          const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n          const checkbox = dirListing.renderer.getCheckboxNode!(\n            itemNode\n          ) as HTMLInputElement;\n          const nameNode = dirListing.renderer.getNameNode!(\n            itemNode\n          ) as HTMLElement;\n          dirListing.selectNext();\n          await signalToPromise(dirListing.updated);\n          expect(checkbox.checked).toBe(true);\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaDeselectFile(nameNode.textContent)\n          );\n          // Selecting the next item unselects the first.\n          dirListing.selectNext();\n          await signalToPromise(dirListing.updated);\n          expect(checkbox.checked).toBe(false);\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaSelectFile(nameNode.textContent)\n          );\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21301,15 +21622,16 @@
             "name": "should allow selecting multiple items",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 127,
-                "column": 47
+                "line": 513,
+                "column": 49
             },
-            "line": 127,
-            "code": "      it('should allow selecting multiple items', async () => {\n        const itemNodes = Array.from(\n          dirListing.contentNode.children\n        ) as HTMLElement[];\n        // JSDOM doesn't render anything, which means that all the elements have\n        // zero dimensions, so this is needed in order for the DirListing\n        // mousedown handler to believe that the mousedown event is relevant.\n        itemNodes[0].getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        itemNodes[1].getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 10,\n          bottom: 20\n        });\n        const checkboxes = itemNodes.map(node =>\n          dirListing.renderer.getCheckboxNode!(node)\n        ) as HTMLInputElement[];\n        const items = Array.from(dirListing.sortedItems());\n        expect(dirListing.isSelected(items[0].name)).toBe(false);\n        expect(dirListing.isSelected(items[1].name)).toBe(false);\n        simulate(checkboxes[0], 'mousedown', {\n          clientX: 1,\n          clientY: 1\n        });\n        simulate(checkboxes[1], 'mousedown', {\n          clientX: 1,\n          clientY: 11\n        });\n        await signalToPromise(dirListing.updated);\n        expect(dirListing.isSelected(items[0].name)).toBe(true);\n        expect(dirListing.isSelected(items[1].name)).toBe(true);\n      });",
+            "line": 513,
+            "code": "        it('should allow selecting multiple items', async () => {\n          const itemNodes = Array.from(\n            dirListing.contentNode.children\n          ) as HTMLElement[];\n          // JSDOM doesn't render anything, which means that all the elements have\n          // zero dimensions, so this is needed in order for the DirListing\n          // mousedown handler to believe that the mousedown event is relevant.\n          itemNodes[0].getBoundingClientRect = (): any => ({\n            left: 0,\n            right: 10,\n            top: 0,\n            bottom: 10\n          });\n          itemNodes[1].getBoundingClientRect = (): any => ({\n            left: 0,\n            right: 10,\n            top: 10,\n            bottom: 20\n          });\n          const checkboxes = itemNodes.map(node =>\n            dirListing.renderer.getCheckboxNode!(node)\n          ) as HTMLInputElement[];\n          const items = Array.from(dirListing.sortedItems());\n          expect(dirListing.isSelected(items[0].name)).toBe(false);\n          expect(dirListing.isSelected(items[1].name)).toBe(false);\n          simulate(checkboxes[0], 'mousedown', {\n            clientX: 1,\n            clientY: 1\n          });\n          simulate(checkboxes[1], 'mousedown', {\n            clientX: 1,\n            clientY: 11\n          });\n          await signalToPromise(dirListing.updated);\n          expect(dirListing.isSelected(items[0].name)).toBe(true);\n          expect(dirListing.isSelected(items[1].name)).toBe(true);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21318,15 +21640,16 @@
             "name": "should reflect multiple items selected",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 165,
-                "column": 48
+                "line": 551,
+                "column": 50
             },
-            "line": 165,
-            "code": "      it('should reflect multiple items selected', async () => {\n        const itemNodes = Array.from(\n          dirListing.contentNode.children\n        ) as HTMLElement[];\n        const checkboxes = itemNodes.map(node =>\n          dirListing.renderer.getCheckboxNode!(node)\n        ) as HTMLInputElement[];\n        const nameNodes = itemNodes.map(node =>\n          dirListing.renderer.getNameNode!(node)\n        ) as HTMLElement[];\n        checkboxes.map((checkbox, index) => {\n          expect(checkbox.checked).toBe(false);\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaSelectFile(nameNodes[index].textContent)\n          );\n        });\n        dirListing.selectNext();\n        dirListing.selectNext(true); // true = keep existing selection\n        await signalToPromise(dirListing.updated);\n        checkboxes.map((checkbox, index) => {\n          expect(checkbox.checked).toBe(true);\n          expect(checkbox.getAttribute('aria-label')).toBe(\n            ariaDeselectFile(nameNodes[index].textContent)\n          );\n        });\n      });",
+            "line": 551,
+            "code": "        it('should reflect multiple items selected', async () => {\n          const itemNodes = Array.from(\n            dirListing.contentNode.children\n          ) as HTMLElement[];\n          const checkboxes = itemNodes.map(node =>\n            dirListing.renderer.getCheckboxNode!(node)\n          ) as HTMLInputElement[];\n          const nameNodes = itemNodes.map(node =>\n            dirListing.renderer.getNameNode!(node)\n          ) as HTMLElement[];\n          expect(checkboxes[0].checked).toBe(false);\n          expect(checkboxes[1].checked).toBe(false);\n          expect(checkboxes[0].getAttribute('aria-label')).toBe(\n            ariaSelectFile(nameNodes[0].textContent)\n          );\n          expect(checkboxes[1].getAttribute('aria-label')).toBe(\n            ariaSelectFile(nameNodes[1].textContent)\n          );\n          dirListing.selectNext();\n          dirListing.selectNext(true); // true = keep existing selection\n          await signalToPromise(dirListing.updated);\n          expect(checkboxes[0].checked).toBe(true);\n          expect(checkboxes[1].checked).toBe(true);\n          expect(checkboxes[0].getAttribute('aria-label')).toBe(\n            ariaDeselectFile(nameNodes[0].textContent)\n          );\n          expect(checkboxes[1].getAttribute('aria-label')).toBe(\n            ariaDeselectFile(nameNodes[1].textContent)\n          );\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21335,15 +21658,16 @@
             "name": "should not open item on double click",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 194,
-                "column": 46
+                "line": 584,
+                "column": 48
             },
-            "line": 194,
-            "code": "      it('should not open item on double click', () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const wasOpened = jest.fn();\n        dirListing.onItemOpened.connect(wasOpened);\n        simulate(checkbox, 'dblclick');\n        expect(wasOpened).not.toHaveBeenCalled();\n        dirListing.onItemOpened.disconnect(wasOpened);\n      });",
+            "line": 584,
+            "code": "        it('should not open item on double click', () => {\n          const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n          const checkbox = dirListing.renderer.getCheckboxNode!(\n            itemNode\n          ) as HTMLInputElement;\n          const wasOpened = jest.fn();\n          dirListing.onItemOpened.connect(wasOpened);\n          simulate(checkbox, 'dblclick');\n          expect(wasOpened).not.toHaveBeenCalled();\n          dirListing.onItemOpened.disconnect(wasOpened);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21352,15 +21676,16 @@
             "name": "should not become unchecked due to right-click on selected item",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 206,
-                "column": 73
+                "line": 596,
+                "column": 75
             },
-            "line": 206,
-            "code": "      it('should not become unchecked due to right-click on selected item', async () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        itemNode.getBoundingClientRect = (): any => ({\n          left: 0,\n          right: 10,\n          top: 0,\n          bottom: 10\n        });\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        const item = dirListing.sortedItems().next();\n        const waitForUpdate = signalToPromise(dirListing.updated);\n        await dirListing.selectItemByName(item.value.name);\n        await waitForUpdate;\n        expect(checkbox.checked).toBe(true);\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        const waitForUpdate2 = signalToPromise(dirListing.updated);\n        simulate(checkbox, 'mousedown', {\n          clientX: 1,\n          clientY: 1,\n          button: 2\n        });\n        await waitForUpdate2;\n        // Item is still selected and checkbox is still checked after\n        // right-click.\n        expect(dirListing.isSelected(item.value.name)).toBe(true);\n        expect(checkbox.checked).toBe(true);\n      });",
+            "line": 596,
+            "code": "        it('should not become unchecked due to right-click on selected item', async () => {\n          const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n          itemNode.getBoundingClientRect = (): any => ({\n            left: 0,\n            right: 10,\n            top: 0,\n            bottom: 10\n          });\n          const checkbox = dirListing.renderer.getCheckboxNode!(\n            itemNode\n          ) as HTMLInputElement;\n          const item = dirListing.sortedItems().next();\n          const waitForUpdate = signalToPromise(dirListing.updated);\n          await dirListing.selectItemByName(item.value.name);\n          await waitForUpdate;\n          expect(checkbox.checked).toBe(true);\n          expect(dirListing.isSelected(item.value.name)).toBe(true);\n          const waitForUpdate2 = signalToPromise(dirListing.updated);\n          simulate(checkbox, 'mousedown', {\n            clientX: 1,\n            clientY: 1,\n            button: 2\n          });\n          await waitForUpdate2;\n          // Item is still selected and checkbox is still checked after\n          // right-click.\n          expect(dirListing.isSelected(item.value.name)).toBe(true);\n          expect(checkbox.checked).toBe(true);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21369,15 +21694,16 @@
             "name": "should not get checked by the default action of a click",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "file/item checkbox"
             ],
             "updatePoint": {
-                "line": 240,
-                "column": 65
+                "line": 630,
+                "column": 67
             },
-            "line": 240,
-            "code": "      it('should not get checked by the default action of a click', () => {\n        const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n        const checkbox = dirListing.renderer.getCheckboxNode!(\n          itemNode\n        ) as HTMLInputElement;\n        expect(checkbox.checked).toBe(false);\n        simulate(checkbox, 'click', { bubbles: false });\n        expect(checkbox.checked).toBe(false);\n      });",
+            "line": 630,
+            "code": "        it('should not get checked by the default action of a click', () => {\n          const itemNode = dirListing.contentNode.children[0] as HTMLElement;\n          const checkbox = dirListing.renderer.getCheckboxNode!(\n            itemNode\n          ) as HTMLInputElement;\n          expect(checkbox.checked).toBe(false);\n          simulate(checkbox, 'click', { bubbles: false });\n          expect(checkbox.checked).toBe(false);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21386,33 +21712,16 @@
             "name": "should be unchecked when the current directory is empty",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "check-all checkbox"
             ],
             "updatePoint": {
-                "line": 252,
-                "column": 65
+                "line": 642,
+                "column": 67
             },
-            "line": 252,
-            "code": "      it('should be unchecked when the current directory is empty', async () => {\n        const { path } = await dirListing.model.manager.newUntitled({\n          type: 'directory'\n        });\n        await dirListing.model.cd(path);\n        await signalToPromise(dirListing.updated);\n        const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n          dirListing.headerNode\n        ) as HTMLInputElement;\n        expect(headerCheckbox.checked).toBe(false);\n        expect(headerCheckbox!.indeterminate).toBe(false);\n      });",
-            "file": "listing.spec.ts",
-            "skipped": false,
-            "dir": "packages/filebrowser/test"
-        },
-        {
-            "name": "check initial conditions",
-            "suites": [
-                "filebrowser/listing",
-                "checkboxes",
-                "check-all checkbox",
-                "when previously unchecked"
-            ],
-            "updatePoint": {
-                "line": 266,
-                "column": 36
-            },
-            "line": 266,
-            "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(false);\n          expect(headerCheckbox!.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(ariaSelectAll);\n        });",
+            "line": 642,
+            "code": "        it('should be unchecked when the current directory is empty', async () => {\n          const { path } = await dirListing.model.manager.newUntitled({\n            type: 'directory'\n          });\n          await dirListing.model.cd(path);\n          await signalToPromise(dirListing.updated);\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(false);\n          expect(headerCheckbox!.indeterminate).toBe(false);\n        });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21421,34 +21730,17 @@
             "name": "should check all",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "check-all checkbox",
                 "when previously unchecked"
             ],
             "updatePoint": {
-                "line": 275,
-                "column": 28
+                "line": 667,
+                "column": 30
             },
-            "line": 275,
-            "code": "        it('should check all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(\n            ariaDeselectAll\n          );\n        });",
-            "file": "listing.spec.ts",
-            "skipped": false,
-            "dir": "packages/filebrowser/test"
-        },
-        {
-            "name": "check initial conditions",
-            "suites": [
-                "filebrowser/listing",
-                "checkboxes",
-                "check-all checkbox",
-                "when previously indeterminate"
-            ],
-            "updatePoint": {
-                "line": 293,
-                "column": 36
-            },
-            "line": 293,
-            "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.indeterminate).toBe(true);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(1);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(\n            ariaDeselectAll\n          );\n        });",
+            "line": 667,
+            "code": "          it('should check all', async () => {\n            expectInitialConditions();\n            const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n              dirListing.headerNode\n            ) as HTMLInputElement;\n            simulate(headerCheckbox, 'click');\n            await signalToPromise(dirListing.updated);\n            expect(Array.from(dirListing.selectedItems())).toHaveLength(4);\n            expect(headerCheckbox.getAttribute('aria-label')).toBe(\n              ariaDeselectAll\n            );\n          });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21457,34 +21749,17 @@
             "name": "should uncheck all",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "check-all checkbox",
                 "when previously indeterminate"
             ],
             "updatePoint": {
-                "line": 303,
-                "column": 30
+                "line": 697,
+                "column": 32
             },
-            "line": 303,
-            "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n          expect(headerCheckbox.getAttribute('aria-label')).toBe(ariaSelectAll);\n        });",
-            "file": "listing.spec.ts",
-            "skipped": false,
-            "dir": "packages/filebrowser/test"
-        },
-        {
-            "name": "check initial conditions",
-            "suites": [
-                "filebrowser/listing",
-                "checkboxes",
-                "check-all checkbox",
-                "when previously checked"
-            ],
-            "updatePoint": {
-                "line": 320,
-                "column": 36
-            },
-            "line": 320,
-            "code": "        it('check initial conditions', () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          expect(headerCheckbox.checked).toBe(true);\n          expect(headerCheckbox.indeterminate).toBe(false);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(2);\n        });",
+            "line": 697,
+            "code": "          it('should uncheck all', async () => {\n            expectInitialConditions();\n            const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n              dirListing.headerNode\n            ) as HTMLInputElement;\n            simulate(headerCheckbox, 'click');\n            await signalToPromise(dirListing.updated);\n            expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n            expect(headerCheckbox.getAttribute('aria-label')).toBe(\n              ariaSelectAll\n            );\n          });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
@@ -21493,16 +21768,17 @@
             "name": "should uncheck all",
             "suites": [
                 "filebrowser/listing",
+                "DirListing",
                 "checkboxes",
                 "check-all checkbox",
                 "when previously checked"
             ],
             "updatePoint": {
-                "line": 328,
-                "column": 30
+                "line": 728,
+                "column": 32
             },
-            "line": 328,
-            "code": "        it('should uncheck all', async () => {\n          const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n            dirListing.headerNode\n          ) as HTMLInputElement;\n          simulate(headerCheckbox, 'click');\n          await signalToPromise(dirListing.updated);\n          expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n        });",
+            "line": 728,
+            "code": "          it('should uncheck all', async () => {\n            expectInitialConditions();\n            const headerCheckbox = dirListing.renderer.getCheckboxNode!(\n              dirListing.headerNode\n            ) as HTMLInputElement;\n            simulate(headerCheckbox, 'click');\n            await signalToPromise(dirListing.updated);\n            expect(Array.from(dirListing.selectedItems())).toHaveLength(0);\n          });",
             "file": "listing.spec.ts",
             "skipped": false,
             "dir": "packages/filebrowser/test"
