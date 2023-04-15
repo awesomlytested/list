@@ -7301,6 +7301,22 @@
             "dir": "packages/apputils/test"
         },
         {
+            "name": "should update the toolbar items with late item factory",
+            "suites": [
+                "@jupyterlab/apputils",
+                "createToolbarFactory"
+            ],
+            "updatePoint": {
+                "line": 538,
+                "column": 62
+            },
+            "line": 538,
+            "code": "    it('should update the toolbar items with late item factory', async () => {\n      const factoryName = 'dummyFactory';\n      const pluginId = 'test-plugin:settings';\n\n      const dummyWidget = new Widget();\n      const defaultFactory = jest.fn().mockReturnValue(dummyWidget);\n\n      const textContent = 'This is a test widget';\n      const node = document.createElement('div');\n      node.textContent = textContent;\n      const testWidget = new Widget({ node });\n      const itemFactory = jest.fn().mockReturnValue(testWidget);\n\n      const toolbarRegistry = new ToolbarWidgetRegistry({\n        defaultFactory: defaultFactory\n      });\n\n      const bar: ISettingRegistry.IPlugin = {\n        data: {\n          composite: {},\n          user: {}\n        },\n        id: pluginId,\n        raw: '{}',\n        schema: {\n          'jupyter.lab.toolbars': {\n            dummyFactory: [\n              {\n                name: 'test',\n                rank: 20\n              }\n            ]\n          },\n          'jupyter.lab.transform': true,\n          properties: {\n            toolbar: {\n              type: 'array'\n            }\n          },\n          type: 'object'\n        },\n        version: 'test'\n      };\n\n      const connector: IDataConnector<\n        ISettingRegistry.IPlugin,\n        string,\n        string,\n        string\n      > = {\n        fetch: jest.fn().mockImplementation((id: string) => {\n          switch (id) {\n            case bar.id:\n              return bar;\n            default:\n              return {};\n          }\n        }),\n        list: jest.fn(),\n        save: jest.fn(),\n        remove: jest.fn()\n      };\n\n      const settingRegistry = new SettingRegistry({\n        connector\n      });\n\n      const translator: ITranslator = {\n        languageCode: 'en',\n        load: jest.fn()\n      };\n\n      const factory = createToolbarFactory(\n        toolbarRegistry,\n        settingRegistry,\n        factoryName,\n        pluginId,\n        translator\n      );\n\n      await settingRegistry.load(bar.id);\n\n      const toolbar = factory(new Widget());\n\n      // Should contain the defaultFactory widget\n      expect(toolbar).toHaveLength(1);\n      expect(toolbar.get(0).widget.node.textContent).not.toContain(textContent);\n\n      // Add a factory item to the toolbar should re-render the widget.\n      toolbarRegistry.addFactory(factoryName, 'test', itemFactory);\n      expect(toolbar).toHaveLength(1);\n      expect(toolbar.get(0).widget.node.textContent).toContain(textContent);\n    });",
+            "file": "toolbar.spec.ts",
+            "skipped": false,
+            "dir": "packages/apputils/test"
+        },
+        {
             "name": "should create an WidgetTracker",
             "suites": [
                 "@jupyterlab/apputils",
