@@ -434,7 +434,7 @@
                 "column": 27
             },
             "line": 156,
-            "code": "test('extractSourceLocation', function () {\n  const filePath = path.join(__dirname, 'fixtures', 'extractSourceLocation.js')\n  const messages: ExtractedMessageDescriptor[] = []\n  const meta = {}\n\n  const {code} = transform(filePath, {\n    pragma: '@react-intl',\n    extractSourceLocation: true,\n    onMsgExtracted(_, msgs) {\n      messages.push(...msgs)\n    },\n    onMetaExtracted(_, m) {\n      Object.assign(meta, m)\n    },\n  })\n  expect(code?.trim()).toMatchSnapshot()\n  expect(messages).toMatchSnapshot([\n    {\n      file: expect.any(String),\n    },\n  ])\n  expect(meta).toMatchSnapshot()\n})",
+            "code": "test('extractSourceLocation', function () {\n  const filePath = path.join(__dirname, 'fixtures', 'extractSourceLocation.js')\n  const messages: ExtractedMessageDescriptor[] = []\n  const meta = {}\n\n  const {code} = transform(filePath, {\n    pragma: '@react-intl',\n    extractSourceLocation: true,\n    onMsgExtracted(_, msgs) {\n      messages.push(...msgs)\n    },\n    onMetaExtracted(_, m) {\n      Object.assign(meta, m)\n    },\n  })\n  expect(code?.trim()).toMatchSnapshot()\n  expect(messages.map(m => m.file).filter(Boolean)).toHaveLength(1)\n  expect(meta).toMatchSnapshot()\n})",
             "file": "index.test.ts",
             "skipped": false,
             "dir": "packages/babel-plugin-formatjs/tests"
@@ -443,10 +443,10 @@
             "name": "Properly throws parse errors",
             "suites": [],
             "updatePoint": {
-                "line": 180,
+                "line": 176,
                 "column": 34
             },
-            "line": 180,
+            "line": 176,
             "code": "test('Properly throws parse errors', () => {\n  expect(() =>\n    transform(path.join(__dirname, 'fixtures', 'icuSyntax.js'))\n  ).toThrow('SyntaxError: MALFORMED_ARGUMENT')\n})",
             "file": "index.test.ts",
             "skipped": false,
@@ -456,10 +456,10 @@
             "name": "skipExtractionFormattedMessage",
             "suites": [],
             "updatePoint": {
-                "line": 186,
+                "line": 182,
                 "column": 36
             },
-            "line": 186,
+            "line": 182,
             "code": "test('skipExtractionFormattedMessage', function () {\n  transformAndCheck('skipExtractionFormattedMessage')\n})",
             "file": "index.test.ts",
             "skipped": false,
@@ -6697,7 +6697,7 @@
                 "column": 67
             },
             "line": 290,
-            "code": "      it('warns when `message` is missing and locales are different', () => {\n        config.locale = 'fr'\n\n        const {locale, messages, defaultLocale} = config\n        const mf = new IntlMessageFormat(messages!.with_arg, locale)\n        const id = 'missing'\n        const values = {name: 'Eric'}\n\n        expect(locale).not.toEqual(defaultLocale)\n\n        expect(\n          formatMessage(\n            {\n              id,\n              defaultMessage: messages!.with_arg,\n            },\n            values\n          )\n        ).toBe(mf.format(values))\n\n        expect((config.onError as jest.Mock).mock.calls.map(c => c[0].code))\n          .toMatchInlineSnapshot(`\n          Array [\n            \"MISSING_TRANSLATION\",\n          ]\n        `)\n      })",
+            "code": "      it('warns when `message` is missing and locales are different', () => {\n        config.locale = 'fr'\n\n        const {locale, messages, defaultLocale} = config\n        const mf = new IntlMessageFormat(messages!.with_arg, locale)\n        const id = 'missing'\n        const values = {name: 'Eric'}\n\n        expect(locale).not.toEqual(defaultLocale)\n\n        expect(\n          formatMessage(\n            {\n              id,\n              defaultMessage: messages!.with_arg,\n            },\n            values\n          )\n        ).toBe(mf.format(values))\n\n        expect((config.onError as jest.Mock).mock.calls.map(c => c[0].code))\n          .toMatchInlineSnapshot(`\n          [\n            \"MISSING_TRANSLATION\",\n          ]\n        `)\n      })",
             "file": "formatMessage.test.ts",
             "skipped": false,
             "dir": "packages/intl/tests"
@@ -6714,7 +6714,7 @@
                 "column": 63
             },
             "line": 318,
-            "code": "      it('warns when `message` and `defaultMessage` are missing', () => {\n        const {messages} = config\n        const id = 'missing'\n        const values = {name: 'Eric'}\n\n        expect(\n          formatMessage(\n            {\n              id: id,\n              defaultMessage: messages!.missing,\n            },\n            values\n          )\n        ).toBe(id)\n\n        expect((config.onError as jest.Mock).mock.calls.map(c => c[0].code))\n          .toMatchInlineSnapshot(`\n          Array [\n            \"MISSING_TRANSLATION\",\n          ]\n        `)\n      })",
+            "code": "      it('warns when `message` and `defaultMessage` are missing', () => {\n        const {messages} = config\n        const id = 'missing'\n        const values = {name: 'Eric'}\n\n        expect(\n          formatMessage(\n            {\n              id: id,\n              defaultMessage: messages!.missing,\n            },\n            values\n          )\n        ).toBe(id)\n\n        expect((config.onError as jest.Mock).mock.calls.map(c => c[0].code))\n          .toMatchInlineSnapshot(`\n          [\n            \"MISSING_TRANSLATION\",\n          ]\n        `)\n      })",
             "file": "formatMessage.test.ts",
             "skipped": false,
             "dir": "packages/intl/tests"
