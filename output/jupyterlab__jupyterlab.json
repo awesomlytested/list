@@ -11206,16 +11206,32 @@
             "dir": "packages/codemirror/test"
         },
         {
+            "name": "should return preceeding token when it is the last token",
+            "suites": [
+                "CodeMirrorEditor",
+                "#getTokenAt()"
+            ],
+            "updatePoint": {
+                "line": 460,
+                "column": 64
+            },
+            "line": 460,
+            "code": "    it('should return preceeding token when it is the last token', async () => {\n      model.mimeType = 'text/x-python';\n      model.sharedModel.setSource('import');\n      // Needed to have the sharedModel content transferred to the editor document\n      await sleep(0.01);\n      expect(editor.getTokenAt(6)).toStrictEqual({\n        type: 'import',\n        offset: 0,\n        value: 'import'\n      });\n    });",
+            "file": "editor.spec.ts",
+            "skipped": false,
+            "dir": "packages/codemirror/test"
+        },
+        {
             "name": "should get a list of tokens",
             "suites": [
                 "CodeMirrorEditor",
                 "#getTokens()"
             ],
             "updatePoint": {
-                "line": 463,
+                "line": 474,
                 "column": 35
             },
-            "line": 463,
+            "line": 474,
             "code": "    it('should get a list of tokens', async () => {\n      model.mimeType = 'text/x-python';\n      model.sharedModel.setSource('foo = \"a\"\\nbar = 1');\n      // Needed to have the sharedModel content transferred to the editor document\n      await sleep(0.01);\n      expect(editor.getTokens()).toStrictEqual([\n        {\n          offset: 0,\n          type: 'VariableName',\n          value: 'foo'\n        },\n        {\n          offset: 4,\n          type: 'AssignOp',\n          value: '='\n        },\n        {\n          offset: 6,\n          type: 'String',\n          value: '\"a\"'\n        },\n        {\n          offset: 10,\n          type: 'VariableName',\n          value: 'bar'\n        },\n        {\n          offset: 14,\n          type: 'AssignOp',\n          value: '='\n        },\n        {\n          offset: 16,\n          type: 'Number',\n          value: '1'\n        }\n      ]);\n    });",
             "file": "editor.spec.ts",
             "skipped": false,
@@ -11228,10 +11244,10 @@
                 "#replaceSelection()"
             ],
             "updatePoint": {
-                "line": 504,
+                "line": 515,
                 "column": 39
             },
-            "line": 504,
+            "line": 515,
             "code": "    it('should set text in empty editor', () => {\n      model.sharedModel.setSource('');\n      editor.replaceSelection('text');\n      expect(model.sharedModel.source).toBe('text');\n      expect(editor.getSelection().end.column).toBe(4);\n    });",
             "file": "editor.spec.ts",
             "skipped": false,
@@ -11244,10 +11260,10 @@
                 "#replaceSelection()"
             ],
             "updatePoint": {
-                "line": 511,
+                "line": 522,
                 "column": 53
             },
-            "line": 511,
+            "line": 522,
             "code": "    it('should replace from start to end of selection', () => {\n      model.sharedModel.setSource('axxc');\n      const start = { line: 0, column: 1 };\n      const end = { line: 0, column: 3 };\n      editor.setSelection({ start, end });\n      editor.replaceSelection('b');\n      expect(model.sharedModel.source).toBe('abc');\n    });",
             "file": "editor.spec.ts",
             "skipped": false,
@@ -12086,6 +12102,40 @@
             "file": "widget.spec.ts",
             "skipped": false,
             "dir": "packages/codemirror/test"
+        },
+        {
+            "name": "should accept results with `_jupyter_types_experimental` metadata",
+            "suites": [
+                "completer/default/kernelprovider",
+                "KernelCompleterProvider",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 25,
+                "column": 75
+            },
+            "line": 25,
+            "code": "      it('should accept results with `_jupyter_types_experimental` metadata', async () => {\n        kernel.requestComplete = async (\n          contents: KernelMessage.ICompleteRequestMsg['content']\n        ) => {\n          return {\n            channel: 'shell',\n            header: {\n              msg_id: '8a1cb99c-fdff731a5471adf71bcccb01_103588_3078',\n              msg_type: 'complete_reply',\n              username: '',\n              session: '8a1cb99c-fdff731a5471adf71bcccb01',\n              date: '2023-05-07T13:37:29.216298Z',\n              version: '5.3'\n            },\n            parent_header: {\n              date: '2023-05-07T13:37:29.092000Z',\n              msg_id: '766951ae-5117-4282-abd3-b43b569aa496',\n              msg_type: 'complete_request',\n              session: '7ec9fde6-c8bb-40b2-a7f3-8e1b514f7037',\n              username: '',\n              version: '5.2'\n            },\n            metadata: {},\n            content: {\n              matches: ['staticmethod', 'str', '%store'],\n              cursor_end: 2,\n              cursor_start: 0,\n              metadata: {\n                _jupyter_types_experimental: [\n                  {\n                    start: 0,\n                    end: 2,\n                    text: 'staticmethod',\n                    type: 'class',\n                    signature: ''\n                  },\n                  {\n                    start: 0,\n                    end: 2,\n                    text: 'str',\n                    type: 'class',\n                    signature: ''\n                  },\n                  {\n                    start: 0,\n                    end: 2,\n                    text: '%store',\n                    type: 'magic',\n                    signature: ''\n                  }\n                ]\n              },\n              status: 'ok'\n            }\n          };\n        };\n\n        const result = await provider.fetch({ text: 'st', offset: 2 }, context);\n\n        expect(result).toStrictEqual({\n          start: 0,\n          end: 2,\n          items: [\n            {\n              label: 'staticmethod',\n              type: 'class',\n              insertText: 'staticmethod'\n            },\n            { label: 'str', type: 'class', insertText: 'str' },\n            { label: '%store', type: 'magic', insertText: '%store' }\n          ]\n        });\n      });",
+            "file": "kernelprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
+        },
+        {
+            "name": "should accept results without `_jupyter_types_experimental` metadata",
+            "suites": [
+                "completer/default/kernelprovider",
+                "KernelCompleterProvider",
+                "#fetch()"
+            ],
+            "updatePoint": {
+                "line": 99,
+                "column": 78
+            },
+            "line": 99,
+            "code": "      it('should accept results without `_jupyter_types_experimental` metadata', async () => {\n        kernel.requestComplete = async (\n          contents: KernelMessage.ICompleteRequestMsg['content']\n        ) => {\n          return {\n            channel: 'shell',\n            header: {\n              msg_id: '6bb75124-996c-45b6-80ce-cd28f490a9d2',\n              session: 'fd6b9f46-6d46-4e11-b686-27f73b027f8d',\n              username: '',\n              date: '2023-05-07T13:10:54.600942Z',\n              msg_type: 'complete_reply',\n              version: '5.3'\n            },\n            parent_header: {\n              date: '2023-05-07T13:10:54.586Z',\n              msg_id: '7c93ba17-facd-44ed-b6a7-f34348a9ea42',\n              msg_type: 'complete_request',\n              session: 'fd6b9f46-6d46-4e11-b686-27f73b027f8d',\n              username: '',\n              version: '5.2'\n            },\n            metadata: {},\n            content: {\n              matches: [\n                'plclust',\n                'plnorm',\n                'plogis',\n                'plot',\n                'plot.default',\n                'plot.design',\n                'plot.ecdf',\n                'plot.function',\n                'plot.new',\n                'plot.spec.coherency',\n                'plot.spec.phase',\n                'plot.stepfun',\n                'plot.ts',\n                'plot.window',\n                'plot.xy'\n              ],\n              metadata: {},\n              cursor_start: 0,\n              cursor_end: 2,\n              status: 'ok'\n            }\n          };\n        };\n\n        const result = await provider.fetch({ text: 'pl', offset: 2 }, context);\n        expect(result).toStrictEqual({\n          start: 0,\n          end: 2,\n          items: [\n            { label: 'plclust' },\n            { label: 'plnorm' },\n            { label: 'plogis' },\n            { label: 'plot' },\n            { label: 'plot.default' },\n            { label: 'plot.design' },\n            { label: 'plot.ecdf' },\n            { label: 'plot.function' },\n            { label: 'plot.new' },\n            { label: 'plot.spec.coherency' },\n            { label: 'plot.spec.phase' },\n            { label: 'plot.stepfun' },\n            { label: 'plot.ts' },\n            { label: 'plot.window' },\n            { label: 'plot.xy' }\n          ]\n        });\n      });",
+            "file": "kernelprovider.spec.ts",
+            "skipped": false,
+            "dir": "packages/completer/test"
         },
         {
             "name": "should create a completer model",
