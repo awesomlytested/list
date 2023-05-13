@@ -2126,6 +2126,201 @@
             "dir": "packages/graphql-codegen-cli/tests"
         },
         {
+            "name": "watches the longest common prefix directory",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 20,
+                "column": 51
+            },
+            "line": 20,
+            "code": "  test('watches the longest common prefix directory', async () => {\n    const { stopWatching, watchDirectory } = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            documents: ['./foo/bar/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(watchDirectory).toBe(join(process.cwd(), 'foo'));\n    await stopWatching();\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "watches process.cwd() when longest common prefix directory is not accessible",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 37,
+                "column": 84
+            },
+            "line": 37,
+            "code": "  test('watches process.cwd() when longest common prefix directory is not accessible', async () => {\n    setupMockFilesystem({\n      access: async path => {\n        if (path === join(process.cwd(), 'foo')) {\n          throw new Error();\n        }\n      },\n    });\n\n    const { stopWatching, watchDirectory } = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            documents: ['./foo/bar/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(watchDirectory).toBe(join(process.cwd()));\n    await stopWatching();\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "triggers a rebuild for basic case",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 64,
+                "column": 41
+            },
+            "line": 64,
+            "code": "  test('triggers a rebuild for basic case', async () => {\n    const { onWatchTriggered, dispatchChange, stopWatching, subscribeCallbackSpy, unsubscribeSpy, watchDirectory } =\n      await setupMockWatcher({\n        filepath: './foo/some-config.ts',\n        config: {\n          schema: './foo/something.ts',\n          generates: {\n            ['./foo/some-output.ts']: {\n              documents: ['./foo/bar/*.graphql'],\n            },\n          },\n        },\n      });\n\n    expect(watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    const shouldTriggerBuild = join(process.cwd(), './foo/bar/fizzbuzz.graphql');\n    const shouldNotTriggerBuild = join(process.cwd(), './foo/bar/something.ts');\n\n    await dispatchChange(shouldTriggerBuild);\n    expect(subscribeCallbackSpy).toHaveBeenLastCalledWith(undefined, [{ path: shouldTriggerBuild, type: 'update' }]);\n    expect(onWatchTriggered).toHaveBeenLastCalledWith('update', shouldTriggerBuild);\n\n    await dispatchChange(shouldNotTriggerBuild);\n    expect(subscribeCallbackSpy).toHaveBeenLastCalledWith(undefined, [{ path: shouldNotTriggerBuild, type: 'update' }]);\n    expect(onWatchTriggered).not.toHaveBeenLastCalledWith('update', shouldNotTriggerBuild);\n    expect(onWatchTriggered).toHaveBeenCalledTimes(1);\n\n    expect(subscribeCallbackSpy).toHaveBeenCalledTimes(2);\n\n    await stopWatching();\n    expect(unsubscribeSpy).toHaveBeenCalled();\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "globally included paths should be included even when a local pattern negates them",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 89
+            },
+            "line": 98,
+            "code": "  test('globally included paths should be included even when a local pattern negates them', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: ['./foo/**/match-schema-everywhere.graphql'],\n        watch: [\n          'foo/**/match-watch-everywhere.graphql',\n          'foo/**/match-watch-doc-everywhere.graphql',\n          'foo/**/match-watch-schema-everywhere.graphql',\n        ],\n        documents: ['foo/**/match-doc-everywhere.graphql'],\n        generates: {\n          // globally inclued paths should be included even when a local pattern negates them\n          ['./foo/local-exclusions-dont-precede-global-inclusions.ts']: {\n            watchPattern: ['!foo/global-beats-local/match-watch-everywhere.graphql'],\n            documents: [\n              '!foo/global-beats-local/match-doc-everywhere.graphql',\n              '!foo/global-beats-local/match-watch-doc-everywhere.graphql',\n            ],\n            schema: [\n              '!foo/global-beats-local/match-schema-everywhere.graphql',\n              '!foo/global-beats-local/match-watch-schema-everywhere.graphql',\n            ],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: [\n        // watch\n        './foo/match-watch-everywhere.graphql',\n        './foo/fizz/match-watch-everywhere.graphql',\n        './foo/fizz/buzz/match-watch-everywhere.graphql',\n        './foo/fizz/buzz/foobarbaz/match-watch-everywhere.graphql',\n        // watch-doc (matched in global watch, excluded in local doc)\n        './foo/match-watch-doc-everywhere.graphql',\n        './foo/fizz/match-watch-doc-everywhere.graphql',\n        './foo/fizz/buzz/match-watch-doc-everywhere.graphql',\n        './foo/fizz/buzz/foobarbaz/match-watch-doc-everywhere.graphql',\n        // watch-schema (matched in global watch, excluded in local schema)\n        './foo/match-watch-schema-everywhere.graphql',\n        './foo/fizz/match-watch-schema-everywhere.graphql',\n        './foo/fizz/buzz/match-watch-schema-everywhere.graphql',\n        './foo/fizz/buzz/foobarbaz/match-watch-schema-everywhere.graphql',\n        // doc\n        './foo/match-doc-everywhere.graphql',\n        './foo/fizz/match-doc-everywhere.graphql',\n        './foo/fizz/buzz/match-doc-everywhere.graphql',\n        './foo/fizz/buzz/foobarbaz/match-doc-everywhere.graphql',\n        // schema\n        './foo/match-schema-everywhere.graphql',\n        './foo/fizz/match-schema-everywhere.graphql',\n        './foo/fizz/buzz/match-schema-everywhere.graphql',\n        './foo/fizz/buzz/foobarbaz/match-schema-everywhere.graphql',\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "globally negated paths should be excluded even when a local pattern matches them",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 159,
+                "column": 88
+            },
+            "line": 159,
+            "code": "  test('globally negated paths should be excluded even when a local pattern matches them', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: ['!**/exclude-schema-everywhere.graphql'],\n        watch: [\n          '!**/exclude-watch-everywhere.graphql',\n          '!**/exclude-watch-doc-everywhere.graphql',\n          '!**/exclude-watch-schema-everywhere.graphql',\n        ],\n        documents: ['!**/exclude-doc-everywhere.graphql'],\n        generates: {\n          ['./foo/local-inclusions-dont-precede-global-exclusions.ts']: {\n            watchPattern: [\n              'foo/global-beats-local/exclude-watch-everywhere.graphql',\n              'foo/global-beats-local/exclude-watch-doc-everywhere.graphql',\n              'foo/global-beats-local/exclude-watch-schema-everywhere.graphql',\n            ],\n            documents: [\n              'foo/global-beats-local/exclude-doc-everywhere.graphql',\n              'foo/global-beats-local/exclude-watch-doc-everywhere.graphql',\n            ],\n            schema: [\n              'foo/global-beats-local/exclude-schema-everywhere.graphql',\n              'foo/global-beats-local/exclude-watch-schema-everywhere.graphql',\n            ],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldNotTriggerBuild: [\n        'foo/global-beats-local/exclude-watch-everywhere.graphql',\n        'foo/global-beats-local/exclude-doc-everywhere.graphql',\n        'foo/global-beats-local/exclude-schema-everywhere.graphql',\n        'foo/global-beats-local/exclude-watch-doc-everywhere.graphql',\n        'foo/global-beats-local/exclude-watch-schema-everywhere.graphql',\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "local watchPattern negation should override local documents match",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 203,
+                "column": 73
+            },
+            "line": 203,
+            "code": "  test('local watchPattern negation should override local documents match', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            watchPattern: '!./foo/bar/never-watch.graphql',\n            documents: ['./foo/bar/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: ['./foo/bar/okay-doc.graphql'],\n      shouldNotTriggerBuild: ['./foo/bar/never-watch.graphql'],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "local negations in documents set should override match in same documents set",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 225,
+                "column": 84
+            },
+            "line": 225,
+            "code": "  test('local negations in documents set should override match in same documents set', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            documents: ['./foo/bar/*.graphql', '!./foo/bar/never.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: ['./foo/bar/okay.graphql'],\n      shouldNotTriggerBuild: ['./foo/bar/never.graphql'],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "local watchPattern negation should override local schema match",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 246,
+                "column": 70
+            },
+            "line": 246,
+            "code": "  test('local watchPattern negation should override local schema match', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            watchPattern: '!./foo/bar/never-watch.graphql',\n            schema: ['./foo/bar/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: ['./foo/bar/okay-doc.graphql'],\n      shouldNotTriggerBuild: ['./foo/bar/never-watch.graphql'],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "local negations in schema set should override match in same schema set",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 268,
+                "column": 78
+            },
+            "line": 268,
+            "code": "  test('local negations in schema set should override match in same schema set', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          ['./foo/some-output.ts']: {\n            schema: ['./foo/bar/*.graphql', '!./foo/bar/never.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: ['./foo/bar/okay.graphql'],\n      shouldNotTriggerBuild: ['./foo/bar/never.graphql'],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "match in one local group, negated in another group, should still match",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 289,
+                "column": 78
+            },
+            "line": 289,
+            "code": "  test('match in one local group, negated in another group, should still match', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        schema: './foo/something.ts',\n        generates: {\n          // match in one local group, negation in another local group, should still match\n          ['./foo/alphabet/types-no-sigma.ts']: {\n            schema: [\n              './foo/alphabet/schema/delta.graphql', // delta explicitly included\n              './foo/alphabet/schema/zeta.graphql', // zeta explicitly included\n              '!foo/alphabet/schema/sigma.graphql', // sigma explicitly excluded\n            ],\n            documents: [\n              './foo/alphabet/docs/*.graphql', // zeta implicitly included\n              '!**/sigma.graphql', // sigma excluded here\n            ],\n          },\n          // match in one local group, negation in another local group, should still match\n          ['./foo/alphabet/types-no-zeta.ts']: {\n            watchPattern: [\n              // local watch pattern doesnt take priority over other groups schema\n              '!./foo/alphabet/schema/delta.graphql', // delta explicitly excluded\n            ],\n            schema: [\n              './foo/alphabet/schema/sigma.graphql', // sigma explicitly included\n              '!foo/alphabet/schema/zeta.graphql', // zeta explicitly excluded\n            ],\n            documents: [\n              './foo/alphabet/docs/sigma.graphql', // sigma explicitly included (should always match)\n              '!./foo/alphabet/docs/zeta.graphql', // zeta excluded here\n            ],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: [\n        './foo/alphabet/docs/zeta.graphql',\n        './foo/alphabet/docs/sigma.graphql',\n        './foo/alphabet/schema/zeta.graphql',\n        './foo/alphabet/schema/sigma.graphql',\n        './foo/alphabet/schema/delta.graphql',\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "output directories with presetConfig create glob patterns ignored by parcel watcher",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 339,
+                "column": 91
+            },
+            "line": 339,
+            "code": "  test('output directories with presetConfig create glob patterns ignored by parcel watcher', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        generates: {\n          ['./foo/some-preset-bar/']: {\n            preset: 'near-operation-file',\n            presetConfig: {\n              extension: '.generated.tsx',\n              baseTypesPath: 'types.ts',\n            },\n            documents: ['./foo/some-preset-bar/*.graphql'],\n          },\n          ['./foo/some-preset-without-trailing-slash']: {\n            // no trailing slash after directory\n            preset: 'near-operation-file',\n            presetConfig: {\n              extension: '.fizzbuzz.tsx',\n              baseTypesPath: 'types.ts',\n            },\n            documents: ['./foo/some-preset-without-trailing-slash/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      // note: since our mock does not implement ParcelWatcher's shouldIgnore logic,\n      // we can't actually test shouldNotTriggerBuild, because the subscription callback\n      // will still be called. For that reason, we only check that the globs were passed\n      // to ParcelWatcher.Options[\"ignore\"] as expected (hence _would_BeIgnoredByParcelWatcher)\n      shouldNotTriggerBuild: [],\n      globsWouldBeIgnoredByParcelWatcher: [\n        // note: globs are tested for exact match with argument passed to subscribe options,\n        //       so they should be specified relative from watchDirectory, _not_ cwd (see typedoc)\n        'some-preset-bar/**/*.generated.tsx',\n        'some-preset-without-trailing-slash/**/*.fizzbuzz.tsx',\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "output files are ignored by parcel watcher, but would not trigger rebuild anyway",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 382,
+                "column": 88
+            },
+            "line": 382,
+            "code": "  test('output files are ignored by parcel watcher, but would not trigger rebuild anyway', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './foo/some-config.ts',\n      config: {\n        generates: {\n          ['./foo/some-output.ts']: {\n            documents: ['./foo/bar/*.graphql', '!./foo/bar/never.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'foo'));\n\n    await assertBuildTriggers(mockWatcher, {\n      // NOTE: Unlike the test with output _directories_, we can actually assert\n      // that we wouldn't build output files, even if they were _not_ passed\n      // to ParcelWatcher.Options[ignore], because we don't include output files\n      // in our pattern matching (but there is no logic for output directories)\n      shouldNotTriggerBuild: [\n        './foo/some-output.ts', // output file (note: should be ignored by parcel anyway)\n      ],\n      pathsWouldBeIgnoredByParcelWatcher: [\n        // note: expectations should be relative from cwd; assertion helper converts\n        //       the values received by parcelWatcher to match before testing them (see typedoc)\n        './foo/some-output.ts', // output file\n        'foo/some-output.ts', // output file\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
+            "name": "all expectations also work in a big combined config",
+            "suites": [
+                "Watch targets"
+            ],
+            "updatePoint": {
+                "line": 418,
+                "column": 59
+            },
+            "line": 418,
+            "code": "  test('all expectations also work in a big combined config', async () => {\n    const mockWatcher = await setupMockWatcher({\n      filepath: './fuzz/some-config.ts',\n      config: {\n        schema: [\n          './fuzz/something.ts',\n          './fuzz/**/match-schema-everywhere.graphql',\n          '!**/exclude-schema-everywhere.graphql',\n        ],\n        watch: ['!**/exclude-watch-everywhere.graphql', 'fuzz/**/match-watch-everywhere.graphql'],\n        documents: ['fuzz/**/match-doc-everywhere.graphql', '!**/exclude-doc-everywhere.graphql'],\n        generates: {\n          // globally inclued paths should be included even when a local pattern negates them\n          ['./fuzz/local-exclusions-dont-precede-global-inclusions.ts']: {\n            watchPattern: ['!fuzz/global-beats-local/match-watch-everywhere.graphql'],\n            documents: ['!fuzz/global-beats-local/match-doc-everywhere.graphql'],\n            schema: ['!fuzz/global-beats-local/match-schema-everywhere.graphql'],\n          },\n          // globally negated paths should be excluded even when a local pattern matches them\n          ['./fuzz/local-inclusions-dont-precede-global-exclusions.ts']: {\n            watchPattern: ['fuzz/global-beats-local/exclude-watch-everywhere.graphql'],\n            documents: ['fuzz/global-beats-local/exclude-doc-everywhere.graphql'],\n            schema: ['fuzz/global-beats-local/exclude-schema-everywhere.graphql'],\n          },\n          // local watchPattern negation should override local documents match\n          ['./fuzz/some-output.ts']: {\n            watchPattern: '!./fuzz/bar/never-watch.graphql',\n            documents: ['./fuzz/bar/*.graphql', '!./fuzz/bar/never.graphql'],\n          },\n          // local watchPattern negation should override local schema match\n          ['./fuzz/some-other-output.ts']: {\n            documents: './fuzz/some-other-bar/*.graphql',\n            watchPattern: ['!fuzz/some-other-bar/schemas/never-watch-schema.graphql'],\n            schema: ['./fuzz/some-other-bar/schemas/*.graphql', '!fuzz/some-other-bar/schemas/never-schema.graphql'],\n          },\n          // match in one local group, negation in another local group, should still match\n          ['./fuzz/alphabet/types-no-sigma.ts']: {\n            schema: './fuzz/alphabet/schema/no-sigma.graphql',\n            documents: [\n              './fuzz/alphabet/queries/*.graphql', // zeta implicitly included (should always match)\n              '!**/sigma.graphql', // sigma excluded here\n            ],\n          },\n          // match in one local group, negation in another local group, should still match\n          ['./fuzz/alphabet/types-no-zeta.ts']: {\n            schema: './fuzz/alphabet/schema/no-sigma.graphql',\n            documents: [\n              './fuzz/alphabet/queries/sigma.graphql', // sigma explicitly included (should always match)\n              '!./fuzz/alphabet/queries/zeta.graphql', // zeta excluded here\n            ],\n          },\n          ['./fuzz/some-preset-bar/']: {\n            preset: 'near-operation-file',\n            presetConfig: {\n              extension: '.generated.tsx',\n              baseTypesPath: 'types.ts',\n            },\n            documents: ['./fuzz/some-preset-bar/*.graphql'],\n          },\n        },\n      },\n    });\n\n    expect(mockWatcher.watchDirectory).toBe(join(process.cwd(), 'fuzz'));\n\n    await assertBuildTriggers(mockWatcher, {\n      shouldTriggerBuild: [\n        './fuzz/some-config.ts', // config file\n        './fuzz/bar/fizzbuzz.graphql',\n        './fuzz/some-other-bar/schemas/fizzbuzz.graphql', // included by wildcard\n        //\n        // match in one local group, negation in another local group, should still match\n        './fuzz/alphabet/queries/zeta.graphql', // excluded in types-no-zeta, but included in types-no-sigma\n        './fuzz/alphabet/queries/sigma.graphql', // excluded in types-no-sigma, but included in types-no-sigma\n        //\n        // globally inclued paths should be included even when a local pattern negates them\n        // watch\n        './fuzz/match-watch-everywhere.graphql',\n        './fuzz/fizz/match-watch-everywhere.graphql',\n        './fuzz/fizz/buzz/match-watch-everywhere.graphql',\n        './fuzz/fizz/buzz/fuzzbarbaz/match-watch-everywhere.graphql',\n        // doc\n        './fuzz/match-doc-everywhere.graphql',\n        './fuzz/fizz/match-doc-everywhere.graphql',\n        './fuzz/fizz/buzz/match-doc-everywhere.graphql',\n        './fuzz/fizz/buzz/fuzzbarbaz/match-doc-everywhere.graphql',\n        // schema\n        './fuzz/match-schema-everywhere.graphql',\n        './fuzz/fizz/match-schema-everywhere.graphql',\n        './fuzz/fizz/buzz/match-schema-everywhere.graphql',\n        './fuzz/fizz/buzz/fuzzbarbaz/match-schema-everywhere.graphql',\n      ],\n      shouldNotTriggerBuild: [\n        //\n        // paths outside of watch directory should be excluded\n        '.git/index.lock', // totally unrelated\n        'match-watch-everywhere.graphql', // would match pattern if under fuzz\n        //\n        // pattern matching should work as expected\n        './fuzz/bar/something.ts', // unrelated file (non-matching extension)\n        './fuzz/some-other-bar/nested/directory/blah.graphql', // no greedy pattern (**/*) to match\n        //\n        // output files should be excluded\n        './fuzz/some-output.ts', // output file (note: should be ignored by parcel anyway)\n        //\n        // locally negated paths should be excluded even when a local pattern matches them\n        './fuzz/bar/never.graphql', // excluded in same document set\n        './fuzz/bar/never-watch.graphql', // excluded by local watchPattern, matched by local docs\n        './fuzz/some-other-bar/schemas/never-schema.graphql', // excluded by local schema group\n        './fuzz/some-other-bar/schemas/never-watch-schema.graphql', // excluded by local watchPattern group\n        //\n        // globally negated paths should be excluded even when a local pattern matches them\n        './fuzz/alphabet/queries/exclude-watch-everywhere.graphql', // included in types-no-sigma.ts, but globaly excluded\n        'fuzz/global-beats-local/exclude-watch-everywhere.graphql',\n        'fuzz/global-beats-local/exclude-doc-everywhere.graphql',\n        'fuzz/global-beats-local/exclude-schema-everywhere.graphql',\n      ],\n      pathsWouldBeIgnoredByParcelWatcher: [\n        // note: expectations should be relative from cwd; assertion helper converts\n        //       the values received by parcelWatcher to match before testing them (see typedoc)\n        './fuzz/some-output.ts', // output file\n        'fuzz/some-output.ts', // output file\n      ],\n      globsWouldBeIgnoredByParcelWatcher: [\n        // note: globs are tested for exact match with argument passed to subscribe options,\n        //       so they should be specified relative from watchDirectory, _not_ cwd (see typedoc)\n        'some-preset-bar/**/*.generated.tsx', // output of preset\n      ],\n    });\n  });",
+            "file": "watcher.spec.ts",
+            "skipped": false,
+            "dir": "packages/graphql-codegen-cli/tests"
+        },
+        {
             "name": "Should sort and use the correct order",
             "suites": [
                 "sortPrependValues"
@@ -4238,7 +4433,7 @@
                 "column": 61
             },
             "line": 2218,
-            "code": "    it('Should support merging identical fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        query test {\n          notifications {\n            ...N\n          }\n        }\n\n        fragment N on Notifiction {\n          id\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        export type TestQueryVariables = Exact<{ [key: string]: never; }>;\n\n        export type TestQuery = (\n          { notifications: Array<(\n            { id: string }\n            & { __typename?: 'TextNotification' | 'ImageNotification' }\n          )> }\n          & { __typename?: 'Query' }\n        );\n\n        export type NFragment = (\n          { id: string }\n          & { __typename?: 'TextNotification' | 'ImageNotification' }\n        );\n     `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should support merging identical fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        query test {\n          notifications {\n            ...N\n          }\n        }\n\n        fragment N on Notifiction {\n          id\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        export type testQueryVariables = Exact<{ [key: string]: never; }>;\n\n        export type testQuery = (\n          { notifications: Array<(\n            { id: string }\n            & { __typename?: 'TextNotification' | 'ImageNotification' }\n          )> }\n          & { __typename?: 'Query' }\n        );\n\n        export type NFragment = (\n          { id: string }\n          & { __typename?: 'TextNotification' | 'ImageNotification' }\n        );\n     `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
@@ -4254,7 +4449,7 @@
                 "column": 78
             },
             "line": 2254,
-            "code": "    it('Should support computing correct names for merged fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Notifiction {\n          id\n          ... on TextNotification {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        type N_TextNotification_Fragment = (\n          { text: string, id: string }\n          & { __typename?: 'TextNotification' }\n        );\n\n        type N_ImageNotification_Fragment = (\n          { id: string }\n          & { __typename?: 'ImageNotification' }\n        );\n\n        export type NFragment = N_TextNotification_Fragment | N_ImageNotification_Fragment;\n      `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should support computing correct names for merged fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Notifiction {\n          id\n          ... on TextNotification {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        type N_TextNotification_Fragment = (\n          { text: string, id: string }\n          & { __typename?: 'TextNotification' }\n        );\n\n        type N_ImageNotification_Fragment = (\n          { id: string }\n          & { __typename?: 'ImageNotification' }\n        );\n\n        export type NFragment = N_TextNotification_Fragment | N_ImageNotification_Fragment;\n      `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
@@ -4270,7 +4465,7 @@
                 "column": 84
             },
             "line": 2284,
-            "code": "    it('Should support computing correct names for large merged fragment union types', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        interface Node {\n          id: ID!\n        }\n\n        type A implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type B implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type C implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type D implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type E implements Node {\n          id: ID!\n          text: String!\n        }\n      `);\n\n      const ast = parse(/* GraphQL */ `\n        fragment N on Node {\n          id\n          ... on A {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true };\n      const { content } = await plugin(testSchema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n         type N_A_Fragment = (\n           { text: string, id: string }\n           & { __typename?: 'A' }\n         );\n\n         type N_ZhJjUzpMTyh98zugnx0IKwiLetPNjV8KYbSlmpAeuu_Fragment = (\n           { id: string }\n           & { __typename?: 'B' | 'C' | 'D' | 'E' }\n         );\n\n         export type NFragment = N_A_Fragment | N_ZhJjUzpMTyh98zugnx0IKwiLetPNjV8KYbSlmpAeuu_Fragment;\n      `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should support computing correct names for large merged fragment union types', async () => {\n      const testSchema = buildSchema(/* GraphQL */ `\n        interface Node {\n          id: ID!\n        }\n\n        type A implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type B implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type C implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type D implements Node {\n          id: ID!\n          text: String!\n        }\n\n        type E implements Node {\n          id: ID!\n          text: String!\n        }\n      `);\n\n      const ast = parse(/* GraphQL */ `\n        fragment N on Node {\n          id\n          ... on A {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(testSchema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n         type N_A_Fragment = (\n           { text: string, id: string }\n           & { __typename?: 'A' }\n         );\n\n         type N_zhJJUzpMTyh98zugnx0IKwiLetPNjV8KybSlmpAEUU_Fragment = (\n           { id: string }\n           & { __typename?: 'B' | 'C' | 'D' | 'E' }\n         );\n\n         export type NFragment = N_A_Fragment | N_zhJJUzpMTyh98zugnx0IKwiLetPNjV8KybSlmpAEUU_Fragment;\n      `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
@@ -4286,7 +4481,7 @@
                 "column": 71
             },
             "line": 2345,
-            "code": "    it('Should not create empty types when merging fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Query {\n          notifications {\n            ... on TextNotification {\n              text\n            }\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n       export type NFragment = (\n         { notifications: Array<(\n           { text: string }\n           & { __typename?: 'TextNotification' }\n         ) | { __typename?: 'ImageNotification' }> }\n         & { __typename?: 'Query' }\n       );\n      `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should not create empty types when merging fragment union types', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Query {\n          notifications {\n            ... on TextNotification {\n              text\n            }\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n       export type NFragment = (\n         { notifications: Array<(\n           { text: string }\n           & { __typename?: 'TextNotification' }\n         ) | { __typename?: 'ImageNotification' }> }\n         & { __typename?: 'Query' }\n       );\n      `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
@@ -4302,7 +4497,7 @@
                 "column": 79
             },
             "line": 2372,
-            "code": "    it('Should support merging identical fragment union types with skipTypename', async () => {\n      const ast = parse(/* GraphQL */ `\n        query test {\n          notifications {\n            ...N\n          }\n        }\n\n        fragment N on Notifiction {\n          id\n        }\n      `);\n      const config = { preResolveTypes: true, skipTypename: true, mergeFragmentTypes: true };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        export type TestQueryVariables = Exact<{ [key: string]: never; }>;\n\n        export type TestQuery = { notifications: Array<{ id: string }> };\n      `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should support merging identical fragment union types with skipTypename', async () => {\n      const ast = parse(/* GraphQL */ `\n        query test {\n          notifications {\n            ...N\n          }\n        }\n\n        fragment N on Notifiction {\n          id\n        }\n      `);\n      const config = { preResolveTypes: true, skipTypename: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n        export type testQueryVariables = Exact<{ [key: string]: never; }>;\n\n        export type testQuery = { notifications: Array<{ id: string }> };\n      `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
@@ -4318,7 +4513,7 @@
                 "column": 96
             },
             "line": 2397,
-            "code": "    it('Should support computing correct names for merged fragment union types with skipTypename', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Notifiction {\n          id\n          ... on TextNotification {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, skipTypename: true, mergeFragmentTypes: true };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n       type N_TextNotification_Fragment = { text: string, id: string };\n\n       type N_ImageNotification_Fragment = { id: string };\n\n       export type NFragment = N_TextNotification_Fragment | N_ImageNotification_Fragment;\n      `);\n      await validate(content, config);\n    });",
+            "code": "    it('Should support computing correct names for merged fragment union types with skipTypename', async () => {\n      const ast = parse(/* GraphQL */ `\n        fragment N on Notifiction {\n          id\n          ... on TextNotification {\n            text\n          }\n        }\n      `);\n      const config = { preResolveTypes: true, skipTypename: true, mergeFragmentTypes: true, namingConvention: 'keep' };\n      const { content } = await plugin(schema, [{ location: 'test-file.ts', document: ast }], config, {\n        outputFile: '',\n      });\n\n      expect(content).toBeSimilarStringTo(`\n       type N_TextNotification_Fragment = { text: string, id: string };\n\n       type N_ImageNotification_Fragment = { id: string };\n\n       export type NFragment = N_TextNotification_Fragment | N_ImageNotification_Fragment;\n      `);\n      await validate(content, config);\n    });",
             "file": "ts-documents.spec.ts",
             "skipped": false,
             "dir": "packages/plugins/typescript/operations/tests"
