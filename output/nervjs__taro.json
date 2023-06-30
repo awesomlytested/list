@@ -5165,6 +5165,38 @@
             "dir": "packages/stylelint-config-taro-rn/__tests__"
         },
         {
+            "name": "项目 output.clean = clean: { keep: ['project.config.json'] } ==> 清空dist文件夹但保留指定文件",
+            "suites": [
+                "构建配置测试",
+                "小程序"
+            ],
+            "updatePoint": {
+                "line": 42,
+                "column": 87
+            },
+            "line": 42,
+            "code": "    it(`项目 output.clean = clean: { keep: ['project.config.json'] } ==> 清空dist文件夹但保留指定文件`, async () => {\n      const exitSpy = jest.spyOn(process, 'exit') as jest.SpyInstance<void, any>\n      const logSpy = jest.spyOn(console, 'log')\n      const errorSpy = jest.spyOn(console, 'error')\n      logSpy.mockImplementation(() => {})\n      errorSpy.mockImplementation(() => {})\n      exitSpy.mockImplementation(() => {\n        throw new Error()\n      })\n\n      try {\n        await runBuild(APP_PATH, {\n          options: {\n            type: 'weapp',\n            platform: 'weapp'\n          }\n        })\n      } catch (error) {\n        // no handler\n      }\n      expect(emptyDirectoryMocked).toBeCalledWith(OUTPUT_PATH, { excludes: ['project.config.json'] })\n\n      exitSpy.mockRestore()\n      logSpy.mockRestore()\n      errorSpy.mockRestore()\n    })",
+            "file": "build-config.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "output.clean = false ==> 保留dist文件夹",
+            "suites": [
+                "构建配置测试",
+                "h5"
+            ],
+            "updatePoint": {
+                "line": 71,
+                "column": 42
+            },
+            "line": 71,
+            "code": "    it('output.clean = false ==> 保留dist文件夹', async () => {\n      const exitSpy = jest.spyOn(process, 'exit') as jest.SpyInstance<void, any>\n      const logSpy = jest.spyOn(console, 'log')\n      const errorSpy = jest.spyOn(console, 'error')\n      logSpy.mockImplementation(() => {})\n      errorSpy.mockImplementation(() => {})\n      exitSpy.mockImplementation(() => {\n        throw new Error()\n      })\n\n      try {\n        await runBuild(APP_PATH, {\n          options: {\n            type: 'h5',\n            platform: 'h5'\n          }\n        })\n      } catch (error) {\n        // no handler\n      }\n      expect(emptyDirectoryMocked).toBeCalledTimes(0)\n\n      exitSpy.mockRestore()\n      logSpy.mockRestore()\n      errorSpy.mockRestore()\n    })",
+            "file": "build-config.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
             "name": "should make configs",
             "suites": [
                 "inspect",
@@ -6153,15 +6185,128 @@
         {
             "name": "dotenvParse .env .env.dev should success",
             "suites": [
-                "dotenvParse"
+                "inspect",
+                "cli mode env"
             ],
             "updatePoint": {
-                "line": 7,
-                "column": 46
+                "line": 49,
+                "column": 48
             },
-            "line": 7,
-            "code": "  it('dotenvParse .env .env.dev should success', async () => {\n    expect(process.env.TARO_test).toBeUndefined()\n    dotenvParse(resolve(__dirname, 'env'), 'TARO_', 'dev')\n    expect(process.env.TARO_test).toBe('123')\n    expect(process.env._TARO_test).toBeUndefined()\n  })",
-            "file": "dotenvParse.spec.ts",
+            "line": 49,
+            "code": "    it('dotenvParse .env .env.dev should success', async () => {\n      expect(process.env.TARO_test).toBeUndefined()\n      dotenvParse(path.resolve(__dirname, 'env'), 'TARO_', 'dev')\n      expect(process.env.TARO_test).toBe('123')\n      expect(process.env._TARO_test).toBeUndefined()\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "--watch true => 默认加载 .env.development",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 56,
+                "column": 45
+            },
+            "line": 56,
+            "code": "    it('--watch true => 默认加载 .env.development', async () => {\n      setProcessArgv('taro build --watch --type weapp')\n      await cli.run()\n      expect(process.env.TARO_APP_TEST).toEqual('env-development')\n      expect(process.env.TARO_APP_DEFAULT).toEqual('default')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "--watch false => 默认加载 .env.production",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 63,
+                "column": 45
+            },
+            "line": 63,
+            "code": "    it('--watch false => 默认加载 .env.production', async () => {\n      setProcessArgv('taro build --type weapp')\n      await cli.run()\n      expect(process.env.TARO_APP_TEST).toEqual('env-production')\n      expect(process.env.TARO_APP_DEFAULT).toEqual('default')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "指定加载 .env.pre",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 70,
+                "column": 21
+            },
+            "line": 70,
+            "code": "    it('指定加载 .env.pre', async () => {\n      setProcessArgv('taro build --type weapp --mode pre')\n      await cli.run()\n      expect(process.env.TARO_APP_TEST).toEqual('env-pre')\n      expect(process.env.TARO_APP_DEFAULT).toEqual('default')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "env.local 比 .env 优先级更高",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 77,
+                "column": 30
+            },
+            "line": 77,
+            "code": "    it('env.local 比 .env 优先级更高', async () => {\n      setProcessArgv('taro build --type weapp --mode find404')\n      await cli.run()\n      expect(process.env.TARO_APP_TEST).toEqual('env-local')\n      expect(process.env.TARO_APP_DEFAULT).toEqual('default')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "env.uat.local 比 .env.uat 优先级更高",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 84,
+                "column": 38
+            },
+            "line": 84,
+            "code": "    it('env.uat.local 比 .env.uat 优先级更高', async () => {\n      setProcessArgv('taro build --type weapp --mode uat')\n      await cli.run()\n      expect(process.env.TARO_APP_TEST).toEqual('env-uat-local')\n      expect(process.env.TARO_APP_DEFAULT).toEqual('default')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "自定义前缀: JD_APP_",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 91,
+                "column": 22
+            },
+            "line": 91,
+            "code": "    it('自定义前缀: JD_APP_', async () => {\n      setProcessArgv('taro build --type weapp --mode uat --env-prefix JD_APP_')\n      await cli.run()\n      expect(process.env.JD_APP_TEST).toEqual('env-uat')\n      expect(process.env.TARO_APP_TEST).toEqual(undefined)\n      expect(process.env.TARO_APP_ID).toEqual('特殊变量appid')\n    })",
+            "file": "dotenv-parse.spec.ts",
+            "skipped": false,
+            "dir": "packages/taro-cli/src/__tests__"
+        },
+        {
+            "name": "环境变量可以相互引用",
+            "suites": [
+                "inspect",
+                "cli mode env"
+            ],
+            "updatePoint": {
+                "line": 99,
+                "column": 18
+            },
+            "line": 99,
+            "code": "    it('环境变量可以相互引用', async () => {\n      setProcessArgv('taro build --type weapp --mode pre')\n      await cli.run()\n      expect(process.env.TARO_APP_FOO).toEqual('env-pre-foo')\n    })",
+            "file": "dotenv-parse.spec.ts",
             "skipped": false,
             "dir": "packages/taro-cli/src/__tests__"
         },
