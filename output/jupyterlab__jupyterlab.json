@@ -18150,6 +18150,23 @@
             "dir": "packages/docregistry/test"
         },
         {
+            "name": "should not contain the file content attribute",
+            "suites": [
+                "docregistry/context",
+                "Context",
+                "#fileChanged"
+            ],
+            "updatePoint": {
+                "line": 98,
+                "column": 55
+            },
+            "line": 98,
+            "code": "      it('should not contain the file content attribute', async () => {\n        let called = false;\n        context.fileChanged.connect((sender, args) => {\n          // @ts-expect-error content is omitted\n          expect(args['content']).toBeUndefined();\n          called = true;\n        });\n        await context.initialize(true);\n        expect(called).toBe(true);\n      });",
+            "file": "context.spec.ts",
+            "skipped": false,
+            "dir": "packages/docregistry/test"
+        },
+        {
             "name": "should emit 'starting' when the file starts saving",
             "suites": [
                 "docregistry/context",
@@ -18157,10 +18174,10 @@
                 "#saving"
             ],
             "updatePoint": {
-                "line": 100,
+                "line": 111,
                 "column": 60
             },
-            "line": 100,
+            "line": 111,
             "code": "      it(\"should emit 'starting' when the file starts saving\", async () => {\n        let called = false;\n        let checked = false;\n        context.saveState.connect((sender, args) => {\n          if (!called) {\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(sender).toBe(context);\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(args).toBe('started');\n\n            checked = true;\n          }\n\n          called = true;\n        });\n\n        await context.initialize(true);\n        expect(called).toBe(true);\n        expect(checked).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18174,10 +18191,10 @@
                 "#saving"
             ],
             "updatePoint": {
-                "line": 121,
+                "line": 132,
                 "column": 59
             },
-            "line": 121,
+            "line": 132,
             "code": "      it(\"should emit 'completed' when the file ends saving\", async () => {\n        let called = 0;\n        let checked = false;\n        context.saveState.connect((sender, args) => {\n          if (called > 0) {\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(sender).toBe(context);\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(args).toBe('completed');\n            checked = true;\n          }\n\n          called += 1;\n        });\n\n        await context.initialize(true);\n        expect(called).toBe(2);\n        expect(checked).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18191,10 +18208,10 @@
                 "#saving"
             ],
             "updatePoint": {
-                "line": 141,
+                "line": 152,
                 "column": 64
             },
-            "line": 141,
+            "line": 152,
             "code": "      it(\"should emit 'failed' when the save operation fails out\", async () => {\n        context = new Context({\n          manager,\n          factory,\n          path: 'readonly.txt'\n        });\n\n        let called = 0;\n        let checked;\n        context.saveState.connect((sender, args) => {\n          if (called > 0) {\n            // eslint-disable-next-line jest/no-conditional-expect\n            expect(sender).toBe(context);\n            checked = args;\n          }\n\n          called += 1;\n        });\n\n        await expect(context.initialize(true)).rejects.toThrow(\n          'Invalid response: 403 Forbidden'\n        );\n        expect(called).toBe(2);\n        expect(checked).toBe('failed');\n\n        await acceptDialog();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18208,10 +18225,10 @@
                 "#isReady"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 182,
                 "column": 54
             },
-            "line": 171,
+            "line": 182,
             "code": "      it('should indicate whether the context is ready', async () => {\n        expect(context.isReady).toBe(false);\n        const func = async () => {\n          await context.ready;\n          expect(context.isReady).toBe(true);\n        };\n        const promise = func();\n        await context.initialize(true);\n        await promise;\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18225,10 +18242,10 @@
                 "#ready()"
             ],
             "updatePoint": {
-                "line": 184,
+                "line": 195,
                 "column": 66
             },
-            "line": 184,
+            "line": 195,
             "code": "      it('should resolve when the file is saved for the first time', async () => {\n        await context.initialize(true);\n        await expect(context.ready).resolves.not.toThrow();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18242,10 +18259,10 @@
                 "#ready()"
             ],
             "updatePoint": {
-                "line": 189,
+                "line": 200,
                 "column": 69
             },
-            "line": 189,
+            "line": 200,
             "code": "      it('should resolve when the file is reverted for the first time', async () => {\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(false);\n        await expect(context.ready).resolves.not.toThrow();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18259,10 +18276,10 @@
                 "#disposed"
             ],
             "updatePoint": {
-                "line": 201,
+                "line": 212,
                 "column": 56
             },
-            "line": 201,
+            "line": 212,
             "code": "      it('should be emitted when the context is disposed', () => {\n        let called = false;\n        context.disposed.connect((sender, args) => {\n          expect(sender).toBe(context);\n          expect(args).toBeUndefined();\n          called = true;\n        });\n        context.dispose();\n        expect(called).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18276,10 +18293,10 @@
                 "#model"
             ],
             "updatePoint": {
-                "line": 214,
+                "line": 225,
                 "column": 58
             },
-            "line": 214,
+            "line": 225,
             "code": "      it('should be the model associated with the document', () => {\n        expect(context.model.toString()).toBe('');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18293,10 +18310,10 @@
                 "#sessionContext"
             ],
             "updatePoint": {
-                "line": 220,
+                "line": 231,
                 "column": 44
             },
-            "line": 220,
+            "line": 231,
             "code": "      it('should be a ISessionContext object', () => {\n        expect(context.sessionContext).toBeInstanceOf(SessionContext);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18310,10 +18327,10 @@
                 "#path"
             ],
             "updatePoint": {
-                "line": 226,
+                "line": 237,
                 "column": 52
             },
-            "line": 226,
+            "line": 237,
             "code": "      it('should be the current path for the context', () => {\n        expect(typeof context.path).toBe('string');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18327,10 +18344,10 @@
                 "#lastModifiedCheckMargin"
             ],
             "updatePoint": {
-                "line": 232,
+                "line": 243,
                 "column": 36
             },
-            "line": 232,
+            "line": 243,
             "code": "      it('should be 500ms by default', () => {\n        expect(context.lastModifiedCheckMargin).toBe(500);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18344,10 +18361,10 @@
                 "#lastModifiedCheckMargin"
             ],
             "updatePoint": {
-                "line": 236,
+                "line": 247,
                 "column": 28
             },
-            "line": 236,
+            "line": 247,
             "code": "      it('should be set-able', () => {\n        context.lastModifiedCheckMargin = 600;\n        expect(context.lastModifiedCheckMargin).toBe(600);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18361,10 +18378,10 @@
                 "#contentsModel"
             ],
             "updatePoint": {
-                "line": 243,
+                "line": 254,
                 "column": 44
             },
-            "line": 243,
+            "line": 254,
             "code": "      it('should be `null` before population', () => {\n        expect(context.contentsModel).toBeNull();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18378,11 +18395,11 @@
                 "#contentsModel"
             ],
             "updatePoint": {
-                "line": 247,
+                "line": 258,
                 "column": 40
             },
-            "line": 247,
-            "code": "      it('should be set after population', async () => {\n        const { path } = context;\n\n        void context.initialize(true);\n        await context.ready;\n        expect(context.contentsModel!.path).toBe(path);\n      });",
+            "line": 258,
+            "code": "      it('should be set after population', async () => {\n        const { path } = context;\n\n        void context.initialize(true);\n        await context.ready;\n        expect(context.contentsModel!.path).toBe(path);\n        // @ts-expect-error content is omitted\n        expect(context.contentsModel!['content']).toBeUndefined();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
             "dir": "packages/docregistry/test"
@@ -18395,10 +18412,10 @@
                 "#factoryName"
             ],
             "updatePoint": {
-                "line": 257,
+                "line": 270,
                 "column": 63
             },
-            "line": 257,
+            "line": 270,
             "code": "      it('should be the name of the factory used by the context', () => {\n        expect(context.factoryName).toBe(factory.name);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18412,10 +18429,10 @@
                 "#isDisposed"
             ],
             "updatePoint": {
-                "line": 263,
+                "line": 276,
                 "column": 53
             },
-            "line": 263,
+            "line": 276,
             "code": "      it('should test whether the context is disposed', () => {\n        expect(context.isDisposed).toBe(false);\n        context.dispose();\n        expect(context.isDisposed).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18429,10 +18446,10 @@
                 "#dispose()"
             ],
             "updatePoint": {
-                "line": 271,
+                "line": 284,
                 "column": 61
             },
-            "line": 271,
+            "line": 284,
             "code": "      it('should dispose of the resources used by the context', () => {\n        context.dispose();\n        expect(context.isDisposed).toBe(true);\n        context.dispose();\n        expect(context.isDisposed).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18446,10 +18463,10 @@
                 "#rename()"
             ],
             "updatePoint": {
-                "line": 280,
+                "line": 293,
                 "column": 60
             },
-            "line": 280,
+            "line": 293,
             "code": "      it('should change the name of the file to the new name', async () => {\n        await context.initialize(true);\n        context.model.fromString('foo');\n\n        const newName = UUID.uuid4() + '.txt';\n\n        await context.rename(newName);\n        await context.save();\n\n        const opts: Contents.IFetchOptions = {\n          format: factory.fileFormat,\n          type: factory.contentType,\n          content: true\n        };\n\n        const model = await manager.contents.get(newName, opts);\n\n        expect(model.content).toBe('foo');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18463,10 +18480,10 @@
                 "#save()"
             ],
             "updatePoint": {
-                "line": 302,
+                "line": 315,
                 "column": 54
             },
-            "line": 302,
+            "line": 315,
             "code": "      it('should save the contents of the file to disk', async () => {\n        await context.initialize(true);\n        context.model.fromString('foo');\n        await context.save();\n\n        const opts: Contents.IFetchOptions = {\n          format: factory.fileFormat,\n          type: factory.contentType,\n          content: true\n        };\n        const model = await manager.contents.get(context.path, opts);\n\n        expect(model.content).toBe('foo');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18480,10 +18497,10 @@
                 "#save()"
             ],
             "updatePoint": {
-                "line": 317,
+                "line": 330,
                 "column": 58
             },
-            "line": 317,
+            "line": 330,
             "code": "      it('should should preserve LF line endings upon save', async () => {\n        await context.initialize(true);\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo\\nbar'\n        });\n        await context.revert();\n        await context.save();\n        const opts: Contents.IFetchOptions = {\n          format: factory.fileFormat,\n          type: factory.contentType,\n          content: true\n        };\n        const model = await manager.contents.get(context.path, opts);\n        expect(model.content).toBe('foo\\nbar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18497,10 +18514,10 @@
                 "#save()"
             ],
             "updatePoint": {
-                "line": 335,
+                "line": 348,
                 "column": 58
             },
-            "line": 335,
+            "line": 348,
             "code": "      it('should should preserve CR line endings upon save', async () => {\n        await context.initialize(true);\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo\\rbar'\n        });\n        await context.revert();\n        await context.save();\n        const opts: Contents.IFetchOptions = {\n          format: factory.fileFormat,\n          type: factory.contentType,\n          content: true\n        };\n        const model = await manager.contents.get(context.path, opts);\n        expect(model.content).toBe('foo\\rbar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18514,10 +18531,10 @@
                 "#save()"
             ],
             "updatePoint": {
-                "line": 353,
+                "line": 366,
                 "column": 60
             },
-            "line": 353,
+            "line": 366,
             "code": "      it('should should preserve CRLF line endings upon save', async () => {\n        await context.initialize(true);\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo\\r\\nbar'\n        });\n        await context.revert();\n        await context.save();\n        const opts: Contents.IFetchOptions = {\n          format: factory.fileFormat,\n          type: factory.contentType,\n          content: true\n        };\n        const model = await manager.contents.get(context.path, opts);\n        expect(model.content).toBe('foo\\r\\nbar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18531,10 +18548,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 373,
+                "line": 386,
                 "column": 73
             },
-            "line": 373,
+            "line": 386,
             "code": "      it('should save the document to a different path chosen by the user', async () => {\n        const initialize = context.initialize(true);\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await initialize;\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog();\n        };\n        const promise = func();\n        await initialize;\n\n        const changed = signalToPromise(manager.contents.fileChanged);\n        const oldPath = context.path;\n        await context.saveAs();\n        await promise;\n\n        // We no longer rename the current document\n        //expect(context.path).toBe(newPath);\n\n        // Make sure the signal emitted has a different path\n        const res = await changed;\n        expect(res[1].type).toBe('save');\n        expect(res[1].newValue?.path).toEqual(newPath);\n        expect(res[1].newValue?.path !== oldPath).toBe(true);\n\n        // Make sure the both files are there now.\n        const model = await manager.contents.get('', { content: true });\n        expect(model.content.find((x: any) => x.name === oldPath)).toBeTruthy();\n        expect(model.content.find((x: any) => x.name === newPath)).toBeTruthy();\n\n        // Make sure both files are equal\n        const model1 = await manager.contents.get(oldPath, { content: true });\n        const model2 = await manager.contents.get(newPath, { content: true });\n        expect(model1.content).toEqual(model2.content);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18548,10 +18565,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 413,
+                "line": 426,
                 "column": 43
             },
-            "line": 413,
+            "line": 426,
             "code": "      it('should bring up a conflict dialog', async () => {\n        const newPath = UUID.uuid4() + '.txt';\n\n        const func = async () => {\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog(); // Accept rename dialog\n          await acceptDialog(); // Accept conflict dialog\n        };\n        await manager.contents.save(newPath, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(true);\n        const promise = func();\n\n        const oldPath = context.path;\n        await context.saveAs();\n        await promise;\n\n        // We no longer rename the current document\n        //expect(context.path).toBe(newPath);\n        // Make sure the both files are there now.\n        const model = await manager.contents.get('', { content: true });\n        expect(model.content.find((x: any) => x.name === oldPath)).toBeTruthy();\n        expect(model.content.find((x: any) => x.name === newPath)).toBeTruthy();\n\n        // Make sure both files are equal\n        const model1 = await manager.contents.get(oldPath, { content: true });\n        const model2 = await manager.contents.get(newPath, { content: true });\n        expect(model1.content).toEqual(model2.content);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18565,10 +18582,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 449,
+                "line": 462,
                 "column": 54
             },
-            "line": 449,
+            "line": 462,
             "code": "      it('should keep the file if overwrite is aborted', async () => {\n        const oldPath = context.path;\n        const newPath = UUID.uuid4() + '.txt';\n        const func = async () => {\n          await waitForDialog();\n          const dialog = document.body.getElementsByClassName('jp-Dialog')[0];\n          const input = dialog.getElementsByTagName('input')[0];\n          input.value = newPath;\n          await acceptDialog(); // Accept rename dialog\n          await dismissDialog(); // Reject conflict dialog\n        };\n        await manager.contents.save(newPath, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo'\n        });\n        await context.initialize(true);\n        const promise = func();\n        await context.saveAs();\n        await promise;\n        expect(context.path).toBe(oldPath);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18582,10 +18599,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 472,
+                "line": 485,
                 "column": 59
             },
-            "line": 472,
+            "line": 485,
             "code": "      it('should just save if the file name does not change', async () => {\n        const changed = signalToPromise(manager.contents.fileChanged);\n\n        const path = context.path;\n        await context.initialize(true);\n        const promise = context.saveAs();\n        await acceptDialog();\n        await promise;\n        expect(context.path).toBe(path);\n\n        const res = await changed;\n        expect(res[1].newValue?.path).toEqual(path);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18599,10 +18616,10 @@
                 "#saveAs()"
             ],
             "updatePoint": {
-                "line": 486,
+                "line": 499,
                 "column": 69
             },
-            "line": 486,
+            "line": 499,
             "code": "      it('should no trigger save signal if the user cancel the dialog', async () => {\n        let saveEmitted = false;\n        await context.initialize(true);\n        manager.contents.fileChanged.connect((sender, args) => {\n          if (args.type === 'save') {\n            saveEmitted = true;\n          }\n        });\n        const promise = context.saveAs();\n        await dismissDialog();\n        await promise;\n        expect(saveEmitted).toEqual(false);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18616,10 +18633,10 @@
                 "#revert()"
             ],
             "updatePoint": {
-                "line": 502,
+                "line": 515,
                 "column": 60
             },
-            "line": 502,
+            "line": 515,
             "code": "      it('should revert the contents of the file to the disk', async () => {\n        await context.initialize(true);\n        context.model.fromString('foo');\n        await context.save();\n        context.model.fromString('bar');\n        await context.revert();\n        expect(context.model.toString()).toBe('foo');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18633,10 +18650,10 @@
                 "#revert()"
             ],
             "updatePoint": {
-                "line": 511,
+                "line": 524,
                 "column": 50
             },
-            "line": 511,
+            "line": 524,
             "code": "      it('should normalize CRLF line endings to LF', async () => {\n        await context.initialize(true);\n        await manager.contents.save(context.path, {\n          type: factory.contentType,\n          format: factory.fileFormat,\n          content: 'foo\\r\\nbar'\n        });\n        await context.revert();\n        expect(context.model.toString()).toBe('foo\\nbar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18650,10 +18667,10 @@
                 "#createCheckpoint()"
             ],
             "updatePoint": {
-                "line": 524,
+                "line": 537,
                 "column": 49
             },
-            "line": 524,
+            "line": 537,
             "code": "      it('should create a checkpoint for the file', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        expect(model.id).toBeTruthy();\n        expect(model.last_modified).toBeTruthy();\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18667,10 +18684,10 @@
                 "#deleteCheckpoint()"
             ],
             "updatePoint": {
-                "line": 533,
+                "line": 546,
                 "column": 44
             },
-            "line": 533,
+            "line": 546,
             "code": "      it('should delete the given checkpoint', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        await context.deleteCheckpoint(model.id);\n        const models = await context.listCheckpoints();\n        expect(models.length).toBe(0);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18684,10 +18701,10 @@
                 "#restoreCheckpoint()"
             ],
             "updatePoint": {
-                "line": 543,
+                "line": 556,
                 "column": 63
             },
-            "line": 543,
+            "line": 556,
             "code": "      it('should restore the value to the last checkpoint value', async () => {\n        context.model.fromString('bar');\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        context.model.fromString('foo');\n        const id = model.id;\n        await context.save();\n        await context.restoreCheckpoint(id);\n        await context.revert();\n        expect(context.model.toString()).toBe('bar');\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18701,10 +18718,10 @@
                 "#listCheckpoints()"
             ],
             "updatePoint": {
-                "line": 557,
+                "line": 570,
                 "column": 50
             },
-            "line": 557,
+            "line": 570,
             "code": "      it('should list the checkpoints for the file', async () => {\n        await context.initialize(true);\n        const model = await context.createCheckpoint();\n        const id = model.id;\n        const models = await context.listCheckpoints();\n        let found = false;\n        for (const model of models) {\n          if (model.id === id) {\n            found = true;\n          }\n        }\n        expect(found).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18718,10 +18735,10 @@
                 "#urlResolver"
             ],
             "updatePoint": {
-                "line": 573,
+                "line": 586,
                 "column": 34
             },
-            "line": 573,
+            "line": 586,
             "code": "      it('should be a url resolver', () => {\n        expect(context.urlResolver).toBeInstanceOf(\n          RenderMimeRegistry.UrlResolver\n        );\n      });",
             "file": "context.spec.ts",
             "skipped": false,
@@ -18735,10 +18752,10 @@
                 "#addSibling()"
             ],
             "updatePoint": {
-                "line": 581,
+                "line": 594,
                 "column": 37
             },
-            "line": 581,
+            "line": 594,
             "code": "      it('should add a sibling widget', () => {\n        let called = false;\n        const opener = (widget: Widget) => {\n          called = true;\n        };\n        context = new Context({\n          manager,\n          factory,\n          path: UUID.uuid4() + '.txt',\n          opener\n        });\n        context.addSibling(new Widget());\n        expect(called).toBe(true);\n      });",
             "file": "context.spec.ts",
             "skipped": false,

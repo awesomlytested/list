@@ -3988,10 +3988,10 @@
                 "configure test"
             ],
             "updatePoint": {
-                "line": 40,
+                "line": 66,
                 "column": 38
             },
-            "line": 40,
+            "line": 66,
             "code": "\t\ttest('happy case with default parser', () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tClientDevice.clientInfo = jest.fn().mockReturnValueOnce('clientInfo');\n\n\t\t\tconst mockAWSAnalyticsProviderConfigure = jest\n\t\t\t\t.spyOn(AWSAnalyticsProvider.prototype, 'configure')\n\t\t\t\t.mockImplementationOnce(() => {\n\t\t\t\t\treturn;\n\t\t\t\t});\n\n\t\t\texpect(analytics.configure({ attr: 'attr' })).toEqual({\n\t\t\t\tAWSPinpoint: { appId: 'appId' },\n\t\t\t\tattr: 'attr',\n\t\t\t\tautoSessionRecord: true,\n\t\t\t});\n\n\t\t\tmockAWSAnalyticsProviderConfigure.mockClear();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4004,10 +4004,10 @@
                 "startSession test"
             ],
             "updatePoint": {
-                "line": 61,
+                "line": 87,
                 "column": 18
             },
-            "line": 61,
+            "line": 87,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.startSession();\n\t\t\texpect(mockHubDispatch).toBeCalledWith(\n\t\t\t\t'analytics',\n\t\t\t\t{\n\t\t\t\t\tevent: 'record',\n\t\t\t\t\tdata: { name: '_session.start' },\n\t\t\t\t\tmessage: 'Recording Analytics session start event',\n\t\t\t\t},\n\t\t\t\t'Analytics',\n\t\t\t\texpect.anything()\n\t\t\t);\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4020,10 +4020,10 @@
                 "stopSession test"
             ],
             "updatePoint": {
-                "line": 83,
+                "line": 109,
                 "column": 18
             },
-            "line": 83,
+            "line": 109,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.stopSession();\n\t\t\texpect(mockHubDispatch).toBeCalledWith(\n\t\t\t\t'analytics',\n\t\t\t\t{\n\t\t\t\t\tevent: 'record',\n\t\t\t\t\tdata: { name: '_session.stop' },\n\t\t\t\t\tmessage: 'Recording Analytics session stop event',\n\t\t\t\t},\n\t\t\t\t'Analytics',\n\t\t\t\texpect.anything()\n\t\t\t);\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4036,11 +4036,27 @@
                 "record test"
             ],
             "updatePoint": {
-                "line": 105,
+                "line": 131,
                 "column": 18
             },
-            "line": 105,
+            "line": 131,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\t\t\tconst event = {\n\t\t\t\tname: 'event',\n\t\t\t\tattributes: { key: 'value' },\n\t\t\t\tmetrics: { metric: 123 },\n\t\t\t};\n\n\t\t\tawait analytics.record(event);\n\t\t\texpect(mockHubDispatch).toBeCalledWith(\n\t\t\t\t'analytics',\n\t\t\t\t{\n\t\t\t\t\tevent: 'record',\n\t\t\t\t\tdata: event,\n\t\t\t\t\tmessage: 'Recording Analytics event',\n\t\t\t\t},\n\t\t\t\t'Analytics',\n\t\t\t\texpect.anything()\n\t\t\t);\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
+            "file": "Analytics.test.ts",
+            "skipped": false,
+            "dir": "packages/analytics/__tests__"
+        },
+        {
+            "name": "record with custom provider",
+            "suites": [
+                "Analytics test",
+                "record test"
+            ],
+            "updatePoint": {
+                "line": 160,
+                "column": 35
+            },
+            "line": 160,
+            "code": "\t\ttest('record with custom provider', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst customProvider = new TestCustomProvider();\n\t\t\tconst customProviderRecordSpy = jest.spyOn(customProvider, 'record');\n\n\t\t\tanalytics.addPluggable(customProvider);\n\n\t\t\tconst recordResponse = await analytics.record(\n\t\t\t\t{ name: 'testEvent' },\n\t\t\t\t'CustomProvider'\n\t\t\t);\n\n\t\t\texpect(customProviderRecordSpy).toBeCalled();\n\t\t\texpect(recordResponse).toBe(true);\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
             "dir": "packages/analytics/__tests__"
@@ -4052,10 +4068,10 @@
                 "updateEndpoint test"
             ],
             "updatePoint": {
-                "line": 132,
+                "line": 178,
                 "column": 18
             },
-            "line": 132,
+            "line": 178,
             "code": "\t\ttest('happy case', async () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\t\t\tanalytics.configure({ mock: 'value' });\n\n\t\t\tawait analytics.updateEndpoint({\n\t\t\t\tUserId: 'id',\n\t\t\t});\n\t\t\texpect(record_spyon).toBeCalled();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4068,10 +4084,10 @@
                 "analytics turn on/off test"
             ],
             "updatePoint": {
-                "line": 146,
+                "line": 192,
                 "column": 20
             },
-            "line": 146,
+            "line": 192,
             "code": "\t\ttest('disable test', () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tanalytics.disable();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4084,10 +4100,10 @@
                 "analytics turn on/off test"
             ],
             "updatePoint": {
-                "line": 151,
+                "line": 197,
                 "column": 19
             },
-            "line": 151,
+            "line": 197,
             "code": "\t\ttest('enable test', () => {\n\t\t\tconst analytics = new Analytics();\n\t\t\tanalytics.enable();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4100,10 +4116,10 @@
                 "getPluggable test"
             ],
             "updatePoint": {
-                "line": 158,
+                "line": 204,
                 "column": 18
             },
-            "line": 158,
+            "line": 204,
             "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new Analytics();\n\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\t\t\tanalytics.addPluggable(provider);\n\n\t\t\texpect(analytics.getPluggable(provider.getProviderName())).toBeInstanceOf(\n\t\t\t\tAWSAnalyticsProvider\n\t\t\t);\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
@@ -4116,10 +4132,10 @@
                 "removePluggable test"
             ],
             "updatePoint": {
-                "line": 171,
+                "line": 217,
                 "column": 18
             },
-            "line": 171,
+            "line": 217,
             "code": "\t\ttest('happy case', () => {\n\t\t\tconst analytics = new Analytics();\n\n\t\t\t// this provider is added by default in the configure method\n\t\t\t// of analytics when initialized. No need to add it again here.\n\t\t\tconst provider = new AWSAnalyticsProvider();\n\n\t\t\tanalytics.removePluggable(provider.getProviderName());\n\n\t\t\texpect(analytics.getPluggable(provider.getProviderName())).toBeNull();\n\t\t});",
             "file": "Analytics.test.ts",
             "skipped": false,
