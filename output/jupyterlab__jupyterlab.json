@@ -455,7 +455,7 @@
                 "index": 2033
             },
             "line": 74,
-            "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const runButton = await page.waitForSelector('.jp-Toolbar-item >> [data-command=\"runmenu:run\"]');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(runButton)]);\n    await runButton.focus();\n    await runButton.hover();\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 60\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
+            "code": "  test('Highlight run cell button', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const runButton = await page.waitForSelector('.jp-Toolbar-item >> [data-command=\"notebook:run-cell-and-select-next\"]');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(runButton)]);\n    await runButton.focus();\n    await runButton.hover();\n    expect(await page.screenshot({\n      clip: {\n        y: 62,\n        x: 400,\n        width: 190,\n        height: 60\n      }\n    })).toMatchSnapshot('debugger_run.png');\n  });",
             "file": "documentation/debugger.test.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -466,7 +466,7 @@
             "updatePoint": {
                 "line": 97,
                 "column": 26,
-                "index": 2687
+                "index": 2709
             },
             "line": 97,
             "code": "  test('Stop on breakpoint', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 100,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_breakpoint.png');\n    await page.click('button[title^=Continue]');\n  });",
@@ -480,7 +480,7 @@
             "updatePoint": {
                 "line": 123,
                 "column": 32,
-                "index": 3420
+                "index": 3442
             },
             "line": 123,
             "code": "  test('Breakpoints on exception', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await expect(page.locator('button.jp-PauseOnExceptions')).not.toHaveClass(/lm-mod-toggled/);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    const menu = page.locator('.jp-PauseOnExceptions-menu');\n    await expect(menu).toBeVisible();\n    await expect(menu.locator('li.lm-Menu-item')).toHaveCount(3);\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(0);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"userUnhandled\")').click();\n    await expect(page.locator('button.jp-PauseOnExceptions')).toHaveClass(/lm-mod-toggled/);\n    await page.notebook.enterCellEditingMode(0);\n    const keyboard = page.keyboard;\n    await keyboard.press('Control+A');\n    await keyboard.type('try:\\n1/0\\n', {\n      delay: 100\n    });\n    await keyboard.press('Backspace');\n    await keyboard.type('except:\\n2/0\\n', {\n      delay: 100\n    });\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_unhandled_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.notebook.waitForRun(0);\n    await page.locator('button.jp-PauseOnExceptions').click();\n    await expect(menu.locator('li.lm-Menu-item.lm-mod-toggled')).toHaveCount(1);\n    await expect(menu.locator('li:has(div.lm-Menu-itemLabel:text(\"userUnhandled\"))')).toHaveClass(/lm-mod-toggled/);\n    await menu.locator('li div.lm-Menu-itemLabel:text(\"raised\")').click();\n    void page.notebook.runCell(0);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    expect(await page.screenshot({\n      clip: {\n        y: 110,\n        x: 300,\n        width: 300,\n        height: 80\n      }\n    })).toMatchSnapshot('debugger_stop_on_raised_exception.png');\n    await page.click('button[title^=Continue]');\n    await page.click('button[title^=Continue]');\n  });",
@@ -494,7 +494,7 @@
             "updatePoint": {
                 "line": 183,
                 "column": 24,
-                "index": 5752
+                "index": 5774
             },
             "line": 183,
             "code": "  test('Debugger sidebar', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    const sidebar = await page.waitForSelector('[data-id=\"jp-debugger-sidebar\"]');\n    await sidebar.click();\n    await setSidebarWidth(page, 251, 'right');\n\n    // Inject mouse pointer\n    await page.evaluate(([mouse]) => {\n      document.body.insertAdjacentHTML('beforeend', mouse);\n    }, [await positionMouseOver(sidebar, {\n      left: 0.25\n    })]);\n    expect(await page.screenshot({\n      clip: {\n        y: 22,\n        x: 1200,\n        width: 85,\n        height: 160\n      }\n    })).toMatchSnapshot('debugger_sidebar.png');\n  });",
@@ -508,7 +508,7 @@
             "updatePoint": {
                 "line": 208,
                 "column": 23,
-                "index": 6429
+                "index": 6451
             },
             "line": 208,
             "code": "  test('Variables panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint and the local variables to be displayed\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('select[aria-label=\"Scope\"]')).toHaveValue('Locals');\n    expect(await page.screenshot({\n      clip: {\n        y: 58,\n        x: 998,\n        width: 280,\n        height: 138\n      }\n    })).toMatchSnapshot('debugger_variables.png');\n  });",
@@ -522,7 +522,7 @@
             "updatePoint": {
                 "line": 234,
                 "column": 24,
-                "index": 7220
+                "index": 7242
             },
             "line": 234,
             "code": "  test('Call Stack panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=add').first()).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 196,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-callstack.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
@@ -536,7 +536,7 @@
             "updatePoint": {
                 "line": 265,
                 "column": 25,
-                "index": 8155
+                "index": 8177
             },
             "line": 265,
             "code": "  test('Breakpoints panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    const breakpointsPanel = await page.debugger.getBreakPointsPanel();\n    expect(await breakpointsPanel.innerText()).toMatch(/ipykernel.*\\/\\d+.py/);\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 334,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-breakpoints.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
@@ -550,7 +550,7 @@
             "updatePoint": {
                 "line": 297,
                 "column": 20,
-                "index": 9135
+                "index": 9157
             },
             "line": 297,
             "code": "  test('Source panel', async ({\n    page,\n    tmpPath\n  }) => {\n    await page.goto(`tree/${tmpPath}`);\n    await createNotebook(page);\n    await page.debugger.switchOn();\n    await page.waitForCondition(() => page.debugger.isOpen());\n    await setSidebarWidth(page, 251, 'right');\n    await setBreakpoint(page);\n\n    // Don't wait as it will be blocked\n    void page.notebook.runCell(1);\n\n    // Wait to be stopped on the breakpoint\n    await page.debugger.waitForCallStack();\n    await expect(page.locator('[aria-label=\"side panel content\"] >> text=Source/tmp/ipykernel_')).toBeVisible();\n\n    // Don't compare screenshot as the kernel id varies\n    // Need to set precisely the path\n    await page.screenshot({\n      clip: {\n        y: 478,\n        x: 998,\n        width: 280,\n        height: 138\n      },\n      path: 'test/documentation/screenshots/debugger-source.png'\n    });\n    await page.click('button[title^=Continue]');\n  });",
