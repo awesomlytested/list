@@ -763,7 +763,7 @@
                 "index": 990
             },
             "line": 34,
-            "code": "test('should reset the UI', async ({\n  page\n}) => {\n  await page.resetUI();\n  expect(await page.menu.isAnyOpen()).toEqual(false);\n  expect(await page.waitForSelector(page.launcherSelector)).toBeTruthy();\n  expect(await page.kernel.isAnyRunning()).toEqual(false);\n  expect(await page.statusbar.isVisible()).toEqual(true);\n  expect(await page.sidebar.isTabOpen('filebrowser')).toEqual(true);\n});",
+            "code": "test('should reset the UI', async ({\n  page\n}) => {\n  await page.resetUI();\n  expect(await page.menu.isAnyOpen()).toEqual(false);\n  await expect(page.launcher).toBeVisible();\n  expect(await page.kernel.isAnyRunning()).toEqual(false);\n  expect(await page.statusbar.isVisible()).toEqual(true);\n  expect(await page.sidebar.isTabOpen('filebrowser')).toEqual(true);\n});",
             "file": "galata/jupyterlabpage.spec.ts",
             "skipped": false,
             "dir": "galata/test"
@@ -774,7 +774,7 @@
             "updatePoint": {
                 "line": 44,
                 "column": 31,
-                "index": 1390
+                "index": 1361
             },
             "line": 44,
             "code": "test('should toggle simple mode', async ({\n  page\n}) => {\n  expect(await page.setSimpleMode(true)).toEqual(true);\n  expect(await page.isInSimpleMode()).toEqual(true);\n});",
@@ -788,7 +788,7 @@
             "updatePoint": {
                 "line": 60,
                 "column": 42,
-                "index": 1915
+                "index": 1886
             },
             "line": 60,
             "code": "  test('should listen to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      window.galata.on('dialog', d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n      });\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n  });",
@@ -802,7 +802,7 @@
             "updatePoint": {
                 "line": 75,
                 "column": 50,
-                "index": 2566
+                "index": 2537
             },
             "line": 75,
             "code": "  test('should stop listening to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n        window.galata.off('dialog', callback);\n      };\n      window.galata.on('dialog', callback);\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(1);\n  });",
@@ -816,7 +816,7 @@
             "updatePoint": {
                 "line": 94,
                 "column": 52,
-                "index": 3470
+                "index": 3441
             },
             "line": 94,
             "code": "  test('should listen only once to JupyterLab dialog', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = d => {\n        // We need to slightly wait before rejecting otherwise\n        // the `locator('.jp-Dialog').waitFor()` is not resolved.\n        setTimeout(() => d?.reject(), 100);\n      };\n      window.galata.once('dialog', callback);\n    });\n    await page.menu.clickMenuItem('File>New>Text File');\n    await page.waitForSelector(`[role=\"main\"] >> text=${DEFAULT_NAME}`);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(0);\n    await Promise.all([page.locator('.jp-Dialog').waitFor(), page.menu.clickMenuItem('File>Save Text As…')]);\n    await expect(page.locator('.jp-Dialog')).toHaveCount(1);\n  });",
@@ -830,7 +830,7 @@
             "updatePoint": {
                 "line": 112,
                 "column": 48,
-                "index": 4325
+                "index": 4296
             },
             "line": 112,
             "code": "  test('should listen to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      window.galata.on('notification', n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n      });\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      void window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n  });",
@@ -844,7 +844,7 @@
             "updatePoint": {
                 "line": 137,
                 "column": 56,
-                "index": 5194
+                "index": 5165
             },
             "line": 137,
             "code": "  test('should stop listening to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n        window.galata.off('notification', callback);\n      };\n      window.galata.on('notification', callback);\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(1);\n  });",
@@ -858,7 +858,7 @@
             "updatePoint": {
                 "line": 173,
                 "column": 58,
-                "index": 6497
+                "index": 6468
             },
             "line": 173,
             "code": "  test('should listen only once to JupyterLab notification', async ({\n    page\n  }) => {\n    await page.evaluate(() => {\n      const callback = n => {\n        // We need to slightly wait before dismissing otherwise\n        // the toast is not yet displayed and won't be removed when the notification\n        // is dismissed.\n        setTimeout(() => {\n          void window.jupyterapp.commands.execute('apputils:dismiss-notification', {\n            id: n.id\n          });\n        }, 100);\n      };\n      window.galata.once('notification', callback);\n    });\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(0);\n    await Promise.all([page.locator('.Toastify__toast').waitFor(), page.evaluate(() => {\n      return window.jupyterapp.commands.execute('apputils:notify', {\n        message: 'This is a test message',\n        options: {\n          autoClose: false\n        }\n      });\n    })]);\n    await expect(page.locator('.Toastify__toast')).toHaveCount(1);\n  });",
@@ -875,7 +875,7 @@
                 "index": 228
             },
             "line": 6,
-            "code": "test('should display the launcher', async ({\n  page\n}) => {\n  expect(await page.waitForSelector(page.launcherSelector)).toBeTruthy();\n});",
+            "code": "test('should display the launcher', async ({\n  page\n}) => {\n  await expect(page.launcher).toBeVisible();\n});",
             "file": "galata/test.spec.ts",
             "skipped": false,
             "dir": "galata/test"
